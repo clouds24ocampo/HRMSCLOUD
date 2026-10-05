@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.*
+
+# Production / Next.js
+/.next/
+/out/
+/build/
+/dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment variables
+.env
+.env*.local
+.env.development
+.env.test
+.env.production
+hrms/.env
+!**/.env.example
+
+# Testing and reports
+coverage/
+test-results/
+playwright-report/
+e2e/*.png
+tunnel.log
+.agents/skills/**/evals/
+.agents/**/evals/
+
+# Uploaded storage files
+storage/
+hrms/storage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# System
+.DS_Store
+Thumbs.db
+*.pem

@@ -1,0 +1,18 @@
+{
+  "name": "hmrs-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root workspace proxy for HRMS",
+  "scripts": {
+    "dev": "npm run dev --prefix hrms",
+    "build": "npm run build --prefix hrms",
+    "start": "npm run start --prefix hrms",
+    "lint": "npm run lint --prefix hrms",
+    "test": "npm run test --prefix hrms",
+    "typecheck": "npm run typecheck --prefix hrms",
+    "db:seed": "npm run db:seed --prefix hrms"
+  },
+  "dependencies": {
+    "animejs": "^4.5.0"
+  }
+}

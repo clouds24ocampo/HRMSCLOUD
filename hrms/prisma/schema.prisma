@@ -1,0 +1,1212 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Roles are data. Keys used in code live in src/lib/roles.ts.
+model Role {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  name      String
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// One row per registered company/organization. Every tenant table carries organizationId.
+// categoryKey / industryKey / sizeKey are keys from src/lib/industries.ts.
+model Organization {
+  id             String               @id @default(cuid())
+  name           String
+  categoryKey    String
+  industryKey    String
+  sizeKey        String
+  users          User[]
+  settings       OrgSettings?
+  departments    Department[]
+  positions      Position[]
+  employees      Employee[]
+  history        EmploymentHistory[]
+  shifts         ShiftTemplate[]
+  schedule       ScheduleEntry[]
+  timeEvents     TimeEvent[]
+  leaveTypes     LeaveType[]
+  leaveRequests  LeaveRequest[]
+  stampTypes     TimeStampType[]
+  regulars       RegularSchedule[]
+  notifications  Notification[]
+  overtime       OvertimeRequest[]
+  compensations  Compensation[]
+  payComponents  PayComponent[]
+  empComponents  EmployeeComponent[]
+  contributions  ContributionRule[]
+  taxBrackets    TaxBracket[]
+  periods        PayrollPeriod[]
+  payslips       Payslip[]
+  adjustments    PayrollAdjustment[]
+  checklistTpl   ChecklistTemplate[]
+  checklistItems ChecklistItem[]
+  jobs           JobPosting[]
+  applicants     Applicant[]
+  applicantNotes ApplicantNote[]
+  cycles         ReviewCycle[]
+  reviews        Review[]
+  goals          Goal[]
+  courses        Course[]
+  enrollments    Enrollment[]
+  documents      EmployeeDocument[]
+  hrRequests     HrRequest[]
+  announcements  Announcement[]
+  statutoryRules StatutoryRule[]
+  taxProfiles    EmployeeTaxProfile[]
+  wageOrders     WageOrder[]
+  holidays       Holiday[]
+  prevEmployment PreviousEmployment[]
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+}
+
+model User {
+  id                 String         @id @default(cuid())
+  organizationId     String
+  organization       Organization   @relation(fields: [organizationId], references: [id])
+  email              String         @unique
+  name               String
+  passwordHash       String
+  active             Boolean        @default(true)
+  // True when an admin set a temporary password: user must choose their own at first sign-in.
+  mustChangePassword Boolean        @default(false)
+  roleId             String
+  role               Role           @relation(fields: [roleId], references: [id])
+  sessions           Session[]
+  employee           Employee?
+  notifications      Notification[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  @@index([roleId])
+  @@index([organizationId])
+}
+
+// Only a SHA-256 hash of the cookie token is stored.
+model Session {
+  id                 String    @id @default(cuid())
+  tokenHash          String    @unique
+  userId             String
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt          DateTime
+  punchUnlockedUntil DateTime? // set when the password is re-verified for a time stamp, cleared after one use
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+// Append-only: who did what, when.
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String?
+  actorId        String?
+  action         String
+  entity         String
+  entityId       String?
+  detail         Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([actorId])
+  @@index([entity, entityId])
+}
+
+// ───────────── Organization structure ─────────────
+
+enum PositionLevel {
+  ENTRY
+  TEAM_LEAD
+  MANAGER
+  DEPT_HEAD
+  EXECUTIVE
+}
+
+enum GpsPolicy {
+  ALLOW_FLAG // location missing: allow, flag it, require a note
+  BLOCK // location missing: refuse the punch
+}
+
+// Per-organization work rules. Same clock engine for everyone; only these values differ.
+model OrgSettings {
+  id                   String               @id @default(cuid())
+  organizationId       String               @unique
+  organization         Organization         @relation(fields: [organizationId], references: [id])
+  timezone             String               @default("Asia/Manila")
+  gpsPolicy            GpsPolicy            @default(ALLOW_FLAG)
+  graceMinutes         Int                  @default(10)
+  lowAccuracyMeters    Int                  @default(100)
+  // Re-enter the password before each time stamp (stops buddy punching). The unlock lasts a short window.
+  requirePunchPassword Boolean              @default(true)
+  punchUnlockSeconds   Int                  @default(120)
+  // Payroll factors. Editable; nothing about pay is hardcoded.
+  workDaysPerMonth     Int                  @default(22)
+  hoursPerDay          Int                  @default(8)
+  otMultiplierBp       Int                  @default(12500) // 12500 = 1.25x
+  // MANUAL = the rates entered on Pay setup. PHILIPPINES = dated statutory rules (SSS, GSIS, PhilHealth, Pag-IBIG, BIR, DOLE premiums).
+  statutoryProfile     StatutoryProfile     @default(MANUAL)
+  // When government contributions come off pay: every period (split), or once a month in the period that holds the month end.
+  contributionSchedule ContributionSchedule @default(EVERY_PERIOD)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+}
+
+model Department {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  name           String
+  parentId       String?
+  parent         Department?  @relation("DepartmentTree", fields: [parentId], references: [id])
+  children       Department[] @relation("DepartmentTree")
+  archivedAt     DateTime? // archived, never deleted: history must stay readable
+  employees      Employee[]
+  positions      Position[]
+  jobs           JobPosting[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, name])
+  @@index([parentId])
+}
+
+model Position {
+  id             String        @id @default(cuid())
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  departmentId   String?
+  department     Department?   @relation(fields: [departmentId], references: [id])
+  title          String
+  level          PositionLevel @default(ENTRY)
+  archivedAt     DateTime?
+  employees      Employee[]
+  jobs           JobPosting[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([organizationId])
+  @@index([departmentId])
+}
+
+// ───────────── People ─────────────
+
+enum EmployeeStatus {
+  ACTIVE
+  ON_LEAVE
+  SUSPENDED
+  SEPARATED
+}
+
+model Employee {
+  id             String               @id @default(cuid())
+  organizationId String
+  organization   Organization         @relation(fields: [organizationId], references: [id])
+  userId         String?              @unique // login account, optional
+  user           User?                @relation(fields: [userId], references: [id])
+  employeeNo     String
+  firstName      String
+  lastName       String
+  email          String?
+  phone          String?
+  departmentId   String?
+  department     Department?          @relation(fields: [departmentId], references: [id])
+  positionId     String?
+  position       Position?            @relation(fields: [positionId], references: [id])
+  managerId      String? // immediate supervisor: defines who sees whom
+  manager        Employee?            @relation("Reports", fields: [managerId], references: [id])
+  reports        Employee[]           @relation("Reports")
+  hireDate       DateTime             @db.Date
+  status         EmployeeStatus       @default(ACTIVE)
+  history        EmploymentHistory[]
+  schedule       ScheduleEntry[]
+  regulars       RegularSchedule[]
+  timeEvents     TimeEvent[]
+  leaveRequests  LeaveRequest[]
+  overtime       OvertimeRequest[]
+  compensations  Compensation[]
+  components     EmployeeComponent[]
+  payslips       Payslip[]
+  adjustments    PayrollAdjustment[]
+  checklistItems ChecklistItem[]
+  applicant      Applicant?
+  reviews        Review[]
+  goals          Goal[]
+  enrollments    Enrollment[]
+  documents      EmployeeDocument[]
+  hrRequests     HrRequest[]
+  taxProfiles    EmployeeTaxProfile[]
+  prevEmployment PreviousEmployment[]
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@unique([organizationId, employeeNo])
+  @@index([organizationId])
+  @@index([managerId])
+  @@index([departmentId])
+}
+
+enum EmploymentChange {
+  HIRED
+  ASSIGNMENT // department, position or supervisor changed
+  STATUS
+}
+
+// Append-only. Names are copied in, so history still reads right after renames or archiving.
+model EmploymentHistory {
+  id             String           @id @default(cuid())
+  organizationId String
+  organization   Organization     @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee         @relation(fields: [employeeId], references: [id])
+  change         EmploymentChange
+  departmentName String?
+  positionTitle  String?
+  managerName    String?
+  status         EmployeeStatus?
+  effectiveFrom  DateTime         @db.Date
+  note           String?
+  createdById    String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([employeeId])
+  @@index([organizationId])
+}
+
+// ───────────── Schedule (the plan) ─────────────
+
+model ShiftTemplate {
+  id             String            @id @default(cuid())
+  organizationId String
+  organization   Organization      @relation(fields: [organizationId], references: [id])
+  name           String
+  startTime      String // "HH:MM" 24h, organization timezone
+  endTime        String // earlier than start means the shift ends the next day
+  breakMinutes   Int               @default(60)
+  archivedAt     DateTime?
+  entries        ScheduleEntry[]
+  regulars       RegularSchedule[]
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@unique([organizationId, name])
+}
+
+// An employee's regular weekly schedule. Effective-dated and never edited: a change adds a new row,
+// so late/undertime/overtime for past days is always judged against the schedule that applied then.
+model RegularSchedule {
+  id             String        @id @default(cuid())
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee      @relation(fields: [employeeId], references: [id])
+  shiftId        String
+  shift          ShiftTemplate @relation(fields: [shiftId], references: [id])
+  workDays       Int[] // 0 = Sunday ... 6 = Saturday
+  effectiveFrom  DateTime      @db.Date
+  createdById    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([employeeId, effectiveFrom])
+  @@index([organizationId])
+}
+
+// A specific day or range that differs from the regular schedule (shift swap, day off, overtime day).
+model ScheduleEntry {
+  id             String         @id @default(cuid())
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee       @relation(fields: [employeeId], references: [id])
+  date           DateTime       @db.Date
+  shiftId        String? // null = day off
+  shift          ShiftTemplate? @relation(fields: [shiftId], references: [id])
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@unique([employeeId, date])
+  @@index([organizationId, date])
+}
+
+// ───────────── DTR (what was actually worked) ─────────────
+
+enum TimeEventType {
+  IN
+  OUT
+  PAUSE_START
+  PAUSE_END
+}
+
+enum StampKind {
+  IN // starts the work day
+  OUT // ends it
+  PAUSE // Break, Meal, Bio Break, System Issue, On Trip...: starts a timed pause that must be ended
+}
+
+// Time stamp buttons are data. Time In and Time Out are locked; every organization can add its own pause types.
+model TimeStampType {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  key            String // stable machine key, e.g. TIME_IN, BREAK, MEAL
+  name           String
+  icon           String       @default("⏱️")
+  tone           String       @default("slate") // button color family
+  kind           StampKind
+  paid           Boolean      @default(true) // pauses: does the time still count as worked?
+  allowedMinutes Int? // pauses: flag when longer than this
+  requiresNote   Boolean      @default(false)
+  defaultContext WorkContext? // e.g. On Trip -> Field work
+  sortOrder      Int          @default(0)
+  locked         Boolean      @default(false)
+  archivedAt     DateTime?
+  events         TimeEvent[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, key])
+}
+
+enum WorkContext {
+  OFFICE
+  FIELD
+  REMOTE
+  CLIENT_SITE
+}
+
+enum GpsStatus {
+  OK
+  LOW_ACCURACY
+  DENIED
+  UNAVAILABLE
+  NOT_CAPTURED // manual entry by HR
+}
+
+enum TimeSource {
+  WEB
+  MOBILE
+  MANUAL
+}
+
+// Append-only punches. Server time only. Corrections are new MANUAL rows or a void with a reason.
+model TimeEvent {
+  id             String         @id @default(cuid())
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee       @relation(fields: [employeeId], references: [id])
+  type           TimeEventType
+  stampTypeId    String?
+  stampType      TimeStampType? @relation(fields: [stampTypeId], references: [id])
+  at             DateTime       @default(now())
+  source         TimeSource     @default(WEB)
+  workContext    WorkContext    @default(OFFICE)
+  lat            Float?
+  lng            Float?
+  accuracy       Float?
+  gpsStatus      GpsStatus
+  note           String?
+  createdById    String?
+  voidedAt       DateTime?
+  voidedById     String?
+  voidReason     String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([employeeId, at])
+  @@index([organizationId, at])
+}
+
+// ───────────── Leave ─────────────
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model LeaveType {
+  id             String         @id @default(cuid())
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  name           String
+  annualDays     Int
+  paid           Boolean        @default(true)
+  archivedAt     DateTime?
+  requests       LeaveRequest[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@unique([organizationId, name])
+}
+
+model LeaveRequest {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee     @relation(fields: [employeeId], references: [id])
+  leaveTypeId    String
+  leaveType      LeaveType    @relation(fields: [leaveTypeId], references: [id])
+  startDate      DateTime     @db.Date
+  endDate        DateTime     @db.Date
+  days           Int
+  reason         String
+  status         LeaveStatus  @default(PENDING)
+  decidedById    String?
+  decidedAt      DateTime?
+  decisionNote   String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([employeeId])
+  @@index([organizationId, status])
+}
+
+// ───────────── Notifications ─────────────
+
+model Notification {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  body           String?
+  href           String?
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([userId, readAt])
+}
+
+// ───────────── Overtime ─────────────
+
+// Overtime shown on the DTR is only a candidate. Pay uses approved requests.
+model OvertimeRequest {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee     @relation(fields: [employeeId], references: [id])
+  date           DateTime     @db.Date
+  minutes        Int
+  reason         String
+  status         LeaveStatus  @default(PENDING)
+  decidedById    String?
+  decidedAt      DateTime?
+  decisionNote   String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([employeeId, date])
+  @@index([organizationId, status])
+}
+
+// ───────────── Payroll ─────────────
+
+enum PayType {
+  MONTHLY
+  DAILY
+  HOURLY
+}
+
+// Effective-dated pay rate. Money is always whole centavos.
+model Compensation {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee     @relation(fields: [employeeId], references: [id])
+  payType        PayType
+  rateCents      Int
+  effectiveFrom  DateTime     @db.Date
+  note           String?
+  createdById    String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([employeeId, effectiveFrom])
+}
+
+enum ComponentKind {
+  EARNING
+  DEDUCTION
+}
+
+enum ComponentCalc {
+  FIXED // value = centavos per pay period
+  PERCENT_OF_BASIC // value = basis points of the period's basic pay (100 = 1%)
+}
+
+model PayComponent {
+  id                 String              @id @default(cuid())
+  organizationId     String
+  organization       Organization        @relation(fields: [organizationId], references: [id])
+  name               String
+  kind               ComponentKind
+  calc               ComponentCalc
+  value              Int
+  taxClass           TaxClass            @default(TAXABLE)
+  deMinimisCode      String? // rule code of the de minimis benefit this pays, when taxClass is DE_MINIMIS
+  preTax             Boolean             @default(false) // a deduction that lowers taxable pay, like union dues
+  inContributionBase Boolean             @default(false) // counts toward the monthly pay that SSS-type contributions are based on
+  mweExempt          Boolean             @default(false) // stays untaxed for a minimum wage earner, like hazard pay
+  archivedAt         DateTime?
+  assignments        EmployeeComponent[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  @@unique([organizationId, name])
+}
+
+model EmployeeComponent {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee     @relation(fields: [employeeId], references: [id])
+  componentId    String
+  component      PayComponent @relation(fields: [componentId], references: [id])
+  valueOverride  Int?
+  active         Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([employeeId, componentId])
+}
+
+// Government contributions as data. Rates and limits are entered by the organization from current official tables.
+model ContributionRule {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  name           String
+  employeeBp     Int
+  employerBp     Int
+  minBaseCents   Int          @default(0)
+  maxBaseCents   Int?
+  archivedAt     DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, name])
+}
+
+// Withholding tax per pay period: tax = fixedCents + (taxable - fromCents) * rateBp / 10000 for the highest bracket reached.
+model TaxBracket {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  fromCents      Int
+  rateBp         Int
+  fixedCents     Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+}
+
+enum PayrollStatus {
+  DRAFT
+  CALCULATED
+  APPROVED
+  FINALIZED // locked: the database refuses changes to its payslips
+}
+
+model PayrollPeriod {
+  id              String              @id @default(cuid())
+  organizationId  String
+  organization    Organization        @relation(fields: [organizationId], references: [id])
+  name            String
+  startDate       DateTime            @db.Date
+  endDate         DateTime            @db.Date
+  payDate         DateTime            @db.Date
+  periodsPerMonth Int                 @default(2)
+  kind            PayrollKind         @default(REGULAR)
+  yearEnd         Boolean             @default(false) // true-up the year's withholding tax on this payroll
+  incentiveCode   String? // rule code, for a GOV_INCENTIVE payroll
+  skipEmployeeIds String[]            @default([])
+  status          PayrollStatus       @default(DRAFT)
+  calculatedAt    DateTime?
+  calculatedById  String?
+  approvedAt      DateTime?
+  approvedById    String?
+  finalizedAt     DateTime?
+  finalizedById   String?
+  createdById     String?
+  payslips        Payslip[]
+  adjustments     PayrollAdjustment[]
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([organizationId, startDate])
+}
+
+enum LineKind {
+  EARNING
+  DEDUCTION
+  EMPLOYER
+}
+
+// A payslip is a snapshot: names, inputs and every line are stored, so it can be explained later even if the source data changes.
+model Payslip {
+  id                   String        @id @default(cuid())
+  organizationId       String
+  organization         Organization  @relation(fields: [organizationId], references: [id])
+  periodId             String
+  period               PayrollPeriod @relation(fields: [periodId], references: [id])
+  employeeId           String
+  employee             Employee      @relation(fields: [employeeId], references: [id])
+  employeeNo           String
+  employeeName         String
+  grossCents           Int
+  deductionsCents      Int
+  netCents             Int
+  employerCostCents    Int           @default(0)
+  // Tax breakdown, kept so year-to-date totals, the 1601-C summary and BIR 2316 never have to be re-derived.
+  taxableCents         Int           @default(0) // pay the withholding table was applied to
+  taxWithheldCents     Int           @default(0) // includes any year-end adjustment (negative = refund)
+  nonTaxableCents      Int           @default(0)
+  mweExemptCents       Int           @default(0)
+  mandatoryEeCents     Int           @default(0) // employee SSS/GSIS, PhilHealth, Pag-IBIG and pre-tax deductions
+  benefitsExemptCents  Int           @default(0) // 13th month and other benefits kept inside the yearly exemption
+  benefitsTaxableCents Int           @default(0) // the part over the yearly exemption
+  basicEarnedCents     Int           @default(0) // basic pay after absences, late and undertime: the 13th month base
+  inputs               Json
+  lines                PayslipLine[]
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@unique([periodId, employeeId])
+  @@index([organizationId])
+}
+
+model PayslipLine {
+  id          String   @id @default(cuid())
+  payslipId   String
+  payslip     Payslip  @relation(fields: [payslipId], references: [id], onDelete: Cascade)
+  kind        LineKind
+  code        String
+  label       String
+  amountCents Int
+  detail      String?
+  sortOrder   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([payslipId])
+}
+
+// One-off corrections for a draft period (including fixes to a finalized one: they go into the next period).
+model PayrollAdjustment {
+  id             String        @id @default(cuid())
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  periodId       String
+  period         PayrollPeriod @relation(fields: [periodId], references: [id])
+  employeeId     String
+  employee       Employee      @relation(fields: [employeeId], references: [id])
+  kind           ComponentKind
+  label          String
+  amountCents    Int
+  reason         String
+  createdById    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([periodId])
+}
+
+// ───────────── Onboarding / offboarding ─────────────
+
+enum ChecklistKind {
+  ONBOARDING
+  OFFBOARDING
+}
+
+enum ChecklistOwner {
+  HR
+  MANAGER
+  EMPLOYEE
+}
+
+model ChecklistTemplate {
+  id             String         @id @default(cuid())
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  kind           ChecklistKind
+  title          String
+  owner          ChecklistOwner
+  sortOrder      Int            @default(0)
+  archivedAt     DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([organizationId, kind])
+}
+
+model ChecklistItem {
+  id             String         @id @default(cuid())
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee       @relation(fields: [employeeId], references: [id])
+  kind           ChecklistKind
+  title          String
+  owner          ChecklistOwner
+  sortOrder      Int            @default(0)
+  doneAt         DateTime?
+  doneById       String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([employeeId, kind])
+}
+
+// ───────────── Recruitment ─────────────
+
+enum JobStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+model JobPosting {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  title          String
+  departmentId   String?
+  department     Department?  @relation(fields: [departmentId], references: [id])
+  positionId     String?
+  position       Position?    @relation(fields: [positionId], references: [id])
+  openings       Int          @default(1)
+  description    String?
+  status         JobStatus    @default(OPEN)
+  createdById    String?
+  applicants     Applicant[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId, status])
+}
+
+enum ApplicantStage {
+  APPLIED
+  SCREENING
+  INTERVIEW
+  OFFER
+  HIRED
+  REJECTED
+}
+
+model Applicant {
+  id             String          @id @default(cuid())
+  organizationId String
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  jobId          String
+  job            JobPosting      @relation(fields: [jobId], references: [id])
+  name           String
+  email          String?
+  phone          String?
+  source         String?
+  stage          ApplicantStage  @default(APPLIED)
+  interviewAt    DateTime?
+  employeeId     String?         @unique // set when hired: the applicant became this employee
+  employee       Employee?       @relation(fields: [employeeId], references: [id])
+  notes          ApplicantNote[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([jobId, stage])
+  @@index([organizationId])
+}
+
+model ApplicantNote {
+  id             String          @id @default(cuid())
+  organizationId String
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  applicantId    String
+  applicant      Applicant       @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  stage          ApplicantStage?
+  text           String
+  createdById    String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([applicantId])
+}
+
+// ───────────── Performance ─────────────
+
+enum CycleStatus {
+  OPEN
+  CLOSED
+}
+
+model ReviewCycle {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  name           String
+  startDate      DateTime     @db.Date
+  endDate        DateTime     @db.Date
+  status         CycleStatus  @default(OPEN)
+  reviews        Review[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+}
+
+enum ReviewStage {
+  SELF // waiting for the employee's self-assessment
+  MANAGER // waiting for the manager
+  FINAL // waiting for HR to set the final rating
+  DONE // final rating given
+}
+
+model Review {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  cycleId        String
+  cycle          ReviewCycle  @relation(fields: [cycleId], references: [id])
+  employeeId     String
+  employee       Employee     @relation(fields: [employeeId], references: [id])
+  reviewerId     String? // employee id of the manager, copied when the cycle started
+  stage          ReviewStage  @default(SELF)
+  selfRating     Int?
+  selfComment    String?
+  managerRating  Int?
+  managerComment String?
+  finalRating    Int?
+  finalComment   String?
+  acknowledgedAt DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([cycleId, employeeId])
+  @@index([organizationId])
+}
+
+enum GoalStatus {
+  ACTIVE
+  ACHIEVED
+  DROPPED
+}
+
+model Goal {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee     @relation(fields: [employeeId], references: [id])
+  title          String
+  description    String?
+  targetDate     DateTime?    @db.Date
+  progress       Int          @default(0)
+  status         GoalStatus   @default(ACTIVE)
+  createdById    String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([employeeId])
+}
+
+// ───────────── Learning ─────────────
+
+model Course {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  title          String
+  description    String?
+  hours          Int?
+  validityMonths Int? // certificates expire this many months after completion
+  archivedAt     DateTime?
+  enrollments    Enrollment[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, title])
+}
+
+enum EnrollmentStatus {
+  ENROLLED
+  COMPLETED
+  CANCELLED
+}
+
+model Enrollment {
+  id             String           @id @default(cuid())
+  organizationId String
+  organization   Organization     @relation(fields: [organizationId], references: [id])
+  courseId       String
+  course         Course           @relation(fields: [courseId], references: [id])
+  employeeId     String
+  employee       Employee         @relation(fields: [employeeId], references: [id])
+  status         EnrollmentStatus @default(ENROLLED)
+  completedOn    DateTime?        @db.Date
+  expiresOn      DateTime?        @db.Date
+  assignedById   String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([courseId, employeeId])
+  @@index([organizationId])
+}
+
+// ───────────── Documents ─────────────
+
+// File bytes live on disk under storage/, never in the database. Only HR and the owner can open a file.
+model EmployeeDocument {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee     @relation(fields: [employeeId], references: [id])
+  category       String
+  title          String
+  fileName       String
+  mimeType       String
+  sizeBytes      Int
+  storageKey     String       @unique
+  version        Int          @default(1)
+  expiresOn      DateTime?    @db.Date
+  uploadedById   String?
+  archivedAt     DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([employeeId])
+  @@index([organizationId, expiresOn])
+}
+
+// ───────────── HR service desk and announcements ─────────────
+
+enum RequestStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+model HrRequest {
+  id             String        @id @default(cuid())
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee      @relation(fields: [employeeId], references: [id])
+  category       String
+  subject        String
+  message        String
+  status         RequestStatus @default(OPEN)
+  response       String?
+  respondedById  String?
+  respondedAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([organizationId, status])
+  @@index([employeeId])
+}
+
+model Announcement {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  title          String
+  body           String
+  pinned         Boolean      @default(false)
+  createdById    String?
+  archivedAt     DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId, createdAt])
+}
+
+// ───────────── Philippine statutory rules (dated, versioned data) ─────────────
+
+enum StatutoryProfile {
+  MANUAL
+  PHILIPPINES
+}
+
+enum ContributionSchedule {
+  EVERY_PERIOD
+  LAST_PERIOD
+}
+
+enum PayrollKind {
+  REGULAR
+  THIRTEENTH_MONTH
+  GOV_INCENTIVE
+}
+
+enum TaxClass {
+  TAXABLE
+  EXEMPT // not taxable at all (entered by the employer)
+  DE_MINIMIS // exempt up to the dated ceiling, the excess goes into the yearly benefits exemption
+  OTHER_BENEFIT // bonus, incentive: counts toward the yearly benefits exemption
+}
+
+enum RuleSector {
+  ALL
+  PRIVATE
+  GOVERNMENT
+}
+
+enum StatutoryKind {
+  SSS
+  PERCENT_CONTRIBUTION
+  WITHHOLDING_TABLE
+  ANNUAL_TAX_TABLE
+  DE_MINIMIS
+  BENEFITS_POOL
+  PREMIUM_PAY
+  INCENTIVE
+}
+
+// One version of one rule. The rule in force on a pay day is the latest one that started on or before it.
+// A change in law is a new row with a new start date: old rows stay so old payrolls can be explained.
+model StatutoryRule {
+  id             String        @id @default(cuid())
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  agency         String // BIR, SSS, PHILHEALTH, PAGIBIG, GSIS, DOLE, DBM, CSC, COMPANY
+  code           String
+  kind           StatutoryKind
+  sector         RuleSector    @default(ALL)
+  name           String
+  params         Json
+  effectiveFrom  DateTime      @db.Date
+  effectiveTo    DateTime?     @db.Date
+  legalBasis     String
+  note           String?
+  packVersion    String?
+  createdById    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([organizationId, code, effectiveFrom])
+}
+
+enum EmployeeSector {
+  PRIVATE
+  GOVERNMENT
+}
+
+enum WageBasis {
+  SIX_DAY_313
+  FIVE_DAY_261
+  ALL_DAYS_365
+  CUSTOM
+}
+
+// Tax, contribution and wage settings for one employee, effective-dated.
+model EmployeeTaxProfile {
+  id                 String         @id @default(cuid())
+  organizationId     String
+  organization       Organization   @relation(fields: [organizationId], references: [id])
+  employeeId         String
+  employee           Employee       @relation(fields: [employeeId], references: [id])
+  sector             EmployeeSector @default(PRIVATE)
+  mwe                Boolean        @default(false) // minimum wage earner
+  wageBasis          WageBasis      @default(FIVE_DAY_261)
+  customFactor       Int? // days a year, when wageBasis is CUSTOM
+  wageRegion         String?
+  socialCovered      Boolean        @default(true) // SSS (private) or GSIS (government)
+  philhealthCovered  Boolean        @default(true)
+  pagibigCovered     Boolean        @default(true)
+  withholdingApplies Boolean        @default(true)
+  tin                String?
+  sssNo              String?
+  philhealthNo       String?
+  pagibigNo          String?
+  gsisNo             String?
+  effectiveFrom      DateTime       @db.Date
+  note               String?
+  createdById        String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  @@index([employeeId, effectiveFrom])
+  @@index([organizationId])
+}
+
+// Regional minimum wage, entered from the current wage order. Used to warn when a daily rate is below it.
+model WageOrder {
+  id                String       @id @default(cuid())
+  organizationId    String
+  organization      Organization @relation(fields: [organizationId], references: [id])
+  region            String
+  orderNo           String
+  sector            String? // for example non-agriculture
+  dailyMinimumCents Int
+  effectiveFrom     DateTime     @db.Date
+  effectiveTo       DateTime?    @db.Date
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([organizationId, region, effectiveFrom])
+}
+
+enum HolidayType {
+  REGULAR
+  SPECIAL_NON_WORKING
+  SPECIAL_WORKING
+}
+
+model Holiday {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  date           DateTime     @db.Date
+  name           String
+  type           HolidayType
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, date, name])
+  @@index([organizationId, date])
+}
+
+// Pay and tax already settled with an earlier employer in the same year (from their BIR 2316). Needed for annualization.
+model PreviousEmployment {
+  id                   String       @id @default(cuid())
+  organizationId       String
+  organization         Organization @relation(fields: [organizationId], references: [id])
+  employeeId           String
+  employee             Employee     @relation(fields: [employeeId], references: [id])
+  year                 Int
+  employerName         String
+  grossCents           Int
+  taxableCents         Int
+  nonTaxableCents      Int          @default(0)
+  benefitsExemptCents  Int          @default(0)
+  benefitsTaxableCents Int          @default(0)
+  mandatoryCents       Int          @default(0)
+  taxWithheldCents     Int
+  note                 String?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  @@index([employeeId, year])
+}

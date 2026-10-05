@@ -1,0 +1,51 @@
+{
+  "name": "hrms",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "next build",
+    "start": "node scripts/ensure-db.mjs && next start -p 3300",
+    "lint": "eslint",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "db:seed": "prisma db seed",
+    "demo:seed": "tsx prisma/demo.ts",
+    "demo:remove": "tsx prisma/demo.ts remove",
+    "tunnel": "cloudflared tunnel --url http://localhost:3300",
+    "db:up": "node scripts/ensure-db.mjs",
+    "dev:phone": "node scripts/dev.mjs --tunnel",
+    "dev:next": "next dev -p 3300"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "@react-three/fiber": "^9.8.1",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^18.0.5",
+    "motion": "^14.0.0",
+    "next": "16.3.8",
+    "pg": "^8.23.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "three": "^0.186.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^24.19.1",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/three": "^0.186.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.8",
+    "prisma": "^7.10.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.0.3"
+  }
+}

@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+/* Design tokens: change colors here, never inline. */
+:root {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --brand: #4f46e5;
+  --brand-ink: #ffffff;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+
+  /* Quantum theme: landing + login only. */
+  --void: #04050d;
+  --deep: #0b0d22;
+  --photon: #8fa2ff;
+  --halo: #eef0ff;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-void: var(--void);
+  --color-deep: var(--deep);
+  --color-photon: var(--photon);
+  --color-halo: var(--halo);
+  --font-headline: var(--font-display);
+  --font-sans: var(--font-geist-sans);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Visible keyboard focus everywhere. */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark quantum scope: re-points the same tokens, so shared components restyle themselves. */
+.theme-quantum {
+  --surface: rgb(255 255 255 / 0.06);
+  --ink: #eef0ff;
+  --muted: rgb(238 240 255 / 0.62);
+  --line: rgb(255 255 255 / 0.14);
+  --brand: #8fa2ff;
+  --brand-ink: #04050d;
+  --danger: #fb7185;
+  --success: #4ade80;
+  color: var(--ink);
+  color-scheme: dark;
+}
+.theme-quantum option {
+  background: #0b0d22;
+  color: #eef0ff;
+}
+
+/* Printing a payslip: only the page itself. */
+@media print {
+  nav[aria-label="Main"], header { display: none !important; }
+  body { background: #fff; }
+}
