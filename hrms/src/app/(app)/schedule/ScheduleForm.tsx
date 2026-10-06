@@ -8,8 +8,9 @@ import { assignSchedule, setRegularSchedule } from "./actions";
 
 const WEEK = [["1", "Mon"], ["2", "Tue"], ["3", "Wed"], ["4", "Thu"], ["5", "Fri"], ["6", "Sat"], ["0", "Sun"]] as const;
 type Person = { id: string; label: string };
+export type Team = { id: string; label: string; members: string[] }; // a leader and everyone below them
 
-function PeoplePicker({ people, picked, setPicked }: { people: Person[]; picked: string[]; setPicked: (v: string[]) => void }) {
+function PeoplePicker({ people, picked, setPicked, teams = [] }: { people: Person[]; picked: string[]; setPicked: (v: string[]) => void; teams?: Team[] }) {
   const toggle = (id: string) => setPicked(picked.includes(id) ? picked.filter((x) => x !== id) : [...picked, id]);
   return (
     <fieldset>
@@ -19,6 +20,17 @@ function PeoplePicker({ people, picked, setPicked }: { people: Person[]; picked:
           {picked.length === people.length ? "Clear all" : "Choose everyone"}
         </button>
       </div>
+      {teams.length > 0 && (
+        <label className="mb-2 block text-sm font-medium">
+          Pick a whole team in one click
+          <select value="" onChange={(e) => { const t = teams.find((x) => x.id === e.target.value); if (t) setPicked(t.members); }} className={inputClass}>
+            <option value="">Choose a leader…</option>
+            {teams.map((t) => (
+              <option key={t.id} value={t.id}>{t.label} ({t.members.length})</option>
+            ))}
+          </select>
+        </label>
+      )}
       <div className="max-h-48 space-y-1 overflow-y-auto rounded-xl border border-line p-2">
         {people.map((x) => (
           <label key={x.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-bg">
@@ -48,12 +60,12 @@ export function WeekdayPicker({ legend = "On these days", defaults = [1, 2, 3, 4
 }
 
 // Same shift every week on chosen weekdays, from a date. One person (profile) or many (schedule page).
-export function RegularScheduleForm(p: { people: Person[]; shifts: Person[]; from: string; preselect?: string; fixedPerson?: string; defaultShift?: string; defaultDays?: number[] }) {
+export function RegularScheduleForm(p: { people: Person[]; teams?: Team[]; shifts: Person[]; from: string; preselect?: string; fixedPerson?: string; defaultShift?: string; defaultDays?: number[] }) {
   const [picked, setPicked] = useState<string[]>(p.preselect ? [p.preselect] : []);
   const { state, pending, formProps } = useKeptForm(setRegularSchedule);
   return (
     <form {...formProps} className="space-y-4">
-      {p.fixedPerson ? <input type="hidden" name="people" value={p.fixedPerson} /> : <PeoplePicker people={p.people} picked={picked} setPicked={setPicked} />}
+      {p.fixedPerson ? <input type="hidden" name="people" value={p.fixedPerson} /> : <PeoplePicker people={p.people} picked={picked} setPicked={setPicked} teams={p.teams} />}
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block text-sm font-medium">
           Regular shift
@@ -78,12 +90,12 @@ export function RegularScheduleForm(p: { people: Person[]; shifts: Person[]; fro
 }
 
 // Specific days that differ from the regular schedule.
-export function ScheduleForm(p: { people: Person[]; shifts: Person[]; from: string; to: string; preselect?: string }) {
+export function ScheduleForm(p: { people: Person[]; teams?: Team[]; shifts: Person[]; from: string; to: string; preselect?: string }) {
   const [picked, setPicked] = useState<string[]>(p.preselect ? [p.preselect] : []);
   const { state, pending, formProps } = useKeptForm(assignSchedule);
   return (
     <form {...formProps} className="space-y-4">
-      <PeoplePicker people={p.people} picked={picked} setPicked={setPicked} />
+      <PeoplePicker people={p.people} picked={picked} setPicked={setPicked} teams={p.teams} />
       <div className="grid gap-3 sm:grid-cols-3">
         <label className="block text-sm font-medium">
           Shift

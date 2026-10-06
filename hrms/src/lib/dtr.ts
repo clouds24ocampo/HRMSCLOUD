@@ -3,11 +3,11 @@
 import { addDays, dayKey, parseHM, zonedTimeToUtc } from "@/lib/time";
 
 // What a pause punch knew about its time stamp type. Missing = a plain unpaid break.
-export type StampInfo = { id: string; name: string; paid: boolean; allowedMinutes: number | null };
+export type StampInfo = { id: string; name: string; paid: boolean; allowedMinutes: number | null; dailyCapMinutes?: number | null };
 export type Punch = { type: "IN" | "OUT" | "PAUSE_START" | "PAUSE_END"; at: Date; stamp?: StampInfo | null };
 export type ShiftTimes = { startTime: string; endTime: string; breakMinutes: number };
 
-export type Pause = { startAt: Date; endAt: Date | null; name: string; typeId: string | null; paid: boolean; allowedMinutes: number | null };
+export type Pause = { startAt: Date; endAt: Date | null; name: string; typeId: string | null; paid: boolean; allowedMinutes: number | null; dailyCapMinutes?: number | null };
 export type Session = { inAt: Date; outAt: Date | null; pauses: Pause[] };
 
 export type DtrStatus = "PRESENT" | "INCOMPLETE" | "ABSENT" | "LEAVE" | "DAY_OFF" | "NO_SCHEDULE";
@@ -40,7 +40,7 @@ export function toSessions(punches: Punch[]): Session[] {
     if (p.type === "IN" && !cur) cur = { inAt: p.at, outAt: null, pauses: [] };
     else if (p.type === "PAUSE_START" && cur && !openPause(cur)) {
       const s = p.stamp;
-      cur.pauses.push({ startAt: p.at, endAt: null, ...(s ? { name: s.name, typeId: s.id, paid: s.paid, allowedMinutes: s.allowedMinutes } : DEFAULT_PAUSE) });
+      cur.pauses.push({ startAt: p.at, endAt: null, ...(s ? { name: s.name, typeId: s.id, paid: s.paid, allowedMinutes: s.allowedMinutes, dailyCapMinutes: s.dailyCapMinutes ?? null } : DEFAULT_PAUSE) });
     } else if (p.type === "PAUSE_END" && cur) {
       const open = openPause(cur);
       if (open) open.endAt = p.at;
@@ -107,6 +107,7 @@ export function buildDtr(input: {
     const worked = sessions.reduce((n, s) => n + (s.outAt ? s.outAt.getTime() - s.inAt.getTime() : 0), 0) - unpaidMs;
 
     const summary = new Map<string, PauseSummary>();
+    const caps = new Map<string, number>();
     let overLimit = 0;
     for (const p of allPauses) {
       const m = mins(pauseMs(p));
@@ -117,6 +118,16 @@ export function buildDtr(input: {
       row.minutes += m;
       row.overMinutes += over;
       summary.set(p.name, row);
+      if (p.dailyCapMinutes != null) caps.set(p.name, p.dailyCapMinutes);
+    }
+    // A daily cap (e.g. Bio Break 10 min a day) counts the day's total, not each pause. Excess is flagged, never blocked.
+    for (const [name, cap] of caps) {
+      const row = summary.get(name)!;
+      const extra = Math.max(0, row.minutes - cap) - row.overMinutes;
+      if (extra > 0) {
+        row.overMinutes += extra;
+        overLimit += extra;
+      }
     }
 
     let late = 0, under = 0, over = 0;

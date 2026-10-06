@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { describeDays, hasRegular, resolveDay, resolveRange, type RegularRow, type ShiftLite } from "./schedule";
+import { becomeCustom, describeDays, followersOf, hasRegular, resolveDay, resolveRange, teamOf, type RegularRow, type ShiftLite, type TeamRow } from "./schedule";
 
 const day: ShiftLite = { name: "Day", startTime: "08:00", endTime: "17:00", breakMinutes: 60 };
 const night: ShiftLite = { name: "Night", startTime: "22:00", endTime: "07:00", breakMinutes: 60 };
@@ -53,5 +53,34 @@ describe("describeDays", () => {
     expect(describeDays([0, 1, 2, 3, 4, 5, 6])).toBe("Every day");
     expect(describeDays([1, 3, 5])).toBe("Mon, Wed, Fri");
     expect(describeDays([6, 0])).toBe("Sat, Sun");
+  });
+});
+
+describe("team-linked schedules", () => {
+  // head -> lead -> a, b (b is Custom) ; lead2 -> c
+  const rows: TeamRow[] = [
+    { id: "head", managerId: null, scheduleLinked: true },
+    { id: "lead", managerId: "head", scheduleLinked: true },
+    { id: "a", managerId: "lead", scheduleLinked: true },
+    { id: "b", managerId: "lead", scheduleLinked: false },
+    { id: "lead2", managerId: "head", scheduleLinked: true },
+    { id: "c", managerId: "lead2", scheduleLinked: true },
+  ];
+  it("a leader's change flows to linked people below, skipping Custom ones", () => {
+    expect(followersOf(rows, ["lead"]).sort()).toEqual(["a"]);
+  });
+  it("a department head's change flows through leaders to members", () => {
+    expect(followersOf(rows, ["head"]).sort()).toEqual(["a", "c", "lead", "lead2"]);
+  });
+  it("people edited in the same batch are never overwritten by propagation", () => {
+    expect(followersOf(rows, ["lead", "a"])).toEqual([]);
+  });
+  it("editing one member alone makes them Custom; editing leader and member together does not", () => {
+    expect(becomeCustom(rows, ["a"])).toEqual(["a"]);
+    expect(becomeCustom(rows, ["lead", "a"])).toEqual(["lead"]); // lead differs from head; a still follows lead
+    expect(becomeCustom(rows, ["head"])).toEqual([]); // no supervisor
+  });
+  it("teamOf returns the leader and everyone below", () => {
+    expect(teamOf(rows, "lead").sort()).toEqual(["a", "b", "lead"]);
   });
 });

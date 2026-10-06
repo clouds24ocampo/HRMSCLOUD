@@ -286,9 +286,9 @@ test("time clock: password unlock, then Time In, Break, End Break and Time Out w
   await expect(card.getByRole("button", { name: "Time In" })).toBeDisabled(); // one unlock, one time stamp: locked again
   await backdate(ids.e1, 240);
 
-  await pressAction(card, /^Break/);
-  await expect(card.getByRole("status").filter({ hasText: "Break started" })).toBeVisible();
-  await expect(card.getByText(/^Break · \d+:\d\d$/)).toBeVisible();
+  await pressAction(card, /^Break 1/);
+  await expect(card.getByRole("status").filter({ hasText: "Break 1 started" })).toBeVisible();
+  await expect(card.getByText(/^Break 1 · \d+:\d\d$/)).toBeVisible();
   await backdate(ids.e1, 180);
 
   await card.getByLabel("Your password").fill(pw);
@@ -297,7 +297,7 @@ test("time clock: password unlock, then Time In, Break, End Break and Time Out w
   await expect(card.getByRole("button", { name: /^Meal/ })).toBeDisabled(); // on a break: other pauses wait
   await expect(card.getByRole("button", { name: "Time In" })).toBeDisabled();
   await card.getByRole("button", { name: /^End Break/ }).click();
-  await expect(card.getByRole("status").filter({ hasText: "Break ended" })).toBeVisible();
+  await expect(card.getByRole("status").filter({ hasText: "Break 1 ended" })).toBeVisible();
   await backdate(ids.e1, 150);
 
   await pressAction(card, "Time Out");
@@ -316,7 +316,7 @@ test("time clock: password unlock, then Time In, Break, End Break and Time Out w
   await expect(todayRow.getByText("Present")).toBeVisible();
   await todayRow.locator("summary").click();
   await expect(todayRow.getByRole("link", { name: /View location \(±12 m\)/ }).first()).toHaveAttribute("href", /openstreetmap\.org.*14\.5995/);
-  await expect(todayRow.getByText(/Break.*\(start\)/)).toBeVisible();
+  await expect(todayRow.getByText(/Break 1.*\(start\)/)).toBeVisible();
   await ctx.close();
 });
 
@@ -338,7 +338,7 @@ test("time clock without GPS: note required, flagged, and BLOCK policy refuses",
 
   await backdate(ids.e2, 60);
   await db.orgSettings.updateMany({ where: { organization: { name: `Sys A ${stamp}` } }, data: { gpsPolicy: "BLOCK" } });
-  await pressAction(card, /^Break/);
+  await pressAction(card, /^Break 1/);
   await expect(card.locator("p[role=alert]")).toContainText("requires your location");
   expect(await db.timeEvent.count({ where: { employeeId: ids.e2 } })).toBe(1);
   await db.orgSettings.updateMany({ where: { organization: { name: `Sys A ${stamp}` } }, data: { gpsPolicy: "ALLOW_FLAG" } });

@@ -70,14 +70,17 @@ export const TIMEZONES = [
 export const DEFAULT_STAMP_TYPES: {
   key: string; name: string; icon: string; tone: string; kind: "IN" | "OUT" | "PAUSE"; paid: boolean;
   allowedMinutes?: number; requiresNote?: boolean; defaultContext?: "OFFICE" | "FIELD" | "REMOTE" | "CLIENT_SITE"; sortOrder: number; locked?: boolean;
+  page?: "PUNCH" | "ISSUE"; maxPerDay?: number; dailyCapMinutes?: number; requiresOvertimeOver?: number;
 }[] = [
   { key: "TIME_IN", name: "Time In", icon: "➡️", tone: "blue", kind: "IN", paid: true, sortOrder: 10, locked: true },
-  { key: "BREAK", name: "Break", icon: "☕", tone: "amber", kind: "PAUSE", paid: true, allowedMinutes: 15, sortOrder: 20 },
-  { key: "MEAL", name: "Meal", icon: "🍽️", tone: "indigo", kind: "PAUSE", paid: false, allowedMinutes: 60, sortOrder: 30 },
-  { key: "BIO_BREAK", name: "Bio Break", icon: "🚻", tone: "slate", kind: "PAUSE", paid: true, allowedMinutes: 10, sortOrder: 40 },
-  { key: "CLINIC_BREAK", name: "Clinic Break", icon: "🩺", tone: "teal", kind: "PAUSE", paid: true, allowedMinutes: 30, sortOrder: 50 },
-  { key: "SYSTEM_ISSUE", name: "System Issue", icon: "⚠️", tone: "red", kind: "PAUSE", paid: true, requiresNote: true, sortOrder: 60 },
-  { key: "ON_TRIP", name: "On Trip", icon: "📍", tone: "blue", kind: "PAUSE", paid: true, requiresNote: true, defaultContext: "FIELD", sortOrder: 70 },
+  { key: "BREAK", name: "Break 1", icon: "☕", tone: "amber", kind: "PAUSE", paid: true, allowedMinutes: 15, maxPerDay: 1, sortOrder: 20 },
+  { key: "BREAK_2", name: "Break 2", icon: "☕", tone: "amber", kind: "PAUSE", paid: true, allowedMinutes: 15, maxPerDay: 1, sortOrder: 21 },
+  { key: "BREAK_3", name: "Break 3", icon: "☕", tone: "amber", kind: "PAUSE", paid: true, allowedMinutes: 15, maxPerDay: 1, requiresOvertimeOver: 120, sortOrder: 22 },
+  { key: "MEAL", name: "Meal", icon: "🍽️", tone: "indigo", kind: "PAUSE", paid: false, allowedMinutes: 60, maxPerDay: 2, sortOrder: 30 },
+  { key: "BIO_BREAK", name: "Bio Break", icon: "🚻", tone: "slate", kind: "PAUSE", paid: true, dailyCapMinutes: 10, sortOrder: 40 },
+  { key: "ON_TRIP", name: "On Trip", icon: "📍", tone: "blue", kind: "PAUSE", paid: true, defaultContext: "FIELD", sortOrder: 70 },
+  { key: "CLINIC_BREAK", name: "Clinic Break", icon: "🩺", tone: "teal", kind: "PAUSE", paid: true, allowedMinutes: 30, page: "ISSUE", sortOrder: 50 },
+  { key: "SYSTEM_ISSUE", name: "System Issue", icon: "⚠️", tone: "red", kind: "PAUSE", paid: true, requiresNote: true, page: "ISSUE", sortOrder: 60 },
   { key: "TIME_OUT", name: "Time Out", icon: "⬅️", tone: "slate", kind: "OUT", paid: true, sortOrder: 99, locked: true },
 ];
 

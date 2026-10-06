@@ -25,6 +25,8 @@ export const PAGE_ACCESS: Record<string, RoleKey[]> = {
   "/employees": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // managers see their own team only
   "/organization": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
   "/schedule": ALL, // employees see their own; managers edit their team
+  "/schedule/live": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // who is in, late, absent right now: downline only for managers
+  "/schedule/analytics": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // adherence and tardiness across the downline
   "/dtr": ALL, // everyone sees what their place in the chain allows
   "/leave": ALL,
   "/overtime": ALL,

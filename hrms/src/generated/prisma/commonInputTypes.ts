@@ -370,6 +370,13 @@ export type EnumWorkContextNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumWorkContextNullableFilter<$PrismaModel> | $Enums.WorkContext | null
 }
 
+export type EnumStampPageFilter<$PrismaModel = never> = {
+  equals?: $Enums.StampPage | Prisma.EnumStampPageFieldRefInput<$PrismaModel>
+  in?: $Enums.StampPage[] | Prisma.ListEnumStampPageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StampPage[] | Prisma.ListEnumStampPageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStampPageFilter<$PrismaModel> | $Enums.StampPage
+}
+
 export type EnumStampKindWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.StampKind | Prisma.EnumStampKindFieldRefInput<$PrismaModel>
   in?: $Enums.StampKind[] | Prisma.ListEnumStampKindFieldRefInput<$PrismaModel>
@@ -404,6 +411,16 @@ export type EnumWorkContextNullableWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumWorkContextNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumWorkContextNullableFilter<$PrismaModel>
+}
+
+export type EnumStampPageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.StampPage | Prisma.EnumStampPageFieldRefInput<$PrismaModel>
+  in?: $Enums.StampPage[] | Prisma.ListEnumStampPageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StampPage[] | Prisma.ListEnumStampPageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStampPageWithAggregatesFilter<$PrismaModel> | $Enums.StampPage
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumStampPageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumStampPageFilter<$PrismaModel>
 }
 
 export type EnumTimeEventTypeFilter<$PrismaModel = never> = {
@@ -1274,6 +1291,13 @@ export type NestedEnumWorkContextNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumWorkContextNullableFilter<$PrismaModel> | $Enums.WorkContext | null
 }
 
+export type NestedEnumStampPageFilter<$PrismaModel = never> = {
+  equals?: $Enums.StampPage | Prisma.EnumStampPageFieldRefInput<$PrismaModel>
+  in?: $Enums.StampPage[] | Prisma.ListEnumStampPageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StampPage[] | Prisma.ListEnumStampPageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStampPageFilter<$PrismaModel> | $Enums.StampPage
+}
+
 export type NestedEnumStampKindWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.StampKind | Prisma.EnumStampKindFieldRefInput<$PrismaModel>
   in?: $Enums.StampKind[] | Prisma.ListEnumStampKindFieldRefInput<$PrismaModel>
@@ -1319,6 +1343,16 @@ export type NestedEnumWorkContextNullableWithAggregatesFilter<$PrismaModel = nev
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumWorkContextNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumWorkContextNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumStampPageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.StampPage | Prisma.EnumStampPageFieldRefInput<$PrismaModel>
+  in?: $Enums.StampPage[] | Prisma.ListEnumStampPageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StampPage[] | Prisma.ListEnumStampPageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStampPageWithAggregatesFilter<$PrismaModel> | $Enums.StampPage
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumStampPageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumStampPageFilter<$PrismaModel>
 }
 
 export type NestedEnumTimeEventTypeFilter<$PrismaModel = never> = {

@@ -36,6 +36,7 @@ export type EmployeeMinAggregateOutputType = {
   departmentId: string | null
   positionId: string | null
   managerId: string | null
+  scheduleLinked: boolean | null
   hireDate: Date | null
   status: $Enums.EmployeeStatus | null
   createdAt: Date | null
@@ -54,6 +55,7 @@ export type EmployeeMaxAggregateOutputType = {
   departmentId: string | null
   positionId: string | null
   managerId: string | null
+  scheduleLinked: boolean | null
   hireDate: Date | null
   status: $Enums.EmployeeStatus | null
   createdAt: Date | null
@@ -72,6 +74,7 @@ export type EmployeeCountAggregateOutputType = {
   departmentId: number
   positionId: number
   managerId: number
+  scheduleLinked: number
   hireDate: number
   status: number
   createdAt: number
@@ -92,6 +95,7 @@ export type EmployeeMinAggregateInputType = {
   departmentId?: true
   positionId?: true
   managerId?: true
+  scheduleLinked?: true
   hireDate?: true
   status?: true
   createdAt?: true
@@ -110,6 +114,7 @@ export type EmployeeMaxAggregateInputType = {
   departmentId?: true
   positionId?: true
   managerId?: true
+  scheduleLinked?: true
   hireDate?: true
   status?: true
   createdAt?: true
@@ -128,6 +133,7 @@ export type EmployeeCountAggregateInputType = {
   departmentId?: true
   positionId?: true
   managerId?: true
+  scheduleLinked?: true
   hireDate?: true
   status?: true
   createdAt?: true
@@ -219,6 +225,7 @@ export type EmployeeGroupByOutputType = {
   departmentId: string | null
   positionId: string | null
   managerId: string | null
+  scheduleLinked: boolean
   hireDate: Date
   status: $Enums.EmployeeStatus
   createdAt: Date
@@ -258,6 +265,7 @@ export type EmployeeWhereInput = {
   departmentId?: Prisma.StringNullableFilter<"Employee"> | string | null
   positionId?: Prisma.StringNullableFilter<"Employee"> | string | null
   managerId?: Prisma.StringNullableFilter<"Employee"> | string | null
+  scheduleLinked?: Prisma.BoolFilter<"Employee"> | boolean
   hireDate?: Prisma.DateTimeFilter<"Employee"> | Date | string
   status?: Prisma.EnumEmployeeStatusFilter<"Employee"> | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
@@ -301,6 +309,7 @@ export type EmployeeOrderByWithRelationInput = {
   departmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   positionId?: Prisma.SortOrderInput | Prisma.SortOrder
   managerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleLinked?: Prisma.SortOrder
   hireDate?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -348,6 +357,7 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   departmentId?: Prisma.StringNullableFilter<"Employee"> | string | null
   positionId?: Prisma.StringNullableFilter<"Employee"> | string | null
   managerId?: Prisma.StringNullableFilter<"Employee"> | string | null
+  scheduleLinked?: Prisma.BoolFilter<"Employee"> | boolean
   hireDate?: Prisma.DateTimeFilter<"Employee"> | Date | string
   status?: Prisma.EnumEmployeeStatusFilter<"Employee"> | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
@@ -391,6 +401,7 @@ export type EmployeeOrderByWithAggregationInput = {
   departmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   positionId?: Prisma.SortOrderInput | Prisma.SortOrder
   managerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleLinked?: Prisma.SortOrder
   hireDate?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -415,6 +426,7 @@ export type EmployeeScalarWhereWithAggregatesInput = {
   departmentId?: Prisma.StringNullableWithAggregatesFilter<"Employee"> | string | null
   positionId?: Prisma.StringNullableWithAggregatesFilter<"Employee"> | string | null
   managerId?: Prisma.StringNullableWithAggregatesFilter<"Employee"> | string | null
+  scheduleLinked?: Prisma.BoolWithAggregatesFilter<"Employee"> | boolean
   hireDate?: Prisma.DateTimeWithAggregatesFilter<"Employee"> | Date | string
   status?: Prisma.EnumEmployeeStatusWithAggregatesFilter<"Employee"> | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Employee"> | Date | string
@@ -428,6 +440,7 @@ export type EmployeeCreateInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -471,6 +484,7 @@ export type EmployeeUncheckedCreateInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -504,6 +518,7 @@ export type EmployeeUpdateInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -547,6 +562,7 @@ export type EmployeeUncheckedUpdateInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -585,6 +601,7 @@ export type EmployeeCreateManyInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -598,6 +615,7 @@ export type EmployeeUpdateManyMutationInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -616,6 +634,7 @@ export type EmployeeUncheckedUpdateManyInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -654,6 +673,7 @@ export type EmployeeCountOrderByAggregateInput = {
   departmentId?: Prisma.SortOrder
   positionId?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
+  scheduleLinked?: Prisma.SortOrder
   hireDate?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -672,6 +692,7 @@ export type EmployeeMaxOrderByAggregateInput = {
   departmentId?: Prisma.SortOrder
   positionId?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
+  scheduleLinked?: Prisma.SortOrder
   hireDate?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -690,6 +711,7 @@ export type EmployeeMinOrderByAggregateInput = {
   departmentId?: Prisma.SortOrder
   positionId?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
+  scheduleLinked?: Prisma.SortOrder
   hireDate?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -1196,6 +1218,7 @@ export type EmployeeCreateWithoutOrganizationInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -1237,6 +1260,7 @@ export type EmployeeUncheckedCreateWithoutOrganizationInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -1304,6 +1328,7 @@ export type EmployeeScalarWhereInput = {
   departmentId?: Prisma.StringNullableFilter<"Employee"> | string | null
   positionId?: Prisma.StringNullableFilter<"Employee"> | string | null
   managerId?: Prisma.StringNullableFilter<"Employee"> | string | null
+  scheduleLinked?: Prisma.BoolFilter<"Employee"> | boolean
   hireDate?: Prisma.DateTimeFilter<"Employee"> | Date | string
   status?: Prisma.EnumEmployeeStatusFilter<"Employee"> | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
@@ -1317,6 +1342,7 @@ export type EmployeeCreateWithoutUserInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -1358,6 +1384,7 @@ export type EmployeeUncheckedCreateWithoutUserInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -1407,6 +1434,7 @@ export type EmployeeUpdateWithoutUserInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1448,6 +1476,7 @@ export type EmployeeUncheckedUpdateWithoutUserInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1481,6 +1510,7 @@ export type EmployeeCreateWithoutDepartmentInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -1522,6 +1552,7 @@ export type EmployeeUncheckedCreateWithoutDepartmentInput = {
   phone?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -1581,6 +1612,7 @@ export type EmployeeCreateWithoutPositionInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -1622,6 +1654,7 @@ export type EmployeeUncheckedCreateWithoutPositionInput = {
   phone?: string | null
   departmentId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -1681,6 +1714,7 @@ export type EmployeeCreateWithoutReportsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -1723,6 +1757,7 @@ export type EmployeeUncheckedCreateWithoutReportsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -1760,6 +1795,7 @@ export type EmployeeCreateWithoutManagerInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -1801,6 +1837,7 @@ export type EmployeeUncheckedCreateWithoutManagerInput = {
   phone?: string | null
   departmentId?: string | null
   positionId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -1855,6 +1892,7 @@ export type EmployeeUpdateWithoutReportsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1897,6 +1935,7 @@ export type EmployeeUncheckedUpdateWithoutReportsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1945,6 +1984,7 @@ export type EmployeeCreateWithoutHistoryInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -1987,6 +2027,7 @@ export type EmployeeUncheckedCreateWithoutHistoryInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -2035,6 +2076,7 @@ export type EmployeeUpdateWithoutHistoryInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2077,6 +2119,7 @@ export type EmployeeUncheckedUpdateWithoutHistoryInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2109,6 +2152,7 @@ export type EmployeeCreateWithoutRegularsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -2151,6 +2195,7 @@ export type EmployeeUncheckedCreateWithoutRegularsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -2199,6 +2244,7 @@ export type EmployeeUpdateWithoutRegularsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2241,6 +2287,7 @@ export type EmployeeUncheckedUpdateWithoutRegularsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2273,6 +2320,7 @@ export type EmployeeCreateWithoutScheduleInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -2315,6 +2363,7 @@ export type EmployeeUncheckedCreateWithoutScheduleInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -2363,6 +2412,7 @@ export type EmployeeUpdateWithoutScheduleInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2405,6 +2455,7 @@ export type EmployeeUncheckedUpdateWithoutScheduleInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2437,6 +2488,7 @@ export type EmployeeCreateWithoutTimeEventsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -2479,6 +2531,7 @@ export type EmployeeUncheckedCreateWithoutTimeEventsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -2527,6 +2580,7 @@ export type EmployeeUpdateWithoutTimeEventsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2569,6 +2623,7 @@ export type EmployeeUncheckedUpdateWithoutTimeEventsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2601,6 +2656,7 @@ export type EmployeeCreateWithoutLeaveRequestsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -2643,6 +2699,7 @@ export type EmployeeUncheckedCreateWithoutLeaveRequestsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -2691,6 +2748,7 @@ export type EmployeeUpdateWithoutLeaveRequestsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2733,6 +2791,7 @@ export type EmployeeUncheckedUpdateWithoutLeaveRequestsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2765,6 +2824,7 @@ export type EmployeeCreateWithoutOvertimeInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -2807,6 +2867,7 @@ export type EmployeeUncheckedCreateWithoutOvertimeInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -2855,6 +2916,7 @@ export type EmployeeUpdateWithoutOvertimeInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2897,6 +2959,7 @@ export type EmployeeUncheckedUpdateWithoutOvertimeInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2929,6 +2992,7 @@ export type EmployeeCreateWithoutCompensationsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -2971,6 +3035,7 @@ export type EmployeeUncheckedCreateWithoutCompensationsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -3019,6 +3084,7 @@ export type EmployeeUpdateWithoutCompensationsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3061,6 +3127,7 @@ export type EmployeeUncheckedUpdateWithoutCompensationsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3093,6 +3160,7 @@ export type EmployeeCreateWithoutComponentsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -3135,6 +3203,7 @@ export type EmployeeUncheckedCreateWithoutComponentsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -3183,6 +3252,7 @@ export type EmployeeUpdateWithoutComponentsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3225,6 +3295,7 @@ export type EmployeeUncheckedUpdateWithoutComponentsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3257,6 +3328,7 @@ export type EmployeeCreateWithoutPayslipsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -3299,6 +3371,7 @@ export type EmployeeUncheckedCreateWithoutPayslipsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -3347,6 +3420,7 @@ export type EmployeeUpdateWithoutPayslipsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3389,6 +3463,7 @@ export type EmployeeUncheckedUpdateWithoutPayslipsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3421,6 +3496,7 @@ export type EmployeeCreateWithoutAdjustmentsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -3463,6 +3539,7 @@ export type EmployeeUncheckedCreateWithoutAdjustmentsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -3511,6 +3588,7 @@ export type EmployeeUpdateWithoutAdjustmentsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3553,6 +3631,7 @@ export type EmployeeUncheckedUpdateWithoutAdjustmentsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3585,6 +3664,7 @@ export type EmployeeCreateWithoutChecklistItemsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -3627,6 +3707,7 @@ export type EmployeeUncheckedCreateWithoutChecklistItemsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -3675,6 +3756,7 @@ export type EmployeeUpdateWithoutChecklistItemsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3717,6 +3799,7 @@ export type EmployeeUncheckedUpdateWithoutChecklistItemsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3749,6 +3832,7 @@ export type EmployeeCreateWithoutApplicantInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -3791,6 +3875,7 @@ export type EmployeeUncheckedCreateWithoutApplicantInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -3839,6 +3924,7 @@ export type EmployeeUpdateWithoutApplicantInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3881,6 +3967,7 @@ export type EmployeeUncheckedUpdateWithoutApplicantInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3913,6 +4000,7 @@ export type EmployeeCreateWithoutReviewsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -3955,6 +4043,7 @@ export type EmployeeUncheckedCreateWithoutReviewsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -4003,6 +4092,7 @@ export type EmployeeUpdateWithoutReviewsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4045,6 +4135,7 @@ export type EmployeeUncheckedUpdateWithoutReviewsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4077,6 +4168,7 @@ export type EmployeeCreateWithoutGoalsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -4119,6 +4211,7 @@ export type EmployeeUncheckedCreateWithoutGoalsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -4167,6 +4260,7 @@ export type EmployeeUpdateWithoutGoalsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4209,6 +4303,7 @@ export type EmployeeUncheckedUpdateWithoutGoalsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4241,6 +4336,7 @@ export type EmployeeCreateWithoutEnrollmentsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -4283,6 +4379,7 @@ export type EmployeeUncheckedCreateWithoutEnrollmentsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -4331,6 +4428,7 @@ export type EmployeeUpdateWithoutEnrollmentsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4373,6 +4471,7 @@ export type EmployeeUncheckedUpdateWithoutEnrollmentsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4405,6 +4504,7 @@ export type EmployeeCreateWithoutDocumentsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -4447,6 +4547,7 @@ export type EmployeeUncheckedCreateWithoutDocumentsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -4495,6 +4596,7 @@ export type EmployeeUpdateWithoutDocumentsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4537,6 +4639,7 @@ export type EmployeeUncheckedUpdateWithoutDocumentsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4569,6 +4672,7 @@ export type EmployeeCreateWithoutHrRequestsInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -4611,6 +4715,7 @@ export type EmployeeUncheckedCreateWithoutHrRequestsInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -4659,6 +4764,7 @@ export type EmployeeUpdateWithoutHrRequestsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4701,6 +4807,7 @@ export type EmployeeUncheckedUpdateWithoutHrRequestsInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4733,6 +4840,7 @@ export type EmployeeCreateWithoutTaxProfilesInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -4775,6 +4883,7 @@ export type EmployeeUncheckedCreateWithoutTaxProfilesInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -4823,6 +4932,7 @@ export type EmployeeUpdateWithoutTaxProfilesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4865,6 +4975,7 @@ export type EmployeeUncheckedUpdateWithoutTaxProfilesInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4897,6 +5008,7 @@ export type EmployeeCreateWithoutPrevEmploymentInput = {
   lastName: string
   email?: string | null
   phone?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -4939,6 +5051,7 @@ export type EmployeeUncheckedCreateWithoutPrevEmploymentInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -4987,6 +5100,7 @@ export type EmployeeUpdateWithoutPrevEmploymentInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5029,6 +5143,7 @@ export type EmployeeUncheckedUpdateWithoutPrevEmploymentInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5065,6 +5180,7 @@ export type EmployeeCreateManyOrganizationInput = {
   departmentId?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -5078,6 +5194,7 @@ export type EmployeeUpdateWithoutOrganizationInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5119,6 +5236,7 @@ export type EmployeeUncheckedUpdateWithoutOrganizationInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5156,6 +5274,7 @@ export type EmployeeUncheckedUpdateManyWithoutOrganizationInput = {
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5173,6 +5292,7 @@ export type EmployeeCreateManyDepartmentInput = {
   phone?: string | null
   positionId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -5186,6 +5306,7 @@ export type EmployeeUpdateWithoutDepartmentInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5227,6 +5348,7 @@ export type EmployeeUncheckedUpdateWithoutDepartmentInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5264,6 +5386,7 @@ export type EmployeeUncheckedUpdateManyWithoutDepartmentInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5281,6 +5404,7 @@ export type EmployeeCreateManyPositionInput = {
   phone?: string | null
   departmentId?: string | null
   managerId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -5294,6 +5418,7 @@ export type EmployeeUpdateWithoutPositionInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5335,6 +5460,7 @@ export type EmployeeUncheckedUpdateWithoutPositionInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5372,6 +5498,7 @@ export type EmployeeUncheckedUpdateManyWithoutPositionInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5389,6 +5516,7 @@ export type EmployeeCreateManyManagerInput = {
   phone?: string | null
   departmentId?: string | null
   positionId?: string | null
+  scheduleLinked?: boolean
   hireDate: Date | string
   status?: $Enums.EmployeeStatus
   createdAt?: Date | string
@@ -5402,6 +5530,7 @@ export type EmployeeUpdateWithoutManagerInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5443,6 +5572,7 @@ export type EmployeeUncheckedUpdateWithoutManagerInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5480,6 +5610,7 @@ export type EmployeeUncheckedUpdateManyWithoutManagerInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5691,6 +5822,7 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   departmentId?: boolean
   positionId?: boolean
   managerId?: boolean
+  scheduleLinked?: boolean
   hireDate?: boolean
   status?: boolean
   createdAt?: boolean
@@ -5735,6 +5867,7 @@ export type EmployeeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   departmentId?: boolean
   positionId?: boolean
   managerId?: boolean
+  scheduleLinked?: boolean
   hireDate?: boolean
   status?: boolean
   createdAt?: boolean
@@ -5758,6 +5891,7 @@ export type EmployeeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   departmentId?: boolean
   positionId?: boolean
   managerId?: boolean
+  scheduleLinked?: boolean
   hireDate?: boolean
   status?: boolean
   createdAt?: boolean
@@ -5781,13 +5915,14 @@ export type EmployeeSelectScalar = {
   departmentId?: boolean
   positionId?: boolean
   managerId?: boolean
+  scheduleLinked?: boolean
   hireDate?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "userId" | "employeeNo" | "firstName" | "lastName" | "email" | "phone" | "departmentId" | "positionId" | "managerId" | "hireDate" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["employee"]>
+export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "userId" | "employeeNo" | "firstName" | "lastName" | "email" | "phone" | "departmentId" | "positionId" | "managerId" | "scheduleLinked" | "hireDate" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["employee"]>
 export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   user?: boolean | Prisma.Employee$userArgs<ExtArgs>
@@ -5872,6 +6007,7 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     departmentId: string | null
     positionId: string | null
     managerId: string | null
+    scheduleLinked: boolean
     hireDate: Date
     status: $Enums.EmployeeStatus
     createdAt: Date
@@ -6335,6 +6471,7 @@ export interface EmployeeFieldRefs {
   readonly departmentId: Prisma.FieldRef<"Employee", 'String'>
   readonly positionId: Prisma.FieldRef<"Employee", 'String'>
   readonly managerId: Prisma.FieldRef<"Employee", 'String'>
+  readonly scheduleLinked: Prisma.FieldRef<"Employee", 'Boolean'>
   readonly hireDate: Prisma.FieldRef<"Employee", 'DateTime'>
   readonly status: Prisma.FieldRef<"Employee", 'EmployeeStatus'>
   readonly createdAt: Prisma.FieldRef<"Employee", 'DateTime'>

@@ -10,16 +10,17 @@ import { requireUser, SESSION_COOKIE } from "@/lib/auth";
 import { clockStatus } from "@/lib/dtr";
 import { getMyEmployee } from "@/lib/employees";
 import { STAMP_SELECT, toPunch } from "@/lib/punch";
+import { stampBlock, tripError } from "@/lib/stamp-rules";
 import { clearAttempts, tooManyAttempts } from "@/lib/rate-limit";
 import { getOrgSettings } from "@/lib/settings";
 import { isHr } from "@/lib/scope";
 import { getPunchUnlock, setPunchUnlock } from "@/lib/session";
-import { formatTime, parseHM, zonedTimeToUtc } from "@/lib/time";
+import { dayKey, dbDate, formatTime, parseHM, zonedTimeToUtc } from "@/lib/time";
 import type { FormState } from "@/app/login/actions";
 
 const CONTEXTS = ["OFFICE", "FIELD", "REMOTE", "CLIENT_SITE"] as const;
 
-export type ClockResult = { ok?: string; error?: string; needNote?: boolean; locked?: boolean };
+export type ClockResult = { ok?: string; error?: string; needNote?: boolean; needTrip?: boolean; locked?: boolean };
 export type UnlockResult = { ok?: boolean; error?: string; seconds?: number };
 
 // Step 2 of the time stamp: prove it is really you. Unlocks one time stamp for a short window.
@@ -40,6 +41,9 @@ const input = z.object({
   stampTypeId: z.string().min(1),
   workContext: z.enum(CONTEXTS),
   note: z.string().trim().max(300).optional(),
+  tripFrom: z.string().trim().max(120).optional(),
+  tripTo: z.string().trim().max(120).optional(),
+  tripReason: z.string().trim().max(120).optional(),
   geo: z
     .object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180), accuracy: z.number().min(0).max(1_000_000) })
     .nullable(),
@@ -70,7 +74,7 @@ export async function recordTime(raw: z.input<typeof input>): Promise<ClockResul
   // Recent punches decide what is allowed next (36 hours back covers overnight shifts).
   const recent = await prisma.timeEvent.findMany({
     where: { employeeId: emp.id, organizationId: me.organizationId, voidedAt: null, at: { gte: new Date(Date.now() - 36 * 3600_000) } },
-    select: { type: true, at: true, stampType: { select: STAMP_SELECT } },
+    select: { type: true, at: true, stampTypeId: true, stampType: { select: STAMP_SELECT } },
     orderBy: { at: "asc" },
   });
   const status = clockStatus(recent.map(toPunch));
@@ -92,6 +96,21 @@ export async function recordTime(raw: z.input<typeof input>): Promise<ClockResul
     return { error: `You are on ${status.pause?.name}. End it first.` };
   }
 
+  if (type === "PAUSE_START") {
+    const ot = await prisma.overtimeRequest.findFirst({
+      where: { employeeId: emp.id, organizationId: me.organizationId, status: "APPROVED", date: dbDate(dayKey(new Date(), settings.timezone)) },
+      select: { minutes: true },
+    });
+    const blocked = stampBlock(stamp, recent, ot?.minutes ?? 0, false);
+    if (blocked) return { error: `${stamp.name}: ${blocked}.` };
+  }
+
+  const isTrip = stamp.key === "ON_TRIP" && type === "PAUSE_START";
+  if (isTrip) {
+    const te = tripError(d);
+    if (te) return { needTrip: true, error: te };
+  }
+
   const lastAt = recent[recent.length - 1]?.at;
   if (lastAt && Date.now() - lastAt.getTime() < 5000) return { error: "Already recorded. Please wait a moment." };
 
@@ -110,6 +129,7 @@ export async function recordTime(raw: z.input<typeof input>): Promise<ClockResul
     data: {
       organizationId: me.organizationId, employeeId: emp.id, type, stampTypeId: stamp.id, source: "WEB",
       workContext: stamp.defaultContext ?? d.workContext,
+      ...(isTrip ? { tripFrom: d.tripFrom, tripTo: d.tripTo, tripReason: d.tripReason } : {}),
       lat: d.geo?.lat, lng: d.geo?.lng, accuracy: d.geo?.accuracy, gpsStatus, note: d.note || null, createdById: me.id,
     },
   });

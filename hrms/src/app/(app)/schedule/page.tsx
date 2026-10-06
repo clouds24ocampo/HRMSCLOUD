@@ -9,7 +9,10 @@ import { describeDays, hasRegular } from "@/lib/schedule";
 import { loadSchedules, resolvePerson } from "@/lib/schedule-data";
 import { addDays, dayKey, daysBetween, formatDay, weekStart } from "@/lib/time";
 import { Badge, Card, EmptyState, PageHeader, ghostClass } from "@/components/ui";
-import { RegularScheduleForm, ScheduleForm } from "./ScheduleForm";
+import { RegularScheduleForm, ScheduleForm, type Team } from "./ScheduleForm";
+import { CellEditor, CopyWeekForm, RelinkButton } from "./ScheduleCells";
+import { teamOf } from "@/lib/schedule";
+import { ScheduleTabs } from "@/components/ScheduleTabs";
 
 export default async function SchedulePage({ searchParams }: { searchParams: Promise<{ week?: string; employee?: string }> }) {
   const me = await requireUser("/schedule");
@@ -26,7 +29,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
     prisma.employee.findMany({
       // AND, not a spread: a spread of {id} would overwrite the visibility rule.
       where: { AND: [scope, { status: { not: "SEPARATED" } }, sp.employee ? { id: sp.employee } : {}] },
-      select: { id: true, firstName: true, lastName: true, employeeNo: true },
+      select: { id: true, firstName: true, lastName: true, employeeNo: true, managerId: true, scheduleLinked: true },
       orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
       take: 300,
     }),
@@ -38,6 +41,10 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
   const link = (w: string) => `/schedule?${new URLSearchParams({ week: w, ...(sp.employee ? { employee: sp.employee } : {}) })}`;
   const shiftOpts = shifts.map((s) => ({ id: s.id, label: `${s.name} (${s.startTime}–${s.endTime})` }));
   const personOpts = people.map((p) => ({ id: p.id, label: `${p.lastName}, ${p.firstName}` }));
+  const nameOf = new Map(people.map((p) => [p.id, `${p.firstName} ${p.lastName}`]));
+  const rows = people.map((p) => ({ id: p.id, managerId: p.managerId, scheduleLinked: p.scheduleLinked }));
+  const leaders = [...new Set(people.map((p) => p.managerId).filter((m): m is string => !!m && nameOf.has(m)))];
+  const teams: Team[] = leaders.map((id) => ({ id, label: `${nameOf.get(id)}'s team`, members: teamOf(rows, id) }));
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
@@ -45,6 +52,8 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
         title="Schedule"
         subtitle={canEdit ? "The plan: who works which shift. DTR compares it with what was actually worked, to find late, undertime and overtime." : "Your planned shifts. DTR compares them with what you actually worked."}
       />
+
+      <ScheduleTabs active="/schedule" leader={canEdit} />
 
       {canEdit && uncovered.length > 0 && (
         <div role="status" className="rounded-2xl border border-warning/40 bg-warning/10 p-4 text-sm">
@@ -59,6 +68,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
         <Link href={link(addDays(ws, 7))} className={ghostClass}>Next →</Link>
         <p className="ml-1 text-sm font-medium">{formatDay(ws, { month: "short", day: "numeric" })} – {formatDay(days[6], { month: "short", day: "numeric", year: "numeric" })}</p>
         {sp.employee && <Link href="/schedule" className="text-sm font-medium text-muted hover:text-ink">Show everyone</Link>}
+        {canEdit && people.length > 0 && <div className="ml-auto"><CopyWeekForm weekStart={ws} peopleIds={people.map((p) => p.id)} /></div>}
       </div>
 
       {people.length === 0 ? (
@@ -83,11 +93,19 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
                     <td className="px-4 py-2.5">
                       <p className="font-medium">{p.lastName}, {p.firstName}</p>
                       <p className="text-xs text-muted">{cur ? `${cur.shift.name} · ${describeDays(cur.workDays)}` : "No regular schedule"}</p>
+                      {p.managerId && nameOf.has(p.managerId) && (
+                        p.scheduleLinked ? (
+                          <p className="mt-0.5"><Badge tone="brand">Follows {nameOf.get(p.managerId)!.split(" ")[0]}</Badge></p>
+                        ) : (
+                          <p className="mt-0.5 flex flex-wrap items-center gap-2"><Badge tone="warning">Custom</Badge>{canEdit && <RelinkButton employeeId={p.id} />}</p>
+                        )
+                      )}
                     </td>
                     {days.map((d) => {
                       const r = resolved.get(p.id)?.get(d);
                       return (
                         <td key={d} className="px-1.5 py-2 text-center">
+                          <CellEditor employeeId={p.id} day={d} weekday={new Date(`${d}T00:00:00Z`).getUTCDay()} shifts={shiftOpts} locked={!canEdit || (d < today && !isHr(me.role.key))}>
                           {r?.shift ? (
                             <span
                               title={`${r.shift.name}${r.source === "override" ? " (changed for this day)" : ""}`}
@@ -100,6 +118,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
                           ) : (
                             <span className="text-muted/50">—</span>
                           )}
+                          </CellEditor>
                         </td>
                       );
                     })}
@@ -109,7 +128,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
             </tbody>
           </table>
           <p className="border-t border-line px-4 py-2 text-xs text-muted">
-            <Badge tone="brand">blue</Badge> regular schedule · <Badge tone="warning">orange</Badge> changed for that day · — nothing scheduled
+            <Badge tone="brand">blue</Badge> regular schedule · <Badge tone="warning">orange</Badge> changed for that day · — nothing scheduled{canEdit ? " · click any day to change it" : ""}
           </p>
         </Card>
       )}
@@ -118,13 +137,13 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
             <h2 className="mb-1 text-lg font-semibold">Regular weekly schedule</h2>
-            <p className="mb-4 text-sm text-muted">Set once and it repeats every week. Changing it later starts a new one from that date, so past days are judged by the schedule that applied then.</p>
-            <RegularScheduleForm people={personOpts} shifts={shiftOpts} from={today} preselect={sp.employee} />
+            <p className="mb-4 text-sm text-muted">Set once and it repeats every week. Changing a leader&apos;s schedule updates everyone who follows them. Changing it later starts a new one from that date, so past days are judged by the schedule that applied then.</p>
+            <RegularScheduleForm people={personOpts} teams={teams} shifts={shiftOpts} from={today} preselect={sp.employee} />
           </Card>
           <Card>
             <h2 className="mb-1 text-lg font-semibold">Change specific days</h2>
             <p className="mb-4 text-sm text-muted">A swap, an extra shift or a day off. This sits on top of the regular schedule.{isHr(me.role.key) ? "" : " You can change today and later."}</p>
-            <ScheduleForm people={personOpts} shifts={shiftOpts} from={ws > today ? ws : today} to={days[6] > today ? days[6] : addDays(today, 6)} preselect={sp.employee} />
+            <ScheduleForm people={personOpts} teams={teams} shifts={shiftOpts} from={ws > today ? ws : today} to={days[6] > today ? days[6] : addDays(today, 6)} preselect={sp.employee} />
           </Card>
         </div>
       )}

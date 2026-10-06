@@ -206,6 +206,7 @@ export default async function DtrPage({ searchParams }: { searchParams: Promise<
                                 )}
                                 {p.gpsStatus === "LOW_ACCURACY" && <Badge tone="warning">Low accuracy</Badge>}
                               </div>
+                              {p.tripFrom && <p className="mt-1">📍 <span className="font-medium">{p.tripFrom} → {p.tripTo}</span> <span className="text-muted">· {p.tripReason}</span></p>}
                               {p.note && <p className="mt-1 text-muted">“{p.note}”</p>}
                               {p.voidedAt ? (
                                 <p className="mt-1 text-xs text-danger">Voided: {p.voidReason}</p>

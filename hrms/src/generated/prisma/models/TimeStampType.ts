@@ -28,11 +28,17 @@ export type AggregateTimeStampType = {
 
 export type TimeStampTypeAvgAggregateOutputType = {
   allowedMinutes: number | null
+  maxPerDay: number | null
+  dailyCapMinutes: number | null
+  requiresOvertimeOver: number | null
   sortOrder: number | null
 }
 
 export type TimeStampTypeSumAggregateOutputType = {
   allowedMinutes: number | null
+  maxPerDay: number | null
+  dailyCapMinutes: number | null
+  requiresOvertimeOver: number | null
   sortOrder: number | null
 }
 
@@ -48,6 +54,10 @@ export type TimeStampTypeMinAggregateOutputType = {
   allowedMinutes: number | null
   requiresNote: boolean | null
   defaultContext: $Enums.WorkContext | null
+  page: $Enums.StampPage | null
+  maxPerDay: number | null
+  dailyCapMinutes: number | null
+  requiresOvertimeOver: number | null
   sortOrder: number | null
   locked: boolean | null
   archivedAt: Date | null
@@ -67,6 +77,10 @@ export type TimeStampTypeMaxAggregateOutputType = {
   allowedMinutes: number | null
   requiresNote: boolean | null
   defaultContext: $Enums.WorkContext | null
+  page: $Enums.StampPage | null
+  maxPerDay: number | null
+  dailyCapMinutes: number | null
+  requiresOvertimeOver: number | null
   sortOrder: number | null
   locked: boolean | null
   archivedAt: Date | null
@@ -86,6 +100,10 @@ export type TimeStampTypeCountAggregateOutputType = {
   allowedMinutes: number
   requiresNote: number
   defaultContext: number
+  page: number
+  maxPerDay: number
+  dailyCapMinutes: number
+  requiresOvertimeOver: number
   sortOrder: number
   locked: number
   archivedAt: number
@@ -97,11 +115,17 @@ export type TimeStampTypeCountAggregateOutputType = {
 
 export type TimeStampTypeAvgAggregateInputType = {
   allowedMinutes?: true
+  maxPerDay?: true
+  dailyCapMinutes?: true
+  requiresOvertimeOver?: true
   sortOrder?: true
 }
 
 export type TimeStampTypeSumAggregateInputType = {
   allowedMinutes?: true
+  maxPerDay?: true
+  dailyCapMinutes?: true
+  requiresOvertimeOver?: true
   sortOrder?: true
 }
 
@@ -117,6 +141,10 @@ export type TimeStampTypeMinAggregateInputType = {
   allowedMinutes?: true
   requiresNote?: true
   defaultContext?: true
+  page?: true
+  maxPerDay?: true
+  dailyCapMinutes?: true
+  requiresOvertimeOver?: true
   sortOrder?: true
   locked?: true
   archivedAt?: true
@@ -136,6 +164,10 @@ export type TimeStampTypeMaxAggregateInputType = {
   allowedMinutes?: true
   requiresNote?: true
   defaultContext?: true
+  page?: true
+  maxPerDay?: true
+  dailyCapMinutes?: true
+  requiresOvertimeOver?: true
   sortOrder?: true
   locked?: true
   archivedAt?: true
@@ -155,6 +187,10 @@ export type TimeStampTypeCountAggregateInputType = {
   allowedMinutes?: true
   requiresNote?: true
   defaultContext?: true
+  page?: true
+  maxPerDay?: true
+  dailyCapMinutes?: true
+  requiresOvertimeOver?: true
   sortOrder?: true
   locked?: true
   archivedAt?: true
@@ -261,6 +297,10 @@ export type TimeStampTypeGroupByOutputType = {
   allowedMinutes: number | null
   requiresNote: boolean
   defaultContext: $Enums.WorkContext | null
+  page: $Enums.StampPage
+  maxPerDay: number | null
+  dailyCapMinutes: number | null
+  requiresOvertimeOver: number | null
   sortOrder: number
   locked: boolean
   archivedAt: Date | null
@@ -303,6 +343,10 @@ export type TimeStampTypeWhereInput = {
   allowedMinutes?: Prisma.IntNullableFilter<"TimeStampType"> | number | null
   requiresNote?: Prisma.BoolFilter<"TimeStampType"> | boolean
   defaultContext?: Prisma.EnumWorkContextNullableFilter<"TimeStampType"> | $Enums.WorkContext | null
+  page?: Prisma.EnumStampPageFilter<"TimeStampType"> | $Enums.StampPage
+  maxPerDay?: Prisma.IntNullableFilter<"TimeStampType"> | number | null
+  dailyCapMinutes?: Prisma.IntNullableFilter<"TimeStampType"> | number | null
+  requiresOvertimeOver?: Prisma.IntNullableFilter<"TimeStampType"> | number | null
   sortOrder?: Prisma.IntFilter<"TimeStampType"> | number
   locked?: Prisma.BoolFilter<"TimeStampType"> | boolean
   archivedAt?: Prisma.DateTimeNullableFilter<"TimeStampType"> | Date | string | null
@@ -324,6 +368,10 @@ export type TimeStampTypeOrderByWithRelationInput = {
   allowedMinutes?: Prisma.SortOrderInput | Prisma.SortOrder
   requiresNote?: Prisma.SortOrder
   defaultContext?: Prisma.SortOrderInput | Prisma.SortOrder
+  page?: Prisma.SortOrder
+  maxPerDay?: Prisma.SortOrderInput | Prisma.SortOrder
+  dailyCapMinutes?: Prisma.SortOrderInput | Prisma.SortOrder
+  requiresOvertimeOver?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   locked?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -349,6 +397,10 @@ export type TimeStampTypeWhereUniqueInput = Prisma.AtLeast<{
   allowedMinutes?: Prisma.IntNullableFilter<"TimeStampType"> | number | null
   requiresNote?: Prisma.BoolFilter<"TimeStampType"> | boolean
   defaultContext?: Prisma.EnumWorkContextNullableFilter<"TimeStampType"> | $Enums.WorkContext | null
+  page?: Prisma.EnumStampPageFilter<"TimeStampType"> | $Enums.StampPage
+  maxPerDay?: Prisma.IntNullableFilter<"TimeStampType"> | number | null
+  dailyCapMinutes?: Prisma.IntNullableFilter<"TimeStampType"> | number | null
+  requiresOvertimeOver?: Prisma.IntNullableFilter<"TimeStampType"> | number | null
   sortOrder?: Prisma.IntFilter<"TimeStampType"> | number
   locked?: Prisma.BoolFilter<"TimeStampType"> | boolean
   archivedAt?: Prisma.DateTimeNullableFilter<"TimeStampType"> | Date | string | null
@@ -370,6 +422,10 @@ export type TimeStampTypeOrderByWithAggregationInput = {
   allowedMinutes?: Prisma.SortOrderInput | Prisma.SortOrder
   requiresNote?: Prisma.SortOrder
   defaultContext?: Prisma.SortOrderInput | Prisma.SortOrder
+  page?: Prisma.SortOrder
+  maxPerDay?: Prisma.SortOrderInput | Prisma.SortOrder
+  dailyCapMinutes?: Prisma.SortOrderInput | Prisma.SortOrder
+  requiresOvertimeOver?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   locked?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -397,6 +453,10 @@ export type TimeStampTypeScalarWhereWithAggregatesInput = {
   allowedMinutes?: Prisma.IntNullableWithAggregatesFilter<"TimeStampType"> | number | null
   requiresNote?: Prisma.BoolWithAggregatesFilter<"TimeStampType"> | boolean
   defaultContext?: Prisma.EnumWorkContextNullableWithAggregatesFilter<"TimeStampType"> | $Enums.WorkContext | null
+  page?: Prisma.EnumStampPageWithAggregatesFilter<"TimeStampType"> | $Enums.StampPage
+  maxPerDay?: Prisma.IntNullableWithAggregatesFilter<"TimeStampType"> | number | null
+  dailyCapMinutes?: Prisma.IntNullableWithAggregatesFilter<"TimeStampType"> | number | null
+  requiresOvertimeOver?: Prisma.IntNullableWithAggregatesFilter<"TimeStampType"> | number | null
   sortOrder?: Prisma.IntWithAggregatesFilter<"TimeStampType"> | number
   locked?: Prisma.BoolWithAggregatesFilter<"TimeStampType"> | boolean
   archivedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"TimeStampType"> | Date | string | null
@@ -415,6 +475,10 @@ export type TimeStampTypeCreateInput = {
   allowedMinutes?: number | null
   requiresNote?: boolean
   defaultContext?: $Enums.WorkContext | null
+  page?: $Enums.StampPage
+  maxPerDay?: number | null
+  dailyCapMinutes?: number | null
+  requiresOvertimeOver?: number | null
   sortOrder?: number
   locked?: boolean
   archivedAt?: Date | string | null
@@ -436,6 +500,10 @@ export type TimeStampTypeUncheckedCreateInput = {
   allowedMinutes?: number | null
   requiresNote?: boolean
   defaultContext?: $Enums.WorkContext | null
+  page?: $Enums.StampPage
+  maxPerDay?: number | null
+  dailyCapMinutes?: number | null
+  requiresOvertimeOver?: number | null
   sortOrder?: number
   locked?: boolean
   archivedAt?: Date | string | null
@@ -455,6 +523,10 @@ export type TimeStampTypeUpdateInput = {
   allowedMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requiresNote?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultContext?: Prisma.NullableEnumWorkContextFieldUpdateOperationsInput | $Enums.WorkContext | null
+  page?: Prisma.EnumStampPageFieldUpdateOperationsInput | $Enums.StampPage
+  maxPerDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  dailyCapMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  requiresOvertimeOver?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   locked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -476,6 +548,10 @@ export type TimeStampTypeUncheckedUpdateInput = {
   allowedMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requiresNote?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultContext?: Prisma.NullableEnumWorkContextFieldUpdateOperationsInput | $Enums.WorkContext | null
+  page?: Prisma.EnumStampPageFieldUpdateOperationsInput | $Enums.StampPage
+  maxPerDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  dailyCapMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  requiresOvertimeOver?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   locked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -496,6 +572,10 @@ export type TimeStampTypeCreateManyInput = {
   allowedMinutes?: number | null
   requiresNote?: boolean
   defaultContext?: $Enums.WorkContext | null
+  page?: $Enums.StampPage
+  maxPerDay?: number | null
+  dailyCapMinutes?: number | null
+  requiresOvertimeOver?: number | null
   sortOrder?: number
   locked?: boolean
   archivedAt?: Date | string | null
@@ -514,6 +594,10 @@ export type TimeStampTypeUpdateManyMutationInput = {
   allowedMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requiresNote?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultContext?: Prisma.NullableEnumWorkContextFieldUpdateOperationsInput | $Enums.WorkContext | null
+  page?: Prisma.EnumStampPageFieldUpdateOperationsInput | $Enums.StampPage
+  maxPerDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  dailyCapMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  requiresOvertimeOver?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   locked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -533,6 +617,10 @@ export type TimeStampTypeUncheckedUpdateManyInput = {
   allowedMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requiresNote?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultContext?: Prisma.NullableEnumWorkContextFieldUpdateOperationsInput | $Enums.WorkContext | null
+  page?: Prisma.EnumStampPageFieldUpdateOperationsInput | $Enums.StampPage
+  maxPerDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  dailyCapMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  requiresOvertimeOver?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   locked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -567,6 +655,10 @@ export type TimeStampTypeCountOrderByAggregateInput = {
   allowedMinutes?: Prisma.SortOrder
   requiresNote?: Prisma.SortOrder
   defaultContext?: Prisma.SortOrder
+  page?: Prisma.SortOrder
+  maxPerDay?: Prisma.SortOrder
+  dailyCapMinutes?: Prisma.SortOrder
+  requiresOvertimeOver?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   locked?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrder
@@ -576,6 +668,9 @@ export type TimeStampTypeCountOrderByAggregateInput = {
 
 export type TimeStampTypeAvgOrderByAggregateInput = {
   allowedMinutes?: Prisma.SortOrder
+  maxPerDay?: Prisma.SortOrder
+  dailyCapMinutes?: Prisma.SortOrder
+  requiresOvertimeOver?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
 }
 
@@ -591,6 +686,10 @@ export type TimeStampTypeMaxOrderByAggregateInput = {
   allowedMinutes?: Prisma.SortOrder
   requiresNote?: Prisma.SortOrder
   defaultContext?: Prisma.SortOrder
+  page?: Prisma.SortOrder
+  maxPerDay?: Prisma.SortOrder
+  dailyCapMinutes?: Prisma.SortOrder
+  requiresOvertimeOver?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   locked?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrder
@@ -610,6 +709,10 @@ export type TimeStampTypeMinOrderByAggregateInput = {
   allowedMinutes?: Prisma.SortOrder
   requiresNote?: Prisma.SortOrder
   defaultContext?: Prisma.SortOrder
+  page?: Prisma.SortOrder
+  maxPerDay?: Prisma.SortOrder
+  dailyCapMinutes?: Prisma.SortOrder
+  requiresOvertimeOver?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   locked?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrder
@@ -619,6 +722,9 @@ export type TimeStampTypeMinOrderByAggregateInput = {
 
 export type TimeStampTypeSumOrderByAggregateInput = {
   allowedMinutes?: Prisma.SortOrder
+  maxPerDay?: Prisma.SortOrder
+  dailyCapMinutes?: Prisma.SortOrder
+  requiresOvertimeOver?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
 }
 
@@ -685,6 +791,10 @@ export type NullableEnumWorkContextFieldUpdateOperationsInput = {
   set?: $Enums.WorkContext | null
 }
 
+export type EnumStampPageFieldUpdateOperationsInput = {
+  set?: $Enums.StampPage
+}
+
 export type TimeStampTypeCreateNestedOneWithoutEventsInput = {
   create?: Prisma.XOR<Prisma.TimeStampTypeCreateWithoutEventsInput, Prisma.TimeStampTypeUncheckedCreateWithoutEventsInput>
   connectOrCreate?: Prisma.TimeStampTypeCreateOrConnectWithoutEventsInput
@@ -712,6 +822,10 @@ export type TimeStampTypeCreateWithoutOrganizationInput = {
   allowedMinutes?: number | null
   requiresNote?: boolean
   defaultContext?: $Enums.WorkContext | null
+  page?: $Enums.StampPage
+  maxPerDay?: number | null
+  dailyCapMinutes?: number | null
+  requiresOvertimeOver?: number | null
   sortOrder?: number
   locked?: boolean
   archivedAt?: Date | string | null
@@ -731,6 +845,10 @@ export type TimeStampTypeUncheckedCreateWithoutOrganizationInput = {
   allowedMinutes?: number | null
   requiresNote?: boolean
   defaultContext?: $Enums.WorkContext | null
+  page?: $Enums.StampPage
+  maxPerDay?: number | null
+  dailyCapMinutes?: number | null
+  requiresOvertimeOver?: number | null
   sortOrder?: number
   locked?: boolean
   archivedAt?: Date | string | null
@@ -780,6 +898,10 @@ export type TimeStampTypeScalarWhereInput = {
   allowedMinutes?: Prisma.IntNullableFilter<"TimeStampType"> | number | null
   requiresNote?: Prisma.BoolFilter<"TimeStampType"> | boolean
   defaultContext?: Prisma.EnumWorkContextNullableFilter<"TimeStampType"> | $Enums.WorkContext | null
+  page?: Prisma.EnumStampPageFilter<"TimeStampType"> | $Enums.StampPage
+  maxPerDay?: Prisma.IntNullableFilter<"TimeStampType"> | number | null
+  dailyCapMinutes?: Prisma.IntNullableFilter<"TimeStampType"> | number | null
+  requiresOvertimeOver?: Prisma.IntNullableFilter<"TimeStampType"> | number | null
   sortOrder?: Prisma.IntFilter<"TimeStampType"> | number
   locked?: Prisma.BoolFilter<"TimeStampType"> | boolean
   archivedAt?: Prisma.DateTimeNullableFilter<"TimeStampType"> | Date | string | null
@@ -798,6 +920,10 @@ export type TimeStampTypeCreateWithoutEventsInput = {
   allowedMinutes?: number | null
   requiresNote?: boolean
   defaultContext?: $Enums.WorkContext | null
+  page?: $Enums.StampPage
+  maxPerDay?: number | null
+  dailyCapMinutes?: number | null
+  requiresOvertimeOver?: number | null
   sortOrder?: number
   locked?: boolean
   archivedAt?: Date | string | null
@@ -818,6 +944,10 @@ export type TimeStampTypeUncheckedCreateWithoutEventsInput = {
   allowedMinutes?: number | null
   requiresNote?: boolean
   defaultContext?: $Enums.WorkContext | null
+  page?: $Enums.StampPage
+  maxPerDay?: number | null
+  dailyCapMinutes?: number | null
+  requiresOvertimeOver?: number | null
   sortOrder?: number
   locked?: boolean
   archivedAt?: Date | string | null
@@ -852,6 +982,10 @@ export type TimeStampTypeUpdateWithoutEventsInput = {
   allowedMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requiresNote?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultContext?: Prisma.NullableEnumWorkContextFieldUpdateOperationsInput | $Enums.WorkContext | null
+  page?: Prisma.EnumStampPageFieldUpdateOperationsInput | $Enums.StampPage
+  maxPerDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  dailyCapMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  requiresOvertimeOver?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   locked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -872,6 +1006,10 @@ export type TimeStampTypeUncheckedUpdateWithoutEventsInput = {
   allowedMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requiresNote?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultContext?: Prisma.NullableEnumWorkContextFieldUpdateOperationsInput | $Enums.WorkContext | null
+  page?: Prisma.EnumStampPageFieldUpdateOperationsInput | $Enums.StampPage
+  maxPerDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  dailyCapMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  requiresOvertimeOver?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   locked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -890,6 +1028,10 @@ export type TimeStampTypeCreateManyOrganizationInput = {
   allowedMinutes?: number | null
   requiresNote?: boolean
   defaultContext?: $Enums.WorkContext | null
+  page?: $Enums.StampPage
+  maxPerDay?: number | null
+  dailyCapMinutes?: number | null
+  requiresOvertimeOver?: number | null
   sortOrder?: number
   locked?: boolean
   archivedAt?: Date | string | null
@@ -908,6 +1050,10 @@ export type TimeStampTypeUpdateWithoutOrganizationInput = {
   allowedMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requiresNote?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultContext?: Prisma.NullableEnumWorkContextFieldUpdateOperationsInput | $Enums.WorkContext | null
+  page?: Prisma.EnumStampPageFieldUpdateOperationsInput | $Enums.StampPage
+  maxPerDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  dailyCapMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  requiresOvertimeOver?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   locked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -927,6 +1073,10 @@ export type TimeStampTypeUncheckedUpdateWithoutOrganizationInput = {
   allowedMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requiresNote?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultContext?: Prisma.NullableEnumWorkContextFieldUpdateOperationsInput | $Enums.WorkContext | null
+  page?: Prisma.EnumStampPageFieldUpdateOperationsInput | $Enums.StampPage
+  maxPerDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  dailyCapMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  requiresOvertimeOver?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   locked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -946,6 +1096,10 @@ export type TimeStampTypeUncheckedUpdateManyWithoutOrganizationInput = {
   allowedMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requiresNote?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultContext?: Prisma.NullableEnumWorkContextFieldUpdateOperationsInput | $Enums.WorkContext | null
+  page?: Prisma.EnumStampPageFieldUpdateOperationsInput | $Enums.StampPage
+  maxPerDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  dailyCapMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  requiresOvertimeOver?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   locked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -996,6 +1150,10 @@ export type TimeStampTypeSelect<ExtArgs extends runtime.Types.Extensions.Interna
   allowedMinutes?: boolean
   requiresNote?: boolean
   defaultContext?: boolean
+  page?: boolean
+  maxPerDay?: boolean
+  dailyCapMinutes?: boolean
+  requiresOvertimeOver?: boolean
   sortOrder?: boolean
   locked?: boolean
   archivedAt?: boolean
@@ -1018,6 +1176,10 @@ export type TimeStampTypeSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   allowedMinutes?: boolean
   requiresNote?: boolean
   defaultContext?: boolean
+  page?: boolean
+  maxPerDay?: boolean
+  dailyCapMinutes?: boolean
+  requiresOvertimeOver?: boolean
   sortOrder?: boolean
   locked?: boolean
   archivedAt?: boolean
@@ -1038,6 +1200,10 @@ export type TimeStampTypeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   allowedMinutes?: boolean
   requiresNote?: boolean
   defaultContext?: boolean
+  page?: boolean
+  maxPerDay?: boolean
+  dailyCapMinutes?: boolean
+  requiresOvertimeOver?: boolean
   sortOrder?: boolean
   locked?: boolean
   archivedAt?: boolean
@@ -1058,6 +1224,10 @@ export type TimeStampTypeSelectScalar = {
   allowedMinutes?: boolean
   requiresNote?: boolean
   defaultContext?: boolean
+  page?: boolean
+  maxPerDay?: boolean
+  dailyCapMinutes?: boolean
+  requiresOvertimeOver?: boolean
   sortOrder?: boolean
   locked?: boolean
   archivedAt?: boolean
@@ -1065,7 +1235,7 @@ export type TimeStampTypeSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TimeStampTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "key" | "name" | "icon" | "tone" | "kind" | "paid" | "allowedMinutes" | "requiresNote" | "defaultContext" | "sortOrder" | "locked" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["timeStampType"]>
+export type TimeStampTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "key" | "name" | "icon" | "tone" | "kind" | "paid" | "allowedMinutes" | "requiresNote" | "defaultContext" | "page" | "maxPerDay" | "dailyCapMinutes" | "requiresOvertimeOver" | "sortOrder" | "locked" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["timeStampType"]>
 export type TimeStampTypeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   events?: boolean | Prisma.TimeStampType$eventsArgs<ExtArgs>
@@ -1096,6 +1266,10 @@ export type $TimeStampTypePayload<ExtArgs extends runtime.Types.Extensions.Inter
     allowedMinutes: number | null
     requiresNote: boolean
     defaultContext: $Enums.WorkContext | null
+    page: $Enums.StampPage
+    maxPerDay: number | null
+    dailyCapMinutes: number | null
+    requiresOvertimeOver: number | null
     sortOrder: number
     locked: boolean
     archivedAt: Date | null
@@ -1537,6 +1711,10 @@ export interface TimeStampTypeFieldRefs {
   readonly allowedMinutes: Prisma.FieldRef<"TimeStampType", 'Int'>
   readonly requiresNote: Prisma.FieldRef<"TimeStampType", 'Boolean'>
   readonly defaultContext: Prisma.FieldRef<"TimeStampType", 'WorkContext'>
+  readonly page: Prisma.FieldRef<"TimeStampType", 'StampPage'>
+  readonly maxPerDay: Prisma.FieldRef<"TimeStampType", 'Int'>
+  readonly dailyCapMinutes: Prisma.FieldRef<"TimeStampType", 'Int'>
+  readonly requiresOvertimeOver: Prisma.FieldRef<"TimeStampType", 'Int'>
   readonly sortOrder: Prisma.FieldRef<"TimeStampType", 'Int'>
   readonly locked: Prisma.FieldRef<"TimeStampType", 'Boolean'>
   readonly archivedAt: Prisma.FieldRef<"TimeStampType", 'DateTime'>

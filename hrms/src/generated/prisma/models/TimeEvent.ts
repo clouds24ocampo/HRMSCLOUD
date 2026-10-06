@@ -52,6 +52,9 @@ export type TimeEventMinAggregateOutputType = {
   accuracy: number | null
   gpsStatus: $Enums.GpsStatus | null
   note: string | null
+  tripFrom: string | null
+  tripTo: string | null
+  tripReason: string | null
   createdById: string | null
   voidedAt: Date | null
   voidedById: string | null
@@ -74,6 +77,9 @@ export type TimeEventMaxAggregateOutputType = {
   accuracy: number | null
   gpsStatus: $Enums.GpsStatus | null
   note: string | null
+  tripFrom: string | null
+  tripTo: string | null
+  tripReason: string | null
   createdById: string | null
   voidedAt: Date | null
   voidedById: string | null
@@ -96,6 +102,9 @@ export type TimeEventCountAggregateOutputType = {
   accuracy: number
   gpsStatus: number
   note: number
+  tripFrom: number
+  tripTo: number
+  tripReason: number
   createdById: number
   voidedAt: number
   voidedById: number
@@ -132,6 +141,9 @@ export type TimeEventMinAggregateInputType = {
   accuracy?: true
   gpsStatus?: true
   note?: true
+  tripFrom?: true
+  tripTo?: true
+  tripReason?: true
   createdById?: true
   voidedAt?: true
   voidedById?: true
@@ -154,6 +166,9 @@ export type TimeEventMaxAggregateInputType = {
   accuracy?: true
   gpsStatus?: true
   note?: true
+  tripFrom?: true
+  tripTo?: true
+  tripReason?: true
   createdById?: true
   voidedAt?: true
   voidedById?: true
@@ -176,6 +191,9 @@ export type TimeEventCountAggregateInputType = {
   accuracy?: true
   gpsStatus?: true
   note?: true
+  tripFrom?: true
+  tripTo?: true
+  tripReason?: true
   createdById?: true
   voidedAt?: true
   voidedById?: true
@@ -285,6 +303,9 @@ export type TimeEventGroupByOutputType = {
   accuracy: number | null
   gpsStatus: $Enums.GpsStatus
   note: string | null
+  tripFrom: string | null
+  tripTo: string | null
+  tripReason: string | null
   createdById: string | null
   voidedAt: Date | null
   voidedById: string | null
@@ -330,6 +351,9 @@ export type TimeEventWhereInput = {
   accuracy?: Prisma.FloatNullableFilter<"TimeEvent"> | number | null
   gpsStatus?: Prisma.EnumGpsStatusFilter<"TimeEvent"> | $Enums.GpsStatus
   note?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  tripFrom?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  tripTo?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  tripReason?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   createdById?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   voidedAt?: Prisma.DateTimeNullableFilter<"TimeEvent"> | Date | string | null
   voidedById?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
@@ -355,6 +379,9 @@ export type TimeEventOrderByWithRelationInput = {
   accuracy?: Prisma.SortOrderInput | Prisma.SortOrder
   gpsStatus?: Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
+  tripFrom?: Prisma.SortOrderInput | Prisma.SortOrder
+  tripTo?: Prisma.SortOrderInput | Prisma.SortOrder
+  tripReason?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrderInput | Prisma.SortOrder
   voidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   voidedById?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -383,6 +410,9 @@ export type TimeEventWhereUniqueInput = Prisma.AtLeast<{
   accuracy?: Prisma.FloatNullableFilter<"TimeEvent"> | number | null
   gpsStatus?: Prisma.EnumGpsStatusFilter<"TimeEvent"> | $Enums.GpsStatus
   note?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  tripFrom?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  tripTo?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  tripReason?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   createdById?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   voidedAt?: Prisma.DateTimeNullableFilter<"TimeEvent"> | Date | string | null
   voidedById?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
@@ -408,6 +438,9 @@ export type TimeEventOrderByWithAggregationInput = {
   accuracy?: Prisma.SortOrderInput | Prisma.SortOrder
   gpsStatus?: Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
+  tripFrom?: Prisma.SortOrderInput | Prisma.SortOrder
+  tripTo?: Prisma.SortOrderInput | Prisma.SortOrder
+  tripReason?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrderInput | Prisma.SortOrder
   voidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   voidedById?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -438,6 +471,9 @@ export type TimeEventScalarWhereWithAggregatesInput = {
   accuracy?: Prisma.FloatNullableWithAggregatesFilter<"TimeEvent"> | number | null
   gpsStatus?: Prisma.EnumGpsStatusWithAggregatesFilter<"TimeEvent"> | $Enums.GpsStatus
   note?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
+  tripFrom?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
+  tripTo?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
+  tripReason?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
   createdById?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
   voidedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"TimeEvent"> | Date | string | null
   voidedById?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
@@ -457,6 +493,9 @@ export type TimeEventCreateInput = {
   accuracy?: number | null
   gpsStatus: $Enums.GpsStatus
   note?: string | null
+  tripFrom?: string | null
+  tripTo?: string | null
+  tripReason?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -482,6 +521,9 @@ export type TimeEventUncheckedCreateInput = {
   accuracy?: number | null
   gpsStatus: $Enums.GpsStatus
   note?: string | null
+  tripFrom?: string | null
+  tripTo?: string | null
+  tripReason?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -501,6 +543,9 @@ export type TimeEventUpdateInput = {
   accuracy?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   gpsStatus?: Prisma.EnumGpsStatusFieldUpdateOperationsInput | $Enums.GpsStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -526,6 +571,9 @@ export type TimeEventUncheckedUpdateInput = {
   accuracy?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   gpsStatus?: Prisma.EnumGpsStatusFieldUpdateOperationsInput | $Enums.GpsStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -548,6 +596,9 @@ export type TimeEventCreateManyInput = {
   accuracy?: number | null
   gpsStatus: $Enums.GpsStatus
   note?: string | null
+  tripFrom?: string | null
+  tripTo?: string | null
+  tripReason?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -567,6 +618,9 @@ export type TimeEventUpdateManyMutationInput = {
   accuracy?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   gpsStatus?: Prisma.EnumGpsStatusFieldUpdateOperationsInput | $Enums.GpsStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -589,6 +643,9 @@ export type TimeEventUncheckedUpdateManyInput = {
   accuracy?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   gpsStatus?: Prisma.EnumGpsStatusFieldUpdateOperationsInput | $Enums.GpsStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -621,6 +678,9 @@ export type TimeEventCountOrderByAggregateInput = {
   accuracy?: Prisma.SortOrder
   gpsStatus?: Prisma.SortOrder
   note?: Prisma.SortOrder
+  tripFrom?: Prisma.SortOrder
+  tripTo?: Prisma.SortOrder
+  tripReason?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   voidedAt?: Prisma.SortOrder
   voidedById?: Prisma.SortOrder
@@ -649,6 +709,9 @@ export type TimeEventMaxOrderByAggregateInput = {
   accuracy?: Prisma.SortOrder
   gpsStatus?: Prisma.SortOrder
   note?: Prisma.SortOrder
+  tripFrom?: Prisma.SortOrder
+  tripTo?: Prisma.SortOrder
+  tripReason?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   voidedAt?: Prisma.SortOrder
   voidedById?: Prisma.SortOrder
@@ -671,6 +734,9 @@ export type TimeEventMinOrderByAggregateInput = {
   accuracy?: Prisma.SortOrder
   gpsStatus?: Prisma.SortOrder
   note?: Prisma.SortOrder
+  tripFrom?: Prisma.SortOrder
+  tripTo?: Prisma.SortOrder
+  tripReason?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   voidedAt?: Prisma.SortOrder
   voidedById?: Prisma.SortOrder
@@ -846,6 +912,9 @@ export type TimeEventCreateWithoutOrganizationInput = {
   accuracy?: number | null
   gpsStatus: $Enums.GpsStatus
   note?: string | null
+  tripFrom?: string | null
+  tripTo?: string | null
+  tripReason?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -869,6 +938,9 @@ export type TimeEventUncheckedCreateWithoutOrganizationInput = {
   accuracy?: number | null
   gpsStatus: $Enums.GpsStatus
   note?: string | null
+  tripFrom?: string | null
+  tripTo?: string | null
+  tripReason?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -920,6 +992,9 @@ export type TimeEventScalarWhereInput = {
   accuracy?: Prisma.FloatNullableFilter<"TimeEvent"> | number | null
   gpsStatus?: Prisma.EnumGpsStatusFilter<"TimeEvent"> | $Enums.GpsStatus
   note?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  tripFrom?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  tripTo?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  tripReason?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   createdById?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   voidedAt?: Prisma.DateTimeNullableFilter<"TimeEvent"> | Date | string | null
   voidedById?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
@@ -939,6 +1014,9 @@ export type TimeEventCreateWithoutEmployeeInput = {
   accuracy?: number | null
   gpsStatus: $Enums.GpsStatus
   note?: string | null
+  tripFrom?: string | null
+  tripTo?: string | null
+  tripReason?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -962,6 +1040,9 @@ export type TimeEventUncheckedCreateWithoutEmployeeInput = {
   accuracy?: number | null
   gpsStatus: $Enums.GpsStatus
   note?: string | null
+  tripFrom?: string | null
+  tripTo?: string | null
+  tripReason?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -1007,6 +1088,9 @@ export type TimeEventCreateWithoutStampTypeInput = {
   accuracy?: number | null
   gpsStatus: $Enums.GpsStatus
   note?: string | null
+  tripFrom?: string | null
+  tripTo?: string | null
+  tripReason?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -1030,6 +1114,9 @@ export type TimeEventUncheckedCreateWithoutStampTypeInput = {
   accuracy?: number | null
   gpsStatus: $Enums.GpsStatus
   note?: string | null
+  tripFrom?: string | null
+  tripTo?: string | null
+  tripReason?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -1077,6 +1164,9 @@ export type TimeEventCreateManyOrganizationInput = {
   accuracy?: number | null
   gpsStatus: $Enums.GpsStatus
   note?: string | null
+  tripFrom?: string | null
+  tripTo?: string | null
+  tripReason?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -1096,6 +1186,9 @@ export type TimeEventUpdateWithoutOrganizationInput = {
   accuracy?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   gpsStatus?: Prisma.EnumGpsStatusFieldUpdateOperationsInput | $Enums.GpsStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1119,6 +1212,9 @@ export type TimeEventUncheckedUpdateWithoutOrganizationInput = {
   accuracy?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   gpsStatus?: Prisma.EnumGpsStatusFieldUpdateOperationsInput | $Enums.GpsStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1140,6 +1236,9 @@ export type TimeEventUncheckedUpdateManyWithoutOrganizationInput = {
   accuracy?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   gpsStatus?: Prisma.EnumGpsStatusFieldUpdateOperationsInput | $Enums.GpsStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1161,6 +1260,9 @@ export type TimeEventCreateManyEmployeeInput = {
   accuracy?: number | null
   gpsStatus: $Enums.GpsStatus
   note?: string | null
+  tripFrom?: string | null
+  tripTo?: string | null
+  tripReason?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -1180,6 +1282,9 @@ export type TimeEventUpdateWithoutEmployeeInput = {
   accuracy?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   gpsStatus?: Prisma.EnumGpsStatusFieldUpdateOperationsInput | $Enums.GpsStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1203,6 +1308,9 @@ export type TimeEventUncheckedUpdateWithoutEmployeeInput = {
   accuracy?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   gpsStatus?: Prisma.EnumGpsStatusFieldUpdateOperationsInput | $Enums.GpsStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1224,6 +1332,9 @@ export type TimeEventUncheckedUpdateManyWithoutEmployeeInput = {
   accuracy?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   gpsStatus?: Prisma.EnumGpsStatusFieldUpdateOperationsInput | $Enums.GpsStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1245,6 +1356,9 @@ export type TimeEventCreateManyStampTypeInput = {
   accuracy?: number | null
   gpsStatus: $Enums.GpsStatus
   note?: string | null
+  tripFrom?: string | null
+  tripTo?: string | null
+  tripReason?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -1264,6 +1378,9 @@ export type TimeEventUpdateWithoutStampTypeInput = {
   accuracy?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   gpsStatus?: Prisma.EnumGpsStatusFieldUpdateOperationsInput | $Enums.GpsStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1287,6 +1404,9 @@ export type TimeEventUncheckedUpdateWithoutStampTypeInput = {
   accuracy?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   gpsStatus?: Prisma.EnumGpsStatusFieldUpdateOperationsInput | $Enums.GpsStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1308,6 +1428,9 @@ export type TimeEventUncheckedUpdateManyWithoutStampTypeInput = {
   accuracy?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   gpsStatus?: Prisma.EnumGpsStatusFieldUpdateOperationsInput | $Enums.GpsStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1332,6 +1455,9 @@ export type TimeEventSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   accuracy?: boolean
   gpsStatus?: boolean
   note?: boolean
+  tripFrom?: boolean
+  tripTo?: boolean
+  tripReason?: boolean
   createdById?: boolean
   voidedAt?: boolean
   voidedById?: boolean
@@ -1357,6 +1483,9 @@ export type TimeEventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   accuracy?: boolean
   gpsStatus?: boolean
   note?: boolean
+  tripFrom?: boolean
+  tripTo?: boolean
+  tripReason?: boolean
   createdById?: boolean
   voidedAt?: boolean
   voidedById?: boolean
@@ -1382,6 +1511,9 @@ export type TimeEventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   accuracy?: boolean
   gpsStatus?: boolean
   note?: boolean
+  tripFrom?: boolean
+  tripTo?: boolean
+  tripReason?: boolean
   createdById?: boolean
   voidedAt?: boolean
   voidedById?: boolean
@@ -1407,6 +1539,9 @@ export type TimeEventSelectScalar = {
   accuracy?: boolean
   gpsStatus?: boolean
   note?: boolean
+  tripFrom?: boolean
+  tripTo?: boolean
+  tripReason?: boolean
   createdById?: boolean
   voidedAt?: boolean
   voidedById?: boolean
@@ -1415,7 +1550,7 @@ export type TimeEventSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TimeEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "employeeId" | "type" | "stampTypeId" | "at" | "source" | "workContext" | "lat" | "lng" | "accuracy" | "gpsStatus" | "note" | "createdById" | "voidedAt" | "voidedById" | "voidReason" | "createdAt" | "updatedAt", ExtArgs["result"]["timeEvent"]>
+export type TimeEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "employeeId" | "type" | "stampTypeId" | "at" | "source" | "workContext" | "lat" | "lng" | "accuracy" | "gpsStatus" | "note" | "tripFrom" | "tripTo" | "tripReason" | "createdById" | "voidedAt" | "voidedById" | "voidReason" | "createdAt" | "updatedAt", ExtArgs["result"]["timeEvent"]>
 export type TimeEventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
@@ -1453,6 +1588,9 @@ export type $TimeEventPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     accuracy: number | null
     gpsStatus: $Enums.GpsStatus
     note: string | null
+    tripFrom: string | null
+    tripTo: string | null
+    tripReason: string | null
     createdById: string | null
     voidedAt: Date | null
     voidedById: string | null
@@ -1898,6 +2036,9 @@ export interface TimeEventFieldRefs {
   readonly accuracy: Prisma.FieldRef<"TimeEvent", 'Float'>
   readonly gpsStatus: Prisma.FieldRef<"TimeEvent", 'GpsStatus'>
   readonly note: Prisma.FieldRef<"TimeEvent", 'String'>
+  readonly tripFrom: Prisma.FieldRef<"TimeEvent", 'String'>
+  readonly tripTo: Prisma.FieldRef<"TimeEvent", 'String'>
+  readonly tripReason: Prisma.FieldRef<"TimeEvent", 'String'>
   readonly createdById: Prisma.FieldRef<"TimeEvent", 'String'>
   readonly voidedAt: Prisma.FieldRef<"TimeEvent", 'DateTime'>
   readonly voidedById: Prisma.FieldRef<"TimeEvent", 'String'>

@@ -9,7 +9,9 @@ import { getMyEmployee } from "@/lib/employees";
 import { getOrgSettings } from "@/lib/settings";
 import { isHr, visibleEmployeeIds } from "@/lib/scope";
 import { ROLES } from "@/lib/roles";
-import { dayKey, dbDate, daysBetween, weekday } from "@/lib/time";
+import { addDays as addDaysKey, dayKey, dbDate, daysBetween, keyOfDbDate, weekday } from "@/lib/time";
+import { becomeCustom, followersOf } from "@/lib/schedule";
+import { notify } from "@/lib/notify";
 import type { FormState } from "@/app/login/actions";
 
 const key = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose both dates.");
@@ -49,19 +51,29 @@ export async function setRegularSchedule(_: FormState, form: FormData): Promise<
   const checked = await checkPeople(me, d.people, settings.timezone);
   if ("error" in checked) return checked;
 
+  // Team link: people who follow an edited supervisor get the same schedule; people edited without their supervisor become Custom.
+  const team = await prisma.employee.findMany({ where: { organizationId: me.organizationId }, select: { id: true, managerId: true, scheduleLinked: true, userId: true } });
+  const followers = followersOf(team, checked.ids);
+  const custom = becomeCustom(team, checked.ids);
+  const targets = [...checked.ids, ...followers];
+
   await prisma.$transaction(async (tx) => {
-    for (const employeeId of checked.ids) {
+    for (const employeeId of targets) {
       const same = await tx.regularSchedule.findFirst({ where: { employeeId, organizationId: me.organizationId, effectiveFrom: dbDate(d.effectiveFrom) } });
       const data = { shiftId: shift.id, workDays: d.days, createdById: me.id };
       if (same) await tx.regularSchedule.update({ where: { id: same.id }, data });
       else await tx.regularSchedule.create({ data: { ...data, organizationId: me.organizationId, employeeId, effectiveFrom: dbDate(d.effectiveFrom) } });
     }
+    if (custom.length) await tx.employee.updateMany({ where: { id: { in: custom }, organizationId: me.organizationId }, data: { scheduleLinked: false } });
   });
-  await audit(me.id, "schedule.regular_set", "RegularSchedule", undefined, { people: checked.ids.length, shift: shift.name, days: d.days, from: d.effectiveFrom }, me.organizationId);
+  await audit(me.id, "schedule.regular_set", "RegularSchedule", undefined, { people: checked.ids.length, followers: followers.length, custom: custom.length, shift: shift.name, days: d.days, from: d.effectiveFrom }, me.organizationId);
+  const userIds = team.filter((t) => targets.includes(t.id) && t.userId).map((t) => t.userId!);
+  await notify(me.organizationId, userIds, { title: "Your schedule changed", body: `${shift.name} from ${d.effectiveFrom}.`, href: "/schedule" }, me.id);
   revalidatePath("/schedule");
   revalidatePath("/employees");
   revalidatePath("/dtr");
-  return { ok: `Regular schedule saved for ${checked.ids.length} ${checked.ids.length === 1 ? "person" : "people"}, from ${d.effectiveFrom}.` };
+  const n = targets.length;
+  return { ok: `Regular schedule saved for ${n} ${n === 1 ? "person" : "people"}, from ${d.effectiveFrom}.${followers.length ? ` ${followers.length} followed their leader automatically.` : ""}${custom.length ? ` ${custom.length} now Custom (differs from their leader).` : ""}` };
 }
 
 // Plan a shift (or a day off, or clear the plan) for chosen people over a date range and weekdays.
@@ -115,4 +127,60 @@ export async function assignSchedule(_: FormState, form: FormData): Promise<Form
   revalidatePath("/dtr");
   const n = checked.ids.length;
   return { ok: `${d.shift === "CLEAR" ? "Changes cleared" : "Schedule saved"}: ${n} ${n === 1 ? "person" : "people"}, ${days.length} ${days.length === 1 ? "day" : "days"}.` };
+}
+
+// Put a Custom person back on their supervisor's schedule: copies the supervisor's current regular schedule and links them again.
+export async function relinkToLeader(employeeId: string): Promise<FormState> {
+  const me = await requireUser("/schedule");
+  if (!canPlan(me)) return { error: "You can view the schedule but not change it." };
+  const settings = await getOrgSettings(me.organizationId);
+  const checked = await checkPeople(me, [employeeId], settings.timezone);
+  if ("error" in checked) return checked;
+  const emp = await prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, select: { id: true, managerId: true } });
+  if (!emp?.managerId) return { error: "This person has no supervisor to follow." };
+  const today = dayKey(new Date(), settings.timezone);
+  const lead = await prisma.regularSchedule.findFirst({ where: { employeeId: emp.managerId, organizationId: me.organizationId, effectiveFrom: { lte: dbDate(today) } }, orderBy: { effectiveFrom: "desc" } });
+  if (!lead) return { error: "Their supervisor has no regular schedule yet." };
+  await prisma.$transaction([
+    prisma.regularSchedule.upsert({
+      where: { id: (await prisma.regularSchedule.findFirst({ where: { employeeId, effectiveFrom: dbDate(today) }, select: { id: true } }))?.id ?? "none" },
+      update: { shiftId: lead.shiftId, workDays: lead.workDays, createdById: me.id },
+      create: { organizationId: me.organizationId, employeeId, shiftId: lead.shiftId, workDays: lead.workDays, effectiveFrom: dbDate(today), createdById: me.id },
+    }),
+    prisma.employee.update({ where: { id: employeeId }, data: { scheduleLinked: true } }),
+  ]);
+  await audit(me.id, "schedule.relinked", "Employee", employeeId, { to: emp.managerId }, me.organizationId);
+  revalidatePath("/schedule");
+  revalidatePath("/dtr");
+  return { ok: "Back on their leader's schedule." };
+}
+
+// Copy the previous week's day changes (swaps, extra shifts, days off) onto the shown week for chosen people.
+export async function copyLastWeek(weekStart: string, _: FormState, form: FormData): Promise<FormState> {
+  const me = await requireUser("/schedule");
+  if (!canPlan(me)) return { error: "You can view the schedule but not change it." };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(weekStart)) return { error: "Bad week." };
+  const settings = await getOrgSettings(me.organizationId);
+  const people = form.getAll("people").map(String);
+  const checked = await checkPeople(me, people, settings.timezone);
+  if ("error" in checked) return checked;
+  const today = dayKey(new Date(), settings.timezone);
+  const prev = daysBetween(addDaysKey(weekStart, -7), addDaysKey(weekStart, -1));
+  const rows = await prisma.scheduleEntry.findMany({ where: { organizationId: me.organizationId, employeeId: { in: checked.ids }, date: { in: prev.map(dbDate) } } });
+  let n = 0;
+  await prisma.$transaction(async (tx) => {
+    for (const r of rows) {
+      const target = addDaysKey(keyOfDbDate(r.date), 7);
+      if (target < today && !isHr(me.role.key)) continue;
+      await tx.scheduleEntry.upsert({
+        where: { employeeId_date: { employeeId: r.employeeId, date: dbDate(target) } },
+        update: { shiftId: r.shiftId },
+        create: { organizationId: me.organizationId, employeeId: r.employeeId, date: dbDate(target), shiftId: r.shiftId },
+      });
+      n++;
+    }
+  });
+  await audit(me.id, "schedule.copied_week", "ScheduleEntry", undefined, { weekStart, people: checked.ids.length, entries: n }, me.organizationId);
+  revalidatePath("/schedule");
+  return { ok: n ? `Copied ${n} day ${n === 1 ? "change" : "changes"} from last week.` : "Nothing to copy: last week had no day changes." };
 }

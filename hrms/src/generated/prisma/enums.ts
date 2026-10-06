@@ -66,6 +66,14 @@ export const StampKind = {
 export type StampKind = (typeof StampKind)[keyof typeof StampKind]
 
 
+export const StampPage = {
+  PUNCH: 'PUNCH',
+  ISSUE: 'ISSUE'
+} as const
+
+export type StampPage = (typeof StampPage)[keyof typeof StampPage]
+
+
 export const WorkContext = {
   OFFICE: 'OFFICE',
   FIELD: 'FIELD',

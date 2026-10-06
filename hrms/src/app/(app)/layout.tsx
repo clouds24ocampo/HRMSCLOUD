@@ -4,6 +4,7 @@ import { getUser } from "@/lib/auth";
 import { canAccess } from "@/lib/roles";
 import { MENU, MOBILE_PRIMARY } from "@/lib/menu";
 import { Nav } from "@/components/Nav";
+import { AutoRefresh } from "@/components/AutoRefresh";
 import { logout } from "@/app/login/actions";
 import { prisma } from "@/lib/prisma";
 
@@ -38,6 +39,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         </header>
         <main className="flex-1 px-4 py-6 sm:px-8">{children}</main>
+        <AutoRefresh />
       </div>
     </div>
   );

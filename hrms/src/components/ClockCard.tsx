@@ -75,6 +75,8 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
   const [unlockError, setUnlockError] = useState<string>();
   const [result, setResult] = useState<ClockResult>();
   const [step, setStep] = useState<"idle" | "verifying" | "locating">("idle");
+  const [tab, setTab] = useState<"PUNCH" | "ISSUE">("PUNCH");
+  const [trip, setTrip] = useState<{ open: boolean; from: string; to: string; reason: string }>({ open: false, from: "", to: "", reason: "" });
   const [, start] = useTransition();
 
   useEffect(() => {
@@ -107,16 +109,21 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
     });
   };
 
-  const press = (t: ClockType) => {
+  const press = (t: ClockType, tripReady = false) => {
     setResult(undefined);
+    const resumingNow = state === "ON_PAUSE" && pause?.typeId === t.id;
+    if (t.key === "ON_TRIP" && !resumingNow && !tripReady) return setTrip((x) => ({ ...x, open: true }));
+    const tripFields = t.key === "ON_TRIP" && !resumingNow ? { tripFrom: trip.from, tripTo: trip.to, tripReason: trip.reason } : {};
     setStep("locating");
     start(async () => {
       const loc = await getLocation();
-      const r = await recordTime({ stampTypeId: t.id, workContext: (t.defaultContext ?? ctx) as "OFFICE", note: note || undefined, ...loc });
+      const r = await recordTime({ stampTypeId: t.id, workContext: (t.defaultContext ?? ctx) as "OFFICE", note: note || undefined, ...tripFields, ...loc });
       setStep("idle");
       setResult(r);
+      if (r.needTrip) setTrip((x) => ({ ...x, open: true }));
       if (r.ok) {
         setNote("");
+        setTrip({ open: false, from: "", to: "", reason: "" });
         setUnlockedUntil(null); // one unlock, one time stamp
         router.refresh();
       }
@@ -130,7 +137,7 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
     if (t.kind === "IN") return state === "OUT" ? null : "You are already timed in";
     if (t.kind === "OUT") return state === "OUT" ? "Time In first" : null;
     if (state === "OUT") return "Time In first";
-    if (state === "IN") return null;
+    if (state === "IN") return t.rule;
     return pause?.typeId === t.id ? null : `End ${pause?.name} first`;
   };
 
@@ -187,8 +194,19 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
             className={`${inputClass} ${result?.needNote ? "border-warning ring-2 ring-warning/40" : ""}`}
           />
         </label>
+        <div className="mb-3 flex gap-2" role="tablist" aria-label="Time stamp pages">
+          {([["PUNCH", "Punch"], ["ISSUE", "Issues"]] as const).map(([k, l]) => (
+            <button
+              key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
+              className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${tab === k ? "border-photon bg-photon/15 text-photon" : "border-white/15 text-muted hover:bg-white/5"}`}
+            >
+              {l}
+              {k === "ISSUE" && state === "ON_PAUSE" && types.find((x) => x.id === pause?.typeId)?.page === "ISSUE" && <span className="ml-1.5 inline-block h-2 w-2 rounded-full bg-warning" aria-label="active" />}
+            </button>
+          ))}
+        </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {types.map((t) => {
+          {types.filter((t) => t.page === tab).map((t) => {
             const blocked = why(t);
             const resuming = state === "ON_PAUSE" && pause?.typeId === t.id;
             return (
@@ -201,7 +219,11 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
                 <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border text-xl ${TONE[t.tone] ?? TONE.slate}`} aria-hidden>{t.icon}</span>
                 <span className="min-w-0">
                   <span className="block truncate font-semibold">{resuming ? `End ${t.name}` : t.name}</span>
-                  {t.kind === "PAUSE" && t.allowedMinutes && !resuming && <span className="block text-xs text-muted">up to {t.allowedMinutes} min</span>}
+                  {t.kind === "PAUSE" && !resuming && (blocked && !blocked.startsWith("Verify") && !blocked.startsWith("Time In") ? (
+                    <span className="block text-xs text-warning">{blocked}</span>
+                  ) : (
+                    <span className="block text-xs text-muted">{[t.allowedMinutes ? `up to ${t.allowedMinutes} min` : null, t.hint].filter(Boolean).join(" · ")}</span>
+                  ))}
                   {resuming && <span className={`block text-xs tabular-nums ${pausedOver ? "text-danger" : "text-muted"}`}>{clock(pausedSec)}{pausedOver ? " · over limit" : ""}</span>}
                 </span>
               </button>
@@ -209,6 +231,29 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
           })}
         </div>
       </Step>
+
+      {trip.open && state !== "ON_PAUSE" && (
+        <form
+          onSubmit={(e) => { e.preventDefault(); const t = types.find((x) => x.key === "ON_TRIP"); if (t) press(t, true); }}
+          className="mt-4 space-y-3 rounded-2xl border border-photon/30 bg-photon/5 p-4"
+        >
+          <p className="text-sm font-semibold">On Trip: where are you going?</p>
+          <p className="text-xs text-muted">Date and time are stamped automatically when you press Start trip.</p>
+          {([["from", "Departure"], ["to", "Destination"], ["reason", "Reason for travel"]] as const).map(([k, l]) => (
+            <label key={k} className="block text-sm font-medium">
+              {l}
+              <input
+                value={trip[k]} onChange={(e) => setTrip((x) => ({ ...x, [k]: e.target.value }))} maxLength={120} required minLength={3}
+                className={`${inputClass} ${result?.needTrip && trip[k].trim().length < 3 ? "border-warning ring-2 ring-warning/40" : ""}`}
+              />
+            </label>
+          ))}
+          <div className="flex gap-2">
+            <button disabled={busy || !unlocked} className="rounded-xl bg-photon px-4 py-2 text-sm font-semibold text-void disabled:opacity-40">Start trip</button>
+            <button type="button" onClick={() => setTrip({ open: false, from: "", to: "", reason: "" })} className="px-3 py-2 text-sm text-muted">Cancel</button>
+          </div>
+        </form>
+      )}
 
       {requirePassword && !unlocked && (
         <button

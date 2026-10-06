@@ -130,3 +130,17 @@ describe("clockStatus", () => {
     expect(s.pause?.name).toBe("Meal");
   });
 });
+
+describe("daily cap", () => {
+  const BIO: StampInfo = { id: "bio", name: "Bio Break", paid: true, allowedMinutes: null, dailyCapMinutes: 10 };
+  const bio = (n: number, hm: string, end: string): Punch[] => [p("PAUSE_START", "2026-10-05", hm, BIO), p("PAUSE_END", "2026-10-05", end, BIO)];
+  const day1 = (...mid: Punch[]) => run([p("IN", "2026-10-05", "08:00"), ...mid, p("OUT", "2026-10-05", "17:00")], ["2026-10-05"], [["2026-10-05", day]])[0];
+  it("flags only the minutes above the daily total", () => {
+    const r = day1(...bio(1, "09:00", "09:06"), ...bio(2, "10:00", "10:06"));
+    expect(r.overLimitMinutes).toBe(2);
+    expect(r.pauses.find((x) => x.name === "Bio Break")?.overMinutes).toBe(2);
+  });
+  it("does not flag when the total stays within the cap", () => {
+    expect(day1(...bio(1, "09:00", "09:04"), ...bio(2, "10:00", "10:04")).overLimitMinutes).toBe(0);
+  });
+});

@@ -4033,6 +4033,7 @@ export const EmployeeScalarFieldEnum = {
   departmentId: 'departmentId',
   positionId: 'positionId',
   managerId: 'managerId',
+  scheduleLinked: 'scheduleLinked',
   hireDate: 'hireDate',
   status: 'status',
   createdAt: 'createdAt',
@@ -4116,6 +4117,10 @@ export const TimeStampTypeScalarFieldEnum = {
   allowedMinutes: 'allowedMinutes',
   requiresNote: 'requiresNote',
   defaultContext: 'defaultContext',
+  page: 'page',
+  maxPerDay: 'maxPerDay',
+  dailyCapMinutes: 'dailyCapMinutes',
+  requiresOvertimeOver: 'requiresOvertimeOver',
   sortOrder: 'sortOrder',
   locked: 'locked',
   archivedAt: 'archivedAt',
@@ -4140,6 +4145,9 @@ export const TimeEventScalarFieldEnum = {
   accuracy: 'accuracy',
   gpsStatus: 'gpsStatus',
   note: 'note',
+  tripFrom: 'tripFrom',
+  tripTo: 'tripTo',
+  tripReason: 'tripReason',
   createdById: 'createdById',
   voidedAt: 'voidedAt',
   voidedById: 'voidedById',
@@ -4928,6 +4936,20 @@ export type EnumWorkContextFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'WorkContext[]'
  */
 export type ListEnumWorkContextFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkContext[]'>
+    
+
+
+/**
+ * Reference to a field of type 'StampPage'
+ */
+export type EnumStampPageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StampPage'>
+    
+
+
+/**
+ * Reference to a field of type 'StampPage[]'
+ */
+export type ListEnumStampPageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StampPage[]'>
     
 
 
