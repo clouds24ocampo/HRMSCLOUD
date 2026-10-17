@@ -81,3 +81,9 @@ body {
   nav[aria-label="Main"], header { display: none !important; }
   body { background: #fff; }
 }
+
+/* Hide native browser password reveal eye (e.g. Edge, IE) so only custom eye is shown */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}

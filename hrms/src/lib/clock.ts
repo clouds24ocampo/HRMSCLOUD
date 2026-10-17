@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { sweepAutoTimeouts } from "@/lib/auto-timeout";
 import { clockStatus } from "@/lib/dtr";
 import { getOrgSettings } from "@/lib/settings";
 import { getStampTypes } from "@/lib/stamps";
@@ -15,6 +16,7 @@ export type ClockType = {
 
 // Everything the time stamp card needs: where the person is in their day, which buttons exist, and the password rule.
 export async function getClockInfo(organizationId: string, employeeId: string, tz: string) {
+  await sweepAutoTimeouts(organizationId); // a forgotten time-out shows as done the moment anyone looks
   const [events, types, settings, ot] = await Promise.all([
     prisma.timeEvent.findMany({
       where: { organizationId, employeeId, voidedAt: null, at: { gte: new Date(Date.now() - 36 * 3600_000) } },

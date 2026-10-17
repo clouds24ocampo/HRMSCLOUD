@@ -55,6 +55,10 @@ export type TimeEventMinAggregateOutputType = {
   tripFrom: string | null
   tripTo: string | null
   tripReason: string | null
+  locSource: string | null
+  device: string | null
+  ipAddress: string | null
+  userAgent: string | null
   createdById: string | null
   voidedAt: Date | null
   voidedById: string | null
@@ -80,6 +84,10 @@ export type TimeEventMaxAggregateOutputType = {
   tripFrom: string | null
   tripTo: string | null
   tripReason: string | null
+  locSource: string | null
+  device: string | null
+  ipAddress: string | null
+  userAgent: string | null
   createdById: string | null
   voidedAt: Date | null
   voidedById: string | null
@@ -105,6 +113,10 @@ export type TimeEventCountAggregateOutputType = {
   tripFrom: number
   tripTo: number
   tripReason: number
+  locSource: number
+  device: number
+  ipAddress: number
+  userAgent: number
   createdById: number
   voidedAt: number
   voidedById: number
@@ -144,6 +156,10 @@ export type TimeEventMinAggregateInputType = {
   tripFrom?: true
   tripTo?: true
   tripReason?: true
+  locSource?: true
+  device?: true
+  ipAddress?: true
+  userAgent?: true
   createdById?: true
   voidedAt?: true
   voidedById?: true
@@ -169,6 +185,10 @@ export type TimeEventMaxAggregateInputType = {
   tripFrom?: true
   tripTo?: true
   tripReason?: true
+  locSource?: true
+  device?: true
+  ipAddress?: true
+  userAgent?: true
   createdById?: true
   voidedAt?: true
   voidedById?: true
@@ -194,6 +214,10 @@ export type TimeEventCountAggregateInputType = {
   tripFrom?: true
   tripTo?: true
   tripReason?: true
+  locSource?: true
+  device?: true
+  ipAddress?: true
+  userAgent?: true
   createdById?: true
   voidedAt?: true
   voidedById?: true
@@ -306,6 +330,10 @@ export type TimeEventGroupByOutputType = {
   tripFrom: string | null
   tripTo: string | null
   tripReason: string | null
+  locSource: string | null
+  device: string | null
+  ipAddress: string | null
+  userAgent: string | null
   createdById: string | null
   voidedAt: Date | null
   voidedById: string | null
@@ -354,6 +382,10 @@ export type TimeEventWhereInput = {
   tripFrom?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   tripTo?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   tripReason?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  locSource?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  device?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  ipAddress?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  userAgent?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   createdById?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   voidedAt?: Prisma.DateTimeNullableFilter<"TimeEvent"> | Date | string | null
   voidedById?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
@@ -382,6 +414,10 @@ export type TimeEventOrderByWithRelationInput = {
   tripFrom?: Prisma.SortOrderInput | Prisma.SortOrder
   tripTo?: Prisma.SortOrderInput | Prisma.SortOrder
   tripReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  locSource?: Prisma.SortOrderInput | Prisma.SortOrder
+  device?: Prisma.SortOrderInput | Prisma.SortOrder
+  ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  userAgent?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrderInput | Prisma.SortOrder
   voidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   voidedById?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -413,6 +449,10 @@ export type TimeEventWhereUniqueInput = Prisma.AtLeast<{
   tripFrom?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   tripTo?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   tripReason?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  locSource?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  device?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  ipAddress?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  userAgent?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   createdById?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   voidedAt?: Prisma.DateTimeNullableFilter<"TimeEvent"> | Date | string | null
   voidedById?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
@@ -441,6 +481,10 @@ export type TimeEventOrderByWithAggregationInput = {
   tripFrom?: Prisma.SortOrderInput | Prisma.SortOrder
   tripTo?: Prisma.SortOrderInput | Prisma.SortOrder
   tripReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  locSource?: Prisma.SortOrderInput | Prisma.SortOrder
+  device?: Prisma.SortOrderInput | Prisma.SortOrder
+  ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  userAgent?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrderInput | Prisma.SortOrder
   voidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   voidedById?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -474,6 +518,10 @@ export type TimeEventScalarWhereWithAggregatesInput = {
   tripFrom?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
   tripTo?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
   tripReason?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
+  locSource?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
+  device?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
+  ipAddress?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
+  userAgent?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
   createdById?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
   voidedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"TimeEvent"> | Date | string | null
   voidedById?: Prisma.StringNullableWithAggregatesFilter<"TimeEvent"> | string | null
@@ -496,6 +544,10 @@ export type TimeEventCreateInput = {
   tripFrom?: string | null
   tripTo?: string | null
   tripReason?: string | null
+  locSource?: string | null
+  device?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -524,6 +576,10 @@ export type TimeEventUncheckedCreateInput = {
   tripFrom?: string | null
   tripTo?: string | null
   tripReason?: string | null
+  locSource?: string | null
+  device?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -546,6 +602,10 @@ export type TimeEventUpdateInput = {
   tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  device?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -574,6 +634,10 @@ export type TimeEventUncheckedUpdateInput = {
   tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  device?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -599,6 +663,10 @@ export type TimeEventCreateManyInput = {
   tripFrom?: string | null
   tripTo?: string | null
   tripReason?: string | null
+  locSource?: string | null
+  device?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -621,6 +689,10 @@ export type TimeEventUpdateManyMutationInput = {
   tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  device?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -646,6 +718,10 @@ export type TimeEventUncheckedUpdateManyInput = {
   tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  device?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -681,6 +757,10 @@ export type TimeEventCountOrderByAggregateInput = {
   tripFrom?: Prisma.SortOrder
   tripTo?: Prisma.SortOrder
   tripReason?: Prisma.SortOrder
+  locSource?: Prisma.SortOrder
+  device?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  userAgent?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   voidedAt?: Prisma.SortOrder
   voidedById?: Prisma.SortOrder
@@ -712,6 +792,10 @@ export type TimeEventMaxOrderByAggregateInput = {
   tripFrom?: Prisma.SortOrder
   tripTo?: Prisma.SortOrder
   tripReason?: Prisma.SortOrder
+  locSource?: Prisma.SortOrder
+  device?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  userAgent?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   voidedAt?: Prisma.SortOrder
   voidedById?: Prisma.SortOrder
@@ -737,6 +821,10 @@ export type TimeEventMinOrderByAggregateInput = {
   tripFrom?: Prisma.SortOrder
   tripTo?: Prisma.SortOrder
   tripReason?: Prisma.SortOrder
+  locSource?: Prisma.SortOrder
+  device?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  userAgent?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   voidedAt?: Prisma.SortOrder
   voidedById?: Prisma.SortOrder
@@ -915,6 +1003,10 @@ export type TimeEventCreateWithoutOrganizationInput = {
   tripFrom?: string | null
   tripTo?: string | null
   tripReason?: string | null
+  locSource?: string | null
+  device?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -941,6 +1033,10 @@ export type TimeEventUncheckedCreateWithoutOrganizationInput = {
   tripFrom?: string | null
   tripTo?: string | null
   tripReason?: string | null
+  locSource?: string | null
+  device?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -995,6 +1091,10 @@ export type TimeEventScalarWhereInput = {
   tripFrom?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   tripTo?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   tripReason?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  locSource?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  device?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  ipAddress?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
+  userAgent?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   createdById?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
   voidedAt?: Prisma.DateTimeNullableFilter<"TimeEvent"> | Date | string | null
   voidedById?: Prisma.StringNullableFilter<"TimeEvent"> | string | null
@@ -1017,6 +1117,10 @@ export type TimeEventCreateWithoutEmployeeInput = {
   tripFrom?: string | null
   tripTo?: string | null
   tripReason?: string | null
+  locSource?: string | null
+  device?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -1043,6 +1147,10 @@ export type TimeEventUncheckedCreateWithoutEmployeeInput = {
   tripFrom?: string | null
   tripTo?: string | null
   tripReason?: string | null
+  locSource?: string | null
+  device?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -1091,6 +1199,10 @@ export type TimeEventCreateWithoutStampTypeInput = {
   tripFrom?: string | null
   tripTo?: string | null
   tripReason?: string | null
+  locSource?: string | null
+  device?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -1117,6 +1229,10 @@ export type TimeEventUncheckedCreateWithoutStampTypeInput = {
   tripFrom?: string | null
   tripTo?: string | null
   tripReason?: string | null
+  locSource?: string | null
+  device?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -1167,6 +1283,10 @@ export type TimeEventCreateManyOrganizationInput = {
   tripFrom?: string | null
   tripTo?: string | null
   tripReason?: string | null
+  locSource?: string | null
+  device?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -1189,6 +1309,10 @@ export type TimeEventUpdateWithoutOrganizationInput = {
   tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  device?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1215,6 +1339,10 @@ export type TimeEventUncheckedUpdateWithoutOrganizationInput = {
   tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  device?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1239,6 +1367,10 @@ export type TimeEventUncheckedUpdateManyWithoutOrganizationInput = {
   tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  device?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1263,6 +1395,10 @@ export type TimeEventCreateManyEmployeeInput = {
   tripFrom?: string | null
   tripTo?: string | null
   tripReason?: string | null
+  locSource?: string | null
+  device?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -1285,6 +1421,10 @@ export type TimeEventUpdateWithoutEmployeeInput = {
   tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  device?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1311,6 +1451,10 @@ export type TimeEventUncheckedUpdateWithoutEmployeeInput = {
   tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  device?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1335,6 +1479,10 @@ export type TimeEventUncheckedUpdateManyWithoutEmployeeInput = {
   tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  device?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1359,6 +1507,10 @@ export type TimeEventCreateManyStampTypeInput = {
   tripFrom?: string | null
   tripTo?: string | null
   tripReason?: string | null
+  locSource?: string | null
+  device?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
   createdById?: string | null
   voidedAt?: Date | string | null
   voidedById?: string | null
@@ -1381,6 +1533,10 @@ export type TimeEventUpdateWithoutStampTypeInput = {
   tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  device?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1407,6 +1563,10 @@ export type TimeEventUncheckedUpdateWithoutStampTypeInput = {
   tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  device?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1431,6 +1591,10 @@ export type TimeEventUncheckedUpdateManyWithoutStampTypeInput = {
   tripFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tripReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  device?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1458,6 +1622,10 @@ export type TimeEventSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   tripFrom?: boolean
   tripTo?: boolean
   tripReason?: boolean
+  locSource?: boolean
+  device?: boolean
+  ipAddress?: boolean
+  userAgent?: boolean
   createdById?: boolean
   voidedAt?: boolean
   voidedById?: boolean
@@ -1486,6 +1654,10 @@ export type TimeEventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   tripFrom?: boolean
   tripTo?: boolean
   tripReason?: boolean
+  locSource?: boolean
+  device?: boolean
+  ipAddress?: boolean
+  userAgent?: boolean
   createdById?: boolean
   voidedAt?: boolean
   voidedById?: boolean
@@ -1514,6 +1686,10 @@ export type TimeEventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   tripFrom?: boolean
   tripTo?: boolean
   tripReason?: boolean
+  locSource?: boolean
+  device?: boolean
+  ipAddress?: boolean
+  userAgent?: boolean
   createdById?: boolean
   voidedAt?: boolean
   voidedById?: boolean
@@ -1542,6 +1718,10 @@ export type TimeEventSelectScalar = {
   tripFrom?: boolean
   tripTo?: boolean
   tripReason?: boolean
+  locSource?: boolean
+  device?: boolean
+  ipAddress?: boolean
+  userAgent?: boolean
   createdById?: boolean
   voidedAt?: boolean
   voidedById?: boolean
@@ -1550,7 +1730,7 @@ export type TimeEventSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TimeEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "employeeId" | "type" | "stampTypeId" | "at" | "source" | "workContext" | "lat" | "lng" | "accuracy" | "gpsStatus" | "note" | "tripFrom" | "tripTo" | "tripReason" | "createdById" | "voidedAt" | "voidedById" | "voidReason" | "createdAt" | "updatedAt", ExtArgs["result"]["timeEvent"]>
+export type TimeEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "employeeId" | "type" | "stampTypeId" | "at" | "source" | "workContext" | "lat" | "lng" | "accuracy" | "gpsStatus" | "note" | "tripFrom" | "tripTo" | "tripReason" | "locSource" | "device" | "ipAddress" | "userAgent" | "createdById" | "voidedAt" | "voidedById" | "voidReason" | "createdAt" | "updatedAt", ExtArgs["result"]["timeEvent"]>
 export type TimeEventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
@@ -1591,6 +1771,10 @@ export type $TimeEventPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     tripFrom: string | null
     tripTo: string | null
     tripReason: string | null
+    locSource: string | null
+    device: string | null
+    ipAddress: string | null
+    userAgent: string | null
     createdById: string | null
     voidedAt: Date | null
     voidedById: string | null
@@ -2039,6 +2223,10 @@ export interface TimeEventFieldRefs {
   readonly tripFrom: Prisma.FieldRef<"TimeEvent", 'String'>
   readonly tripTo: Prisma.FieldRef<"TimeEvent", 'String'>
   readonly tripReason: Prisma.FieldRef<"TimeEvent", 'String'>
+  readonly locSource: Prisma.FieldRef<"TimeEvent", 'String'>
+  readonly device: Prisma.FieldRef<"TimeEvent", 'String'>
+  readonly ipAddress: Prisma.FieldRef<"TimeEvent", 'String'>
+  readonly userAgent: Prisma.FieldRef<"TimeEvent", 'String'>
   readonly createdById: Prisma.FieldRef<"TimeEvent", 'String'>
   readonly voidedAt: Prisma.FieldRef<"TimeEvent", 'DateTime'>
   readonly voidedById: Prisma.FieldRef<"TimeEvent", 'String'>

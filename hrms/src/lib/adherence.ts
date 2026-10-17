@@ -12,7 +12,7 @@ export type Summary = {
   onTimePct: number | null; attendancePct: number | null; adherencePct: number | null; verdict: Verdict;
 };
 
-const shiftMinutes = (s: { startTime: string; endTime: string; breakMinutes: number }) => {
+export const shiftMinutes = (s: { startTime: string; endTime: string; breakMinutes: number }) => {
   const a = parseHM(s.startTime) ?? 0, b = parseHM(s.endTime) ?? 0;
   return Math.max(0, (b <= a ? b + 1440 : b) - a - s.breakMinutes);
 };

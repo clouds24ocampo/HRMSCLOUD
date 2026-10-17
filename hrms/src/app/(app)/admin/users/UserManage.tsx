@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { PasswordInput } from "@/components/PasswordInput";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert } from "@/components/Fields";
 import { inputClass } from "@/components/ui";
@@ -21,7 +22,7 @@ export function UserManage({ user, roles }: { user: U; roles: { id: string; name
       <form {...reset.formProps} className="flex flex-wrap items-end gap-2">
         <label className="block min-w-0 flex-1 basis-56 text-sm font-medium">
           New temporary password
-          <input name="password" type="password" autoComplete="new-password" minLength={10} required placeholder="At least 10 characters" className={inputClass} />
+          <PasswordInput id="password" autoComplete="new-password" minLength={10} required placeholder="At least 10 characters" className={inputClass} />
         </label>
         <button disabled={reset.pending} className="rounded-lg border border-line bg-surface px-4 py-2.5 text-sm font-semibold transition hover:bg-bg active:scale-95 disabled:opacity-60">Reset password</button>
       </form>

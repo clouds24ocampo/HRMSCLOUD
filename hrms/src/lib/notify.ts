@@ -12,10 +12,13 @@ export async function notify(organizationId: string, userIds: string[], note: No
 
 // Everyone who may decide for this employee: HR and Super Admins, plus the supervisor chain above them.
 export async function approverUserIds(organizationId: string, employeeId: string): Promise<string[]> {
-  const [hr, people] = await Promise.all([
-    prisma.user.findMany({ where: { organizationId, active: true, role: { key: { in: [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN] } } }, select: { id: true } }),
-    prisma.employee.findMany({ where: { organizationId }, select: { id: true, managerId: true, userId: true } }),
-  ]);
+  const hr = await prisma.user.findMany({ where: { organizationId, active: true, role: { key: { in: [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN] } } }, select: { id: true } });
+  return [...hr.map((u) => u.id), ...(await supervisorUserIds(organizationId, employeeId))];
+}
+
+// Sign-ins of the supervisor chain above this employee, nearest first.
+export async function supervisorUserIds(organizationId: string, employeeId: string): Promise<string[]> {
+  const people = await prisma.employee.findMany({ where: { organizationId }, select: { id: true, managerId: true, userId: true } });
   const byId = new Map(people.map((p) => [p.id, p]));
   const chain: string[] = [];
   const seen = new Set<string>();
@@ -24,7 +27,7 @@ export async function approverUserIds(organizationId: string, employeeId: string
     const uid = byId.get(cur)?.userId;
     if (uid) chain.push(uid);
   }
-  return [...hr.map((u) => u.id), ...chain];
+  return chain;
 }
 
 export async function userIdOfEmployee(organizationId: string, employeeId: string): Promise<string | null> {

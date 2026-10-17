@@ -6,9 +6,10 @@ import { formatMoney } from "@/lib/money";
 import { attendanceSummary, pct } from "@/lib/reports";
 import { getOrgSettings } from "@/lib/settings";
 import { MAX_RANGE_DAYS } from "@/lib/dtr-data";
-import { addDays, dayKey, daysBetween, dbDate, formatDay, formatDuration } from "@/lib/time";
+import { addDays, dayKey, daysBetween, dbDate, formatDay, formatDuration, formatDurationPrecise } from "@/lib/time";
 import { Card, EmptyState, PageHeader, Stat, buttonClass, ghostClass, inputClass } from "@/components/ui";
 import { STATUS_LABEL } from "@/lib/labels";
+
 
 const isKey = (s?: string) => !!s && /^\d{4}-\d{2}-\d{2}$/.test(s);
 
@@ -61,11 +62,21 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
   for (const l of leave) leaveByType.set(l.leaveType.name, (leaveByType.get(l.leaveType.name) ?? 0) + l.days);
   const pay = periods.flatMap((p) => p.payslips).reduce((a, s) => ({ gross: a.gross + s.grossCents, net: a.net + s.netCents, ded: a.ded + s.deductionsCents, er: a.er + s.employerCostCents }), { gross: 0, net: 0, ded: 0, er: 0 });
   const tot = attendance.reduce((a, r) => ({ sched: a.sched + r.scheduled, present: a.present + r.present, absent: a.absent + r.absent, late: a.late + r.lateCount, lateMin: a.lateMin + r.lateMinutes, ot: a.ot + r.overtimeMinutes }), { sched: 0, present: 0, absent: 0, late: 0, lateMin: 0, ot: 0 });
+  const prodTotals = attendance.reduce(
+    (a, r) => ({
+      productiveSec: a.productiveSec + r.productiveSeconds,
+      issueSec: a.issueSec + r.issueSeconds,
+      breakSec: a.breakSec + r.breakSeconds,
+    }),
+    { productiveSec: 0, issueSec: 0, breakSec: 0 }
+  );
+  const activeSec = prodTotals.productiveSec + prodTotals.issueSec;
+  const overallProdRate = activeSec > 0 ? Math.round((prodTotals.productiveSec / activeSec) * 1000) / 10 : (prodTotals.productiveSec > 0 ? 100 : 0);
   const q = new URLSearchParams({ from, to }).toString();
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <PageHeader title="Reports" subtitle="Headcount, attendance, leave and payroll cost for a period. The same numbers as the screens they summarize." />
+      <PageHeader title="Reports" subtitle="Headcount, attendance, leave, productivity, and payroll cost for a period. Real-time metrics with exact seconds precision." />
       <form className="flex flex-wrap items-end gap-2" role="search">
         <label className="block text-sm font-medium">From<input type="date" name="from" defaultValue={from} className={inputClass} /></label>
         <label className="block text-sm font-medium">To<input type="date" name="to" defaultValue={to} className={inputClass} /></label>
@@ -73,6 +84,17 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
         <Link href="/reports" className="self-center text-sm font-medium text-muted hover:text-ink">This month</Link>
       </form>
       <p className="text-sm text-muted">{fmt(from)} to {fmt(to)}</p>
+
+      {/* Productivity & Hours Breakdown */}
+      <section aria-label="Productivity" className="space-y-3">
+        <h2 className="text-lg font-semibold">Productivity & Time Utilization</h2>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <Stat label="Productive Work" value={formatDurationPrecise(prodTotals.productiveSec)} tone="success" hint={`${overallProdRate}% overall productivity`} />
+          <Stat label="Issue Downtime" value={formatDurationPrecise(prodTotals.issueSec)} tone={prodTotals.issueSec > 0 ? "warning" : "neutral"} hint="Issues & outages (not in productivity)" />
+          <Stat label="Breaks & Meals" value={formatDurationPrecise(prodTotals.breakSec)} tone="neutral" hint="Meals & rest (not in productivity)" />
+          <Stat label="Overall Productivity" value={`${overallProdRate}%`} tone={overallProdRate >= 95 ? "success" : overallProdRate >= 80 ? "warning" : "danger"} />
+        </div>
+      </section>
 
       <section aria-label="People" className="space-y-3">
         <h2 className="text-lg font-semibold">People</h2>
@@ -90,7 +112,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
 
       <section aria-label="Attendance" className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold">Attendance</h2>
+          <h2 className="text-lg font-semibold">Attendance & Productivity</h2>
           <a href={`/reports/attendance/export?${q}`} className={ghostClass}>Download CSV</a>
         </div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -101,17 +123,32 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
         </div>
         {attendance.length === 0 ? <EmptyState title="No one to report on" /> : (
           <Card className="overflow-x-auto p-0">
-            <table className="w-full min-w-[44rem] text-sm">
+            <table className="w-full min-w-[50rem] text-sm">
               <thead><tr className="border-b border-line text-left text-muted">
-                <th className="px-4 py-3 font-medium">Employee</th><th className="px-2 py-3 text-right font-medium">Scheduled</th><th className="px-2 py-3 text-right font-medium">Present</th>
-                <th className="px-2 py-3 text-right font-medium">Absent</th><th className="px-2 py-3 text-right font-medium">Leave</th><th className="px-2 py-3 text-right font-medium">Late</th><th className="px-4 py-3 text-right font-medium">Overtime</th>
+                <th className="px-4 py-3 font-medium">Employee</th>
+                <th className="px-2 py-3 text-right font-medium">Scheduled</th>
+                <th className="px-2 py-3 text-right font-medium">Present</th>
+                <th className="px-2 py-3 text-right font-medium">Productive Work</th>
+                <th className="px-2 py-3 text-right font-medium">Issue Downtime</th>
+                <th className="px-2 py-3 text-right font-medium">Productivity</th>
+                <th className="px-2 py-3 text-right font-medium">Absent</th>
+                <th className="px-2 py-3 text-right font-medium">Late</th>
+                <th className="px-4 py-3 text-right font-medium">Overtime</th>
               </tr></thead>
               <tbody className="divide-y divide-line">
                 {attendance.map((r) => (
                   <tr key={r.employeeId}>
                     <td className="px-4 py-2.5"><Link href={`/dtr?employee=${r.employeeId}&from=${from}&to=${to}`} className="font-medium hover:text-brand">{r.name}</Link><span className="block text-xs text-muted">{r.department}</span></td>
-                    <td className="px-2 py-2.5 text-right tabular-nums">{r.scheduled}</td><td className="px-2 py-2.5 text-right tabular-nums">{r.present}</td>
-                    <td className={`px-2 py-2.5 text-right tabular-nums ${r.absent ? "font-semibold text-danger" : ""}`}>{r.absent}</td><td className="px-2 py-2.5 text-right tabular-nums">{r.leave}</td>
+                    <td className="px-2 py-2.5 text-right tabular-nums">{r.scheduled}</td>
+                    <td className="px-2 py-2.5 text-right tabular-nums">{r.present}</td>
+                    <td className="px-2 py-2.5 text-right tabular-nums font-semibold text-emerald-600">{formatDurationPrecise(r.productiveSeconds)}</td>
+                    <td className="px-2 py-2.5 text-right tabular-nums text-amber-600">{r.issueSeconds > 0 ? formatDurationPrecise(r.issueSeconds) : "—"}</td>
+                    <td className="px-2 py-2.5 text-right tabular-nums">
+                      <span className={`inline-block rounded px-1.5 py-0.5 text-xs font-semibold ${r.productivityRate >= 95 ? "bg-emerald-500/10 text-emerald-600" : r.productivityRate >= 80 ? "bg-amber-500/10 text-amber-600" : "bg-red-500/10 text-red-600"}`}>
+                        {r.productivityRate}%
+                      </span>
+                    </td>
+                    <td className={`px-2 py-2.5 text-right tabular-nums ${r.absent ? "font-semibold text-danger" : ""}`}>{r.absent}</td>
                     <td className="px-2 py-2.5 text-right tabular-nums">{r.lateCount ? `${r.lateCount}× · ${formatDuration(r.lateMinutes)}` : "—"}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{r.overtimeMinutes ? formatDuration(r.overtimeMinutes) : "—"}</td>
                   </tr>
@@ -121,6 +158,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
           </Card>
         )}
       </section>
+
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="space-y-3"><h2 className="text-lg font-semibold">Leave taken</h2>{leaveByType.size ? <Bars rows={[...leaveByType]} /> : <p className="text-sm text-muted">No approved leave starting in this period.</p>}</Card>

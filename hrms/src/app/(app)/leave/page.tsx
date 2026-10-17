@@ -2,7 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
 import { getOrgSettings } from "@/lib/settings";
-import { isHr, visibleEmployeeIds } from "@/lib/scope";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { canViewEmployee, isHr, visibleEmployeeIds } from "@/lib/scope";
 import { LEAVE_STATUS } from "@/lib/leave";
 import { ROLES } from "@/lib/roles";
 import { dayKey, dbDate, formatDay, keyOfDbDate } from "@/lib/time";
@@ -14,12 +16,15 @@ const range = (a: Date, b: Date) => {
   return a.getTime() === b.getTime() ? f(a) : `${f(a)} – ${f(b)}`;
 };
 
-export default async function LeavePage() {
+export default async function LeavePage({ searchParams }: { searchParams: Promise<{ employee?: string }> }) {
   const me = await requireUser("/leave");
+  const sp = await searchParams;
   const settings = await getOrgSettings(me.organizationId);
   const emp = await getMyEmployee(me, settings.timezone);
   const today = dayKey(new Date(), settings.timezone);
   const year = today.slice(0, 4);
+  // Opened from someone's profile: that person's balances and requests, never your own.
+  if (sp.employee && sp.employee !== emp.id) return <PersonLeave me={me} meId={emp.id} employeeId={sp.employee} year={year} />;
   const approver = isHr(me.role.key) || me.role.key === ROLES.MANAGER;
 
   const [types, mine, yearRequests] = await Promise.all([
@@ -134,4 +139,44 @@ async function loadQueue(me: Awaited<ReturnType<typeof requireUser>>, myEmployee
     orderBy: { startDate: "asc" },
     take: 100,
   });
+}
+
+async function PersonLeave({ me, meId, employeeId, year }: { me: Awaited<ReturnType<typeof requireUser>>; meId: string; employeeId: string; year: string }) {
+  if (!(await canViewEmployee(me, meId, employeeId))) notFound();
+  const [person, types, requests] = await Promise.all([
+    prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, select: { id: true, firstName: true, lastName: true } }),
+    prisma.leaveType.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, orderBy: { name: "asc" } }),
+    prisma.leaveRequest.findMany({ where: { employeeId, organizationId: me.organizationId }, include: { leaveType: { select: { name: true } } }, orderBy: { startDate: "desc" }, take: 100 }),
+  ]);
+  if (!person) notFound();
+  const used = (typeId: string) => requests.filter((r) => r.leaveTypeId === typeId && r.status === "APPROVED" && keyOfDbDate(r.startDate).startsWith(year)).reduce((n, r) => n + r.days, 0);
+  return (
+    <div className="mx-auto max-w-4xl space-y-6">
+      <Link href={`/employees/${person.id}`} className="text-sm font-medium text-muted hover:text-ink">← {person.firstName} {person.lastName}</Link>
+      <PageHeader title={`Leave of ${person.firstName} ${person.lastName}`} subtitle={`Balances for ${year} and every request.`} />
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        {types.map((t) => (
+          <Card key={t.id}>
+            <p className="text-sm text-muted">{t.name}</p>
+            <p className="mt-1 text-2xl font-bold">{Math.max(0, t.annualDays - used(t.id))} <span className="text-sm font-normal text-muted">of {t.annualDays} left</span></p>
+          </Card>
+        ))}
+      </div>
+      <Card className="p-0">
+        {requests.length === 0 ? <div className="p-5"><EmptyState title="No leave requests" /></div> : (
+          <ul className="divide-y divide-line">
+            {requests.map((r) => (
+              <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3">
+                <div className="min-w-0">
+                  <p className="font-medium">{r.leaveType.name} <span className="text-sm font-normal text-muted">· {range(r.startDate, r.endDate)} · {r.days} day{r.days === 1 ? "" : "s"}</span></p>
+                  <p className="truncate text-sm text-muted">{r.reason}{r.decisionNote ? ` — ${r.decisionNote}` : ""}</p>
+                </div>
+                <Badge tone={LEAVE_STATUS[r.status].tone}>{LEAVE_STATUS[r.status].label}</Badge>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+    </div>
+  );
 }

@@ -25,6 +25,7 @@ const SHIFT_PRESETS: Record<string, Shift[]> = {
 export const shiftPresetFor = (categoryKey: string): Shift[] => SHIFT_PRESETS[categoryKey] ?? [REGULAR];
 
 // One-click suggestions on the Organization page. The Super Admin picks what applies.
+// Every organization also gets "Field" (field and network teams) in its suggestions: see departmentSuggestionsFor.
 export const DEPARTMENT_SUGGESTIONS: Record<string, string[]> = {
   government: ["Office of the Mayor", "Human Resource Management", "Treasury", "Engineering", "Health Office", "Social Welfare"],
   "bpo-it": ["Operations", "Human Resources", "Quality Assurance", "IT Support", "Training", "Finance"],
@@ -38,27 +39,38 @@ export const DEPARTMENT_SUGGESTIONS: Record<string, string[]> = {
   "small-business": ["Operations", "Sales", "Finance", "Administration"],
 };
 
-export const POSITION_SUGGESTIONS: Record<string, { title: string; level: "ENTRY" | "TEAM_LEAD" | "MANAGER" | "DEPT_HEAD" | "EXECUTIVE" }[]> = {
+export const departmentSuggestionsFor = (categoryKey: string) => [...(DEPARTMENT_SUGGESTIONS[categoryKey] ?? []), "Field"];
+
+type PositionSuggestion = { title: string; level: keyof typeof LEVEL_LABEL; department?: string };
+// Department heads and assistant heads are not suggested on their own: they always need a department, so they are added
+// with the form (which asks which department), except where the suggestion names its department.
+const FIELD_POSITIONS: PositionSuggestion[] = [
+  { title: "Head Field / Network Engineer", level: "DEPT_HEAD", department: "Field" },
+  { title: "Field Network Technician", level: "ENTRY", department: "Field" },
+];
+export const POSITION_SUGGESTIONS: Record<string, PositionSuggestion[]> = {
   government: [
     { title: "Administrative Aide", level: "ENTRY" }, { title: "Administrative Officer", level: "TEAM_LEAD" },
-    { title: "Section Chief", level: "MANAGER" }, { title: "Department Head", level: "DEPT_HEAD" }, { title: "Municipal Administrator", level: "EXECUTIVE" },
+    { title: "Section Chief", level: "MANAGER" }, { title: "Municipal Administrator", level: "EXECUTIVE" },
   ],
   "bpo-it": [
     { title: "Agent", level: "ENTRY" }, { title: "Team Leader", level: "TEAM_LEAD" },
-    { title: "Operations Manager", level: "MANAGER" }, { title: "Department Head", level: "DEPT_HEAD" }, { title: "Director", level: "EXECUTIVE" },
+    { title: "Operations Manager", level: "MANAGER" }, { title: "Director", level: "EXECUTIVE" },
   ],
   healthcare: [
     { title: "Staff Nurse", level: "ENTRY" }, { title: "Charge Nurse", level: "TEAM_LEAD" },
-    { title: "Nurse Manager", level: "MANAGER" }, { title: "Department Head", level: "DEPT_HEAD" }, { title: "Chief Operating Officer", level: "EXECUTIVE" },
+    { title: "Nurse Manager", level: "MANAGER" }, { title: "Chief Operating Officer", level: "EXECUTIVE" },
   ],
 };
-const GENERIC_POSITIONS = [
-  { title: "Staff", level: "ENTRY" as const }, { title: "Team Leader", level: "TEAM_LEAD" as const },
-  { title: "Manager", level: "MANAGER" as const }, { title: "Department Head", level: "DEPT_HEAD" as const }, { title: "Executive", level: "EXECUTIVE" as const },
+const GENERIC_POSITIONS: PositionSuggestion[] = [
+  { title: "Staff", level: "ENTRY" }, { title: "Team Leader", level: "TEAM_LEAD" },
+  { title: "Manager", level: "MANAGER" }, { title: "Executive", level: "EXECUTIVE" },
 ];
-export const positionSuggestionsFor = (categoryKey: string) => POSITION_SUGGESTIONS[categoryKey] ?? GENERIC_POSITIONS;
+export const positionSuggestionsFor = (categoryKey: string): PositionSuggestion[] => [...(POSITION_SUGGESTIONS[categoryKey] ?? GENERIC_POSITIONS), ...FIELD_POSITIONS];
 
-export const LEVEL_LABEL = { ENTRY: "Entry level", TEAM_LEAD: "Team leader", MANAGER: "Manager", DEPT_HEAD: "Department head", EXECUTIVE: "Executive" } as const;
+export const LEVEL_LABEL = { ENTRY: "Entry level", TEAM_LEAD: "Team leader", MANAGER: "Manager", ASSISTANT_HEAD: "Assistant department head", DEPT_HEAD: "Department head", EXECUTIVE: "Executive" } as const;
+// These levels always belong to one department: the form asks which.
+export const DEPT_BOUND_LEVELS = ["ASSISTANT_HEAD", "DEPT_HEAD"] as const;
 
 export const TIMEZONES = [
   "Asia/Manila", "Asia/Singapore", "Asia/Hong_Kong", "Asia/Tokyo", "Asia/Dubai", "Europe/London",
@@ -73,16 +85,23 @@ export const DEFAULT_STAMP_TYPES: {
   page?: "PUNCH" | "ISSUE"; maxPerDay?: number; dailyCapMinutes?: number; requiresOvertimeOver?: number;
 }[] = [
   { key: "TIME_IN", name: "Time In", icon: "➡️", tone: "blue", kind: "IN", paid: true, sortOrder: 10, locked: true },
-  { key: "BREAK", name: "Break 1", icon: "☕", tone: "amber", kind: "PAUSE", paid: true, allowedMinutes: 15, maxPerDay: 1, sortOrder: 20 },
-  { key: "BREAK_2", name: "Break 2", icon: "☕", tone: "amber", kind: "PAUSE", paid: true, allowedMinutes: 15, maxPerDay: 1, sortOrder: 21 },
-  { key: "BREAK_3", name: "Break 3", icon: "☕", tone: "amber", kind: "PAUSE", paid: true, allowedMinutes: 15, maxPerDay: 1, requiresOvertimeOver: 120, sortOrder: 22 },
-  { key: "MEAL", name: "Meal", icon: "🍽️", tone: "indigo", kind: "PAUSE", paid: false, allowedMinutes: 60, maxPerDay: 2, sortOrder: 30 },
-  { key: "BIO_BREAK", name: "Bio Break", icon: "🚻", tone: "slate", kind: "PAUSE", paid: true, dailyCapMinutes: 10, sortOrder: 40 },
+  { key: "BREAK", name: "Break 1", icon: "☕", tone: "amber", kind: "PAUSE", paid: false, allowedMinutes: 15, maxPerDay: 1, sortOrder: 20 },
+  { key: "BREAK_2", name: "Break 2", icon: "☕", tone: "amber", kind: "PAUSE", paid: false, allowedMinutes: 15, maxPerDay: 1, sortOrder: 21 },
+  { key: "BREAK_3", name: "Break 3", icon: "☕", tone: "amber", kind: "PAUSE", paid: false, allowedMinutes: 15, maxPerDay: 1, requiresOvertimeOver: 120, sortOrder: 22 },
+  { key: "MEAL", name: "Meal", icon: "🍽️", tone: "indigo", kind: "PAUSE", paid: false, allowedMinutes: 60, maxPerDay: 1, sortOrder: 30 }, // one 60-minute meal a work day
+  { key: "BIO_BREAK", name: "Bio Break", icon: "🚻", tone: "slate", kind: "PAUSE", paid: false, dailyCapMinutes: 10, sortOrder: 40 },
   { key: "ON_TRIP", name: "On Trip", icon: "📍", tone: "blue", kind: "PAUSE", paid: true, defaultContext: "FIELD", sortOrder: 70 },
-  { key: "CLINIC_BREAK", name: "Clinic Break", icon: "🩺", tone: "teal", kind: "PAUSE", paid: true, allowedMinutes: 30, page: "ISSUE", sortOrder: 50 },
-  { key: "SYSTEM_ISSUE", name: "System Issue", icon: "⚠️", tone: "red", kind: "PAUSE", paid: true, requiresNote: true, page: "ISSUE", sortOrder: 60 },
+  { key: "CLINIC_BREAK", name: "Clinic Break", icon: "🩺", tone: "teal", kind: "PAUSE", paid: false, allowedMinutes: 30, page: "ISSUE", sortOrder: 50 },
+  { key: "SYSTEM_ISSUE", name: "System Issue", icon: "⚠️", tone: "red", kind: "PAUSE", paid: false, requiresNote: true, page: "ISSUE", sortOrder: 60 },
+  // Weather and calamities: they explain lost or interrupted work time. Same rows are added to existing organizations by migration.
+  { key: "HEAVY_RAIN", name: "Heavy Rain / Flood", icon: "🌧️", tone: "blue", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 61 },
+  { key: "EXTREME_HEAT", name: "Extreme Heat", icon: "🌡️", tone: "amber", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 62 },
+  { key: "TYPHOON", name: "Typhoon / Storm Signal", icon: "🌀", tone: "indigo", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 63 },
+  { key: "EARTHQUAKE", name: "Earthquake", icon: "🫨", tone: "red", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 64 },
+  { key: "POWER_OUTAGE", name: "Power Outage", icon: "⚡", tone: "slate", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 65 },
+  { key: "CALAMITY", name: "Other Calamity", icon: "🆘", tone: "red", kind: "PAUSE", paid: false, requiresNote: true, page: "ISSUE", sortOrder: 66 },
   { key: "TIME_OUT", name: "Time Out", icon: "⬅️", tone: "slate", kind: "OUT", paid: true, sortOrder: 99, locked: true },
 ];
 
-export const STAMP_ICONS = ["☕", "🍽️", "🚻", "🩺", "⚠️", "📍", "🚗", "🧑‍🏫", "📞", "💻", "🛠️", "🎓", "🏥", "📦", "⏸️", "🙏"];
+export const STAMP_ICONS = ["☕", "🍽️", "🚻", "🩺", "⚠️", "📍", "🚗", "🧑‍🏫", "📞", "💻", "🛠️", "🎓", "🏥", "📦", "⏸️", "🙏", "🌧️", "🌡️", "🌀", "🫨", "⚡", "🆘"];
 export const STAMP_TONES = ["blue", "amber", "indigo", "slate", "teal", "red", "green", "violet", "pink"] as const;

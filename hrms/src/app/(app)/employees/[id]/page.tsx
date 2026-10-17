@@ -8,11 +8,16 @@ import { dbDate, formatDay, keyOfDbDate } from "@/lib/time";
 import { getOrgSettings } from "@/lib/settings";
 import { LEVEL_LABEL } from "@/lib/defaults";
 import { Badge, Card, PageHeader, buttonClass } from "@/components/ui";
-import { AssignmentForm } from "../EmployeeForms";
+import { AssignmentForm, DeleteEmployeeForm, EditDetailsForm } from "../EmployeeForms";
 import { ChecklistCard } from "../ChecklistCard";
 import { OWNER_LABEL } from "@/lib/checklists";
 import { AssignComponentForm, CompensationForm, RemoveComponentButton } from "../PayForms";
 import { formatMoney, formatPercent } from "@/lib/money";
+import { payBreakdown } from "@/lib/pay-breakdown";
+import { PayBreakdown } from "@/components/PayBreakdown";
+import { items201, load201 } from "@/lib/documents";
+import { File201 } from "@/app/(app)/documents/File201";
+import { setFlexible } from "../actions";
 import { RegularScheduleForm } from "@/app/(app)/schedule/ScheduleForm";
 import { describeDays } from "@/lib/schedule";
 import { ROLES } from "@/lib/roles";
@@ -24,9 +29,10 @@ import { PreviousEmploymentForm, RemovePreviousButton, TaxProfileForm } from "..
 const CHANGE_LABEL = { HIRED: "Hired", ASSIGNMENT: "Assignment changed", STATUS: "Status changed" } as const;
 const fmt = (d: Date) => formatDay(keyOfDbDate(d), { year: "numeric", month: "short", day: "numeric" });
 
-export default async function EmployeePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EmployeePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ via?: string }> }) {
   const { id } = await params;
-  const me = await requireUser("/dashboard") // own record for employees; canViewEmployee scopes everyone else;
+  const { via } = await searchParams;
+  const me = await requireUser("/dashboard"); // own record for employees; canViewEmployee scopes everyone else
   const settings = await getOrgSettings(me.organizationId);
   const mine = await getMyEmployee(me, settings.timezone);
   if (!(await canViewEmployee(me, mine.id, id))) notFound();
@@ -37,7 +43,7 @@ export default async function EmployeePage({ params }: { params: Promise<{ id: s
       department: { select: { name: true } },
       position: { select: { title: true, level: true } },
       manager: { select: { id: true, firstName: true, lastName: true } },
-      user: { select: { email: true, role: { select: { name: true } } } },
+      user: { select: { email: true, username: true, role: { select: { name: true } } } },
       history: { orderBy: { createdAt: "desc" }, take: 50 },
     },
   });
@@ -81,6 +87,23 @@ export default async function EmployeePage({ params }: { params: Promise<{ id: s
   const offboarding = listFor("OFFBOARDING");
   const currentComp = comps.find((c) => keyOfDbDate(c.effectiveFrom) <= today);
   const PAY_TYPE = { MONTHLY: "per month", DAILY: "per day", HOURLY: "per hour" } as const;
+  const own = e.id === mine.id;
+  // Pay is personal: HR and the person themselves only.
+  const breakdown = hr || own ? await payBreakdown(me, mine.id, e.id, today, settings) : null;
+  const f201 = hr || own ? items201((await load201(me.organizationId, [e.id])).get(e.id)) : null;
+  const tabs = [
+    (hr || own) && { href: own ? "/payslips" : `/payslips?employee=${e.id}`, label: "Payslips", icon: "🧾" },
+    { href: `/schedule?employee=${e.id}`, label: "Schedule", icon: "📅" },
+    { href: `/dtr?employee=${e.id}`, label: "DTR", icon: "⏱️" },
+    { href: own ? "/performance" : `/performance?employee=${e.id}`, label: "Performance", icon: "📈" },
+    { href: own ? "/leave" : `/leave?employee=${e.id}`, label: "Leave", icon: "🏖️" },
+    { href: own ? "/overtime" : `/overtime?employee=${e.id}`, label: "Overtime", icon: "⏰" },
+    (hr || own) && { href: own ? "/cash-advance" : `/cash-advance?employee=${e.id}`, label: "Cash advance", icon: "💵" },
+    { href: own ? "/daily-report" : `/daily-report?employee=${e.id}`, label: "Daily report", icon: "🗒️" },
+    { href: own ? "/id" : `/id?employee=${e.id}`, label: "Digital ID", icon: "🪪" },
+    (hr || own) && { href: own ? "/policies" : `/policies?employee=${e.id}`, label: "Policies", icon: "📜" },
+    (hr || own) && { href: own ? "/documents" : `/documents?employee=${e.id}`, label: "Documents", icon: "🗂️" },
+  ].filter((t): t is { href: string; label: string; icon: string } => !!t);
   const shifts = canSchedule ? await prisma.shiftTemplate.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, orderBy: { startTime: "asc" } }) : [];
 
   const [departments, positions, managers] = hr
@@ -93,12 +116,31 @@ export default async function EmployeePage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      {me.role.key === ROLES.EMPLOYEE ? <Link href="/dashboard" className="text-sm font-medium text-muted hover:text-ink">← Home</Link> : <Link href="/employees" className="text-sm font-medium text-muted hover:text-ink">← All employees</Link>}
+      {me.role.key === ROLES.EMPLOYEE || me.role.key === ROLES.SUBCONTRACTOR ? <Link href="/dashboard" className="text-sm font-medium text-muted hover:text-ink">← Home</Link> : <Link href="/employees" className="text-sm font-medium text-muted hover:text-ink">← All employees</Link>}
+      {via === "id" && (
+        <p role="status" className="rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm font-medium text-success">
+          🪪 Opened from the QR code on {e.firstName}&apos;s digital ID. Status: {STATUS_LABEL[e.status]}.
+        </p>
+      )}
+      <div className="flex items-center gap-4">
+        {/* eslint-disable-next-line @next/next/no-img-element -- private picture behind a signed-in route */}
+        {e.photoKey ? <img src={`/employees/${e.id}/photo?v=${e.photoKey.slice(-8)}`} alt={`Photo of ${e.firstName}`} className="h-20 w-20 shrink-0 rounded-2xl object-cover" /> : <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-line/60 text-3xl" aria-hidden>👤</span>}
+        <div className="min-w-0 flex-1">
       <PageHeader
         title={`${e.firstName} ${e.lastName}`}
         subtitle={`${e.employeeNo} · hired ${fmt(e.hireDate)}`}
         action={<Badge tone={STATUS_TONE[e.status]}>{STATUS_LABEL[e.status]}</Badge>}
       />
+        </div>
+      </div>
+
+      <nav aria-label={`${e.firstName}'s records`} className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+        {tabs.map((t) => (
+          <Link key={t.label} href={t.href} className="flex shrink-0 items-center gap-1.5 rounded-xl border border-line bg-surface px-3.5 py-2 text-sm font-semibold shadow-sm transition hover:border-brand hover:text-brand">
+            <span aria-hidden>{t.icon}</span>{t.label}
+          </Link>
+        ))}
+      </nav>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
@@ -110,7 +152,7 @@ export default async function EmployeePage({ params }: { params: Promise<{ id: s
               ["Supervisor", e.manager ? `${e.manager.firstName} ${e.manager.lastName}` : "None"],
               ["Email", e.email ?? "Not set"],
               ["Phone", e.phone ?? "Not set"],
-              ["Sign-in", e.user ? `${e.user.email} · ${e.user.role.name}` : "No sign-in"],
+              ["Sign-in", e.user ? `${e.user.username ? `${e.user.username} · ` : ""}${e.user.email} · ${e.user.role.name}` : "No sign-in"],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between gap-4">
                 <dt className="text-muted">{k}</dt>
@@ -129,7 +171,7 @@ export default async function EmployeePage({ params }: { params: Promise<{ id: s
           <ol className="space-y-3 border-l border-line pl-4">
             {e.history.map((h) => (
               <li key={h.id} className="relative text-sm">
-                <span className="absolute -left-[1.4rem] top-1.5 h-2.5 w-2.5 rounded-full bg-brand" aria-hidden />
+                <span className="absolute left-[-1.4rem] top-1.5 h-2.5 w-2.5 rounded-full bg-brand" aria-hidden />
                 <p className="font-medium">{CHANGE_LABEL[h.change]} <span className="font-normal text-muted">· {fmt(h.effectiveFrom)}</span></p>
                 <p className="text-muted">
                   {h.change === "STATUS"
@@ -145,8 +187,17 @@ export default async function EmployeePage({ params }: { params: Promise<{ id: s
       </div>
 
       <Card>
-        <h2 className="mb-1 font-semibold">Work schedule</h2>
-        {currentReg ? (
+        <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-semibold">Work schedule {e.flexible && <Badge tone="brand">Flexible</Badge>}</h2>
+          {hr && (
+            <form action={setFlexible.bind(null, e.id, !e.flexible)}>
+              <button className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium transition hover:bg-bg active:scale-95">{e.flexible ? "Switch to fixed shift" : "Make flexible"}</button>
+            </form>
+          )}
+        </div>
+        {e.flexible ? (
+          <p className="text-sm">Own start time and days off. At least <span className="font-semibold">8 hours</span> on each working day (less is undertime) and at least <span className="font-semibold">1 day off a week</span> (a 7th day in a row is flagged on the DTR).</p>
+        ) : currentReg ? (
           <p className="text-sm">
             <span className="font-medium">{currentReg.shift.name}</span> ({currentReg.shift.startTime}–{currentReg.shift.endTime}) · {describeDays(currentReg.workDays)}
           </p>
@@ -162,7 +213,7 @@ export default async function EmployeePage({ params }: { params: Promise<{ id: s
             ))}
           </ul>
         )}
-        {canSchedule && (
+        {canSchedule && !e.flexible && (
           <details className="mt-4">
             <summary className="cursor-pointer text-sm font-semibold text-brand">{currentReg ? "Change regular schedule" : "Set regular schedule"}</summary>
             <div className="mt-3">
@@ -179,6 +230,20 @@ export default async function EmployeePage({ params }: { params: Promise<{ id: s
         )}
       </Card>
 
+      {f201 && (
+        <Card className="space-y-3">
+          <h2 className="font-semibold">201 file</h2>
+          <File201 employeeId={e.id} items={f201} mandatory={own && !hr} />
+        </Card>
+      )}
+
+      {!hr && own && breakdown && (
+        <Card className="space-y-3">
+          <h2 className="font-semibold">My pay</h2>
+          <PayBreakdown b={breakdown} daysPerYear={settings.daysPerYear} hoursPerDay={settings.hoursPerDay} />
+        </Card>
+      )}
+
       {onboarding.length > 0 && <ChecklistCard title="Onboarding checklist" items={onboarding} />}
       {offboarding.length > 0 && <ChecklistCard title="Offboarding checklist" items={offboarding} />}
 
@@ -186,10 +251,13 @@ export default async function EmployeePage({ params }: { params: Promise<{ id: s
         <Card className="space-y-4">
           <div>
             <h2 className="font-semibold">Pay</h2>
-            <p className="text-xs text-muted">Visible to HR only. Rates are never overwritten: a change starts on its date and the old one stays.</p>
+            <p className="text-xs text-muted">Visible to HR and the employee only. Rates are never overwritten: a change starts on its date and the old one stays.</p>
           </div>
           {currentComp ? (
-            <p className="text-sm"><span className="text-lg font-bold">{formatMoney(currentComp.rateCents)}</span> {PAY_TYPE[currentComp.payType]}</p>
+            <div className="space-y-4 text-sm">
+              <p><span className="text-lg font-bold">{formatMoney(currentComp.rateCents)}</span> {PAY_TYPE[currentComp.payType]}</p>
+              {breakdown && <PayBreakdown b={breakdown} daysPerYear={settings.daysPerYear} hoursPerDay={settings.hoursPerDay} />}
+            </div>
           ) : (
             <p className="rounded-lg border border-warning/40 bg-warning/10 px-3 py-2 text-sm text-warning">No pay rate yet. This person is skipped when payroll is calculated.</p>
           )}
@@ -283,6 +351,17 @@ export default async function EmployeePage({ params }: { params: Promise<{ id: s
 
       {hr && (
         <Card>
+          <h2 className="mb-4 font-semibold">Edit details and sign-in</h2>
+          <EditDetailsForm
+            employeeId={e.id}
+            hasLogin={!!e.user}
+            current={{ firstName: e.firstName, lastName: e.lastName, email: e.user?.email ?? e.email ?? "", phone: e.phone ?? "", hireDate: keyOfDbDate(e.hireDate), username: e.user?.username ?? "" }}
+          />
+        </Card>
+      )}
+
+      {hr && (
+        <Card>
           <h2 className="mb-4 font-semibold">Change assignment or status</h2>
           <AssignmentForm
             employeeId={e.id}
@@ -292,6 +371,12 @@ export default async function EmployeePage({ params }: { params: Promise<{ id: s
             statuses={Object.entries(STATUS_LABEL).map(([id, label]) => ({ id, label }))}
             current={{ departmentId: e.departmentId ?? "", positionId: e.positionId ?? "", managerId: e.managerId ?? "", status: e.status }}
           />
+        </Card>
+      )}
+      {hr && !own && (
+        <Card className="border-danger/40">
+          <h2 className="mb-3 font-semibold text-danger">Delete employee</h2>
+          <DeleteEmployeeForm employeeId={e.id} employeeNo={e.employeeNo} name={`${e.firstName} ${e.lastName}`} superAdmin={me.role.key === ROLES.SUPER_ADMIN} />
         </Card>
       )}
     </div>

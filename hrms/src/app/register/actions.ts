@@ -10,6 +10,8 @@ import { createSession } from "@/lib/session";
 import { SESSION_COOKIE } from "@/lib/auth";
 import { isValidChoice } from "@/lib/industries";
 import { ROLES } from "@/lib/roles";
+import { createEmployee } from "@/lib/employees";
+import { dbDate, dayKey } from "@/lib/time";
 import { isLimited, recordHit } from "@/lib/rate-limit";
 import { DB_DOWN_MESSAGE, isDbDown } from "@/lib/db-health";
 import type { FormState } from "@/app/login/actions";
@@ -78,6 +80,15 @@ async function registerInner(_: FormState, form: FormData): Promise<FormState> {
         roleId: role.id,
       },
     });
+    const [firstName, ...rest] = d.adminName.trim().split(/\s+/);
+    await createEmployee(tx, org.id, user.id, {
+      firstName,
+      lastName: rest.join(" ") || "-",
+      employeeNo: "superadmin001",
+      email: d.email,
+      hireDate: dbDate(dayKey(new Date(), "Asia/Manila")),
+      userId: user.id,
+    }, { checklist: false });
     return { org, user };
   });
   recordHit(limitKey, 60 * 60_000); // only successful registrations count

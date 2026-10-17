@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "next build",
-    "start": "node scripts/ensure-db.mjs && next start -p 3300",
+    "start": "node scripts/ensure-db.mjs && next start -H 0.0.0.0 -p 3300",
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
@@ -15,7 +15,10 @@
     "tunnel": "cloudflared tunnel --url http://localhost:3300",
     "db:up": "node scripts/ensure-db.mjs",
     "dev:phone": "node scripts/dev.mjs --tunnel",
-    "dev:next": "next dev -p 3300"
+    "dev:next": "next dev -H 0.0.0.0 -p 3300",
+    "graphify": "python -m graphify extract . --code-only",
+    "graphify:view": "cmd /c start graphify-out\\graph.html",
+    "graphify:tree": "cmd /c start graphify-out\\GRAPH_TREE.html"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
@@ -26,6 +29,7 @@
     "motion": "^14.0.0",
     "next": "16.3.8",
     "pg": "^8.23.1",
+    "qrcode": "^1.5.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "three": "^0.186.1",
@@ -37,6 +41,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^24.19.1",
     "@types/pg": "^8.23.1",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.186.0",

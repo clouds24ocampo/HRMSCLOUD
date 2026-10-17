@@ -40,7 +40,7 @@ export default async function EmployeesPage({ searchParams }: { searchParams: Pr
     prisma.department.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
     hr ? prisma.position.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, select: { id: true, title: true, level: true }, orderBy: { title: "asc" } }) : [],
     hr ? prisma.employee.findMany({ where: { organizationId: me.organizationId, status: { not: "SEPARATED" } }, select: { id: true, firstName: true, lastName: true, employeeNo: true }, orderBy: { lastName: "asc" } }) : [],
-    hr ? prisma.role.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }) : [],
+    hr ? prisma.role.findMany({ select: { id: true, key: true, name: true }, orderBy: { name: "asc" } }) : [],
     hr ? prisma.shiftTemplate.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, select: { id: true, name: true, startTime: true, endTime: true }, orderBy: { startTime: "asc" } }) : [],
   ]);
   const today = dayKey(new Date(), settings.timezone);
@@ -58,10 +58,13 @@ export default async function EmployeesPage({ searchParams }: { searchParams: Pr
           <div className="px-5 pb-5">
             <AddEmployeeForm
               today={today}
+              daysPerYear={settings.daysPerYear}
+              hoursPerDay={settings.hoursPerDay}
               departments={departments.map((d) => ({ id: d.id, label: d.name }))}
               positions={positions.map((p) => ({ id: p.id, label: `${p.title} (${LEVEL_LABEL[p.level]})` }))}
               managers={managers.map((m) => ({ id: m.id, label: `${m.firstName} ${m.lastName} · ${m.employeeNo}` }))}
               roles={roles.map((r) => ({ id: r.id, label: r.name }))}
+              defaultRoleId={roles.find((r) => r.key === "EMPLOYEE")?.id ?? ""}
               shifts={shifts.map((s) => ({ id: s.id, label: `${s.name} (${s.startTime}–${s.endTime})` }))}
             />
           </div>

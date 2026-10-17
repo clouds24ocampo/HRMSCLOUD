@@ -5,7 +5,11 @@ import type { DtrDay } from "@/lib/dtr";
 import { computePh, type PhInput, type TaxBreakdown } from "@/lib/ph/payroll-ph";
 
 export type PayType = "MONTHLY" | "DAILY" | "HOURLY";
-export type Factors = { workDaysPerMonth: number; hoursPerDay: number; otMultiplierBp: number; periodsPerMonth: number };
+export type Factors = {
+  workDaysPerMonth: number; hoursPerDay: number; otMultiplierBp: number; periodsPerMonth: number;
+  daysPerYear?: number; // when set, a monthly salary's daily rate is monthly x 12 / daysPerYear (else / workDaysPerMonth)
+  payByLoggedHours?: boolean; // monthly staff paid for logged hours (capped at hoursPerDay a day) instead of salary less absences
+};
 export type Component = {
   name: string; kind: "EARNING" | "DEDUCTION"; calc: "FIXED" | "PERCENT_OF_BASIC"; value: number; taxable: boolean;
   // Philippine profile only:
@@ -26,7 +30,11 @@ export type Attendance = {
   undertimeMinutes: number;
   workedMinutes: number;
   approvedOvertimeMinutes: number;
+  regularMinutes?: number; // worked minutes counted for basic pay: each day capped at a normal day, overtime paid apart
 };
+
+// Minutes paid as basic pay. Older stored inputs have no regularMinutes: worked time less approved overtime.
+export const regularMinutesOf = (a: Attendance) => a.regularMinutes ?? Math.max(0, a.workedMinutes - a.approvedOvertimeMinutes);
 
 export type PayInput = {
   payType: PayType;
@@ -45,31 +53,62 @@ export type PayResult = { lines: Line[]; grossCents: number; deductionsCents: nu
 
 const round = (n: number) => Math.round(n);
 const peso = (c: number) => (c / 100).toFixed(2);
+export const rate4 = (c: number) => (Math.floor(c * 100 + 1e-6) / 10000).toFixed(4);
+export const hm = (m: number) => `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m`;
 
 // Turns the DTR rows of a period into the numbers payroll needs.
+// Recovery of issue time. Time lost to an issue (weather, calamity, power, system…) is deducted on its day and owed;
+// on a later day of the same period, minutes worked beyond the normal day that are not approved overtime pay it back at
+// the regular rate, until nothing is owed. Pure; the one rule used by payroll, payslips, the profile and the Payroll tab.
+type RecoveryRow = Pick<DtrDay, "day" | "status" | "workedMinutes" | "overtimeMinutes"> & { issueMinutes?: number };
+export function recoveryCredit(rows: RecoveryRow[], approvedOvertime: Map<string, number>, dayCapMinutes: number): Map<string, number> {
+  const out = new Map<string, number>();
+  if (!Number.isFinite(dayCapMinutes)) return out;
+  let owed = 0;
+  for (const r of [...rows].sort((a, b) => (a.day < b.day ? -1 : 1))) {
+    if (r.status !== "PRESENT") continue;
+    const ot = Math.min(approvedOvertime.get(r.day) ?? 0, r.overtimeMinutes);
+    const regular = Math.min(r.workedMinutes - ot, dayCapMinutes);
+    const credit = Math.min(Math.max(0, r.workedMinutes - ot - dayCapMinutes), owed);
+    if (credit > 0) {
+      out.set(r.day, credit);
+      owed -= credit;
+    }
+    owed += Math.min(r.issueMinutes ?? 0, Math.max(0, dayCapMinutes - regular)); // only the shortfall the issue caused
+  }
+  return out;
+}
+
 export function buildAttendance(
   rows: DtrDay[],
   paidLeave: Set<string>,
   unpaidLeave: Set<string>,
   approvedOvertime: Map<string, number>,
+  dayCapMinutes = Number.POSITIVE_INFINITY, // a normal work day; logged time above it is paid only as approved overtime
 ): Attendance {
-  const a: Attendance = { scheduledDays: 0, presentDays: 0, incompleteDays: 0, absentDays: 0, paidLeaveDays: 0, unpaidLeaveDays: 0, lateMinutes: 0, undertimeMinutes: 0, workedMinutes: 0, approvedOvertimeMinutes: 0 };
+  const a: Attendance = { scheduledDays: 0, presentDays: 0, incompleteDays: 0, absentDays: 0, paidLeaveDays: 0, unpaidLeaveDays: 0, lateMinutes: 0, undertimeMinutes: 0, workedMinutes: 0, approvedOvertimeMinutes: 0, regularMinutes: 0 };
+  let regular = 0;
+  const recovered = recoveryCredit(rows, approvedOvertime, dayCapMinutes);
   for (const r of rows) {
-    if (r.shift) a.scheduledDays += 1;
+    const planned = !!r.shift || (!!r.flex && r.status !== "DAY_OFF");
+    if (planned) a.scheduledDays += 1;
     if (r.status === "PRESENT") {
       a.presentDays += 1;
       a.lateMinutes += r.lateMinutes;
       a.undertimeMinutes += r.undertimeMinutes;
       a.workedMinutes += r.workedMinutes;
       // Approved overtime can never exceed what the DTR actually measured.
-      a.approvedOvertimeMinutes += Math.min(approvedOvertime.get(r.day) ?? 0, r.overtimeMinutes);
+      const ot = Math.min(approvedOvertime.get(r.day) ?? 0, r.overtimeMinutes);
+      a.approvedOvertimeMinutes += ot;
+      regular += Math.min(r.workedMinutes - ot, dayCapMinutes) + (recovered.get(r.day) ?? 0);
     } else if (r.status === "INCOMPLETE") a.incompleteDays += 1;
     else if (r.status === "ABSENT") a.absentDays += 1;
-    else if (r.status === "LEAVE" && r.shift) {
+    else if (r.status === "LEAVE" && planned) {
       if (paidLeave.has(r.day)) a.paidLeaveDays += 1;
       else if (unpaidLeave.has(r.day)) a.unpaidLeaveDays += 1;
     }
   }
+  a.regularMinutes = regular;
   return a;
 }
 
@@ -82,14 +121,20 @@ export function computePayslip(input: PayInput): PayResult {
   const ded = (code: string, label: string, amountCents: number, detail?: string) => lines.push({ kind: "DEDUCTION", code, label, amountCents, detail });
 
   // Rates derived from the one pay rate.
-  const dailyRate = payType === "DAILY" ? rateCents : payType === "MONTHLY" ? rateCents / f.workDaysPerMonth : rateCents * f.hoursPerDay;
+  const dailyRate = payType === "DAILY" ? rateCents : payType === "MONTHLY" ? (f.daysPerYear ? (rateCents * 12) / f.daysPerYear : rateCents / f.workDaysPerMonth) : rateCents * f.hoursPerDay;
+  const byHours = payType === "MONTHLY" && !!f.payByLoggedHours;
   const hourlyRate = payType === "HOURLY" ? rateCents : dailyRate / f.hoursPerDay;
   const minuteRate = hourlyRate / 60;
   const otMult = f.otMultiplierBp / 10000;
 
   // Basic pay.
   let basic = 0;
-  if (payType === "MONTHLY") {
+  if (byHours) {
+    // Paid for what was logged: regular minutes plus paid leave days at a full day each. One rounding, at the end.
+    const minutes = regularMinutesOf(a) + a.paidLeaveDays * f.hoursPerDay * 60;
+    basic = round((dailyRate * minutes) / (f.hoursPerDay * 60));
+    earn("BASIC", "Basic pay (logged hours)", basic, `${hm(minutes)} × ${rate4(hourlyRate)} an hour (monthly ${peso(rateCents)} × 12 ÷ ${f.daysPerYear ?? f.workDaysPerMonth * 12} days = ${rate4(dailyRate)} a day ÷ ${f.hoursPerDay} h)${a.paidLeaveDays ? `, incl. ${a.paidLeaveDays} paid leave day${a.paidLeaveDays === 1 ? "" : "s"}` : ""}`);
+  } else if (payType === "MONTHLY") {
     basic = round(rateCents / f.periodsPerMonth);
     earn("BASIC", "Basic pay", basic, `Monthly ${peso(rateCents)} ÷ ${f.periodsPerMonth} pay period${f.periodsPerMonth === 1 ? "" : "s"} a month`);
   } else if (payType === "DAILY") {
@@ -134,7 +179,7 @@ export function computePayslip(input: PayInput): PayResult {
     attendanceDeductions += amt;
     ded(code, label, amt, `${minutes} min × ${peso(minuteRate)} per min`);
   };
-  if (payType === "MONTHLY") {
+  if (payType === "MONTHLY" && !byHours) {
     if (a.absentDays > 0) {
       const amt = round(dailyRate * a.absentDays);
       attendanceDeductions += amt;
@@ -146,7 +191,7 @@ export function computePayslip(input: PayInput): PayResult {
       ded("UNPAID_LEAVE", "Unpaid leave", amt, `${a.unpaidLeaveDays} day${a.unpaidLeaveDays === 1 ? "" : "s"} × ${peso(dailyRate)}`);
     }
   }
-  if (payType !== "HOURLY") {
+  if (payType !== "HOURLY" && !byHours) {
     minutesOff("LATE", "Late", a.lateMinutes);
     minutesOff("UNDERTIME", "Undertime", a.undertimeMinutes);
   }
@@ -190,7 +235,8 @@ export function computePayslip(input: PayInput): PayResult {
   const net = gross - deductions;
   if (net < 0) warnings.push("Net pay is below zero. Check the deductions.");
   if (a.incompleteDays > 0 && payType !== "MONTHLY") warnings.push(`${a.incompleteDays} day(s) have no clock-out and were not paid. Fix the DTR and recalculate.`);
-  if (a.incompleteDays > 0 && payType === "MONTHLY") warnings.push(`${a.incompleteDays} day(s) have no clock-out. Monthly pay is not affected, but check the DTR.`);
+  if (a.incompleteDays > 0 && byHours) warnings.push(`${a.incompleteDays} day(s) have no clock-out and were not paid. Fix the DTR and recalculate.`);
+  else if (a.incompleteDays > 0 && payType === "MONTHLY") warnings.push(`${a.incompleteDays} day(s) have no clock-out. Monthly pay is not affected, but check the DTR.`);
   if (a.scheduledDays === 0 && payType !== "MONTHLY") warnings.push("No scheduled days in this period, so nothing could be paid.");
 
   return { lines, grossCents: gross, deductionsCents: deductions, netCents: net, employerCostCents: gross + employerContrib, warnings };

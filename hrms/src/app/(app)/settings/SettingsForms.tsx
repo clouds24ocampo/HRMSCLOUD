@@ -144,7 +144,7 @@ export function AddStampTypeForm() {
         </label>
       </div>
       <div className="flex flex-wrap gap-x-6 gap-y-2">
-        <label className="flex items-center gap-2 text-sm font-medium"><input type="checkbox" name="paid" defaultChecked className="h-4 w-4 accent-[var(--brand)]" /> Paid (counts as worked time)</label>
+        <label className="flex items-center gap-2 text-sm font-medium"><input type="checkbox" name="paid" className="h-4 w-4 accent-[var(--brand)]" /> Paid (only On Trip counts as worked time; every other pause is deducted)</label>
         <label className="flex items-center gap-2 text-sm font-medium"><input type="checkbox" name="requiresNote" className="h-4 w-4 accent-[var(--brand)]" /> Needs a note</label>
       </div>
       <Messages state={state} />

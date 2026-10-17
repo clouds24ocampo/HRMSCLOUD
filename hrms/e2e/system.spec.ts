@@ -149,19 +149,23 @@ test("employees: HR adds one with a sign-in, edits assignment, history is kept",
   await page.getByText("Add an employee").click();
   await page.getByLabel("First name").fill("Pia");
   await page.getByLabel("Last name").fill("Reyes");
-  await page.getByLabel("Email (optional)").fill(mail("pia"));
+  await page.getByLabel("Email", { exact: true }).fill(mail("pia"));
+  await page.getByLabel("Monthly salary (pesos)").fill("18000.00");
   await page.locator("#departmentId").selectOption({ label: "Night Operations" });
   await page.locator("#positionId").selectOption({ label: "Floor Agent (Entry level)" });
   await page.locator("#managerId").selectOption({ label: "Marco Test · T-mgr" });
-  await page.getByLabel("Also create a sign-in for this person").check();
+  await page.getByLabel(/Create their own sign-in/).check();
+  await page.getByLabel("Username", { exact: true }).fill(`pia1-${stamp}`);
   await page.locator("#roleId").selectOption({ label: "Employee" });
   await page.getByLabel("Temporary password").fill(pw);
   await page.getByRole("button", { name: "Add employee" }).click();
   await expect(page.getByRole("status")).toContainText("Pia Reyes added as");
   await page.getByLabel("Last name").fill("Dupe");
   await page.getByLabel("First name").fill("Pia");
-  await page.getByLabel("Email (optional)").fill(mail("pia"));
-  await page.getByLabel("Also create a sign-in for this person").check();
+  await page.getByLabel("Email", { exact: true }).fill(mail("pia"));
+  await page.getByLabel("Monthly salary (pesos)").fill("18000.00");
+  await page.getByLabel(/Create their own sign-in/).check();
+  await page.getByLabel("Username", { exact: true }).fill(`pia2-${stamp}`);
   await page.locator("#roleId").selectOption({ label: "Employee" });
   await page.getByLabel("Temporary password").fill(pw);
   await page.getByRole("button", { name: "Add employee" }).click();
@@ -268,6 +272,7 @@ test("time clock: password unlock, then Time In, Break, End Break and Time Out w
   const page = await ctx.newPage();
   watch(page);
   await signIn(page, "e1");
+  await page.goto("/dtr"); // the time clock lives on the DTR page
   const card = page.getByRole("region", { name: "Time clock" });
   await expect(card.getByText("Not timed in")).toBeVisible();
 
@@ -282,20 +287,21 @@ test("time clock: password unlock, then Time In, Break, End Break and Time Out w
   await card.getByRole("radio", { name: "Field work" }).click();
   await pressAction(card, "Time In");
   await expect(card.getByRole("status").filter({ hasText: "Timed in at" })).toContainText(/location recorded \(±12 m\)/);
-  await expect(card.getByText("Timed in", { exact: true })).toBeVisible();
+  await expect(card.getByText(/^Timed in( · Working)?$/)).toBeVisible();
   await expect(card.getByRole("button", { name: "Time In" })).toBeDisabled(); // one unlock, one time stamp: locked again
   await backdate(ids.e1, 240);
 
   await pressAction(card, /^Break 1/);
   await expect(card.getByRole("status").filter({ hasText: "Break 1 started" })).toBeVisible();
-  await expect(card.getByText(/^Break 1 · \d+:\d\d$/)).toBeVisible();
+  await expect(card.getByText(/^Break 1 · \d+:\d\d/)).toBeVisible();
   await backdate(ids.e1, 180);
 
   await card.getByLabel("Your password").fill(pw);
   await card.getByRole("button", { name: "Verify and unlock" }).click();
   await expect(card.getByText(/Unlocked · /)).toBeVisible();
-  await expect(card.getByRole("button", { name: /^Meal/ })).toBeDisabled(); // on a break: other pauses wait
-  await expect(card.getByRole("button", { name: "Time In" })).toBeDisabled();
+  // On a break: Time In resumes work, and another break or issue switches straight to it (the current one is closed first).
+  await expect(card.getByRole("button", { name: /^Switch to Meal/ })).toBeEnabled();
+  await expect(card.getByRole("button", { name: /^Time In \(Resume Work\)/ })).toBeEnabled();
   await card.getByRole("button", { name: /^End Break/ }).click();
   await expect(card.getByRole("status").filter({ hasText: "Break 1 ended" })).toBeVisible();
   await backdate(ids.e1, 150);
@@ -325,11 +331,16 @@ test("time clock without GPS: note required, flagged, and BLOCK policy refuses",
   const page = await ctx.newPage();
   watch(page);
   await signIn(page, "e2");
+  await page.goto("/dtr"); // the time clock lives on the DTR page
   const card = page.getByRole("region", { name: "Time clock" });
   await pressAction(card, "Time In");
+  // A computer with no location is asked to confirm with the phone first; the fallback is a flagged stamp with a note.
+  await expect(card.locator("p[role=alert]")).toContainText("Scan the QR code with your phone");
+  await expect(card.getByRole("img", { name: "QR code to open on your phone" })).toBeVisible();
+  await card.getByRole("button", { name: /I cannot use my phone/ }).click();
   await expect(card.locator("p[role=alert]")).toContainText("Add a short note");
   await card.getByLabel(/^Note/).fill("no signal at site");
-  await card.getByRole("button", { name: "Time In" }).click(); // the unlock is kept after a failed try
+  await card.getByRole("button", { name: /I cannot use my phone/ }).click(); // the unlock is kept after a failed try
   await expect(card.getByRole("status").filter({ hasText: "no location, flagged" })).toBeVisible();
   const ev = await db.timeEvent.findFirstOrThrow({ where: { employeeId: ids.e2 } });
   expect(ev.gpsStatus).toBe("DENIED");
@@ -339,11 +350,13 @@ test("time clock without GPS: note required, flagged, and BLOCK policy refuses",
   await backdate(ids.e2, 60);
   await db.orgSettings.updateMany({ where: { organization: { name: `Sys A ${stamp}` } }, data: { gpsPolicy: "BLOCK" } });
   await pressAction(card, /^Break 1/);
+  await expect(card.locator("p[role=alert]")).toContainText("Scan the QR code with your phone");
+  await card.getByRole("button", { name: /I cannot use my phone/ }).click();
   await expect(card.locator("p[role=alert]")).toContainText("requires your location");
   expect(await db.timeEvent.count({ where: { employeeId: ids.e2 } })).toBe(1);
   await db.orgSettings.updateMany({ where: { organization: { name: `Sys A ${stamp}` } }, data: { gpsPolicy: "ALLOW_FLAG" } });
 
-  await page.goto("/dtr");
+  await page.reload();
   await expect(page.getByText("Location flag").first()).toBeVisible();
   await ctx.close();
 });
@@ -365,7 +378,7 @@ test("a custom time stamp: Super Admin adds it, people use it, a note is require
   await sa.getByRole("button", { name: "Add time stamp" }).click();
   await expect(sa.locator("p[role=alert]")).toContainText("already exists");
   const custom = await db.timeStampType.findFirstOrThrow({ where: { organization: { name: `Sys A ${stamp}` }, name: "Training" } });
-  expect(custom).toMatchObject({ kind: "PAUSE", requiresNote: true, allowedMinutes: 30, paid: true, locked: false });
+  expect(custom).toMatchObject({ kind: "PAUSE", requiresNote: true, allowedMinutes: 30, paid: false, locked: false }); // only On Trip counts as work
 
   // An employee who is timed in now sees the new tile.
   await db.timeEvent.deleteMany({ where: { employeeId: ids.pia ?? "none" } });
@@ -373,6 +386,7 @@ test("a custom time stamp: Super Admin adds it, people use it, a note is require
   const page = await ctx.newPage();
   watch(page);
   await signIn(page, "mgr");
+  await page.goto("/dtr"); // the time clock lives on the DTR page
   const card = page.getByRole("region", { name: "Time clock" });
   await pressAction(card, "Time In");
   await expect(card.getByRole("status").filter({ hasText: "Timed in" })).toBeVisible();
@@ -396,7 +410,7 @@ test("a custom time stamp: Super Admin adds it, people use it, a note is require
   await sa.close();
 });
 
-test("paid and unpaid pauses: worked time and the over-limit flag", async ({ page }) => {
+test("breaks are deducted from worked time, and the over-limit flag", async ({ page }) => {
   watch(page);
   const org = await db.organization.findFirstOrThrow({ where: { name: `Sys A ${stamp}` } });
   const [brk, meal, tin, tout] = await Promise.all(
@@ -418,10 +432,10 @@ test("paid and unpaid pauses: worked time and the over-limit flag", async ({ pag
   const row = page.locator("details").first();
   await expect(row.getByText("Over break limit 15m")).toBeVisible();
   await row.locator("summary").click();
-  await expect(row.getByText(/Break.*30m.*paid/)).toBeVisible();
+  await expect(row.getByText(/Break.*30m/).first()).toBeVisible();
   await expect(row.getByText(/Meal.*1h 00m.*unpaid/)).toBeVisible();
   await expect(row.getByText("over by 15m")).toBeVisible();
-  await expect(row.locator("summary")).toContainText("8h 00m"); // 9h on site minus the unpaid meal; the paid break counts
+  await expect(row.locator("summary")).toContainText("7h 30m"); // 9h on site minus the meal and the break: only work and On Trip count
 });
 
 test("late, undertime and overtime are judged by the schedule that applied on that day", async ({ page }) => {
@@ -509,6 +523,7 @@ test("password step can be switched off: tiles work straight away", async ({ bro
   const page = await ctx.newPage();
   watch(page);
   await signIn(page, "e1");
+  await page.goto("/dtr"); // the time clock lives on the DTR page
   const card = page.getByRole("region", { name: "Time clock" });
   await expect(card.getByLabel("Your password")).toHaveCount(0);
   await expect(card.getByText("Verify your password")).toHaveCount(0);
@@ -546,7 +561,7 @@ test("HR corrects the record: missed punch added, then voided, both on record", 
   const yesterday = addDays(today, -1);
   await page.goto(`/dtr?employee=${ids.e1}&from=${yesterday}&to=${today}`);
   await page.getByLabel("Date").fill(yesterday);
-  await page.getByLabel("Time", { exact: true }).fill("09:05");
+  await page.getByLabel("Time (HH:MM or HH:MM:SS)").fill("09:05");
   await page.getByLabel("Reason (required, kept on record)").fill("ab");
   await page.getByRole("button", { name: "Add missed punch" }).click();
   await expect(alert(page)).toContainText("at least 5");

@@ -42,6 +42,8 @@ export type OvertimeRequestMinAggregateOutputType = {
   minutes: number | null
   reason: string | null
   status: $Enums.LeaveStatus | null
+  headApprovedById: string | null
+  headApprovedAt: Date | null
   decidedById: string | null
   decidedAt: Date | null
   decisionNote: string | null
@@ -57,6 +59,8 @@ export type OvertimeRequestMaxAggregateOutputType = {
   minutes: number | null
   reason: string | null
   status: $Enums.LeaveStatus | null
+  headApprovedById: string | null
+  headApprovedAt: Date | null
   decidedById: string | null
   decidedAt: Date | null
   decisionNote: string | null
@@ -72,6 +76,8 @@ export type OvertimeRequestCountAggregateOutputType = {
   minutes: number
   reason: number
   status: number
+  headApprovedById: number
+  headApprovedAt: number
   decidedById: number
   decidedAt: number
   decisionNote: number
@@ -97,6 +103,8 @@ export type OvertimeRequestMinAggregateInputType = {
   minutes?: true
   reason?: true
   status?: true
+  headApprovedById?: true
+  headApprovedAt?: true
   decidedById?: true
   decidedAt?: true
   decisionNote?: true
@@ -112,6 +120,8 @@ export type OvertimeRequestMaxAggregateInputType = {
   minutes?: true
   reason?: true
   status?: true
+  headApprovedById?: true
+  headApprovedAt?: true
   decidedById?: true
   decidedAt?: true
   decisionNote?: true
@@ -127,6 +137,8 @@ export type OvertimeRequestCountAggregateInputType = {
   minutes?: true
   reason?: true
   status?: true
+  headApprovedById?: true
+  headApprovedAt?: true
   decidedById?: true
   decidedAt?: true
   decisionNote?: true
@@ -229,6 +241,8 @@ export type OvertimeRequestGroupByOutputType = {
   minutes: number
   reason: string
   status: $Enums.LeaveStatus
+  headApprovedById: string | null
+  headApprovedAt: Date | null
   decidedById: string | null
   decidedAt: Date | null
   decisionNote: string | null
@@ -267,6 +281,8 @@ export type OvertimeRequestWhereInput = {
   minutes?: Prisma.IntFilter<"OvertimeRequest"> | number
   reason?: Prisma.StringFilter<"OvertimeRequest"> | string
   status?: Prisma.EnumLeaveStatusFilter<"OvertimeRequest"> | $Enums.LeaveStatus
+  headApprovedById?: Prisma.StringNullableFilter<"OvertimeRequest"> | string | null
+  headApprovedAt?: Prisma.DateTimeNullableFilter<"OvertimeRequest"> | Date | string | null
   decidedById?: Prisma.StringNullableFilter<"OvertimeRequest"> | string | null
   decidedAt?: Prisma.DateTimeNullableFilter<"OvertimeRequest"> | Date | string | null
   decisionNote?: Prisma.StringNullableFilter<"OvertimeRequest"> | string | null
@@ -284,6 +300,8 @@ export type OvertimeRequestOrderByWithRelationInput = {
   minutes?: Prisma.SortOrder
   reason?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  headApprovedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  headApprovedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   decidedById?: Prisma.SortOrderInput | Prisma.SortOrder
   decidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   decisionNote?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -305,6 +323,8 @@ export type OvertimeRequestWhereUniqueInput = Prisma.AtLeast<{
   minutes?: Prisma.IntFilter<"OvertimeRequest"> | number
   reason?: Prisma.StringFilter<"OvertimeRequest"> | string
   status?: Prisma.EnumLeaveStatusFilter<"OvertimeRequest"> | $Enums.LeaveStatus
+  headApprovedById?: Prisma.StringNullableFilter<"OvertimeRequest"> | string | null
+  headApprovedAt?: Prisma.DateTimeNullableFilter<"OvertimeRequest"> | Date | string | null
   decidedById?: Prisma.StringNullableFilter<"OvertimeRequest"> | string | null
   decidedAt?: Prisma.DateTimeNullableFilter<"OvertimeRequest"> | Date | string | null
   decisionNote?: Prisma.StringNullableFilter<"OvertimeRequest"> | string | null
@@ -322,6 +342,8 @@ export type OvertimeRequestOrderByWithAggregationInput = {
   minutes?: Prisma.SortOrder
   reason?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  headApprovedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  headApprovedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   decidedById?: Prisma.SortOrderInput | Prisma.SortOrder
   decidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   decisionNote?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -345,6 +367,8 @@ export type OvertimeRequestScalarWhereWithAggregatesInput = {
   minutes?: Prisma.IntWithAggregatesFilter<"OvertimeRequest"> | number
   reason?: Prisma.StringWithAggregatesFilter<"OvertimeRequest"> | string
   status?: Prisma.EnumLeaveStatusWithAggregatesFilter<"OvertimeRequest"> | $Enums.LeaveStatus
+  headApprovedById?: Prisma.StringNullableWithAggregatesFilter<"OvertimeRequest"> | string | null
+  headApprovedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"OvertimeRequest"> | Date | string | null
   decidedById?: Prisma.StringNullableWithAggregatesFilter<"OvertimeRequest"> | string | null
   decidedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"OvertimeRequest"> | Date | string | null
   decisionNote?: Prisma.StringNullableWithAggregatesFilter<"OvertimeRequest"> | string | null
@@ -358,6 +382,8 @@ export type OvertimeRequestCreateInput = {
   minutes: number
   reason: string
   status?: $Enums.LeaveStatus
+  headApprovedById?: string | null
+  headApprovedAt?: Date | string | null
   decidedById?: string | null
   decidedAt?: Date | string | null
   decisionNote?: string | null
@@ -375,6 +401,8 @@ export type OvertimeRequestUncheckedCreateInput = {
   minutes: number
   reason: string
   status?: $Enums.LeaveStatus
+  headApprovedById?: string | null
+  headApprovedAt?: Date | string | null
   decidedById?: string | null
   decidedAt?: Date | string | null
   decisionNote?: string | null
@@ -388,6 +416,8 @@ export type OvertimeRequestUpdateInput = {
   minutes?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumLeaveStatusFieldUpdateOperationsInput | $Enums.LeaveStatus
+  headApprovedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  headApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -405,6 +435,8 @@ export type OvertimeRequestUncheckedUpdateInput = {
   minutes?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumLeaveStatusFieldUpdateOperationsInput | $Enums.LeaveStatus
+  headApprovedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  headApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -420,6 +452,8 @@ export type OvertimeRequestCreateManyInput = {
   minutes: number
   reason: string
   status?: $Enums.LeaveStatus
+  headApprovedById?: string | null
+  headApprovedAt?: Date | string | null
   decidedById?: string | null
   decidedAt?: Date | string | null
   decisionNote?: string | null
@@ -433,6 +467,8 @@ export type OvertimeRequestUpdateManyMutationInput = {
   minutes?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumLeaveStatusFieldUpdateOperationsInput | $Enums.LeaveStatus
+  headApprovedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  headApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -448,6 +484,8 @@ export type OvertimeRequestUncheckedUpdateManyInput = {
   minutes?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumLeaveStatusFieldUpdateOperationsInput | $Enums.LeaveStatus
+  headApprovedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  headApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -478,6 +516,8 @@ export type OvertimeRequestCountOrderByAggregateInput = {
   minutes?: Prisma.SortOrder
   reason?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  headApprovedById?: Prisma.SortOrder
+  headApprovedAt?: Prisma.SortOrder
   decidedById?: Prisma.SortOrder
   decidedAt?: Prisma.SortOrder
   decisionNote?: Prisma.SortOrder
@@ -497,6 +537,8 @@ export type OvertimeRequestMaxOrderByAggregateInput = {
   minutes?: Prisma.SortOrder
   reason?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  headApprovedById?: Prisma.SortOrder
+  headApprovedAt?: Prisma.SortOrder
   decidedById?: Prisma.SortOrder
   decidedAt?: Prisma.SortOrder
   decisionNote?: Prisma.SortOrder
@@ -512,6 +554,8 @@ export type OvertimeRequestMinOrderByAggregateInput = {
   minutes?: Prisma.SortOrder
   reason?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  headApprovedById?: Prisma.SortOrder
+  headApprovedAt?: Prisma.SortOrder
   decidedById?: Prisma.SortOrder
   decidedAt?: Prisma.SortOrder
   decisionNote?: Prisma.SortOrder
@@ -613,6 +657,8 @@ export type OvertimeRequestCreateWithoutOrganizationInput = {
   minutes: number
   reason: string
   status?: $Enums.LeaveStatus
+  headApprovedById?: string | null
+  headApprovedAt?: Date | string | null
   decidedById?: string | null
   decidedAt?: Date | string | null
   decisionNote?: string | null
@@ -628,6 +674,8 @@ export type OvertimeRequestUncheckedCreateWithoutOrganizationInput = {
   minutes: number
   reason: string
   status?: $Enums.LeaveStatus
+  headApprovedById?: string | null
+  headApprovedAt?: Date | string | null
   decidedById?: string | null
   decidedAt?: Date | string | null
   decisionNote?: string | null
@@ -672,6 +720,8 @@ export type OvertimeRequestScalarWhereInput = {
   minutes?: Prisma.IntFilter<"OvertimeRequest"> | number
   reason?: Prisma.StringFilter<"OvertimeRequest"> | string
   status?: Prisma.EnumLeaveStatusFilter<"OvertimeRequest"> | $Enums.LeaveStatus
+  headApprovedById?: Prisma.StringNullableFilter<"OvertimeRequest"> | string | null
+  headApprovedAt?: Prisma.DateTimeNullableFilter<"OvertimeRequest"> | Date | string | null
   decidedById?: Prisma.StringNullableFilter<"OvertimeRequest"> | string | null
   decidedAt?: Prisma.DateTimeNullableFilter<"OvertimeRequest"> | Date | string | null
   decisionNote?: Prisma.StringNullableFilter<"OvertimeRequest"> | string | null
@@ -685,6 +735,8 @@ export type OvertimeRequestCreateWithoutEmployeeInput = {
   minutes: number
   reason: string
   status?: $Enums.LeaveStatus
+  headApprovedById?: string | null
+  headApprovedAt?: Date | string | null
   decidedById?: string | null
   decidedAt?: Date | string | null
   decisionNote?: string | null
@@ -700,6 +752,8 @@ export type OvertimeRequestUncheckedCreateWithoutEmployeeInput = {
   minutes: number
   reason: string
   status?: $Enums.LeaveStatus
+  headApprovedById?: string | null
+  headApprovedAt?: Date | string | null
   decidedById?: string | null
   decidedAt?: Date | string | null
   decisionNote?: string | null
@@ -740,6 +794,8 @@ export type OvertimeRequestCreateManyOrganizationInput = {
   minutes: number
   reason: string
   status?: $Enums.LeaveStatus
+  headApprovedById?: string | null
+  headApprovedAt?: Date | string | null
   decidedById?: string | null
   decidedAt?: Date | string | null
   decisionNote?: string | null
@@ -753,6 +809,8 @@ export type OvertimeRequestUpdateWithoutOrganizationInput = {
   minutes?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumLeaveStatusFieldUpdateOperationsInput | $Enums.LeaveStatus
+  headApprovedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  headApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -768,6 +826,8 @@ export type OvertimeRequestUncheckedUpdateWithoutOrganizationInput = {
   minutes?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumLeaveStatusFieldUpdateOperationsInput | $Enums.LeaveStatus
+  headApprovedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  headApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -782,6 +842,8 @@ export type OvertimeRequestUncheckedUpdateManyWithoutOrganizationInput = {
   minutes?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumLeaveStatusFieldUpdateOperationsInput | $Enums.LeaveStatus
+  headApprovedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  headApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -796,6 +858,8 @@ export type OvertimeRequestCreateManyEmployeeInput = {
   minutes: number
   reason: string
   status?: $Enums.LeaveStatus
+  headApprovedById?: string | null
+  headApprovedAt?: Date | string | null
   decidedById?: string | null
   decidedAt?: Date | string | null
   decisionNote?: string | null
@@ -809,6 +873,8 @@ export type OvertimeRequestUpdateWithoutEmployeeInput = {
   minutes?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumLeaveStatusFieldUpdateOperationsInput | $Enums.LeaveStatus
+  headApprovedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  headApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -824,6 +890,8 @@ export type OvertimeRequestUncheckedUpdateWithoutEmployeeInput = {
   minutes?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumLeaveStatusFieldUpdateOperationsInput | $Enums.LeaveStatus
+  headApprovedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  headApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -838,6 +906,8 @@ export type OvertimeRequestUncheckedUpdateManyWithoutEmployeeInput = {
   minutes?: Prisma.IntFieldUpdateOperationsInput | number
   reason?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumLeaveStatusFieldUpdateOperationsInput | $Enums.LeaveStatus
+  headApprovedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  headApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decidedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -855,6 +925,8 @@ export type OvertimeRequestSelect<ExtArgs extends runtime.Types.Extensions.Inter
   minutes?: boolean
   reason?: boolean
   status?: boolean
+  headApprovedById?: boolean
+  headApprovedAt?: boolean
   decidedById?: boolean
   decidedAt?: boolean
   decisionNote?: boolean
@@ -872,6 +944,8 @@ export type OvertimeRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   minutes?: boolean
   reason?: boolean
   status?: boolean
+  headApprovedById?: boolean
+  headApprovedAt?: boolean
   decidedById?: boolean
   decidedAt?: boolean
   decisionNote?: boolean
@@ -889,6 +963,8 @@ export type OvertimeRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   minutes?: boolean
   reason?: boolean
   status?: boolean
+  headApprovedById?: boolean
+  headApprovedAt?: boolean
   decidedById?: boolean
   decidedAt?: boolean
   decisionNote?: boolean
@@ -906,6 +982,8 @@ export type OvertimeRequestSelectScalar = {
   minutes?: boolean
   reason?: boolean
   status?: boolean
+  headApprovedById?: boolean
+  headApprovedAt?: boolean
   decidedById?: boolean
   decidedAt?: boolean
   decisionNote?: boolean
@@ -913,7 +991,7 @@ export type OvertimeRequestSelectScalar = {
   updatedAt?: boolean
 }
 
-export type OvertimeRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "employeeId" | "date" | "minutes" | "reason" | "status" | "decidedById" | "decidedAt" | "decisionNote" | "createdAt" | "updatedAt", ExtArgs["result"]["overtimeRequest"]>
+export type OvertimeRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "employeeId" | "date" | "minutes" | "reason" | "status" | "headApprovedById" | "headApprovedAt" | "decidedById" | "decidedAt" | "decisionNote" | "createdAt" | "updatedAt", ExtArgs["result"]["overtimeRequest"]>
 export type OvertimeRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
@@ -941,6 +1019,8 @@ export type $OvertimeRequestPayload<ExtArgs extends runtime.Types.Extensions.Int
     minutes: number
     reason: string
     status: $Enums.LeaveStatus
+    headApprovedById: string | null
+    headApprovedAt: Date | null
     decidedById: string | null
     decidedAt: Date | null
     decisionNote: string | null
@@ -1378,6 +1458,8 @@ export interface OvertimeRequestFieldRefs {
   readonly minutes: Prisma.FieldRef<"OvertimeRequest", 'Int'>
   readonly reason: Prisma.FieldRef<"OvertimeRequest", 'String'>
   readonly status: Prisma.FieldRef<"OvertimeRequest", 'LeaveStatus'>
+  readonly headApprovedById: Prisma.FieldRef<"OvertimeRequest", 'String'>
+  readonly headApprovedAt: Prisma.FieldRef<"OvertimeRequest", 'DateTime'>
   readonly decidedById: Prisma.FieldRef<"OvertimeRequest", 'String'>
   readonly decidedAt: Prisma.FieldRef<"OvertimeRequest", 'DateTime'>
   readonly decisionNote: Prisma.FieldRef<"OvertimeRequest", 'String'>

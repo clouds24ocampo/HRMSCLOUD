@@ -67,27 +67,39 @@ model Organization {
   wageOrders     WageOrder[]
   holidays       Holiday[]
   prevEmployment PreviousEmployment[]
+  dailyReports   DailyReport[]
+  cashAdvances   CashAdvance[]
+  payouts        Payout[]
+  policies       PolicyDocument[]
+  signatures     PolicySignature[]
+  idCard         IdCardSettings?
+  conversations  Conversation[]
+  calls          CallSession[]
   createdAt      DateTime             @default(now())
   updatedAt      DateTime             @updatedAt
 }
 
 model User {
-  id                 String         @id @default(cuid())
+  id                 String               @id @default(cuid())
   organizationId     String
-  organization       Organization   @relation(fields: [organizationId], references: [id])
-  email              String         @unique
+  organization       Organization         @relation(fields: [organizationId], references: [id])
+  email              String               @unique
+  username           String?              @unique // optional sign-in name; email always works too
   name               String
   passwordHash       String
-  active             Boolean        @default(true)
+  active             Boolean              @default(true)
   // True when an admin set a temporary password: user must choose their own at first sign-in.
-  mustChangePassword Boolean        @default(false)
+  mustChangePassword Boolean              @default(false)
   roleId             String
-  role               Role           @relation(fields: [roleId], references: [id])
+  role               Role                 @relation(fields: [roleId], references: [id])
   sessions           Session[]
   employee           Employee?
   notifications      Notification[]
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
+  memberships        ConversationMember[]
+  messages           Message[]
+  locationLinks      LocationLink[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
 
   @@index([roleId])
   @@index([organizationId])
@@ -130,7 +142,8 @@ enum PositionLevel {
   ENTRY
   TEAM_LEAD
   MANAGER
-  DEPT_HEAD
+  ASSISTANT_HEAD // assistant department head: always tied to one department
+  DEPT_HEAD // department head: always tied to one department
   EXECUTIVE
 }
 
@@ -159,6 +172,14 @@ model OrgSettings {
   statutoryProfile     StatutoryProfile     @default(MANUAL)
   // When government contributions come off pay: every period (split), or once a month in the period that holds the month end.
   contributionSchedule ContributionSchedule @default(EVERY_PERIOD)
+  // Daily rate = monthly x 12 / daysPerYear (313 = six-day week, rest day unpaid). Hourly = daily / hoursPerDay.
+  daysPerYear          Int                  @default(313)
+  // Monthly staff are paid for the hours they actually logged (capped at hoursPerDay a day) instead of a fixed salary less absences.
+  payByLoggedHours     Boolean              @default(true)
+  // Government contributions and withholding tax: computed and shown always, taken off pay only when this is on.
+  deductStatutory      Boolean              @default(false)
+  // Semi-monthly cut-offs (1-15 paid at month end, 16-end paid on the 15th) are created and recalculated hourly on their own.
+  autoCutoffs          Boolean              @default(true)
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
 }
@@ -226,6 +247,8 @@ model Employee {
   position       Position?            @relation(fields: [positionId], references: [id])
   managerId      String? // immediate supervisor: defines who sees whom
   scheduleLinked Boolean              @default(true) // follows the supervisor's regular schedule until someone edits it directly (then Custom)
+  flexible       Boolean              @default(false)
+  photoKey       String? // profile picture, stored like documents (storage/<org>/<uuid>) // no fixed shift: own hours and days off, but at least 8 hours a working day and 1 day off a week
   manager        Employee?            @relation("Reports", fields: [managerId], references: [id])
   reports        Employee[]           @relation("Reports")
   hireDate       DateTime             @db.Date
@@ -249,6 +272,9 @@ model Employee {
   hrRequests     HrRequest[]
   taxProfiles    EmployeeTaxProfile[]
   prevEmployment PreviousEmployment[]
+  dailyReports   DailyReport[]
+  cashAdvances   CashAdvance[]
+  signatures     PolicySignature[]
   createdAt      DateTime             @default(now())
   updatedAt      DateTime             @updatedAt
 
@@ -409,6 +435,7 @@ enum TimeSource {
   WEB
   MOBILE
   MANUAL
+  SYSTEM // automatic time-out: nobody timed out 30 minutes after a full day (plus approved overtime)
 }
 
 // Append-only punches. Server time only. Corrections are new MANUAL rows or a void with a reason.
@@ -432,6 +459,11 @@ model TimeEvent {
   tripFrom       String?
   tripTo         String?
   tripReason     String?
+  // Evidence of where the stamp came from: GPS (phone), WIFI (laptop/desktop browser), PHONE_LINK (desktop confirmed by the phone), NONE.
+  locSource      String?
+  device         String? // PHONE, TABLET, DESKTOP
+  ipAddress      String?
+  userAgent      String?
   createdById    String?
   voidedAt       DateTime?
   voidedById     String?
@@ -512,20 +544,23 @@ model Notification {
 
 // Overtime shown on the DTR is only a candidate. Pay uses approved requests.
 model OvertimeRequest {
-  id             String       @id @default(cuid())
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  employeeId     String
-  employee       Employee     @relation(fields: [employeeId], references: [id])
-  date           DateTime     @db.Date
-  minutes        Int
-  reason         String
-  status         LeaveStatus  @default(PENDING)
-  decidedById    String?
-  decidedAt      DateTime?
-  decisionNote   String?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id               String       @id @default(cuid())
+  organizationId   String
+  organization     Organization @relation(fields: [organizationId], references: [id])
+  employeeId       String
+  employee         Employee     @relation(fields: [employeeId], references: [id])
+  date             DateTime     @db.Date
+  minutes          Int
+  reason           String
+  status           LeaveStatus  @default(PENDING)
+  // Two steps: the department head (someone above the employee in the supervisor chain) first, then HR gives the final approval.
+  headApprovedById String?
+  headApprovedAt   DateTime?
+  decidedById      String?
+  decidedAt        DateTime?
+  decisionNote     String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 
   @@unique([employeeId, date])
   @@index([organizationId, status])
@@ -703,6 +738,7 @@ model Payslip {
   basicEarnedCents     Int           @default(0) // basic pay after absences, late and undertime: the 13th month base
   inputs               Json
   lines                PayslipLine[]
+  payouts              Payout[]
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
 
@@ -1222,4 +1258,273 @@ model PreviousEmployment {
   updatedAt            DateTime     @updatedAt
 
   @@index([employeeId, year])
+}
+
+// End-of-day report: what the employee did, what blocked them, what comes next. Append-only: once sent it is never edited;
+// a correction is a new report for the same day (the latest one counts).
+model DailyReport {
+  id              String       @id @default(cuid())
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  employeeId      String
+  employee        Employee     @relation(fields: [employeeId], references: [id])
+  date            DateTime     @db.Date
+  accomplishments String
+  issues          String?
+  plans           String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([employeeId, date])
+  @@index([organizationId, date])
+}
+
+// ───────────── Company policies and e-signatures ─────────────
+
+enum PolicyKind {
+  USER_AGREEMENT
+  SYSTEM_TERMS
+  SYSTEM_PRIVACY
+  COMPANY_PRIVACY
+  COMPANY_POLICY
+}
+
+// A policy to read and sign. Text (body) or an uploaded PDF (storageKey). A new version is a new row; old signatures stay with the old row.
+model PolicyDocument {
+  id                String            @id @default(cuid())
+  organizationId    String
+  organization      Organization      @relation(fields: [organizationId], references: [id])
+  kind              PolicyKind
+  title             String
+  body              String?
+  storageKey        String?           @unique
+  fileName          String?
+  contentHash       String // SHA-256 of the text or file: proves what exactly was signed
+  version           Int               @default(1)
+  requiresSignature Boolean           @default(true)
+  archivedAt        DateTime?
+  createdById       String?
+  signatures        PolicySignature[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([organizationId, archivedAt])
+}
+
+// One person's signature on one policy version. Never edited or deleted.
+model PolicySignature {
+  id             String         @id @default(cuid())
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  policyId       String
+  policy         PolicyDocument @relation(fields: [policyId], references: [id])
+  employeeId     String
+  employee       Employee       @relation(fields: [employeeId], references: [id])
+  signedName     String
+  signatureKey   String // the drawn signature (PNG) in storage
+  contentHash    String // copied from the policy at signing time
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@unique([policyId, employeeId])
+  @@index([employeeId])
+}
+
+// ───────────── Digital ID ─────────────
+
+// The ID card layout. HR edits it; every employee's card is drawn from it plus their own record.
+model IdCardSettings {
+  id             String       @id @default(cuid())
+  organizationId String       @unique
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  title          String       @default("EMPLOYEE ID")
+  accent         String       @default("#2563eb")
+  showPosition   Boolean      @default(true)
+  showDepartment Boolean      @default(true)
+  showHireDate   Boolean      @default(true)
+  showEmployeeNo Boolean      @default(true)
+  signatoryName  String?
+  signatoryTitle String?
+  signatureKey   String? // the signatory's signature image
+  footer         String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+// ───────────── Location from a phone, for stamps made on a desktop or laptop ─────────────
+
+// The desktop shows a QR code; the same person opens it on their phone, which sends its GPS fix here.
+// The desktop's next time stamp uses that fix. Short-lived and single use.
+model LocationLink {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lat       Float?
+  lng       Float?
+  accuracy  Float?
+  fixedAt   DateTime?
+  usedAt    DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+// ───────────── Chat and calls ─────────────
+
+model Conversation {
+  id             String               @id @default(cuid())
+  organizationId String
+  organization   Organization         @relation(fields: [organizationId], references: [id])
+  directKey      String?              @unique // "<userA>:<userB>" sorted, for one-to-one chats
+  name           String? // group chats
+  members        ConversationMember[]
+  messages       Message[]
+  calls          CallSession[]
+  lastMessageAt  DateTime             @default(now())
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@index([organizationId, lastMessageAt])
+}
+
+model ConversationMember {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastReadAt     DateTime     @default(now())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  body           String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([conversationId, createdAt])
+}
+
+enum CallKind {
+  VOICE
+  VIDEO
+}
+
+enum CallStatus {
+  RINGING
+  ACTIVE
+  ENDED
+  DECLINED
+  MISSED
+}
+
+// A one-to-one WebRTC call. The server only relays the connection setup (the offer and the answer, each with its network
+// candidates already gathered); audio and video go peer to peer.
+model CallSession {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  callerId       String
+  calleeId       String
+  kind           CallKind
+  status         CallStatus   @default(RINGING)
+  offer          String?
+  answer         String?
+  answeredAt     DateTime?
+  endedAt        DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([calleeId, status])
+  @@index([callerId, status])
+}
+
+// ───────────── Cash advances ─────────────
+
+// A cash advance against pay. Repaid in equal installments, one per cut-off, starting with the cut-off after the one
+// it was approved in. The schedule is worked out from the dates, so recalculating a payroll never takes an installment twice.
+model CashAdvance {
+  id             String               @id @default(cuid())
+  organizationId String
+  organization   Organization         @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee             @relation(fields: [employeeId], references: [id])
+  amountCents    Int
+  installments   Int                  @default(1) // number of cut-offs to repay it over
+  reason         String
+  status         LeaveStatus          @default(PENDING)
+  decidedById    String?
+  decidedAt      DateTime?
+  decisionNote   String?
+  firstCutoff    DateTime?            @db.Date // start of the first repayment cut-off, set on approval
+  payments       CashAdvancePayment[]
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@index([organizationId, status])
+  @@index([employeeId])
+}
+
+// One repayment, written when the payroll that took it is finalized. Never edited.
+model CashAdvancePayment {
+  id          String      @id @default(cuid())
+  advanceId   String
+  advance     CashAdvance @relation(fields: [advanceId], references: [id])
+  payslipId   String
+  amountCents Int
+  paidOn      DateTime    @db.Date // pay day of that payroll
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([advanceId, payslipId]) // one payslip may repay several advances, each once
+}
+
+// ───────────── Pay released ─────────────
+
+enum PayoutStatus {
+  WAITING // recorded by HR, the employee has not answered yet
+  CONFIRMED // the employee confirmed they received this amount
+  DISPUTED // the employee reported a problem
+}
+
+// What was actually handed over for one payslip, with proof, and the employee's answer. Append-only: a correction is a
+// new record (the latest counts), so the history of what was paid and confirmed is never lost.
+model Payout {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  payslipId      String
+  payslip        Payslip      @relation(fields: [payslipId], references: [id])
+  amountCents    Int
+  method         String // Cash, Bank transfer, GCash, Check…
+  reference      String?
+  paidOn         DateTime     @db.Date
+  proofKey       String?      @unique
+  proofName      String?
+  proofMime      String?
+  recordedById   String
+  status         PayoutStatus @default(WAITING)
+  answeredAt     DateTime?
+  employeeNote   String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([payslipId])
+  @@index([organizationId, status])
 }

@@ -8,10 +8,11 @@ export function liveState(i: {
   now: Date; day: string; tz: string; shift: ShiftTimes | null | undefined; onLeave: boolean; clock: ClockStatus; timedInToday: boolean; graceMinutes: number;
 }): { state: LiveState; detail?: string } {
   if (i.onLeave) return { state: "ON_LEAVE" };
-  if (i.shift === undefined) return { state: "NO_SCHEDULE" };
+  // What the clock says comes first: someone without a schedule (or on a flexible one) who is working is working.
   if (i.clock.state === "ON_PAUSE") return { state: "ON_BREAK", detail: i.clock.pause?.name };
   if (i.clock.state === "IN") return { state: "WORKING" };
   if (i.timedInToday) return { state: "DONE" };
+  if (i.shift === undefined) return { state: "NO_SCHEDULE" };
   if (i.shift === null) return { state: "DAY_OFF" };
   const { start } = shiftInstants(i.day, i.shift, i.tz);
   const late = Math.floor((i.now.getTime() - start.getTime()) / 60000);

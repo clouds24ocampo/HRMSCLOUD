@@ -34,8 +34,9 @@ export function ManualPunchForm({ employees, today, selected, stamps }: { employ
           </select>
         </label>
         <Field label="Date" id="date" type="date" defaultValue={today} max={today} required />
-        <Field label="Time" id="time" type="time" required />
+        <Field label="Time (HH:MM or HH:MM:SS)" id="time" type="time" step="1" required />
       </div>
+
       <Field label="Reason (required, kept on record)" id="reason" required value={reason} onChange={(e) => setReason(e.target.value)} />
       {state?.error && <Alert kind="error">{state.error}</Alert>}
       {state?.ok && <Alert kind="success">{state.ok}</Alert>}

@@ -40,6 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# graphify
+/graphify-out/
 e2e/*.png
 test-results/
 playwright-report/

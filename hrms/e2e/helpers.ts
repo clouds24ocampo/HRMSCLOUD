@@ -22,3 +22,7 @@ export async function wipeOrgs(stamp: string | number) {
     { timeout: 60_000 },
   );
 }
+
+// Org settings that reproduce the original pay math these specs were written against: monthly salary less absences
+// (not logged hours), daily rate = monthly ÷ 22 (264 days a year), government contributions taken off pay, pay periods made by hand.
+export const LEGACY_PAY = { payByLoggedHours: false, daysPerYear: 264, deductStatutory: true, autoCutoffs: false } as const;

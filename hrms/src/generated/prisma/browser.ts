@@ -247,3 +247,63 @@ export type Holiday = Prisma.HolidayModel
  * 
  */
 export type PreviousEmployment = Prisma.PreviousEmploymentModel
+/**
+ * Model DailyReport
+ * 
+ */
+export type DailyReport = Prisma.DailyReportModel
+/**
+ * Model PolicyDocument
+ * 
+ */
+export type PolicyDocument = Prisma.PolicyDocumentModel
+/**
+ * Model PolicySignature
+ * 
+ */
+export type PolicySignature = Prisma.PolicySignatureModel
+/**
+ * Model IdCardSettings
+ * 
+ */
+export type IdCardSettings = Prisma.IdCardSettingsModel
+/**
+ * Model LocationLink
+ * 
+ */
+export type LocationLink = Prisma.LocationLinkModel
+/**
+ * Model Conversation
+ * 
+ */
+export type Conversation = Prisma.ConversationModel
+/**
+ * Model ConversationMember
+ * 
+ */
+export type ConversationMember = Prisma.ConversationMemberModel
+/**
+ * Model Message
+ * 
+ */
+export type Message = Prisma.MessageModel
+/**
+ * Model CallSession
+ * 
+ */
+export type CallSession = Prisma.CallSessionModel
+/**
+ * Model CashAdvance
+ * 
+ */
+export type CashAdvance = Prisma.CashAdvanceModel
+/**
+ * Model CashAdvancePayment
+ * 
+ */
+export type CashAdvancePayment = Prisma.CashAdvancePaymentModel
+/**
+ * Model Payout
+ * 
+ */
+export type Payout = Prisma.PayoutModel

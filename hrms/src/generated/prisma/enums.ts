@@ -13,6 +13,7 @@ export const PositionLevel = {
   ENTRY: 'ENTRY',
   TEAM_LEAD: 'TEAM_LEAD',
   MANAGER: 'MANAGER',
+  ASSISTANT_HEAD: 'ASSISTANT_HEAD',
   DEPT_HEAD: 'DEPT_HEAD',
   EXECUTIVE: 'EXECUTIVE'
 } as const
@@ -98,7 +99,8 @@ export type GpsStatus = (typeof GpsStatus)[keyof typeof GpsStatus]
 export const TimeSource = {
   WEB: 'WEB',
   MOBILE: 'MOBILE',
-  MANUAL: 'MANUAL'
+  MANUAL: 'MANUAL',
+  SYSTEM: 'SYSTEM'
 } as const
 
 export type TimeSource = (typeof TimeSource)[keyof typeof TimeSource]
@@ -324,3 +326,42 @@ export const HolidayType = {
 } as const
 
 export type HolidayType = (typeof HolidayType)[keyof typeof HolidayType]
+
+
+export const PolicyKind = {
+  USER_AGREEMENT: 'USER_AGREEMENT',
+  SYSTEM_TERMS: 'SYSTEM_TERMS',
+  SYSTEM_PRIVACY: 'SYSTEM_PRIVACY',
+  COMPANY_PRIVACY: 'COMPANY_PRIVACY',
+  COMPANY_POLICY: 'COMPANY_POLICY'
+} as const
+
+export type PolicyKind = (typeof PolicyKind)[keyof typeof PolicyKind]
+
+
+export const CallKind = {
+  VOICE: 'VOICE',
+  VIDEO: 'VIDEO'
+} as const
+
+export type CallKind = (typeof CallKind)[keyof typeof CallKind]
+
+
+export const CallStatus = {
+  RINGING: 'RINGING',
+  ACTIVE: 'ACTIVE',
+  ENDED: 'ENDED',
+  DECLINED: 'DECLINED',
+  MISSED: 'MISSED'
+} as const
+
+export type CallStatus = (typeof CallStatus)[keyof typeof CallStatus]
+
+
+export const PayoutStatus = {
+  WAITING: 'WAITING',
+  CONFIRMED: 'CONFIRMED',
+  DISPUTED: 'DISPUTED'
+} as const
+
+export type PayoutStatus = (typeof PayoutStatus)[keyof typeof PayoutStatus]

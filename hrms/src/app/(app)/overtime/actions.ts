@@ -7,10 +7,10 @@ import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
 import { loadDtr } from "@/lib/dtr-data";
 import { getMyEmployee } from "@/lib/employees";
-import { approverUserIds, notify, userIdOfEmployee } from "@/lib/notify";
+import { approverUserIds, notify, supervisorUserIds, userIdOfEmployee } from "@/lib/notify";
 import { getOrgSettings } from "@/lib/settings";
 import { ROLES } from "@/lib/roles";
-import { canViewEmployee, isHr } from "@/lib/scope";
+import { ancestorIds, mayDecide, stepOf } from "@/lib/overtime";
 import { addDays, dayKey, dbDate, formatDuration } from "@/lib/time";
 import type { FormState } from "@/app/login/actions";
 
@@ -44,7 +44,9 @@ export async function requestOvertime(day: string, _: FormState, form: FormData)
     ? await prisma.overtimeRequest.update({ where: { id: existing.id }, data }) // a rejected or cancelled day can be asked again
     : await prisma.overtimeRequest.create({ data: { ...data, organizationId: me.organizationId, employeeId: emp.id, date: dbDate(day) } });
   await audit(me.id, "overtime.requested", "OvertimeRequest", r.id, { day, minutes }, me.organizationId);
-  await notify(me.organizationId, await approverUserIds(me.organizationId, emp.id), { title: `${me.name} asked for ${formatDuration(minutes)} overtime`, body: `${day} · ${reason.data}`, href: "/overtime" }, me.id);
+  // Step 1 goes to the supervisor chain; with no supervisor it goes straight to HR.
+  const chain = await supervisorUserIds(me.organizationId, emp.id);
+  await notify(me.organizationId, chain.length ? chain : await approverUserIds(me.organizationId, emp.id), { title: `${me.name} asked for ${formatDuration(minutes)} overtime`, body: `${day} · ${reason.data}`, href: "/overtime" }, me.id);
   done();
   return { ok: `Requested ${formatDuration(minutes)} of overtime for ${day}.` };
 }
@@ -59,23 +61,39 @@ export async function cancelOvertime(id: string) {
   done();
 }
 
-// Same rule as leave: HR and Super Admin decide for anyone, a Manager for people below them, nobody for themselves (except the Super Admin).
+// Two steps (see lib/overtime.ts): the department head first, then HR. Either step can reject.
 export async function decideOvertime(id: string, decision: "APPROVED" | "REJECTED", _: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/overtime");
   const note = z.string().trim().max(300).optional().parse(form.get("note") ?? undefined);
   if (decision === "REJECTED" && (note ?? "").length < 3) return { error: "Give a short reason for rejecting." };
 
-  const r = await prisma.overtimeRequest.findFirst({ where: { id, organizationId: me.organizationId, status: "PENDING" } });
+  const r = await prisma.overtimeRequest.findFirst({ where: { id, organizationId: me.organizationId, status: "PENDING" }, include: { employee: { select: { managerId: true, firstName: true, lastName: true } } } });
   if (!r) return { error: "This request was already handled." };
   const mine = await getMyEmployee(me);
-  if (r.employeeId === mine.id && me.role.key !== ROLES.SUPER_ADMIN) return { error: "You cannot approve your own overtime." };
-  const allowed = isHr(me.role.key) || (me.role.key === ROLES.MANAGER && (await canViewEmployee(me, mine.id, r.employeeId)));
-  if (!allowed) return { error: "This request is not yours to decide." };
+  const rows = await prisma.employee.findMany({ where: { organizationId: me.organizationId }, select: { id: true, managerId: true } });
+  const step = stepOf(r, !!r.employee.managerId);
+  const blocked = mayDecide({ roleKey: me.role.key, actorUserId: me.id, actorEmployeeId: mine.id, employeeId: r.employeeId, step, ancestors: ancestorIds(rows, r.employeeId), headApprovedById: r.headApprovedById });
+  if (blocked) return { error: blocked };
 
-  await prisma.overtimeRequest.update({ where: { id }, data: { status: decision, decidedById: me.id, decidedAt: new Date(), decisionNote: note || null } });
-  await audit(me.id, decision === "APPROVED" ? "overtime.approved" : "overtime.rejected", "OvertimeRequest", id, { note }, me.organizationId);
   const uid = await userIdOfEmployee(me.organizationId, r.employeeId);
+  const who = `${r.employee.firstName} ${r.employee.lastName}`;
+  if (decision === "APPROVED" && step === "HEAD") {
+    // Guarded update: if someone else decided in the meantime, nothing changes.
+    const n = await prisma.overtimeRequest.updateMany({ where: { id, status: "PENDING", headApprovedAt: null }, data: { headApprovedById: me.id, headApprovedAt: new Date(), decisionNote: note || null } });
+    if (n.count === 0) return { error: "This request was already handled." };
+    await audit(me.id, "overtime.head_approved", "OvertimeRequest", id, { note }, me.organizationId);
+    const hr = await prisma.user.findMany({ where: { organizationId: me.organizationId, active: true, role: { key: { in: [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN] } } }, select: { id: true } });
+    await notify(me.organizationId, hr.map((u) => u.id), { title: `Overtime for ${who} needs final approval`, body: `${formatDuration(r.minutes)} · approved by ${me.name}`, href: "/overtime" }, me.id);
+    if (uid) await notify(me.organizationId, [uid], { title: "Your department head approved your overtime", body: "HR gives the final approval.", href: "/overtime" }, me.id);
+    done();
+    return { ok: "Approved. HR gives the final approval." };
+  }
+
+  const n = await prisma.overtimeRequest.updateMany({ where: { id, status: "PENDING" }, data: { status: decision, decidedById: me.id, decidedAt: new Date(), decisionNote: note || r.decisionNote } });
+  if (n.count === 0) return { error: "This request was already handled." };
+  await audit(me.id, decision === "APPROVED" ? "overtime.approved" : "overtime.rejected", "OvertimeRequest", id, { note, step }, me.organizationId);
   if (uid) await notify(me.organizationId, [uid], { title: `Your overtime was ${decision === "APPROVED" ? "approved" : "rejected"}`, body: note || undefined, href: "/overtime" }, me.id);
   done();
-  return { ok: decision === "APPROVED" ? "Approved." : "Rejected." };
+  revalidatePath("/payroll");
+  return { ok: decision === "APPROVED" ? "Approved. It is paid in this cut-off." : "Rejected." };
 }

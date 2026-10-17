@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { DEPARTMENT_SUGGESTIONS, LEVEL_LABEL, positionSuggestionsFor } from "@/lib/defaults";
+import { departmentSuggestionsFor, LEVEL_LABEL, positionSuggestionsFor } from "@/lib/defaults";
 import { Badge, Card, EmptyState, PageHeader, ghostClass } from "@/components/ui";
 import { AddDepartmentForm, AddPositionForm, SuggestionButton } from "./OrgForms";
 import { setDepartmentArchived, setPositionArchived } from "./actions";
+import { descendantIds } from "@/lib/scope";
 
 type Dept = { id: string; name: string; parentId: string | null; archivedAt: Date | null; _count: { employees: number } };
 
@@ -22,7 +24,7 @@ function flatten(depts: Dept[]) {
 export default async function OrganizationPage() {
   const me = await requireUser("/organization");
   const org = me.organization;
-  const [depts, positions] = await Promise.all([
+  const [depts, positions, heads, everyone] = await Promise.all([
     prisma.department.findMany({
       where: { organizationId: org.id },
       select: { id: true, name: true, parentId: true, archivedAt: true, _count: { select: { employees: true } } },
@@ -33,16 +35,43 @@ export default async function OrganizationPage() {
       select: { id: true, title: true, level: true, archivedAt: true, department: { select: { name: true } }, _count: { select: { employees: true } } },
       orderBy: [{ archivedAt: "asc" }, { title: "asc" }],
     }),
+    prisma.employee.findMany({
+      where: { organizationId: org.id, status: { not: "SEPARATED" }, position: { level: "DEPT_HEAD" } },
+      select: { id: true, firstName: true, lastName: true, department: { select: { name: true } }, position: { select: { title: true } }, _count: { select: { reports: true } } },
+      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+    }),
+    prisma.employee.findMany({ where: { organizationId: org.id, status: { not: "SEPARATED" } }, select: { id: true, managerId: true } }),
   ]);
   const active = depts.filter((d) => !d.archivedAt);
   const archived = depts.filter((d) => d.archivedAt);
-  const suggestedDepts = (DEPARTMENT_SUGGESTIONS[org.categoryKey] ?? []).filter((n) => !depts.some((d) => d.name === n));
+  const suggestedDepts = departmentSuggestionsFor(org.categoryKey).filter((n) => !depts.some((d) => d.name === n));
   const posSuggest = positionSuggestionsFor(org.categoryKey).filter((s) => !positions.some((p) => p.title === s.title));
   const levels = Object.entries(LEVEL_LABEL).map(([value, label]) => ({ value, label }));
 
   return (
     <div className="mx-auto max-w-5xl">
       <PageHeader title="Organization" subtitle="Departments and positions. Employees are placed in these." />
+      <Card className="mb-6 space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold">Department heads</h2>
+          <p className="text-sm text-muted">Everyone in a position at the Department head level. Open one to see their assistants and everyone below them.</p>
+        </div>
+        {heads.length === 0 ? (
+          <EmptyState title="No department heads yet" hint="Give a position the Department head level, then assign it to someone on their employee page." />
+        ) : (
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {heads.map((h) => (
+              <li key={h.id}>
+                <Link href={`/organization/heads/${h.id}`} className="block rounded-xl border border-line p-4 transition hover:border-brand hover:bg-brand/5">
+                  <p className="font-semibold">{h.firstName} {h.lastName}</p>
+                  <p className="text-sm text-muted">{h.position?.title}{h.department ? ` · ${h.department.name}` : ""}</p>
+                  <p className="mt-2 text-xs text-muted">{h._count.reports} direct · {descendantIds(everyone, h.id).length - 1} in total below</p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="space-y-5">
           <h2 className="text-lg font-semibold">Departments</h2>

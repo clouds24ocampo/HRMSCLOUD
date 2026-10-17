@@ -72,6 +72,7 @@ export async function approve(periodId: string): Promise<FormState> {
   const p = await prisma.payrollPeriod.findFirst({ where: { id: periodId, organizationId: me.organizationId } });
   if (!p) return { error: "Pay period not found." };
   if (p.status !== "CALCULATED") return { error: "Only a calculated payroll can be approved." };
+  if (!p.calculatedById) return { error: "These are the live, automatic numbers. Press Calculate to confirm the final numbers, then a second person approves." };
   if (p.calculatedById === me.id && me.role.key !== ROLES.SUPER_ADMIN) return { error: "A second person must approve. You calculated this payroll." };
   await prisma.payrollPeriod.update({ where: { id: p.id }, data: { status: "APPROVED", approvedAt: new Date(), approvedById: me.id } });
   await audit(me.id, "payroll.approved", "PayrollPeriod", p.id, { self: p.calculatedById === me.id }, me.organizationId);
@@ -86,7 +87,10 @@ export async function finalize(periodId: string): Promise<FormState> {
   if (p.status !== "APPROVED") return { error: "Approve the payroll before finalizing it." };
   await prisma.payrollPeriod.update({ where: { id: p.id }, data: { status: "FINALIZED", finalizedAt: new Date(), finalizedById: me.id } });
   await audit(me.id, "payroll.finalized", "PayrollPeriod", p.id, undefined, me.organizationId);
-  const slips = await prisma.payslip.findMany({ where: { periodId: p.id, organizationId: me.organizationId }, select: { id: true, employee: { select: { userId: true } } } });
+  const slips = await prisma.payslip.findMany({ where: { periodId: p.id, organizationId: me.organizationId }, select: { id: true, inputs: true, employee: { select: { userId: true } } } });
+  // Cash advance installments taken by this payroll become repayment records. Once only, even if finalize runs twice.
+  const payments = slips.flatMap((s) => ((s.inputs as { cashAdvances?: { id: string; cents: number }[] } | null)?.cashAdvances ?? []).map((c) => ({ advanceId: c.id, payslipId: s.id, amountCents: c.cents, paidOn: p.payDate })));
+  if (payments.length) await prisma.cashAdvancePayment.createMany({ data: payments, skipDuplicates: true });
   for (const s of slips) if (s.employee.userId) await notify(me.organizationId, [s.employee.userId], { title: `Your payslip for ${p.name} is ready`, href: `/payslips/${s.id}` }, me.id);
   done(p.id);
   return { ok: "Finalized. The numbers are locked and employees can see their payslips." };

@@ -3,8 +3,10 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { prisma } from "@/lib/prisma";
+import { FILE_201, FILE_201_CATEGORY } from "@/lib/file201";
 
-export const DOC_CATEGORIES = ["Identification", "Contract", "Certificate", "Education", "Medical", "Other"] as const;
+export const DOC_CATEGORIES = ["201 File", "Identification", "Contract", "Certificate", "Education", "Medical", "Other"] as const;
 export const MAX_BYTES = Number(process.env.DOCUMENT_MAX_MB ?? 5) * 1024 * 1024;
 
 const root = () => path.resolve(process.cwd(), process.env.STORAGE_DIR ?? "storage");
@@ -37,3 +39,47 @@ export async function readStored(storageKey: string, organizationId: string): Pr
 
 // A name safe to show and to send in a header.
 export const safeName = (s: string) => s.replace(/[^\w.\- ()]+/g, "_").slice(0, 120) || "document";
+
+// Current 201 file uploads per employee: employeeId -> title -> the active document.
+export async function load201(organizationId: string, employeeIds: string[]) {
+  const docs = await prisma.employeeDocument.findMany({
+    where: { organizationId, employeeId: { in: employeeIds }, category: FILE_201_CATEGORY, archivedAt: null },
+    select: { id: true, employeeId: true, title: true, version: true, createdAt: true },
+  });
+  const out = new Map<string, Map<string, { id: string; version: number; createdAt: Date }>>();
+  for (const d of docs) {
+    const m = out.get(d.employeeId) ?? new Map();
+    m.set(d.title, d);
+    out.set(d.employeeId, m);
+  }
+  return out;
+}
+
+// The 201 checklist for one person, ready for the File201 component.
+export const items201 = (have: Map<string, { id: string; version: number; createdAt: Date }> | undefined) =>
+  FILE_201.map((r) => {
+    const d = have?.get(r.title);
+    return { ...r, doc: d ? { id: d.id, version: d.version, uploadedOn: d.createdAt.toISOString().slice(0, 10) } : null };
+  });
+
+export const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+
+// Checks an uploaded picture (profile photo, signature) and stores it. Only real PNG or JPEG bytes are kept.
+export async function saveImage(organizationId: string, file: FormDataEntryValue | null): Promise<{ key: string } | { error: string }> {
+  if (!(file instanceof File) || file.size === 0) return { error: "Choose a picture." };
+  if (file.size > MAX_IMAGE_BYTES) return { error: "That picture is too large. The limit is 3 MB." };
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const type = sniffType(bytes);
+  if (!type || type.mime === "application/pdf") return { error: "Only PNG or JPEG pictures are accepted." };
+  return { key: await saveFile(organizationId, bytes) };
+}
+
+// Serves a stored picture to a signed-in viewer who passed the access check.
+export async function imageResponse(storageKey: string | null | undefined, organizationId: string) {
+  const bytes = storageKey ? await readStored(storageKey, organizationId) : null;
+  const type = bytes ? sniffType(bytes) : null;
+  if (!bytes || !type) return new Response("Not found", { status: 404 });
+  return new Response(new Uint8Array(bytes), {
+    headers: { "Content-Type": type.mime, "X-Content-Type-Options": "nosniff", "Cache-Control": "private, max-age=300" },
+  });
+}

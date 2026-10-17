@@ -7,12 +7,13 @@ import { canViewEmployee, type Actor } from "@/lib/scope";
 import { addDays, dayKey, daysBetween, keyOfDbDate, dbDate, zonedTimeToUtc } from "@/lib/time";
 
 export const MAX_RANGE_DAYS = 62;
+export const FLEX_MIN_MINUTES = 8 * 60; // flexible schedule: minimum hours a working day
 
 export async function loadDtr(actor: Actor, myEmployeeId: string, employeeId: string, from: string, to: string, tz: string, graceMinutes: number) {
   if (!(await canViewEmployee(actor, myEmployeeId, employeeId))) return null;
   const employee = await prisma.employee.findFirst({
     where: { id: employeeId, organizationId: actor.organizationId },
-    select: { id: true, employeeNo: true, firstName: true, lastName: true },
+    select: { id: true, employeeNo: true, firstName: true, lastName: true, flexible: true },
   });
   if (!employee) return null;
 
@@ -44,7 +45,7 @@ export async function loadDtr(actor: Actor, myEmployeeId: string, employeeId: st
   const schedule = new Map<string, ShiftTimes | null>([...resolved].map(([d, r]) => [d, r.shift]));
   const leaveDays = new Set(leave.flatMap((l) => daysBetween(keyOfDbDate(l.startDate), keyOfDbDate(l.endDate))));
   const valid = events.filter((e) => !e.voidedAt);
-  const rows = buildDtr({ days, punches: valid.map(toPunch), schedule, leaveDays, today: dayKey(new Date(), tz), tz, graceMinutes });
+  const rows = buildDtr({ days, punches: valid.map(toPunch), schedule, leaveDays, today: dayKey(new Date(), tz), tz, graceMinutes, flexMinutes: employee.flexible ? FLEX_MIN_MINUTES : undefined });
 
   const punchesByDay = new Map<string, typeof events>();
   for (const e of events) {
@@ -58,5 +59,5 @@ export async function loadDtr(actor: Actor, myEmployeeId: string, employeeId: st
     sessionsByDay.set(k, [...(sessionsByDay.get(k) ?? []), sess]);
   }
   const dayOff = new Set([...resolved].filter(([, r]) => r.shift === null).map(([d]) => d));
-  return { employee, rows, punchesByDay, overtime, hasSchedule: resolved.size > 0, sessionsByDay, dayOff };
+  return { employee, rows, punchesByDay, overtime, hasSchedule: employee.flexible || resolved.size > 0, sessionsByDay, dayOff };
 }

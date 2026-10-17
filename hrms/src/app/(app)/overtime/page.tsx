@@ -3,27 +3,31 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
 import { getOrgSettings } from "@/lib/settings";
-import { isHr, visibleEmployeeIds } from "@/lib/scope";
+import { notFound } from "next/navigation";
+import { canViewEmployee, isHr } from "@/lib/scope";
+import { overtimeQueue } from "@/lib/overtime";
 import { LEAVE_STATUS } from "@/lib/leave";
 import { ROLES } from "@/lib/roles";
 import { formatDay, formatDuration, keyOfDbDate } from "@/lib/time";
 import { Badge, Card, EmptyState, PageHeader } from "@/components/ui";
 import { CancelOvertimeButton, DecideOvertimeForm } from "./OvertimeForms";
 
-export default async function OvertimePage() {
+export default async function OvertimePage({ searchParams }: { searchParams: Promise<{ employee?: string }> }) {
   const me = await requireUser("/overtime");
+  const sp = await searchParams;
   const settings = await getOrgSettings(me.organizationId);
   const emp = await getMyEmployee(me, settings.timezone);
+  // Opened from someone's profile: that person's overtime, never your own.
+  if (sp.employee && sp.employee !== emp.id) return <PersonOvertime me={me} meId={emp.id} employeeId={sp.employee} />;
   const approver = isHr(me.role.key) || me.role.key === ROLES.MANAGER;
 
   const mine = await prisma.overtimeRequest.findMany({ where: { employeeId: emp.id, organizationId: me.organizationId }, orderBy: { date: "desc" }, take: 30 });
 
-  let queue: Awaited<ReturnType<typeof loadQueue>> = [];
-  if (approver) queue = await loadQueue(me, emp.id);
+  const queue = approver ? await overtimeQueue(me, emp.id) : [];
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <PageHeader title="Overtime" subtitle="Extra time the DTR measured must be approved before it is paid. Ask from the DTR, on the day you worked it." />
+      <PageHeader title="Overtime" subtitle="Extra time the DTR measured is paid only after two approvals: the department head, then HR. Ask from the DTR, on the day you worked it." />
 
       {approver && (
         <Card>
@@ -34,7 +38,7 @@ export default async function OvertimePage() {
             <ul className="space-y-3">
               {queue.map((r) => (
                 <li key={r.id} className="rounded-xl border border-line p-4">
-                  <p className="font-medium">{r.employee.firstName} {r.employee.lastName} <span className="text-sm font-normal text-muted">· {formatDay(keyOfDbDate(r.date))} · {formatDuration(r.minutes)}</span></p>
+                  <p className="flex flex-wrap items-center gap-2 font-medium">{r.employee.firstName} {r.employee.lastName} <span className="text-sm font-normal text-muted">· {formatDay(keyOfDbDate(r.date))} · {formatDuration(r.minutes)}</span> <Badge tone={r.step === "HEAD" ? "brand" : "warning"}>{r.step === "HEAD" ? "Step 1 · department head" : "Step 2 · final (HR)"}</Badge></p>
                   <p className="mt-1 text-sm">“{r.reason}”</p>
                   <Link href={`/dtr?employee=${r.employeeId}&from=${keyOfDbDate(r.date)}&to=${keyOfDbDate(r.date)}`} className="mt-1 inline-block text-sm font-medium text-brand hover:underline">Check the DTR</Link>
                   <DecideOvertimeForm id={r.id} />
@@ -60,7 +64,7 @@ export default async function OvertimePage() {
                     <p className="truncate text-sm text-muted">{r.reason}{r.decisionNote ? ` — ${r.decisionNote}` : ""}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge tone={s.tone}>{s.label}</Badge>
+                    <Badge tone={s.tone}>{r.status === "PENDING" ? (r.headApprovedAt ? "Head approved · waiting for HR" : "Waiting for department head") : s.label}</Badge>
                     {r.status === "PENDING" && <CancelOvertimeButton id={r.id} />}
                   </div>
                 </li>
@@ -73,13 +77,34 @@ export default async function OvertimePage() {
   );
 }
 
-async function loadQueue(me: Awaited<ReturnType<typeof requireUser>>, myEmployeeId: string) {
-  const ids = await visibleEmployeeIds(me, myEmployeeId);
-  const scoped = ids ? { in: me.role.key === ROLES.SUPER_ADMIN ? ids : ids.filter((i) => i !== myEmployeeId) } : me.role.key === ROLES.SUPER_ADMIN ? undefined : { not: myEmployeeId };
-  return prisma.overtimeRequest.findMany({
-    where: { organizationId: me.organizationId, status: "PENDING", ...(scoped ? { employeeId: scoped } : {}) },
-    include: { employee: { select: { firstName: true, lastName: true } } },
-    orderBy: { date: "asc" },
-    take: 100,
-  });
+
+async function PersonOvertime({ me, meId, employeeId }: { me: Awaited<ReturnType<typeof requireUser>>; meId: string; employeeId: string }) {
+  if (!(await canViewEmployee(me, meId, employeeId))) notFound();
+  const [person, rows] = await Promise.all([
+    prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, select: { id: true, firstName: true, lastName: true } }),
+    prisma.overtimeRequest.findMany({ where: { employeeId, organizationId: me.organizationId }, orderBy: { date: "desc" }, take: 100 }),
+  ]);
+  if (!person) notFound();
+  const approved = rows.filter((r) => r.status === "APPROVED").reduce((n, r) => n + r.minutes, 0);
+  return (
+    <div className="mx-auto max-w-4xl space-y-6">
+      <Link href={`/employees/${person.id}`} className="text-sm font-medium text-muted hover:text-ink">← {person.firstName} {person.lastName}</Link>
+      <PageHeader title={`Overtime of ${person.firstName} ${person.lastName}`} subtitle={`${formatDuration(approved)} approved in the last ${rows.length} requests.`} />
+      <Card className="p-0">
+        {rows.length === 0 ? <div className="p-5"><EmptyState title="No overtime requests" /></div> : (
+          <ul className="divide-y divide-line">
+            {rows.map((r) => (
+              <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3">
+                <div className="min-w-0">
+                  <p className="font-medium">{formatDay(keyOfDbDate(r.date))} <span className="text-sm font-normal text-muted">· {formatDuration(r.minutes)}</span></p>
+                  <p className="truncate text-sm text-muted">{r.reason}{r.decisionNote ? ` — ${r.decisionNote}` : ""}</p>
+                </div>
+                <Badge tone={LEAVE_STATUS[r.status].tone}>{r.status === "PENDING" ? (r.headApprovedAt ? "Head approved · waiting for HR" : "Waiting for department head") : LEAVE_STATUS[r.status].label}</Badge>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+    </div>
+  );
 }

@@ -15,12 +15,14 @@ import { clearAttempts, tooManyAttempts } from "@/lib/rate-limit";
 import { getOrgSettings } from "@/lib/settings";
 import { isHr } from "@/lib/scope";
 import { getPunchUnlock, setPunchUnlock } from "@/lib/session";
-import { dayKey, dbDate, formatTime, parseHM, zonedTimeToUtc } from "@/lib/time";
+import { requestEvidence } from "@/lib/device";
+import { consumeLocationLink } from "@/lib/location-link";
+import { dayKey, dbDate, formatTime, parseHMS, zonedTimeToUtcWithSeconds } from "@/lib/time";
 import type { FormState } from "@/app/login/actions";
 
 const CONTEXTS = ["OFFICE", "FIELD", "REMOTE", "CLIENT_SITE"] as const;
 
-export type ClockResult = { ok?: string; error?: string; needNote?: boolean; needTrip?: boolean; locked?: boolean };
+export type ClockResult = { ok?: string; error?: string; needNote?: boolean; needTrip?: boolean; locked?: boolean; needPhone?: boolean };
 export type UnlockResult = { ok?: boolean; error?: string; seconds?: number };
 
 // Step 2 of the time stamp: prove it is really you. Unlocks one time stamp for a short window.
@@ -48,6 +50,8 @@ const input = z.object({
     .object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180), accuracy: z.number().min(0).max(1_000_000) })
     .nullable(),
   geoError: z.enum(["DENIED", "UNAVAILABLE"]).optional(),
+  linkToken: z.string().max(64).optional(), // the phone confirmed the location (desktop stamps)
+  allowRough: z.boolean().optional(), // desktop: stamp with the computer's rough location anyway (flagged, needs a note)
 });
 
 // The one way anyone records time. Server clock only; the browser supplies location, never the time.
@@ -80,11 +84,26 @@ export async function recordTime(raw: z.input<typeof input>): Promise<ClockResul
   const status = clockStatus(recent.map(toPunch));
 
   let type: "IN" | "OUT" | "PAUSE_START" | "PAUSE_END";
+  let priorPauseTypeIdToClose: string | null = null;
+  let priorPauseName: string | null = null;
+
   if (stamp.kind === "IN") {
-    if (status.state !== "OUT") return { error: "You are already clocked in." };
-    type = "IN";
+    if (status.state === "OUT") {
+      type = "IN";
+    } else if (status.state === "ON_PAUSE") {
+      // User is on a pause/issue (e.g. Heavy Rain, Break, Meal) and clicks "Time In" to resume working!
+      type = "PAUSE_END";
+      priorPauseTypeIdToClose = status.pause?.typeId ?? stamp.id;
+      priorPauseName = status.pause?.name ?? "pause";
+    } else {
+      return { error: "You are already actively timed in and working." };
+    }
   } else if (stamp.kind === "OUT") {
     if (status.state === "OUT") return { error: "You are not clocked in." };
+    if (status.state === "ON_PAUSE" && status.pause?.typeId) {
+      priorPauseTypeIdToClose = status.pause.typeId;
+      priorPauseName = status.pause.name;
+    }
     type = "OUT";
   } else if (status.state === "OUT") {
     return { error: "Time In first." };
@@ -92,8 +111,13 @@ export async function recordTime(raw: z.input<typeof input>): Promise<ClockResul
     type = "PAUSE_START";
   } else if (status.pause?.typeId === stamp.id) {
     type = "PAUSE_END"; // pressing the same pause again resumes work
+    priorPauseName = stamp.name;
   } else {
-    return { error: `You are on ${status.pause?.name}. End it first.` };
+    // User is on a pause/issue (e.g. Heavy Rain) and clicks another pause/tagging (e.g. Meal Break or Break)
+    // Seamlessly change tagging: close the active pause and start the new one!
+    priorPauseTypeIdToClose = status.pause?.typeId ?? null;
+    priorPauseName = status.pause?.name ?? null;
+    type = "PAUSE_START";
   }
 
   if (type === "PAUSE_START") {
@@ -112,33 +136,104 @@ export async function recordTime(raw: z.input<typeof input>): Promise<ClockResul
   }
 
   const lastAt = recent[recent.length - 1]?.at;
-  if (lastAt && Date.now() - lastAt.getTime() < 5000) return { error: "Already recorded. Please wait a moment." };
+  if (lastAt && Date.now() - lastAt.getTime() < 3000) return { error: "Already recorded. Please wait a moment." };
 
   if (stamp.requiresNote && type !== "PAUSE_END" && (d.note ?? "").length < 3) {
     return { needNote: true, error: `${stamp.name} needs a short note. Add one and press again.` };
   }
 
+  // Where the stamp was made. A phone reads GPS; a computer only estimates (Wi-Fi or IP), so on a computer a rough or
+  // missing fix asks for the phone instead. The phone's fix arrives through a one-time link (see locate/actions.ts).
+  const ev0 = await requestEvidence();
+  let geo = d.geo;
+  let locSource: "GPS" | "WIFI" | "PHONE_LINK" | "NONE" = geo ? (ev0.device === "DESKTOP" ? "WIFI" : "GPS") : "NONE";
+  if (d.linkToken) {
+    const phone = await consumeLocationLink(me.id, d.linkToken);
+    if (!phone) return { needPhone: true, error: "The phone location expired or was already used. Scan the QR code again." };
+    geo = phone;
+    locSource = "PHONE_LINK";
+  } else if (ev0.device === "DESKTOP" && (!geo || geo.accuracy > settings.lowAccuracyMeters) && !d.allowRough) {
+    return { needPhone: true, error: `This computer cannot pinpoint where you are${geo ? ` (only ±${Math.round(geo.accuracy)} m)` : ""}. Scan the QR code with your phone to confirm your location.` };
+  }
+  if (d.allowRough && locSource === "WIFI" && geo && geo.accuracy > settings.lowAccuracyMeters) {
+    if (settings.gpsPolicy === "BLOCK") return { needPhone: true, error: "Your organization requires an exact location. Confirm it with your phone." };
+    if ((d.note ?? "").length < 3) return { needNote: true, error: "Add a short note on why you cannot confirm with your phone, and press again." };
+  }
   let gpsStatus: "OK" | "LOW_ACCURACY" | "DENIED" | "UNAVAILABLE" = d.geoError ?? "UNAVAILABLE";
-  if (d.geo) gpsStatus = d.geo.accuracy > settings.lowAccuracyMeters ? "LOW_ACCURACY" : "OK";
-  if (!d.geo) {
+  if (geo) gpsStatus = geo.accuracy > settings.lowAccuracyMeters ? "LOW_ACCURACY" : "OK";
+  if (!geo) {
+    // A phone has GPS: no location from a phone means location is switched off or blocked, so the stamp is refused.
+    if (ev0.device !== "DESKTOP") {
+      return { error: d.geoError === "DENIED"
+        ? "Location is blocked for this site. Allow location in your phone's browser settings, then press again. Time stamps need your location."
+        : "Your phone could not find your location. Turn on Location (GPS), step near a window or outside, and press again." };
+    }
     if (settings.gpsPolicy === "BLOCK") return { error: "Your organization requires your location. Allow location access and try again." };
     if ((d.note ?? "").length < 3) return { needNote: true, error: "We could not get your location. Add a short note (for example, “no signal at site”) and press again." };
   }
 
+  // If changing tagging or clocking out while on pause, record PAUSE_END for the previous pause first
+  if (priorPauseTypeIdToClose && (type === "PAUSE_START" || type === "OUT")) {
+    await prisma.timeEvent.create({
+      data: {
+        organizationId: me.organizationId,
+        employeeId: emp.id,
+        type: "PAUSE_END",
+        stampTypeId: priorPauseTypeIdToClose,
+        source: "WEB",
+        workContext: stamp.defaultContext ?? d.workContext,
+        lat: geo?.lat,
+        lng: geo?.lng,
+        accuracy: geo?.accuracy,
+        gpsStatus,
+        note: type === "OUT" ? `Shift ended while on ${priorPauseName}` : `Switched tagging to ${stamp.name}`,
+        createdById: me.id,
+        locSource,
+        device: ev0.device,
+        ipAddress: ev0.ipAddress,
+        userAgent: ev0.userAgent,
+        at: new Date(Date.now() - 500),
+      },
+    });
+  }
+
+  const eventStampTypeId = type === "PAUSE_END" && priorPauseTypeIdToClose ? priorPauseTypeIdToClose : stamp.id;
   const ev = await prisma.timeEvent.create({
     data: {
-      organizationId: me.organizationId, employeeId: emp.id, type, stampTypeId: stamp.id, source: "WEB",
+      organizationId: me.organizationId,
+      employeeId: emp.id,
+      type,
+      stampTypeId: eventStampTypeId,
+      source: "WEB",
       workContext: stamp.defaultContext ?? d.workContext,
       ...(isTrip ? { tripFrom: d.tripFrom, tripTo: d.tripTo, tripReason: d.tripReason } : {}),
-      lat: d.geo?.lat, lng: d.geo?.lng, accuracy: d.geo?.accuracy, gpsStatus, note: d.note || null, createdById: me.id,
+      lat: geo?.lat,
+      lng: geo?.lng,
+      accuracy: geo?.accuracy,
+      gpsStatus,
+      note: d.note || (stamp.kind === "IN" && type === "PAUSE_END" ? "Resumed work (Time In)" : null),
+      createdById: me.id,
+      locSource,
+      device: ev0.device,
+      ipAddress: ev0.ipAddress,
+      userAgent: ev0.userAgent,
     },
   });
   if (token) await setPunchUnlock(token, null); // one unlock, one time stamp
   revalidatePath("/dtr");
   revalidatePath("/dashboard");
 
-  const verb = type === "IN" ? "Timed in" : type === "OUT" ? "Timed out" : type === "PAUSE_START" ? `${stamp.name} started` : `${stamp.name} ended`;
-  const where = d.geo ? `location recorded (±${Math.round(d.geo.accuracy)} m)` : "no location, flagged";
+  const verb =
+    type === "IN"
+      ? "Timed in"
+      : type === "OUT"
+      ? "Timed out"
+      : type === "PAUSE_END"
+      ? (stamp.kind === "IN" ? `Resumed work (ended ${priorPauseName})` : `${stamp.name} ended`)
+      : priorPauseTypeIdToClose
+      ? `Switched to ${stamp.name} (ended ${priorPauseName})`
+      : `${stamp.name} started`;
+  const where = geo ? `location recorded (±${Math.round(geo.accuracy)} m${locSource === "PHONE_LINK" ? ", from your phone" : ""})` : "no location, flagged";
   return { ok: `${verb} at ${formatTime(ev.at, settings.timezone)}, ${where}.` };
 }
 
@@ -152,8 +247,9 @@ export async function addManualPunch(_: FormState, form: FormData): Promise<Form
       employeeId: z.string().min(1, "Choose an employee."),
       stamp: z.string().regex(/^[^|]+\|(MAIN|START|END)$/, "Choose the time stamp."),
       date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose the date."),
-      time: z.string().refine((v) => parseHM(v) !== null, "Choose the time."),
+      time: z.string().refine((v) => parseHMS(v) !== null, "Choose the time."),
       reason: z.string().trim().min(5, "Give a reason (at least 5 characters).").max(300),
+
     })
     .safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
@@ -169,8 +265,10 @@ export async function addManualPunch(_: FormState, form: FormData): Promise<Form
   const type = stamp.kind === "IN" ? "IN" : stamp.kind === "OUT" ? "OUT" : phase === "END" ? "PAUSE_END" : "PAUSE_START";
 
   const settings = await getOrgSettings(me.organizationId);
-  const at = zonedTimeToUtc(d.date, parseHM(d.time)!, settings.timezone);
+  const parsedTime = parseHMS(d.time)!;
+  const at = zonedTimeToUtcWithSeconds(d.date, parsedTime.minutes, parsedTime.seconds, settings.timezone);
   if (at.getTime() > Date.now() + 5 * 60_000) return { error: "A punch cannot be in the future." };
+
 
   const ev = await prisma.timeEvent.create({
     data: {

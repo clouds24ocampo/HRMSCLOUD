@@ -1,6 +1,6 @@
 // The Philippine payslip. Same shape as the manual calculator in payroll.ts; used when an organization runs the PHILIPPINES profile.
 // Order follows the BIR model: gross pay, less exempt pay, less employee contributions = taxable pay -> withholding table -> net pay.
-import type { Line, PayInput, PayResult } from "@/lib/payroll";
+import { hm, rate4, regularMinutesOf, type Line, type PayInput, type PayResult } from "@/lib/payroll";
 import type { Attendance } from "@/lib/payroll";
 import {
   bracketTax, deMinimisSplit, monthlyShare, percentContribution, poolSplit, rates, round, sssContribution, thirteenthMonth, yearEndAdjustment,
@@ -63,6 +63,9 @@ export function computePh(input: PayInput): PayResult & { tax: TaxBreakdown } {
   if (ph.annualFactor === null) warnings.push("No yearly wage factor is set for this person, so the daily rate uses work days per month from Pay setup.");
   const { daily, hourly, monthly } = rates(input.payType, input.rateCents, factor, f.hoursPerDay);
   const dailyRounded = round(daily);
+  // Monthly salary paid for logged hours: behaves like a daily wage (no work, no pay; unworked regular holidays paid).
+  const byHours = input.payType === "MONTHLY" && !!f.payByLoggedHours;
+  const payKind = byHours ? "DAILY" : input.payType;
   if (ph.minWageDailyCents !== null && input.payType !== "HOURLY") {
     if (dailyRounded < ph.minWageDailyCents) warnings.push(`Daily rate ${peso(dailyRounded)} is below the minimum wage on file (${peso(ph.minWageDailyCents)}).`);
     else if (ph.mwe && dailyRounded > ph.minWageDailyCents) warnings.push(`Marked as a minimum wage earner, but the daily rate ${peso(dailyRounded)} is above the minimum wage on file (${peso(ph.minWageDailyCents)}).`);
@@ -102,7 +105,11 @@ export function computePh(input: PayInput): PayResult & { tax: TaxBreakdown } {
     }
   } else {
     // Basic pay.
-    if (input.payType === "MONTHLY") {
+    if (byHours) {
+      const minutes = regularMinutesOf(a) + a.paidLeaveDays * f.hoursPerDay * 60;
+      basic = round((hourly * minutes) / 60);
+      earn("BASIC", "Basic pay (logged hours)", basic, `${hm(minutes)} × ₱${rate4(hourly)} an hour (monthly ${peso(input.rateCents)} × 12 ÷ ${factor} days = ₱${rate4(daily)} a day ÷ ${f.hoursPerDay} h)${a.paidLeaveDays ? `, incl. ${a.paidLeaveDays} paid leave day${a.paidLeaveDays === 1 ? "" : "s"}` : ""}`);
+    } else if (input.payType === "MONTHLY") {
       basic = round((input.rateCents * 12) / ph.periodsPerYear);
       earn("BASIC", "Basic pay", basic, `Monthly ${peso(input.rateCents)} × 12 ÷ ${ph.periodsPerYear} pay periods a year`);
     } else if (input.payType === "DAILY") {
@@ -121,7 +128,7 @@ export function computePh(input: PayInput): PayResult & { tax: TaxBreakdown } {
     let premiumTotal = 0;
     const p = ph.rules.premium;
     if (p) {
-      const r = premiumPay({ payType: input.payType, dailyCents: daily, hourlyCents: hourly, hoursPerDay: f.hoursPerDay, factor, days: ph.payDays, p, otFloorBp: f.otMultiplierBp });
+      const r = premiumPay({ payType: payKind, dailyCents: daily, hourlyCents: hourly, hoursPerDay: f.hoursPerDay, factor, days: ph.payDays, p, otFloorBp: f.otMultiplierBp });
       const add = (code: string, label: string, v: number, detail: string) => {
         if (v === 0) return;
         earn(code, label, v, detail);
@@ -133,7 +140,7 @@ export function computePh(input: PayInput): PayResult & { tax: TaxBreakdown } {
       add("NIGHT_DIFF", "Night differential", r.nightCents, r.notes.night);
       add("HOLIDAY_UNWORKED", "Holiday pay (not worked)", r.unworkedHolidayCents, `${r.unworkedHolidayDays} day${r.unworkedHolidayDays === 1 ? "" : "s"} × ${peso(dailyRounded)}`);
       gross += premiumTotal;
-      if (input.payType !== "MONTHLY") t.basicEarnedCents += r.unworkedHolidayCents; // paid regular holidays are part of a daily wage
+      if (payKind !== "MONTHLY") t.basicEarnedCents += r.unworkedHolidayCents; // paid regular holidays are part of a daily wage
     } else if (a.approvedOvertimeMinutes > 0) {
       warnings.push("No premium pay rule is in force, so overtime uses the plain overtime rate from Pay setup and holiday, rest day and night pay were not added.");
       const ot = round((hourly / 60) * a.approvedOvertimeMinutes * (f.otMultiplierBp / 10000));
@@ -149,7 +156,7 @@ export function computePh(input: PayInput): PayResult & { tax: TaxBreakdown } {
       attendanceDeductions += amt;
       ded(code, label, amt, `${minutes} min × ${peso(round(hourly / 60))} per min`);
     };
-    if (input.payType === "MONTHLY") {
+    if (input.payType === "MONTHLY" && !byHours) {
       if (a.absentDays > 0) {
         const amt = round(daily * a.absentDays);
         attendanceDeductions += amt;
@@ -161,7 +168,7 @@ export function computePh(input: PayInput): PayResult & { tax: TaxBreakdown } {
         ded("UNPAID_LEAVE", "Unpaid leave", amt, `${a.unpaidLeaveDays} day${a.unpaidLeaveDays === 1 ? "" : "s"} × ${peso(dailyRounded)}`);
       }
     }
-    if (input.payType !== "HOURLY") {
+    if (payKind !== "HOURLY" && !byHours) {
       minutesOff("LATE", "Late", a.lateMinutes);
       minutesOff("UNDERTIME", "Undertime", a.undertimeMinutes);
     }
@@ -293,7 +300,7 @@ export function computePh(input: PayInput): PayResult & { tax: TaxBreakdown } {
   const deductions = attendanceDeductions + employeeContrib + t.taxWithheldCents + otherDeductions;
   const net = gross - deductions;
   if (net < 0) warnings.push("Net pay is below zero. Check the deductions.");
-  if (!special && a.incompleteDays > 0) warnings.push(input.payType === "MONTHLY" ? `${a.incompleteDays} day(s) have no clock-out. Monthly pay is not affected, but check the DTR.` : `${a.incompleteDays} day(s) have no clock-out and were not paid. Fix the DTR and recalculate.`);
+  if (!special && a.incompleteDays > 0) warnings.push(payKind === "MONTHLY" ? `${a.incompleteDays} day(s) have no clock-out. Monthly pay is not affected, but check the DTR.` : `${a.incompleteDays} day(s) have no clock-out and were not paid. Fix the DTR and recalculate.`);
   if (!special && a.scheduledDays === 0 && input.payType !== "MONTHLY") warnings.push("No scheduled days in this period, so nothing could be paid.");
 
   return { lines, grossCents: gross, deductionsCents: deductions, netCents: net, employerCostCents: gross + employerContrib, warnings, tax: t };

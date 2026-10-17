@@ -16,7 +16,7 @@ export function LoginForm() {
       transition={{ duration: 0.4, ease: "easeOut" }}
       className="space-y-4"
     >
-      <Field label="Email" id="email" type="email" autoComplete="username" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} />
+      <Field label="Email or username" id="email" type="text" autoCapitalize="none" spellCheck={false} autoComplete="username" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} />
       <Field label="Password" id="password" type="password" autoComplete="current-password" required />
       {state?.error && <Alert kind="error">{state.error}</Alert>}
       <SubmitButton pending={pending}>Sign in</SubmitButton>

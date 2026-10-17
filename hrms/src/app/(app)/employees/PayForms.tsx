@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { MoneyInput } from "@/components/MoneyInput";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert, Field, SubmitButton } from "@/components/Fields";
 import { inputClass } from "@/components/ui";
@@ -19,7 +20,7 @@ export function CompensationForm({ employeeId, today }: { employeeId: string; to
             <option value="HOURLY">Per hour</option>
           </select>
         </label>
-        <Field label="Rate (pesos)" id="rate" inputMode="decimal" required placeholder="22000.00" />
+        <MoneyInput label="Rate (pesos)" id="rate" required placeholder="22,000.00" />
         <Field label="Starts on" id="effectiveFrom" type="date" required defaultValue={today} />
       </div>
       <Field label="Note (optional)" id="note" />

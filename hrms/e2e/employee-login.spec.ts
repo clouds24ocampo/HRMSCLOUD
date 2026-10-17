@@ -75,7 +75,7 @@ test("employee signs in with a temporary password and must choose their own", as
   // Old password is dead, new one works, and no forced change next time.
   await page.getByRole("button", { name: "Sign out" }).click();
   await signIn(page, empEmail, temp);
-  await expect(alert(page)).toContainText("Wrong email or password");
+  await expect(alert(page)).toContainText("Wrong email, username or password");
   await signIn(page, empEmail, mine);
   await expect(page).toHaveURL(/\/dashboard$/);
 });

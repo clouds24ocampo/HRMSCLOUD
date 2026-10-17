@@ -29,7 +29,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
     prisma.employee.findMany({
       // AND, not a spread: a spread of {id} would overwrite the visibility rule.
       where: { AND: [scope, { status: { not: "SEPARATED" } }, sp.employee ? { id: sp.employee } : {}] },
-      select: { id: true, firstName: true, lastName: true, employeeNo: true, managerId: true, scheduleLinked: true },
+      select: { id: true, firstName: true, lastName: true, employeeNo: true, managerId: true, scheduleLinked: true, flexible: true },
       orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
       take: 300,
     }),
@@ -37,7 +37,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
   ]);
   const sched = await loadSchedules(me.organizationId, people.map((p) => p.id), ws, days[6]);
   const resolved = new Map(people.map((p) => [p.id, resolvePerson(sched.get(p.id), days)]));
-  const uncovered = people.filter((p) => !hasRegular(sched.get(p.id)?.regulars ?? [], today));
+  const uncovered = people.filter((p) => !p.flexible && !hasRegular(sched.get(p.id)?.regulars ?? [], today));
   const link = (w: string) => `/schedule?${new URLSearchParams({ week: w, ...(sp.employee ? { employee: sp.employee } : {}) })}`;
   const shiftOpts = shifts.map((s) => ({ id: s.id, label: `${s.name} (${s.startTime}–${s.endTime})` }));
   const personOpts = people.map((p) => ({ id: p.id, label: `${p.lastName}, ${p.firstName}` }));

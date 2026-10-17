@@ -2,7 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
 import { getOrgSettings } from "@/lib/settings";
-import { employeeScope, isHr } from "@/lib/scope";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { canViewEmployee, employeeScope, isHr } from "@/lib/scope";
 import { ROLES } from "@/lib/roles";
 import { formatDay, keyOfDbDate } from "@/lib/time";
 import { Badge, Card, EmptyState, PageHeader } from "@/components/ui";
@@ -25,10 +27,13 @@ function Ratings({ r }: { r: { selfRating: number | null; selfComment: string | 
   );
 }
 
-export default async function PerformancePage() {
+export default async function PerformancePage({ searchParams }: { searchParams: Promise<{ employee?: string }> }) {
   const me = await requireUser("/performance");
+  const sp = await searchParams;
   const settings = await getOrgSettings(me.organizationId);
   const mine = await getMyEmployee(me, settings.timezone);
+  // Opened from someone's profile: show that person's reviews and goals (read-only), never your own.
+  if (sp.employee && sp.employee !== mine.id) return <PersonPerformance meId={mine.id} employeeId={sp.employee} me={me} />;
   const hr = isHr(me.role.key);
   const manager = me.role.key === ROLES.MANAGER;
   const orgId = me.organizationId;
@@ -174,6 +179,53 @@ export default async function PerformancePage() {
           )}
         </Card>
       )}
+    </div>
+  );
+}
+
+async function PersonPerformance({ me, meId, employeeId }: { me: Awaited<ReturnType<typeof requireUser>>; meId: string; employeeId: string }) {
+  if (!(await canViewEmployee(me, meId, employeeId))) notFound();
+  const [person, reviews, goals] = await Promise.all([
+    prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, select: { id: true, firstName: true, lastName: true } }),
+    prisma.review.findMany({ where: { organizationId: me.organizationId, employeeId }, include: { cycle: true }, orderBy: { cycle: { startDate: "desc" } } }),
+    prisma.goal.findMany({ where: { organizationId: me.organizationId, employeeId }, orderBy: [{ status: "asc" }, { createdAt: "desc" }] }),
+  ]);
+  if (!person) notFound();
+  const fmt = (d: Date) => formatDay(keyOfDbDate(d), { month: "short", day: "numeric", year: "numeric" });
+  return (
+    <div className="mx-auto max-w-4xl space-y-6">
+      <Link href={`/employees/${person.id}`} className="text-sm font-medium text-muted hover:text-ink">← {person.firstName} {person.lastName}</Link>
+      <PageHeader title={`Performance of ${person.firstName} ${person.lastName}`} subtitle="Their reviews and goals." />
+      <Card className="space-y-3">
+        <h2 className="text-lg font-semibold">Reviews</h2>
+        {reviews.length === 0 ? <p className="text-sm text-muted">No review cycle has included them yet.</p> : reviews.map((r) => (
+          <div key={r.id} className="rounded-xl border border-line p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="font-medium">{r.cycle.name} <span className="text-sm font-normal text-muted">{fmt(r.cycle.startDate)} – {fmt(r.cycle.endDate)}</span></p>
+              <Badge tone={r.stage === "DONE" ? "success" : "warning"}>{STAGE[r.stage]}</Badge>
+            </div>
+            <Ratings r={r} />
+          </div>
+        ))}
+      </Card>
+      <Card className="space-y-3">
+        <h2 className="text-lg font-semibold">Goals</h2>
+        {goals.length === 0 ? <EmptyState title="No goals yet" /> : (
+          <ul className="space-y-3">
+            {goals.map((g) => (
+              <li key={g.id} className="rounded-xl border border-line p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-medium">{g.title}</p>
+                  <Badge tone={GOAL_STATUS[g.status][1]}>{GOAL_STATUS[g.status][0]}</Badge>
+                </div>
+                {g.description && <p className="text-sm text-muted">{g.description}</p>}
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-line" aria-hidden><div className="h-full rounded-full bg-brand" style={{ width: `${g.progress}%` }} /></div>
+                <p className="mt-1 text-xs text-muted">{g.progress}%{g.targetDate ? ` · target ${fmt(g.targetDate)}` : ""}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { db } from "../src/lib/db-client";
 import { ROLES } from "../src/lib/roles";
 import { addDays, dayKey, daysBetween, weekStart, weekday } from "../src/lib/time";
-import { wipeOrgs } from "./helpers";
+import { LEGACY_PAY, wipeOrgs } from "./helpers";
 
 test.describe.configure({ mode: "serial" });
 
@@ -35,7 +35,7 @@ test.beforeAll(async () => {
   const role = (k: string) => roles.find((r) => r.key === k)!.id;
   const hash = await bcrypt.hash(pw, 4);
   const org = await db.organization.create({ data: { name: `Pay ${stamp}`, categoryKey: "bpo-it", industryKey: "bpo", sizeKey: "small" } });
-  await db.orgSettings.create({ data: { organizationId: org.id, requirePunchPassword: false } });
+  await db.orgSettings.create({ data: { organizationId: org.id, requirePunchPassword: false, ...LEGACY_PAY } });
   const shift = await db.shiftTemplate.create({ data: { organizationId: org.id, name: "Regular", startTime: "08:00", endTime: "17:00", breakMinutes: 60 } });
   await db.timeStampType.createMany({
     data: [
@@ -132,7 +132,7 @@ test("pay rates: set on the profile, history is kept, others cannot see pay", as
   await page.getByRole("button", { name: "Save pay rate" }).click();
   await expect(page.getByRole("status")).toContainText("Pay rate saved");
   await page.reload();
-  await expect(page.getByText("₱22,000.00")).toBeVisible();
+  await expect(page.getByText("₱22,000.00").first()).toBeVisible();
   // Assign the allowance.
   await page.getByLabel("Pay item").selectOption({ label: "Transport allowance (adds)" });
   await page.getByRole("button", { name: "Assign" }).click();

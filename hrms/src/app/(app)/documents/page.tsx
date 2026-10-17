@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { DOC_CATEGORIES } from "@/lib/documents";
+import { DOC_CATEGORIES, items201, load201 } from "@/lib/documents";
+import { FILE_201_CATEGORY } from "@/lib/file201";
 import { getMyEmployee } from "@/lib/employees";
 import { getOrgSettings } from "@/lib/settings";
 import { isHr } from "@/lib/scope";
 import { addDays, dayKey, formatDay, keyOfDbDate } from "@/lib/time";
 import { Badge, Card, EmptyState, PageHeader, inputClass, buttonClass } from "@/components/ui";
 import { ArchiveDocButton, UploadForm } from "./DocumentForms";
+import { File201 } from "./File201";
 
 const SOON_DAYS = 60;
 const size = (n: number) => (n < 1024 * 1024 ? `${Math.max(1, Math.round(n / 1024))} KB` : `${(n / 1024 / 1024).toFixed(1)} MB`);
@@ -38,14 +40,15 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
         })
       : [],
   ]);
-  const current = docs.filter((d) => !d.archivedAt);
+  const current = docs.filter((d) => !d.archivedAt && d.category !== FILE_201_CATEGORY);
+  const f201 = items201((await load201(me.organizationId, [employeeId])).get(employeeId));
   const older = docs.filter((d) => d.archivedAt);
   const state = (d: { expiresOn: Date | null }) => (d.expiresOn ? (keyOfDbDate(d.expiresOn) < today ? "expired" : keyOfDbDate(d.expiresOn) <= soon ? "soon" : "ok") : null);
   const own = employeeId === mine.id;
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <PageHeader title="Documents" subtitle={own ? "Your personal file: contracts, IDs and certificates. Only you and HR can open them." : `${person.firstName} ${person.lastName}'s file. Opening a file is recorded in the audit log.`} />
+      <PageHeader title="Documents" action={<Link href="/policies" className={buttonClass}>📜 Company policies</Link>} subtitle={own ? "Your personal file: contracts, IDs and certificates. Only you and HR can open them." : `${person.firstName} ${person.lastName}'s file. Opening a file is recorded in the audit log.`} />
 
       {hr && (
         <form className="flex flex-wrap items-end gap-2" role="search">
@@ -74,8 +77,17 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
         </Card>
       )}
 
+      <Card className="scroll-mt-6 space-y-3">
+        <span id="file201" aria-hidden />
+        <div>
+          <h2 className="text-lg font-semibold">201 file</h2>
+          <p className="text-sm text-muted">The personnel record every employee keeps with HR: IDs, clearances and government numbers.</p>
+        </div>
+        <File201 employeeId={employeeId} items={f201} mandatory={own && !hr} />
+      </Card>
+
       <Card className="space-y-3">
-        <h2 className="text-lg font-semibold">{own ? "My documents" : "Documents"}</h2>
+        <h2 className="text-lg font-semibold">Other documents</h2>
         {current.length === 0 ? <EmptyState title="No documents yet" hint="Upload one below." /> : (
           <ul className="divide-y divide-line rounded-xl border border-line">
             {current.map((d) => {
@@ -110,7 +122,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
 
       <Card>
         <h2 className="mb-3 text-lg font-semibold">Upload a document</h2>
-        <UploadForm employeeId={employeeId} categories={DOC_CATEGORIES} />
+        <UploadForm employeeId={employeeId} categories={DOC_CATEGORIES.filter((c) => c !== FILE_201_CATEGORY)} />
       </Card>
     </div>
   );

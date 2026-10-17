@@ -103,7 +103,7 @@ test("users: reset a password, deactivate, reactivate, change a role", async ({ 
   await expect(eve.getByText("Eve Mod can no longer sign in.")).toBeVisible();
   const e2 = await browser.newPage();
   await signIn(e2, "e2");
-  await expect(alert(e2)).toContainText("Wrong email or password");
+  await expect(alert(e2)).toContainText("Wrong email, username or password");
   await eve.getByRole("button", { name: "Activate sign-in" }).click();
   await expect(eve.getByText("Eve Mod can sign in again.")).toBeVisible();
   await signIn(e2, "e2");
@@ -167,9 +167,11 @@ test("hiring from Employees: onboarding checklist, who may tick what, editable t
   await hr.getByText("Add an employee").click();
   await hr.getByLabel("First name").fill("Zed");
   await hr.getByLabel("Last name").fill("Newhire");
-  await hr.getByLabel("Email (optional)").fill(mail("zed"));
+  await hr.getByLabel("Email", { exact: true }).fill(mail("zed"));
+  await hr.getByLabel("Monthly salary (pesos)").fill("18000.00");
   await hr.locator("#managerId").selectOption({ label: "Marco Mod · M-mgr" });
-  await hr.getByLabel("Also create a sign-in for this person").check();
+  await hr.getByLabel(/Create their own sign-in/).check();
+  await hr.getByLabel("Username", { exact: true }).fill(`zed1-${stamp}`);
   await hr.locator("#roleId").selectOption({ label: "Employee" });
   await hr.getByLabel("Temporary password").fill(pw);
   await hr.getByRole("button", { name: "Add employee" }).click();
@@ -223,7 +225,7 @@ test("hiring from Employees: onboarding checklist, who may tick what, editable t
   expect((await db.user.findUniqueOrThrow({ where: { email: mail("zed") } })).active).toBe(false);
   const again = await browser.newPage();
   await signIn(again, "zed", "zeds-own-password-1");
-  await expect(alert(again)).toContainText("Wrong email or password");
+  await expect(alert(again)).toContainText("Wrong email, username or password");
   await again.close();
   await hr.close();
 });
@@ -428,8 +430,9 @@ test("documents: upload, versions, expiry, and only the owner and HR can open a 
     await page.getByLabel("Category").selectOption("Identification");
     await page.getByLabel("Title").fill(title);
     if (expires) await page.getByLabel("Expires on (optional)").fill(expires);
-    await page.locator('input[type=file]').setInputFiles(file);
-    await page.getByRole("button", { name: "Upload" }).click();
+    const form = page.locator("form", { has: page.getByLabel("Category") }); // the general upload, not the 201 checklist
+    await form.locator("input[type=file]").setInputFiles(file);
+    await form.getByRole("button", { name: "Upload" }).click();
   };
   await upload(e1, pdf("id-front.pdf", "v1"), "National ID", addDays(today, 20));
   await expect(e1.getByText("National ID saved.")).toBeVisible();

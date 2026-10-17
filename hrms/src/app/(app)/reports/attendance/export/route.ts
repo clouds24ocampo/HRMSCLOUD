@@ -21,8 +21,23 @@ export async function GET(req: Request) {
   const settings = await getOrgSettings(me.organizationId);
   const mine = await getMyEmployee(me, settings.timezone);
   const rows = await attendanceSummary(me, mine.id, from, to, settings.timezone, settings.graceMinutes);
-  const lines = [["Employee no", "Name", "Department", "Scheduled days", "Present", "Absent", "Leave", "Late days", "Late (min)", "Undertime (min)", "Overtime candidate (min)", "Worked (min)"].join(",")];
-  for (const r of rows) lines.push([r.employeeNo, r.name, r.department, r.scheduled, r.present, r.absent, r.leave, r.lateCount, r.lateMinutes, r.undertimeMinutes, r.overtimeMinutes, r.workedMinutes].map(cell).join(","));
+  const lines = [
+    [
+      "Employee no", "Name", "Department", "Scheduled days", "Present", "Absent", "Leave",
+      "Productive (sec)", "Issues (sec)", "Breaks (sec)", "Productivity (%)",
+      "Late days", "Late (min)", "Undertime (min)", "Overtime candidate (min)", "Worked (min)"
+    ].join(",")
+  ];
+  for (const r of rows) {
+    lines.push(
+      [
+        r.employeeNo, r.name, r.department, r.scheduled, r.present, r.absent, r.leave,
+        r.productiveSeconds, r.issueSeconds, r.breakSeconds, `${r.productivityRate}%`,
+        r.lateCount, r.lateMinutes, r.undertimeMinutes, r.overtimeMinutes, r.workedMinutes
+      ].map(cell).join(",")
+    );
+  }
+
   return new Response(lines.join("\r\n"), {
     headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="attendance-${from}-to-${to}.csv"`, "Cache-Control": "no-store" },
   });

@@ -16,6 +16,8 @@ test.beforeAll(async () => {
   await db.employee.create({ data: { organizationId: org.id, userId: user.id, employeeNo: "P-1", firstName: "Pia", lastName: "Test", hireDate: new Date("2026-01-05T00:00:00Z") } });
 });
 test.afterAll(async () => { await wipeOrgs(stamp); await db.$disconnect(); });
+// A desktop browser with a good location fix (on a computer without one, the clock asks for the phone instead).
+test.use({ geolocation: { latitude: 14.6, longitude: 121.0, accuracy: 10 }, permissions: ["geolocation"] });
 
 test("punch screen: two pages, Break 3 locked, trip form, issues page", async ({ page }) => {
   await page.goto("/login");
@@ -30,6 +32,7 @@ test("punch screen: two pages, Break 3 locked, trip form, issues page", async ({
   await card.getByRole("tab", { name: "Issues" }).click();
   await expect(card.getByRole("button", { name: /Clinic Break/ })).toBeVisible();
   await expect(card.getByRole("button", { name: /System Issue/ })).toBeVisible();
+  for (const n of ["Heavy Rain / Flood", "Extreme Heat", "Typhoon / Storm Signal", "Earthquake", "Power Outage", "Other Calamity"]) await expect(card.getByRole("button", { name: n })).toBeVisible();
   await card.getByRole("tab", { name: "Punch" }).click();
   // unlock and time in
   await card.getByLabel("Your password").fill(pw);

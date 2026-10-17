@@ -14,16 +14,25 @@ const Msg = ({ s }: { s: FormState }) => (
   </>
 );
 
-export function FactorsForm({ current }: { current: { workDaysPerMonth: number; hoursPerDay: number; otMultiplierBp: number } }) {
+export function FactorsForm({ current }: { current: { workDaysPerMonth: number; hoursPerDay: number; otMultiplierBp: number; daysPerYear: number; payByLoggedHours: boolean; autoCutoffs: boolean } }) {
   const f = useKeptForm(saveFactors);
   return (
     <form {...f.formProps} className="space-y-3">
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Field label="Paid days a year" id="daysPerYear" type="number" min={200} max={366} defaultValue={current.daysPerYear} required />
         <Field label="Work days per month" id="workDaysPerMonth" type="number" min={1} max={31} defaultValue={current.workDaysPerMonth} required />
         <Field label="Work hours per day" id="hoursPerDay" type="number" min={1} max={24} defaultValue={current.hoursPerDay} required />
         <Field label="Overtime pays (% of normal)" id="otMultiplierPct" defaultValue={String(current.otMultiplierBp / 100)} required />
       </div>
-      <p className="text-xs text-muted">Daily rate = monthly rate ÷ work days. Hourly rate = daily rate ÷ hours. Overtime 125 means 1.25 times the normal rate.</p>
+      <label className="flex items-center gap-2 text-sm font-medium">
+        <input type="checkbox" name="payByLoggedHours" defaultChecked={current.payByLoggedHours} className="h-4 w-4 accent-brand" />
+        Pay monthly salaries by the hours logged on the DTR
+      </label>
+      <label className="flex items-center gap-2 text-sm font-medium">
+        <input type="checkbox" name="autoCutoffs" defaultChecked={current.autoCutoffs} className="h-4 w-4 accent-brand" />
+        Create the 1–15 and 16–end-of-month cut-offs automatically and keep them up to date every hour
+      </label>
+      <p className="text-xs text-muted">Daily rate = monthly × 12 ÷ paid days a year (313 = six-day week). Hourly rate = daily rate ÷ hours. With logged hours on, each day pays the hours worked up to the normal day; approved overtime is added on top. Overtime 125 means 1.25 times the normal rate. Work days per month is kept only as a fallback for older records.</p>
       <Msg s={f.state} />
       <SubmitButton pending={f.pending}>Save factors</SubmitButton>
     </form>

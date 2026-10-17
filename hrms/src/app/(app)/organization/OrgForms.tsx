@@ -37,9 +37,14 @@ export function AddDepartmentForm({ departments }: { departments: Opt[] }) {
 
 export function AddPositionForm({ departments, levels }: { departments: Opt[]; levels: { value: string; label: string }[] }) {
   const [title, setTitle] = useState("");
+  const [level, setLevel] = useState("ENTRY");
+  const head = level === "DEPT_HEAD" || level === "ASSISTANT_HEAD";
   const { state, pending, formProps } = useKeptForm(async (p: FormState, fd: FormData) => {
     const r = await addPosition(p, fd);
-    if (r?.ok) setTitle("");
+    if (r?.ok) {
+      setTitle("");
+      setLevel("ENTRY");
+    }
     return r;
   });
   return (
@@ -48,22 +53,23 @@ export function AddPositionForm({ departments, levels }: { departments: Opt[]; l
       <div className="grid gap-3 sm:grid-cols-2">
         <label htmlFor="level" className="block text-sm font-medium">
           Level in the chain
-          <select id="level" name="level" className={inputClass} defaultValue="ENTRY">
+          <select id="level" name="level" className={inputClass} value={level} onChange={(e) => setLevel(e.target.value)}>
             {levels.map((l) => (
               <option key={l.value} value={l.value}>{l.label}</option>
             ))}
           </select>
         </label>
         <label htmlFor="departmentId" className="block text-sm font-medium">
-          Department (optional)
-          <select id="departmentId" name="departmentId" className={inputClass} defaultValue="">
-            <option value="">Any department</option>
+          {level === "DEPT_HEAD" ? "Head of which department?" : level === "ASSISTANT_HEAD" ? "Assistant head of which department?" : "Department (optional)"}
+          <select key={head ? "head" : "any"} id="departmentId" name="departmentId" required={head} className={inputClass} defaultValue="">
+            <option value="" disabled={head}>{head ? "Choose the department" : "Any department"}</option>
             {departments.map((d) => (
               <option key={d.id} value={d.id}>{d.name}</option>
             ))}
           </select>
         </label>
       </div>
+      {head && departments.length === 0 && <p className="text-sm text-warning">Add the department first, then its head.</p>}
       {state?.error && <Alert kind="error">{state.error}</Alert>}
       {state?.ok && <Alert kind="success">{state.ok}</Alert>}
       <SubmitButton pending={pending}>Add position</SubmitButton>
@@ -72,7 +78,7 @@ export function AddPositionForm({ departments, levels }: { departments: Opt[]; l
 }
 
 // One click adds every suggestion for the industry. Existing names are skipped.
-export function SuggestionButton({ kind, departments, positions }: { kind: "departments" | "positions"; departments?: string[]; positions?: { title: string; level: string }[] }) {
+export function SuggestionButton({ kind, departments, positions }: { kind: "departments" | "positions"; departments?: string[]; positions?: { title: string; level: string; department?: string }[] }) {
   const [pending, start] = useTransition();
   const [msg, setMsg] = useState<FormState>();
   const list = kind === "departments" ? departments ?? [] : (positions ?? []).map((p) => p.title);

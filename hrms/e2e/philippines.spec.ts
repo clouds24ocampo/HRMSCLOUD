@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { db } from "../src/lib/db-client";
 import { ROLES } from "../src/lib/roles";
 import { addDays, weekStart } from "../src/lib/time";
-import { wipeOrgs } from "./helpers";
+import { LEGACY_PAY, wipeOrgs } from "./helpers";
 
 // Philippine statutory payroll end to end: install the dated rules, set profiles, run a monthly and a weekly payroll,
 // check every number against the worked examples in taxation.md and by hand, then 13th month, year-end adjustment, government bonus and the BIR/remittance reports.
@@ -71,7 +71,7 @@ test.beforeAll(async () => {
   const role = (k: string) => roles.find((r) => r.key === k)!.id;
   const hash = await bcrypt.hash(pw, 4);
   const org = await db.organization.create({ data: { name: orgName(), categoryKey: "bpo-it", industryKey: "bpo", sizeKey: "small" } });
-  await db.orgSettings.create({ data: { organizationId: org.id, requirePunchPassword: false } });
+  await db.orgSettings.create({ data: { organizationId: org.id, requirePunchPassword: false, ...LEGACY_PAY, daysPerYear: 261 } });
   const shift = await db.shiftTemplate.create({ data: { organizationId: org.id, name: "Regular", startTime: "08:00", endTime: "17:00", breakMinutes: 60 } });
   await db.timeStampType.createMany({
     data: [

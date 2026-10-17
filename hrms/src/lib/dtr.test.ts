@@ -38,18 +38,18 @@ describe("buildDtr", () => {
     expect(r.workedMinutes).toBe(7 * 60 + 5); // 08:25-16:30 minus the unpaid meal
     expect(r.breakMinutes).toBe(60);
     expect(r.lateMinutes).toBe(25);
-    expect(r.undertimeMinutes).toBe(30);
-    expect(r.pauses).toEqual([{ name: "Meal", count: 1, minutes: 60, paid: false, overMinutes: 0 }]);
+    expect(r.pauses).toEqual([{ name: "Meal", count: 1, minutes: 60, seconds: 3600, paid: false, overMinutes: 0, category: "BREAK" }]);
   });
 
-  it("keeps paid pauses (break, on trip, system issue) inside worked time", () => {
+
+  it("counts only work and On Trip: every break is deducted, even one marked paid", () => {
     const [r] = run(
       [p("IN", "2026-10-05", "08:00"), p("PAUSE_START", "2026-10-05", "10:00", BREAK), p("PAUSE_END", "2026-10-05", "10:15", BREAK),
        p("PAUSE_START", "2026-10-05", "13:00", TRIP), p("PAUSE_END", "2026-10-05", "15:00", TRIP), p("OUT", "2026-10-05", "17:00")],
       ["2026-10-05"], [["2026-10-05", day]],
     );
-    expect(r.workedMinutes).toBe(9 * 60); // nothing unpaid
-    expect(r.breakMinutes).toBe(0);
+    expect(r.workedMinutes).toBe(9 * 60 - 15); // the 15-minute break is deducted; the 2-hour trip counts as work
+    expect(r.breakMinutes).toBe(15);
     expect(r.pauses.map((x) => [x.name, x.minutes])).toEqual([["Break", 15], ["On Trip", 120]]);
   });
 
@@ -128,6 +128,28 @@ describe("clockStatus", () => {
   it("supports several different pauses in a day", () => {
     const s = clockStatus([q("IN", "08:00"), q("PAUSE_START", "10:00", BREAK), q("PAUSE_END", "10:15", BREAK), q("PAUSE_START", "12:00", MEAL)]);
     expect(s.pause?.name).toBe("Meal");
+  });
+  it("transitions seamlessly when switching tagging from one pause to another without time out", () => {
+    const RAIN: StampInfo = { id: "rain", name: "Heavy Rain / Flood", paid: false, allowedMinutes: null };
+    // Employee starts Heavy Rain, then switches to Meal Break without timing out
+    const switched = clockStatus([
+      q("IN", "08:00"),
+      q("PAUSE_START", "09:00", RAIN),
+      q("PAUSE_END", "12:00", RAIN),
+      q("PAUSE_START", "12:00", MEAL),
+    ]);
+    expect(switched.state).toBe("ON_PAUSE");
+    expect(switched.pause?.name).toBe("Meal");
+
+    // Employee clicks Time In to resume work from Meal
+    const resumed = clockStatus([
+      q("IN", "08:00"),
+      q("PAUSE_START", "09:00", RAIN),
+      q("PAUSE_END", "12:00", RAIN),
+      q("PAUSE_START", "12:00", MEAL),
+      q("PAUSE_END", "13:00", MEAL),
+    ]);
+    expect(resumed.state).toBe("IN");
   });
 });
 

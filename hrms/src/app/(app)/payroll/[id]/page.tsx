@@ -44,7 +44,7 @@ export default async function PeriodPage({ params }: { params: Promise<{ id: str
         {STEPS.map((s, i) => (
           <li key={s} aria-current={i === idx ? "step" : undefined} className={`rounded-xl border px-3 py-2 text-sm ${i <= idx ? "border-brand bg-brand/10 font-semibold text-brand" : "border-line text-muted"}`}>
             {PAYROLL_STATUS[s].label}
-            <span className="block text-xs font-normal text-muted">{s === "CALCULATED" && p.calculatedAt ? who(p.calculatedById) : s === "APPROVED" && p.approvedAt ? who(p.approvedById) : s === "FINALIZED" && p.finalizedAt ? who(p.finalizedById) : " "}</span>
+            <span className="block text-xs font-normal text-muted">{s === "CALCULATED" && p.calculatedAt ? (p.calculatedById ? who(p.calculatedById) : "Automatic, live") : s === "APPROVED" && p.approvedAt ? who(p.approvedById) : s === "FINALIZED" && p.finalizedAt ? who(p.finalizedById) : " "}</span>
           </li>
         ))}
       </ol>

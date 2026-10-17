@@ -57,7 +57,7 @@ test("landing and login: every link goes where it says", async ({ page }) => {
   await page.getByLabel("Email").fill("nobody@example.test");
   await page.getByLabel("Password").fill("whatever-123");
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.locator("p[role=alert]")).toContainText("Wrong email or password");
+  await expect(page.locator("p[role=alert]")).toContainText("Wrong email, username or password");
   await expect(page.getByLabel("Email")).toHaveValue("nobody@example.test"); // kept
 });
 
@@ -112,7 +112,7 @@ test("register, then every button inside the app", async ({ page }) => {
   await expect(page.getByText(`QA Hospital ${stamp} · Super Admin`)).toBeVisible();
 
   const nav = page.locator("nav:visible");
-  await page.getByRole("link", { name: /^Users Sign-ins and roles/ }).click(); // dashboard card
+  await nav.getByRole("link", { name: "Users" }).click();
   await expect(page).toHaveURL(/\/admin\/users$/);
   await nav.getByRole("link", { name: "Home" }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
@@ -121,7 +121,7 @@ test("register, then every button inside the app", async ({ page }) => {
 
   await expect(page.getByLabel("Role")).toBeVisible();
   const roles = await page.getByLabel("Role").locator("option").allTextContents();
-  expect(roles).toEqual(["Choose a role", "Employee", "HR Admin", "Manager", "Super Admin"]);
+  expect(roles).toEqual(["Choose a role", "Employee", "HR Admin", "Manager", "Sub Contractor", "Super Admin"]);
   await page.getByRole("button", { name: "Add user" }).click(); // empty: browser validation
   await expect(page.getByRole("status")).toHaveCount(0);
 

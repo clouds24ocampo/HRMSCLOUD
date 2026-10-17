@@ -1,6 +1,8 @@
 import type { ComponentProps, ReactNode } from "react";
+import { PasswordInput } from "@/components/PasswordInput";
 
 export function Field({ label, id, ...props }: { label: string } & ComponentProps<"input">) {
+  if (props.type === "password") return <PasswordInput label={label} id={id} {...props} />; // with the show/hide eye
   return (
     // The input sits inside its label, so no id is needed. Two forms on one page can reuse a field name safely.
     <label className="block text-sm font-medium text-ink">

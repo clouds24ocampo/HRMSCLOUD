@@ -5,8 +5,23 @@ import { loadDtr } from "@/lib/dtr-data";
 import type { Actor } from "@/lib/scope";
 
 export type AttendanceRow = {
-  employeeId: string; employeeNo: string; name: string; department: string;
-  scheduled: number; present: number; absent: number; leave: number; lateCount: number; lateMinutes: number; undertimeMinutes: number; overtimeMinutes: number; workedMinutes: number;
+  employeeId: string;
+  employeeNo: string;
+  name: string;
+  department: string;
+  scheduled: number;
+  present: number;
+  absent: number;
+  leave: number;
+  lateCount: number;
+  lateMinutes: number;
+  undertimeMinutes: number;
+  overtimeMinutes: number;
+  workedMinutes: number;
+  productiveSeconds: number;
+  issueSeconds: number;
+  breakSeconds: number;
+  productivityRate: number;
 };
 
 // ponytail: one DTR load per person. Fine for a few hundred people; precompute daily rows if a report needs thousands.
@@ -22,8 +37,17 @@ export async function attendanceSummary(me: Actor, myEmployeeId: string, from: s
     const d = await loadDtr(me, myEmployeeId, p.id, from, to, tz, grace);
     if (!d) continue;
     const r = d.rows;
+    const prodSec = r.reduce((n, x) => n + (x.productiveSeconds ?? 0), 0);
+    const issueSec = r.reduce((n, x) => n + (x.issueSeconds ?? 0), 0);
+    const breakSec = r.reduce((n, x) => n + (x.breakSeconds ?? 0), 0);
+    const activeSec = prodSec + issueSec;
+    const prodRate = activeSec > 0 ? Math.round((prodSec / activeSec) * 1000) / 10 : (prodSec > 0 ? 100 : 0);
+
     out.push({
-      employeeId: p.id, employeeNo: p.employeeNo, name: `${p.lastName}, ${p.firstName}`, department: p.department?.name ?? "No department",
+      employeeId: p.id,
+      employeeNo: p.employeeNo,
+      name: `${p.lastName}, ${p.firstName}`,
+      department: p.department?.name ?? "No department",
       scheduled: r.filter((x) => x.shift).length,
       present: r.filter((x) => x.status === "PRESENT" || x.status === "INCOMPLETE").length,
       absent: r.filter((x) => x.status === "ABSENT").length,
@@ -33,9 +57,14 @@ export async function attendanceSummary(me: Actor, myEmployeeId: string, from: s
       undertimeMinutes: r.reduce((n, x) => n + x.undertimeMinutes, 0),
       overtimeMinutes: r.reduce((n, x) => n + x.overtimeMinutes, 0),
       workedMinutes: r.reduce((n, x) => n + x.workedMinutes, 0),
+      productiveSeconds: prodSec,
+      issueSeconds: issueSec,
+      breakSeconds: breakSec,
+      productivityRate: prodRate,
     });
   }
   return out;
 }
+
 
 export const pct = (part: number, whole: number) => (whole > 0 ? Math.round((part / whole) * 1000) / 10 : 0);

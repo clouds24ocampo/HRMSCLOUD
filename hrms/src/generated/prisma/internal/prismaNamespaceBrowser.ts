@@ -96,7 +96,19 @@ export const ModelName = {
   EmployeeTaxProfile: 'EmployeeTaxProfile',
   WageOrder: 'WageOrder',
   Holiday: 'Holiday',
-  PreviousEmployment: 'PreviousEmployment'
+  PreviousEmployment: 'PreviousEmployment',
+  DailyReport: 'DailyReport',
+  PolicyDocument: 'PolicyDocument',
+  PolicySignature: 'PolicySignature',
+  IdCardSettings: 'IdCardSettings',
+  LocationLink: 'LocationLink',
+  Conversation: 'Conversation',
+  ConversationMember: 'ConversationMember',
+  Message: 'Message',
+  CallSession: 'CallSession',
+  CashAdvance: 'CashAdvance',
+  CashAdvancePayment: 'CashAdvancePayment',
+  Payout: 'Payout'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -143,6 +155,7 @@ export const UserScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
   email: 'email',
+  username: 'username',
   name: 'name',
   passwordHash: 'passwordHash',
   active: 'active',
@@ -197,6 +210,10 @@ export const OrgSettingsScalarFieldEnum = {
   otMultiplierBp: 'otMultiplierBp',
   statutoryProfile: 'statutoryProfile',
   contributionSchedule: 'contributionSchedule',
+  daysPerYear: 'daysPerYear',
+  payByLoggedHours: 'payByLoggedHours',
+  deductStatutory: 'deductStatutory',
+  autoCutoffs: 'autoCutoffs',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -244,6 +261,8 @@ export const EmployeeScalarFieldEnum = {
   positionId: 'positionId',
   managerId: 'managerId',
   scheduleLinked: 'scheduleLinked',
+  flexible: 'flexible',
+  photoKey: 'photoKey',
   hireDate: 'hireDate',
   status: 'status',
   createdAt: 'createdAt',
@@ -358,6 +377,10 @@ export const TimeEventScalarFieldEnum = {
   tripFrom: 'tripFrom',
   tripTo: 'tripTo',
   tripReason: 'tripReason',
+  locSource: 'locSource',
+  device: 'device',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
   createdById: 'createdById',
   voidedAt: 'voidedAt',
   voidedById: 'voidedById',
@@ -426,6 +449,8 @@ export const OvertimeRequestScalarFieldEnum = {
   minutes: 'minutes',
   reason: 'reason',
   status: 'status',
+  headApprovedById: 'headApprovedById',
+  headApprovedAt: 'headApprovedAt',
   decidedById: 'decidedById',
   decidedAt: 'decidedAt',
   decisionNote: 'decisionNote',
@@ -918,6 +943,205 @@ export const PreviousEmploymentScalarFieldEnum = {
 } as const
 
 export type PreviousEmploymentScalarFieldEnum = (typeof PreviousEmploymentScalarFieldEnum)[keyof typeof PreviousEmploymentScalarFieldEnum]
+
+
+export const DailyReportScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  employeeId: 'employeeId',
+  date: 'date',
+  accomplishments: 'accomplishments',
+  issues: 'issues',
+  plans: 'plans',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DailyReportScalarFieldEnum = (typeof DailyReportScalarFieldEnum)[keyof typeof DailyReportScalarFieldEnum]
+
+
+export const PolicyDocumentScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  kind: 'kind',
+  title: 'title',
+  body: 'body',
+  storageKey: 'storageKey',
+  fileName: 'fileName',
+  contentHash: 'contentHash',
+  version: 'version',
+  requiresSignature: 'requiresSignature',
+  archivedAt: 'archivedAt',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PolicyDocumentScalarFieldEnum = (typeof PolicyDocumentScalarFieldEnum)[keyof typeof PolicyDocumentScalarFieldEnum]
+
+
+export const PolicySignatureScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  policyId: 'policyId',
+  employeeId: 'employeeId',
+  signedName: 'signedName',
+  signatureKey: 'signatureKey',
+  contentHash: 'contentHash',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PolicySignatureScalarFieldEnum = (typeof PolicySignatureScalarFieldEnum)[keyof typeof PolicySignatureScalarFieldEnum]
+
+
+export const IdCardSettingsScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  title: 'title',
+  accent: 'accent',
+  showPosition: 'showPosition',
+  showDepartment: 'showDepartment',
+  showHireDate: 'showHireDate',
+  showEmployeeNo: 'showEmployeeNo',
+  signatoryName: 'signatoryName',
+  signatoryTitle: 'signatoryTitle',
+  signatureKey: 'signatureKey',
+  footer: 'footer',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IdCardSettingsScalarFieldEnum = (typeof IdCardSettingsScalarFieldEnum)[keyof typeof IdCardSettingsScalarFieldEnum]
+
+
+export const LocationLinkScalarFieldEnum = {
+  id: 'id',
+  tokenHash: 'tokenHash',
+  userId: 'userId',
+  lat: 'lat',
+  lng: 'lng',
+  accuracy: 'accuracy',
+  fixedAt: 'fixedAt',
+  usedAt: 'usedAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LocationLinkScalarFieldEnum = (typeof LocationLinkScalarFieldEnum)[keyof typeof LocationLinkScalarFieldEnum]
+
+
+export const ConversationScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  directKey: 'directKey',
+  name: 'name',
+  lastMessageAt: 'lastMessageAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationScalarFieldEnum = (typeof ConversationScalarFieldEnum)[keyof typeof ConversationScalarFieldEnum]
+
+
+export const ConversationMemberScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  userId: 'userId',
+  lastReadAt: 'lastReadAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationMemberScalarFieldEnum = (typeof ConversationMemberScalarFieldEnum)[keyof typeof ConversationMemberScalarFieldEnum]
+
+
+export const MessageScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  senderId: 'senderId',
+  body: 'body',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+export const CallSessionScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  conversationId: 'conversationId',
+  callerId: 'callerId',
+  calleeId: 'calleeId',
+  kind: 'kind',
+  status: 'status',
+  offer: 'offer',
+  answer: 'answer',
+  answeredAt: 'answeredAt',
+  endedAt: 'endedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CallSessionScalarFieldEnum = (typeof CallSessionScalarFieldEnum)[keyof typeof CallSessionScalarFieldEnum]
+
+
+export const CashAdvanceScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  employeeId: 'employeeId',
+  amountCents: 'amountCents',
+  installments: 'installments',
+  reason: 'reason',
+  status: 'status',
+  decidedById: 'decidedById',
+  decidedAt: 'decidedAt',
+  decisionNote: 'decisionNote',
+  firstCutoff: 'firstCutoff',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CashAdvanceScalarFieldEnum = (typeof CashAdvanceScalarFieldEnum)[keyof typeof CashAdvanceScalarFieldEnum]
+
+
+export const CashAdvancePaymentScalarFieldEnum = {
+  id: 'id',
+  advanceId: 'advanceId',
+  payslipId: 'payslipId',
+  amountCents: 'amountCents',
+  paidOn: 'paidOn',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CashAdvancePaymentScalarFieldEnum = (typeof CashAdvancePaymentScalarFieldEnum)[keyof typeof CashAdvancePaymentScalarFieldEnum]
+
+
+export const PayoutScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  payslipId: 'payslipId',
+  amountCents: 'amountCents',
+  method: 'method',
+  reference: 'reference',
+  paidOn: 'paidOn',
+  proofKey: 'proofKey',
+  proofName: 'proofName',
+  proofMime: 'proofMime',
+  recordedById: 'recordedById',
+  status: 'status',
+  answeredAt: 'answeredAt',
+  employeeNote: 'employeeNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PayoutScalarFieldEnum = (typeof PayoutScalarFieldEnum)[keyof typeof PayoutScalarFieldEnum]
 
 
 export const SortOrder = {

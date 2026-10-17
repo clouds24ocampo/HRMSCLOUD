@@ -33,6 +33,7 @@ export type OrgSettingsAvgAggregateOutputType = {
   workDaysPerMonth: number | null
   hoursPerDay: number | null
   otMultiplierBp: number | null
+  daysPerYear: number | null
 }
 
 export type OrgSettingsSumAggregateOutputType = {
@@ -42,6 +43,7 @@ export type OrgSettingsSumAggregateOutputType = {
   workDaysPerMonth: number | null
   hoursPerDay: number | null
   otMultiplierBp: number | null
+  daysPerYear: number | null
 }
 
 export type OrgSettingsMinAggregateOutputType = {
@@ -58,6 +60,10 @@ export type OrgSettingsMinAggregateOutputType = {
   otMultiplierBp: number | null
   statutoryProfile: $Enums.StatutoryProfile | null
   contributionSchedule: $Enums.ContributionSchedule | null
+  daysPerYear: number | null
+  payByLoggedHours: boolean | null
+  deductStatutory: boolean | null
+  autoCutoffs: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -76,6 +82,10 @@ export type OrgSettingsMaxAggregateOutputType = {
   otMultiplierBp: number | null
   statutoryProfile: $Enums.StatutoryProfile | null
   contributionSchedule: $Enums.ContributionSchedule | null
+  daysPerYear: number | null
+  payByLoggedHours: boolean | null
+  deductStatutory: boolean | null
+  autoCutoffs: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -94,6 +104,10 @@ export type OrgSettingsCountAggregateOutputType = {
   otMultiplierBp: number
   statutoryProfile: number
   contributionSchedule: number
+  daysPerYear: number
+  payByLoggedHours: number
+  deductStatutory: number
+  autoCutoffs: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -107,6 +121,7 @@ export type OrgSettingsAvgAggregateInputType = {
   workDaysPerMonth?: true
   hoursPerDay?: true
   otMultiplierBp?: true
+  daysPerYear?: true
 }
 
 export type OrgSettingsSumAggregateInputType = {
@@ -116,6 +131,7 @@ export type OrgSettingsSumAggregateInputType = {
   workDaysPerMonth?: true
   hoursPerDay?: true
   otMultiplierBp?: true
+  daysPerYear?: true
 }
 
 export type OrgSettingsMinAggregateInputType = {
@@ -132,6 +148,10 @@ export type OrgSettingsMinAggregateInputType = {
   otMultiplierBp?: true
   statutoryProfile?: true
   contributionSchedule?: true
+  daysPerYear?: true
+  payByLoggedHours?: true
+  deductStatutory?: true
+  autoCutoffs?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -150,6 +170,10 @@ export type OrgSettingsMaxAggregateInputType = {
   otMultiplierBp?: true
   statutoryProfile?: true
   contributionSchedule?: true
+  daysPerYear?: true
+  payByLoggedHours?: true
+  deductStatutory?: true
+  autoCutoffs?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -168,6 +192,10 @@ export type OrgSettingsCountAggregateInputType = {
   otMultiplierBp?: true
   statutoryProfile?: true
   contributionSchedule?: true
+  daysPerYear?: true
+  payByLoggedHours?: true
+  deductStatutory?: true
+  autoCutoffs?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -273,6 +301,10 @@ export type OrgSettingsGroupByOutputType = {
   otMultiplierBp: number
   statutoryProfile: $Enums.StatutoryProfile
   contributionSchedule: $Enums.ContributionSchedule
+  daysPerYear: number
+  payByLoggedHours: boolean
+  deductStatutory: boolean
+  autoCutoffs: boolean
   createdAt: Date
   updatedAt: Date
   _count: OrgSettingsCountAggregateOutputType | null
@@ -314,6 +346,10 @@ export type OrgSettingsWhereInput = {
   otMultiplierBp?: Prisma.IntFilter<"OrgSettings"> | number
   statutoryProfile?: Prisma.EnumStatutoryProfileFilter<"OrgSettings"> | $Enums.StatutoryProfile
   contributionSchedule?: Prisma.EnumContributionScheduleFilter<"OrgSettings"> | $Enums.ContributionSchedule
+  daysPerYear?: Prisma.IntFilter<"OrgSettings"> | number
+  payByLoggedHours?: Prisma.BoolFilter<"OrgSettings"> | boolean
+  deductStatutory?: Prisma.BoolFilter<"OrgSettings"> | boolean
+  autoCutoffs?: Prisma.BoolFilter<"OrgSettings"> | boolean
   createdAt?: Prisma.DateTimeFilter<"OrgSettings"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"OrgSettings"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
@@ -333,6 +369,10 @@ export type OrgSettingsOrderByWithRelationInput = {
   otMultiplierBp?: Prisma.SortOrder
   statutoryProfile?: Prisma.SortOrder
   contributionSchedule?: Prisma.SortOrder
+  daysPerYear?: Prisma.SortOrder
+  payByLoggedHours?: Prisma.SortOrder
+  deductStatutory?: Prisma.SortOrder
+  autoCutoffs?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   organization?: Prisma.OrganizationOrderByWithRelationInput
@@ -355,6 +395,10 @@ export type OrgSettingsWhereUniqueInput = Prisma.AtLeast<{
   otMultiplierBp?: Prisma.IntFilter<"OrgSettings"> | number
   statutoryProfile?: Prisma.EnumStatutoryProfileFilter<"OrgSettings"> | $Enums.StatutoryProfile
   contributionSchedule?: Prisma.EnumContributionScheduleFilter<"OrgSettings"> | $Enums.ContributionSchedule
+  daysPerYear?: Prisma.IntFilter<"OrgSettings"> | number
+  payByLoggedHours?: Prisma.BoolFilter<"OrgSettings"> | boolean
+  deductStatutory?: Prisma.BoolFilter<"OrgSettings"> | boolean
+  autoCutoffs?: Prisma.BoolFilter<"OrgSettings"> | boolean
   createdAt?: Prisma.DateTimeFilter<"OrgSettings"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"OrgSettings"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
@@ -374,6 +418,10 @@ export type OrgSettingsOrderByWithAggregationInput = {
   otMultiplierBp?: Prisma.SortOrder
   statutoryProfile?: Prisma.SortOrder
   contributionSchedule?: Prisma.SortOrder
+  daysPerYear?: Prisma.SortOrder
+  payByLoggedHours?: Prisma.SortOrder
+  deductStatutory?: Prisma.SortOrder
+  autoCutoffs?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.OrgSettingsCountOrderByAggregateInput
@@ -400,6 +448,10 @@ export type OrgSettingsScalarWhereWithAggregatesInput = {
   otMultiplierBp?: Prisma.IntWithAggregatesFilter<"OrgSettings"> | number
   statutoryProfile?: Prisma.EnumStatutoryProfileWithAggregatesFilter<"OrgSettings"> | $Enums.StatutoryProfile
   contributionSchedule?: Prisma.EnumContributionScheduleWithAggregatesFilter<"OrgSettings"> | $Enums.ContributionSchedule
+  daysPerYear?: Prisma.IntWithAggregatesFilter<"OrgSettings"> | number
+  payByLoggedHours?: Prisma.BoolWithAggregatesFilter<"OrgSettings"> | boolean
+  deductStatutory?: Prisma.BoolWithAggregatesFilter<"OrgSettings"> | boolean
+  autoCutoffs?: Prisma.BoolWithAggregatesFilter<"OrgSettings"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"OrgSettings"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"OrgSettings"> | Date | string
 }
@@ -417,6 +469,10 @@ export type OrgSettingsCreateInput = {
   otMultiplierBp?: number
   statutoryProfile?: $Enums.StatutoryProfile
   contributionSchedule?: $Enums.ContributionSchedule
+  daysPerYear?: number
+  payByLoggedHours?: boolean
+  deductStatutory?: boolean
+  autoCutoffs?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutSettingsInput
@@ -436,6 +492,10 @@ export type OrgSettingsUncheckedCreateInput = {
   otMultiplierBp?: number
   statutoryProfile?: $Enums.StatutoryProfile
   contributionSchedule?: $Enums.ContributionSchedule
+  daysPerYear?: number
+  payByLoggedHours?: boolean
+  deductStatutory?: boolean
+  autoCutoffs?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -453,6 +513,10 @@ export type OrgSettingsUpdateInput = {
   otMultiplierBp?: Prisma.IntFieldUpdateOperationsInput | number
   statutoryProfile?: Prisma.EnumStatutoryProfileFieldUpdateOperationsInput | $Enums.StatutoryProfile
   contributionSchedule?: Prisma.EnumContributionScheduleFieldUpdateOperationsInput | $Enums.ContributionSchedule
+  daysPerYear?: Prisma.IntFieldUpdateOperationsInput | number
+  payByLoggedHours?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deductStatutory?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  autoCutoffs?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutSettingsNestedInput
@@ -472,6 +536,10 @@ export type OrgSettingsUncheckedUpdateInput = {
   otMultiplierBp?: Prisma.IntFieldUpdateOperationsInput | number
   statutoryProfile?: Prisma.EnumStatutoryProfileFieldUpdateOperationsInput | $Enums.StatutoryProfile
   contributionSchedule?: Prisma.EnumContributionScheduleFieldUpdateOperationsInput | $Enums.ContributionSchedule
+  daysPerYear?: Prisma.IntFieldUpdateOperationsInput | number
+  payByLoggedHours?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deductStatutory?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  autoCutoffs?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -490,6 +558,10 @@ export type OrgSettingsCreateManyInput = {
   otMultiplierBp?: number
   statutoryProfile?: $Enums.StatutoryProfile
   contributionSchedule?: $Enums.ContributionSchedule
+  daysPerYear?: number
+  payByLoggedHours?: boolean
+  deductStatutory?: boolean
+  autoCutoffs?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -507,6 +579,10 @@ export type OrgSettingsUpdateManyMutationInput = {
   otMultiplierBp?: Prisma.IntFieldUpdateOperationsInput | number
   statutoryProfile?: Prisma.EnumStatutoryProfileFieldUpdateOperationsInput | $Enums.StatutoryProfile
   contributionSchedule?: Prisma.EnumContributionScheduleFieldUpdateOperationsInput | $Enums.ContributionSchedule
+  daysPerYear?: Prisma.IntFieldUpdateOperationsInput | number
+  payByLoggedHours?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deductStatutory?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  autoCutoffs?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -525,6 +601,10 @@ export type OrgSettingsUncheckedUpdateManyInput = {
   otMultiplierBp?: Prisma.IntFieldUpdateOperationsInput | number
   statutoryProfile?: Prisma.EnumStatutoryProfileFieldUpdateOperationsInput | $Enums.StatutoryProfile
   contributionSchedule?: Prisma.EnumContributionScheduleFieldUpdateOperationsInput | $Enums.ContributionSchedule
+  daysPerYear?: Prisma.IntFieldUpdateOperationsInput | number
+  payByLoggedHours?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deductStatutory?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  autoCutoffs?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -548,6 +628,10 @@ export type OrgSettingsCountOrderByAggregateInput = {
   otMultiplierBp?: Prisma.SortOrder
   statutoryProfile?: Prisma.SortOrder
   contributionSchedule?: Prisma.SortOrder
+  daysPerYear?: Prisma.SortOrder
+  payByLoggedHours?: Prisma.SortOrder
+  deductStatutory?: Prisma.SortOrder
+  autoCutoffs?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -559,6 +643,7 @@ export type OrgSettingsAvgOrderByAggregateInput = {
   workDaysPerMonth?: Prisma.SortOrder
   hoursPerDay?: Prisma.SortOrder
   otMultiplierBp?: Prisma.SortOrder
+  daysPerYear?: Prisma.SortOrder
 }
 
 export type OrgSettingsMaxOrderByAggregateInput = {
@@ -575,6 +660,10 @@ export type OrgSettingsMaxOrderByAggregateInput = {
   otMultiplierBp?: Prisma.SortOrder
   statutoryProfile?: Prisma.SortOrder
   contributionSchedule?: Prisma.SortOrder
+  daysPerYear?: Prisma.SortOrder
+  payByLoggedHours?: Prisma.SortOrder
+  deductStatutory?: Prisma.SortOrder
+  autoCutoffs?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -593,6 +682,10 @@ export type OrgSettingsMinOrderByAggregateInput = {
   otMultiplierBp?: Prisma.SortOrder
   statutoryProfile?: Prisma.SortOrder
   contributionSchedule?: Prisma.SortOrder
+  daysPerYear?: Prisma.SortOrder
+  payByLoggedHours?: Prisma.SortOrder
+  deductStatutory?: Prisma.SortOrder
+  autoCutoffs?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -604,6 +697,7 @@ export type OrgSettingsSumOrderByAggregateInput = {
   workDaysPerMonth?: Prisma.SortOrder
   hoursPerDay?: Prisma.SortOrder
   otMultiplierBp?: Prisma.SortOrder
+  daysPerYear?: Prisma.SortOrder
 }
 
 export type OrgSettingsCreateNestedOneWithoutOrganizationInput = {
@@ -671,6 +765,10 @@ export type OrgSettingsCreateWithoutOrganizationInput = {
   otMultiplierBp?: number
   statutoryProfile?: $Enums.StatutoryProfile
   contributionSchedule?: $Enums.ContributionSchedule
+  daysPerYear?: number
+  payByLoggedHours?: boolean
+  deductStatutory?: boolean
+  autoCutoffs?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -688,6 +786,10 @@ export type OrgSettingsUncheckedCreateWithoutOrganizationInput = {
   otMultiplierBp?: number
   statutoryProfile?: $Enums.StatutoryProfile
   contributionSchedule?: $Enums.ContributionSchedule
+  daysPerYear?: number
+  payByLoggedHours?: boolean
+  deductStatutory?: boolean
+  autoCutoffs?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -721,6 +823,10 @@ export type OrgSettingsUpdateWithoutOrganizationInput = {
   otMultiplierBp?: Prisma.IntFieldUpdateOperationsInput | number
   statutoryProfile?: Prisma.EnumStatutoryProfileFieldUpdateOperationsInput | $Enums.StatutoryProfile
   contributionSchedule?: Prisma.EnumContributionScheduleFieldUpdateOperationsInput | $Enums.ContributionSchedule
+  daysPerYear?: Prisma.IntFieldUpdateOperationsInput | number
+  payByLoggedHours?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deductStatutory?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  autoCutoffs?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -738,6 +844,10 @@ export type OrgSettingsUncheckedUpdateWithoutOrganizationInput = {
   otMultiplierBp?: Prisma.IntFieldUpdateOperationsInput | number
   statutoryProfile?: Prisma.EnumStatutoryProfileFieldUpdateOperationsInput | $Enums.StatutoryProfile
   contributionSchedule?: Prisma.EnumContributionScheduleFieldUpdateOperationsInput | $Enums.ContributionSchedule
+  daysPerYear?: Prisma.IntFieldUpdateOperationsInput | number
+  payByLoggedHours?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deductStatutory?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  autoCutoffs?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -758,6 +868,10 @@ export type OrgSettingsSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   otMultiplierBp?: boolean
   statutoryProfile?: boolean
   contributionSchedule?: boolean
+  daysPerYear?: boolean
+  payByLoggedHours?: boolean
+  deductStatutory?: boolean
+  autoCutoffs?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
@@ -777,6 +891,10 @@ export type OrgSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   otMultiplierBp?: boolean
   statutoryProfile?: boolean
   contributionSchedule?: boolean
+  daysPerYear?: boolean
+  payByLoggedHours?: boolean
+  deductStatutory?: boolean
+  autoCutoffs?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
@@ -796,6 +914,10 @@ export type OrgSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   otMultiplierBp?: boolean
   statutoryProfile?: boolean
   contributionSchedule?: boolean
+  daysPerYear?: boolean
+  payByLoggedHours?: boolean
+  deductStatutory?: boolean
+  autoCutoffs?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
@@ -815,11 +937,15 @@ export type OrgSettingsSelectScalar = {
   otMultiplierBp?: boolean
   statutoryProfile?: boolean
   contributionSchedule?: boolean
+  daysPerYear?: boolean
+  payByLoggedHours?: boolean
+  deductStatutory?: boolean
+  autoCutoffs?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type OrgSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "timezone" | "gpsPolicy" | "graceMinutes" | "lowAccuracyMeters" | "requirePunchPassword" | "punchUnlockSeconds" | "workDaysPerMonth" | "hoursPerDay" | "otMultiplierBp" | "statutoryProfile" | "contributionSchedule" | "createdAt" | "updatedAt", ExtArgs["result"]["orgSettings"]>
+export type OrgSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "timezone" | "gpsPolicy" | "graceMinutes" | "lowAccuracyMeters" | "requirePunchPassword" | "punchUnlockSeconds" | "workDaysPerMonth" | "hoursPerDay" | "otMultiplierBp" | "statutoryProfile" | "contributionSchedule" | "daysPerYear" | "payByLoggedHours" | "deductStatutory" | "autoCutoffs" | "createdAt" | "updatedAt", ExtArgs["result"]["orgSettings"]>
 export type OrgSettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }
@@ -849,6 +975,10 @@ export type $OrgSettingsPayload<ExtArgs extends runtime.Types.Extensions.Interna
     otMultiplierBp: number
     statutoryProfile: $Enums.StatutoryProfile
     contributionSchedule: $Enums.ContributionSchedule
+    daysPerYear: number
+    payByLoggedHours: boolean
+    deductStatutory: boolean
+    autoCutoffs: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["orgSettings"]>
@@ -1288,6 +1418,10 @@ export interface OrgSettingsFieldRefs {
   readonly otMultiplierBp: Prisma.FieldRef<"OrgSettings", 'Int'>
   readonly statutoryProfile: Prisma.FieldRef<"OrgSettings", 'StatutoryProfile'>
   readonly contributionSchedule: Prisma.FieldRef<"OrgSettings", 'ContributionSchedule'>
+  readonly daysPerYear: Prisma.FieldRef<"OrgSettings", 'Int'>
+  readonly payByLoggedHours: Prisma.FieldRef<"OrgSettings", 'Boolean'>
+  readonly deductStatutory: Prisma.FieldRef<"OrgSettings", 'Boolean'>
+  readonly autoCutoffs: Prisma.FieldRef<"OrgSettings", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"OrgSettings", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"OrgSettings", 'DateTime'>
 }

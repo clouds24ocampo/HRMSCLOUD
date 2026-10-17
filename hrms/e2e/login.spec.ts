@@ -87,7 +87,7 @@ test("registering an already-used email is refused", async ({ page }) => {
 
 test("wrong password shows an error and stays on login", async ({ page }) => {
   await signIn(page, admin, "wrong-password-here");
-  await expect(alert(page)).toContainText("Wrong email or password");
+  await expect(alert(page)).toContainText("Wrong email, username or password");
   await expect(page).toHaveURL(/\/login/);
 });
 

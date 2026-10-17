@@ -5,12 +5,23 @@ import { createChecklist } from "@/lib/checklists";
 
 type Db = Prisma.TransactionClient;
 
-export async function nextEmployeeNo(db: Db, organizationId: string): Promise<string> {
-  let n = (await db.employee.count({ where: { organizationId } })) + 1;
+export async function nextEmployeeNo(db: Db, organizationId: string, at: Date = new Date(), tz = "Asia/Manila"): Promise<string> {
+  const prefix = dayKey(at, tz).replace(/-/g, ""); // "YYYYMMDD"
+  const existing = await db.employee.findMany({
+    where: { organizationId, employeeNo: { startsWith: `${prefix}-` } },
+    select: { employeeNo: true },
+  });
+  let maxSeq = 0;
+  for (const e of existing) {
+    const parts = e.employeeNo.split("-");
+    const num = Number(parts[1]);
+    if (Number.isInteger(num) && num > maxSeq) maxSeq = num;
+  }
+  let seq = maxSeq + 1;
   for (;;) {
-    const employeeNo = `EMP-${String(n).padStart(4, "0")}`;
+    const employeeNo = `${prefix}-${String(seq).padStart(4, "0")}`;
     if (!(await db.employee.findUnique({ where: { organizationId_employeeNo: { organizationId, employeeNo } } }))) return employeeNo;
-    n++;
+    seq++;
   }
 }
 
@@ -27,6 +38,7 @@ export async function assignmentSnapshot(db: Db, organizationId: string, e: { de
 export type NewEmployee = {
   firstName: string;
   lastName: string;
+  employeeNo?: string | null;
   email?: string | null;
   phone?: string | null;
   departmentId?: string | null;
@@ -34,11 +46,14 @@ export type NewEmployee = {
   managerId?: string | null;
   hireDate: Date;
   userId?: string | null;
+  flexible?: boolean;
 };
 
 export async function createEmployee(db: Db, organizationId: string, actorId: string | null, data: NewEmployee, opts: { checklist?: boolean } = {}) {
+  const customNo = data.employeeNo?.trim();
+  const employeeNo = customNo || (await nextEmployeeNo(db, organizationId));
   const emp = await db.employee.create({
-    data: { ...data, organizationId, employeeNo: await nextEmployeeNo(db, organizationId) },
+    data: { ...data, organizationId, employeeNo },
   });
   await db.employmentHistory.create({
     data: {
@@ -52,12 +67,14 @@ export async function createEmployee(db: Db, organizationId: string, actorId: st
 
 // Every signed-in person has an employee profile (time clock, schedule and leave hang off it).
 // Created on first use for accounts that were made before profiles existed.
-export async function getMyEmployee(actor: { id: string; organizationId: string; name: string }, tz = "Asia/Manila") {
+export async function getMyEmployee(actor: { id: string; organizationId: string; name: string; role?: { key: string } }, tz = "Asia/Manila") {
   const found = await prisma.employee.findUnique({ where: { userId: actor.id } });
   if (found) return found;
   const [firstName, ...rest] = actor.name.trim().split(/\s+/);
   const hireDate = dbDate(dayKey(new Date(), tz));
+  const isSuperAdmin = actor.role?.key === "SUPER_ADMIN";
+  const defaultNo = isSuperAdmin ? "superadmin001" : undefined;
   return prisma.$transaction((tx) =>
-    createEmployee(tx, actor.organizationId, actor.id, { firstName, lastName: rest.join(" ") || "-", hireDate, userId: actor.id }, { checklist: false }),
+    createEmployee(tx, actor.organizationId, actor.id, { firstName, lastName: rest.join(" ") || "-", employeeNo: defaultNo, hireDate, userId: actor.id }, { checklist: false }),
   );
 }

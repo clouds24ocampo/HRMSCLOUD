@@ -11,6 +11,8 @@ export const MENU: NavGroup[] = [
       { href: "/organization", label: "Organization", icon: "🏢" },
       { href: "/recruitment", label: "Recruitment", icon: "🎯" },
       { href: "/documents", label: "Documents", icon: "🗂️" },
+      { href: "/policies", label: "Policies", icon: "📜" },
+      { href: "/id", label: "Digital ID", icon: "🪪" },
     ],
   },
   {
@@ -20,6 +22,7 @@ export const MENU: NavGroup[] = [
       { href: "/dtr", label: "DTR", icon: "⏱️" },
       { href: "/overtime", label: "Overtime", icon: "⏰" },
       { href: "/leave", label: "Leave", icon: "🏖️" },
+      { href: "/daily-report", label: "Daily report", icon: "🗒️" },
     ],
   },
   {
@@ -27,6 +30,7 @@ export const MENU: NavGroup[] = [
     items: [
       { href: "/payroll", label: "Payroll", icon: "💰" },
       { href: "/payslips", label: "My payslips", icon: "🧾" },
+      { href: "/cash-advance", label: "Cash advance", icon: "💵" },
     ],
   },
   {
@@ -39,9 +43,11 @@ export const MENU: NavGroup[] = [
   {
     title: "Support",
     items: [
+      { href: "/chat", label: "Chat", icon: "💬" },
       { href: "/requests", label: "HR requests", icon: "🛎️" },
       { href: "/announcements", label: "Announcements", icon: "📣" },
       { href: "/reports", label: "Reports", icon: "📊" },
+      { href: "/analytics", label: "Activity analytics", icon: "🧭" },
     ],
   },
   {

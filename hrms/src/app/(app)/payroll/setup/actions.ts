@@ -7,6 +7,7 @@ import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
 import { parsePercent, parsePesos } from "@/lib/money";
 import { getOrgSettings } from "@/lib/settings";
+import { installPack } from "@/app/(app)/payroll/rules/actions";
 import type { FormState } from "@/app/login/actions";
 
 const done = () => revalidatePath("/payroll/setup");
@@ -18,14 +19,17 @@ export async function saveFactors(_: FormState, form: FormData): Promise<FormSta
     .object({
       workDaysPerMonth: z.coerce.number().int().min(1).max(31, "Work days per month is between 1 and 31."),
       hoursPerDay: z.coerce.number().int().min(1).max(24, "Hours per day is between 1 and 24."),
+      daysPerYear: z.coerce.number().int().min(200, "Days a year is between 200 and 366.").max(366, "Days a year is between 200 and 366."),
     })
     .safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
+  const payByLoggedHours = form.get("payByLoggedHours") === "on";
+  const autoCutoffs = form.get("autoCutoffs") === "on";
   const mult = parsePercent(String(form.get("otMultiplierPct") ?? ""));
   if (mult === null || mult < 10000) return { error: "Overtime rate is a percentage of normal pay, at least 100." };
   await getOrgSettings(me.organizationId);
-  await prisma.orgSettings.update({ where: { organizationId: me.organizationId }, data: { ...parsed.data, otMultiplierBp: mult } });
-  await audit(me.id, "payroll.factors_saved", "OrgSettings", undefined, { ...parsed.data, otMultiplierBp: mult }, me.organizationId);
+  await prisma.orgSettings.update({ where: { organizationId: me.organizationId }, data: { ...parsed.data, payByLoggedHours, autoCutoffs, otMultiplierBp: mult } });
+  await audit(me.id, "payroll.factors_saved", "OrgSettings", undefined, { ...parsed.data, payByLoggedHours, autoCutoffs, otMultiplierBp: mult }, me.organizationId);
   done();
   return { ok: "Saved. It applies the next time a payroll is calculated." };
 }
@@ -128,4 +132,22 @@ export async function savePhSettings(_: FormState, form: FormData): Promise<Form
   await audit(me.id, "payroll.profile_saved", "OrgSettings", undefined, parsed.data, me.organizationId);
   done();
   return { ok: "Saved. It applies the next time a payroll is calculated." };
+}
+
+// Government contributions (SSS/GSIS, PhilHealth, Pag-IBIG) and withholding tax: take them off pay, or only show them.
+// Turning it on uses the Philippine rules; the starter set is installed first if the organization has none.
+export async function setStatutoryDeduction(on: boolean): Promise<FormState> {
+  const me = await requireUser("/payroll");
+  if (on && (await prisma.statutoryRule.count({ where: { organizationId: me.organizationId } })) === 0) {
+    const r = await installPack("PRIVATE");
+    if (r?.error) return r;
+  }
+  await getOrgSettings(me.organizationId);
+  await prisma.orgSettings.update({ where: { organizationId: me.organizationId }, data: on ? { deductStatutory: true, statutoryProfile: "PHILIPPINES" } : { deductStatutory: false } });
+  // Live cut-offs pick the change up on the next view; payrolls a person calculated are left for them to recalculate.
+  await prisma.payrollPeriod.updateMany({ where: { organizationId: me.organizationId, calculatedById: null, status: { in: ["DRAFT", "CALCULATED"] } }, data: { calculatedAt: null } });
+  await audit(me.id, on ? "payroll.statutory_deduct_on" : "payroll.statutory_deduct_off", "OrgSettings", undefined, undefined, me.organizationId);
+  revalidatePath("/dashboard");
+  revalidatePath("/payroll", "layout");
+  return { ok: on ? "Government contributions and tax are now taken off pay." : "Government contributions and tax are shown only, not taken off pay." };
 }

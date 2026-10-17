@@ -44,3 +44,7 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 *.pem
+backups/
+
+# Generated knowledge graph (rebuild with: npm run graphify --prefix hrms)
+/graphify-out/

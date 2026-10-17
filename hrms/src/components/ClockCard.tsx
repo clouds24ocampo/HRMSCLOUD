@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useSyncExternalStore, useTransition } from "react";
+import { PasswordInput } from "@/components/PasswordInput";
 import { useRouter } from "next/navigation";
 import { recordTime, unlockPunch, type ClockResult } from "@/app/(app)/dtr/actions";
 import { Alert } from "@/components/Fields";
 import { inputClass } from "@/components/ui";
 import type { ClockType } from "@/lib/clock";
+import { bestFix, isDesktop } from "@/lib/geo-client";
+import { PhoneLocation } from "@/components/PhoneLocation";
 
 type Props = {
   state: "OUT" | "IN" | "ON_PAUSE";
@@ -35,18 +38,8 @@ const TONE: Record<string, string> = {
   pink: "border-pink-400/30 bg-pink-500/15 text-pink-300",
 };
 
-// Asks the device for its location at the moment of the time stamp only. No background tracking.
-function getLocation(): Promise<{ geo: { lat: number; lng: number; accuracy: number } | null; geoError?: "DENIED" | "UNAVAILABLE" }> {
-  return new Promise((resolve) => {
-    if (!navigator.geolocation) return resolve({ geo: null, geoError: "UNAVAILABLE" });
-    navigator.geolocation.getCurrentPosition(
-      (p) => resolve({ geo: { lat: p.coords.latitude, lng: p.coords.longitude, accuracy: p.coords.accuracy } }),
-      (e) => resolve({ geo: null, geoError: e.code === 1 ? "DENIED" : "UNAVAILABLE" }),
-      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 0 },
-    );
-  });
-}
 
+const noSubscribe = () => () => {};
 const clock = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
 
 function Step({ n, title, hint, right, children }: { n: number; title: string; hint?: string; right?: React.ReactNode; children?: React.ReactNode }) {
@@ -78,6 +71,10 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
   const [tab, setTab] = useState<"PUNCH" | "ISSUE">("PUNCH");
   const [trip, setTrip] = useState<{ open: boolean; from: string; to: string; reason: string }>({ open: false, from: "", to: "", reason: "" });
   const [, start] = useTransition();
+  const [phone, setPhone] = useState<{ open: boolean; token?: string; accuracy?: number }>({ open: false });
+  const [retry, setRetry] = useState<ClockType | null>(null); // the stamp that waits for the phone
+  // Computer or phone: known only in the browser, so the server render says "phone" and the client corrects it.
+  const desktop = useSyncExternalStore(noSubscribe, isDesktop, () => false);
 
   useEffect(() => {
     const tick = () => setNow(Date.now());
@@ -109,19 +106,26 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
     });
   };
 
-  const press = (t: ClockType, tripReady = false) => {
+  const press = (t: ClockType, tripReady = false, allowRough = false) => {
     setResult(undefined);
     const resumingNow = state === "ON_PAUSE" && pause?.typeId === t.id;
     if (t.key === "ON_TRIP" && !resumingNow && !tripReady) return setTrip((x) => ({ ...x, open: true }));
     const tripFields = t.key === "ON_TRIP" && !resumingNow ? { tripFrom: trip.from, tripTo: trip.to, tripReason: trip.reason } : {};
     setStep("locating");
     start(async () => {
-      const loc = await getLocation();
-      const r = await recordTime({ stampTypeId: t.id, workContext: (t.defaultContext ?? ctx) as "OFFICE", note: note || undefined, ...tripFields, ...loc });
+      // With a phone fix in hand there is nothing to measure here; otherwise sample the device for its best fix.
+      const loc = phone.token ? { geo: null } : await bestFix();
+      const r = await recordTime({ stampTypeId: t.id, workContext: (t.defaultContext ?? ctx) as "OFFICE", note: note || undefined, ...tripFields, ...loc, linkToken: phone.token, allowRough: allowRough || undefined });
       setStep("idle");
       setResult(r);
       if (r.needTrip) setTrip((x) => ({ ...x, open: true }));
+      if (r.needPhone) {
+        setPhone({ open: true });
+        setRetry(t);
+      }
       if (r.ok) {
+        setPhone({ open: false });
+        setRetry(null);
         setNote("");
         setTrip({ open: false, from: "", to: "", reason: "" });
         setUnlockedUntil(null); // one unlock, one time stamp
@@ -134,20 +138,43 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
   // Which tiles can be used right now.
   const why = (t: ClockType): string | null => {
     if (requirePassword && !unlocked) return "Verify your password to unlock";
-    if (t.kind === "IN") return state === "OUT" ? null : "You are already timed in";
-    if (t.kind === "OUT") return state === "OUT" ? "Time In first" : null;
+    if (t.kind === "IN") {
+      if (state === "OUT") return null;
+      if (state === "ON_PAUSE") return null; // Can click Time In to resume work from any pause/issue
+      return "You are already actively timed in and working";
+    }
+    if (t.kind === "OUT") {
+      if (state === "OUT") return "Time In first";
+      return null;
+    }
     if (state === "OUT") return "Time In first";
-    if (state === "IN") return t.rule;
-    return pause?.typeId === t.id ? null : `End ${pause?.name} first`;
+    // Ending the pause you are on is always allowed: its daily limit applies to starting it, not to stopping it.
+    if (state === "ON_PAUSE" && pause?.typeId === t.id) return null;
+    // State is IN or ON_PAUSE: any pause/issue can be started or switched to
+    return t.rule;
   };
 
   const time = now ? new Intl.DateTimeFormat("en-US", { timeZone: timezone, hour: "numeric", minute: "2-digit", second: "2-digit" }).format(now) : " ";
   const date = now ? new Intl.DateTimeFormat("en-US", { timeZone: timezone, weekday: "long", month: "long", day: "numeric" }).format(now) : " ";
   const chip =
-    state === "IN" ? ["bg-success/15 text-success", "Timed in"] : state === "ON_PAUSE" ? [pausedOver ? "bg-danger/15 text-danger" : "bg-warning/15 text-warning", `${pause?.name} · ${clock(pausedSec)}`] : ["bg-white/10 text-muted", "Not timed in"];
+    state === "IN"
+      ? ["bg-success/15 text-success", "Timed in · Working"]
+      : state === "ON_PAUSE"
+      ? [
+          pausedOver ? "bg-danger/15 text-danger" : "bg-warning/15 text-warning",
+          `${pause?.name} · ${clock(pausedSec)} · Click Time In to resume`,
+        ]
+      : ["bg-white/10 text-muted", "Not timed in"];
 
   return (
-    <section aria-label="Time clock" className="theme-quantum rounded-2xl border border-white/10 bg-[#0b0d22] p-5 text-ink shadow-lg">
+    // Glass: a frosted panel over a soft colour field. The field is decoration only (aria-hidden).
+    <div className="relative isolate overflow-hidden rounded-3xl bg-[#070918] p-px shadow-2xl shadow-indigo-950/40">
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -left-16 -top-20 h-72 w-72 rounded-full bg-indigo-500/70 blur-3xl" />
+        <div className="absolute -right-10 top-1/4 h-64 w-64 rounded-full bg-fuchsia-500/50 blur-3xl" />
+        <div className="absolute -bottom-24 left-1/3 h-72 w-72 rounded-full bg-cyan-400/45 blur-3xl" />
+      </div>
+    <section aria-label="Time clock" className="theme-quantum rounded-[calc(1.5rem-1px)] border border-white/20 bg-linear-to-br from-white/[0.14] via-white/5 to-white/2 p-5 text-ink shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-2xl backdrop-saturate-150">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-muted">{date}</p>
         <span className={`rounded-full px-3 py-1 text-xs font-semibold tabular-nums ${chip[0]}`}>{chip[1]}</span>
@@ -176,8 +203,8 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
             </p>
           ) : (
             <form id="unlock-form" onSubmit={verify}>
-              <input
-                type="password" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="current-password"
+              <PasswordInput
+                value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="current-password"
                 placeholder="Your password" aria-label="Your password" className={`${inputClass} mt-0`}
               />
             </form>
@@ -186,7 +213,17 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
         </Step>
       )}
 
-      <Step n={requirePassword ? 3 : 2} title="Choose an action" hint={unlocked ? "Pick what you are doing now." : "Verify your password to unlock"}>
+      <Step
+        n={requirePassword ? 3 : 2}
+        title="Choose an action"
+        hint={
+          unlocked
+            ? state === "ON_PAUSE"
+              ? `You are on ${pause?.name}. Click Time In to resume work, or choose another tagging to switch.`
+              : "Pick what you are doing now."
+            : "Verify your password to unlock"
+        }
+      >
         <label className="mb-3 block text-sm font-medium">
           Note {types.some((t) => t.requiresNote) ? "(needed for some actions)" : "(optional)"}
           <input
@@ -208,23 +245,53 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {types.filter((t) => t.page === tab).map((t) => {
             const blocked = why(t);
-            const resuming = state === "ON_PAUSE" && pause?.typeId === t.id;
+            const resuming = state === "ON_PAUSE" && (pause?.typeId === t.id || t.kind === "IN");
+            const switching = state === "ON_PAUSE" && t.kind === "PAUSE" && pause?.typeId !== t.id;
+
+            let buttonTitle = t.name;
+            let buttonHint = [t.allowedMinutes ? `up to ${t.allowedMinutes} min` : null, t.hint].filter(Boolean).join(" · ");
+
+            if (t.kind === "IN") {
+              if (state === "ON_PAUSE") {
+                buttonTitle = "Time In (Resume Work)";
+                buttonHint = `End ${pause?.name} & resume work`;
+              } else if (state === "OUT") {
+                buttonTitle = "Time In";
+                buttonHint = "Start your shift";
+              }
+            } else if (t.kind === "OUT") {
+              buttonTitle = "Time Out";
+              buttonHint = "Shift completed (once a day)";
+            } else if (resuming && pause?.typeId === t.id) {
+              buttonTitle = `End ${t.name}`;
+              buttonHint = "Click to resume work";
+            } else if (switching) {
+              buttonTitle = `Switch to ${t.name}`;
+              buttonHint = `Switch from ${pause?.name}`;
+            }
+
             return (
               <button
                 key={t.id} type="button" disabled={!!blocked || busy} onClick={() => press(t)} title={blocked ?? undefined}
                 className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition enabled:hover:bg-white/5 enabled:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 ${
-                  resuming ? "border-photon bg-photon/10 ring-2 ring-photon/40" : "border-white/10 bg-white/[0.03]"
+                  resuming
+                    ? "border-photon bg-photon/15 ring-2 ring-photon/40"
+                    : switching
+                    ? "border-amber-400/30 bg-white/5 hover:border-amber-400/60"
+                    : "border-white/10 bg-white/3"
                 }`}
               >
                 <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border text-xl ${TONE[t.tone] ?? TONE.slate}`} aria-hidden>{t.icon}</span>
                 <span className="min-w-0">
-                  <span className="block truncate font-semibold">{resuming ? `End ${t.name}` : t.name}</span>
-                  {t.kind === "PAUSE" && !resuming && (blocked && !blocked.startsWith("Verify") && !blocked.startsWith("Time In") ? (
+                  <span className="block truncate font-semibold">{buttonTitle}</span>
+                  {blocked && !blocked.startsWith("Verify") && !blocked.startsWith("Time In") ? (
                     <span className="block text-xs text-warning">{blocked}</span>
-                  ) : (
-                    <span className="block text-xs text-muted">{[t.allowedMinutes ? `up to ${t.allowedMinutes} min` : null, t.hint].filter(Boolean).join(" · ")}</span>
-                  ))}
-                  {resuming && <span className={`block text-xs tabular-nums ${pausedOver ? "text-danger" : "text-muted"}`}>{clock(pausedSec)}{pausedOver ? " · over limit" : ""}</span>}
+                  ) : buttonHint ? (
+                    <span className="block text-xs text-muted">{buttonHint}</span>
+                  ) : null}
+                  {resuming && pause?.typeId === t.id && (
+                    <span className={`block text-xs tabular-nums ${pausedOver ? "text-danger" : "text-muted"}`}>{clock(pausedSec)}{pausedOver ? " · over limit" : ""}</span>
+                  )}
                 </span>
               </button>
             );
@@ -264,12 +331,34 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
         </button>
       )}
 
+      {phone.token && (
+        <p role="status" className="mt-4 rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm font-medium text-success">
+          📱 Phone location received (±{Math.round(phone.accuracy ?? 0)} m). {retry ? `Press ${retry.name} again to record it.` : "It is used for your next time stamp."}
+        </p>
+      )}
+      {phone.open && !phone.token && (
+        <>
+          <PhoneLocation onReady={(token, accuracy) => setPhone({ open: false, token, accuracy })} onClose={() => setPhone({ open: false })} />
+          {retry && (
+            <button type="button" disabled={busy} onClick={() => press(retry, true, true)} className="mt-2 text-xs font-medium text-muted underline hover:text-ink">
+              I cannot use my phone: record {retry.name} with this computer&apos;s rough location (flagged, needs a note)
+            </button>
+          )}
+        </>
+      )}
+      {desktop && !phone.open && !phone.token && (
+        <button type="button" onClick={() => setPhone({ open: true })} className="mt-4 text-sm font-medium text-photon hover:underline">
+          💻 On a computer? Confirm your exact location with your phone first
+        </button>
+      )}
+
       <div className="mt-3 min-h-6" aria-live="polite">
-        {step === "locating" && <p className="text-sm text-muted">Getting your location…</p>}
+        {step === "locating" && <p className="text-sm text-muted">Getting your exact location (a few seconds)…</p>}
         {step === "idle" && result?.ok && <Alert kind="success">{result.ok}</Alert>}
         {step === "idle" && result?.error && <Alert kind="error">{result.error}</Alert>}
       </div>
-      <p className="mt-2 text-xs text-muted">Your location is saved only when you press an action. Your supervisor chain and HR can see it.</p>
+      <p className="mt-2 text-xs text-muted">Your location, device and network address are saved only when you press an action. Your supervisor chain and HR can see them.</p>
     </section>
+    </div>
   );
 }
