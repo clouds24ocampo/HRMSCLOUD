@@ -21,9 +21,8 @@ type Props = {
 
 const CONTEXTS = [
   ["OFFICE", "Office"],
-  ["FIELD", "Field work"],
+  ["FIELD", "Field work / Client site"],
   ["REMOTE", "Remote"],
-  ["CLIENT_SITE", "Client site"],
 ] as const;
 
 const TONE: Record<string, string> = {
@@ -182,7 +181,7 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
       <p className="mt-2 text-5xl font-bold tracking-tight tabular-nums" aria-live="off">{time}</p>
       {lastText && <p className="mt-1 text-sm text-muted">{lastText}</p>}
 
-      <Step n={1} title="Where are you working?" hint={types.some((t) => t.defaultContext) ? "On Trip is always counted as field work." : undefined}>
+      <Step n={1} title="Where are you working?" hint={types.some((t) => t.defaultContext) ? "On Trip is always counted as field work / client site." : undefined}>
         <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Where are you working">
           {CONTEXTS.map(([v, l]) => (
             <button

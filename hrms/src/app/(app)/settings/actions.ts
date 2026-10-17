@@ -105,7 +105,11 @@ export async function addStampType(_: FormState, form: FormData): Promise<FormSt
       icon: z.enum(STAMP_ICONS as [string, ...string[]]),
       tone: z.enum(STAMP_TONES),
       allowedMinutes: z.string().optional().transform((v) => (v ? Number(v) : null)).pipe(z.number().int().min(1, "Allowed time is at least 1 minute.").max(720).nullable()),
-      defaultContext: z.enum(["OFFICE", "FIELD", "REMOTE", "CLIENT_SITE"]).optional().or(z.literal("").transform(() => undefined)),
+      defaultContext: z
+        .enum(["OFFICE", "FIELD", "REMOTE", "CLIENT_SITE"])
+        .optional()
+        .or(z.literal("").transform(() => undefined))
+        .transform((v) => (v === "CLIENT_SITE" ? "FIELD" : v)),
     })
     .safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: parsed.error.issues[0].message };

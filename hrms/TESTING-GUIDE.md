@@ -70,7 +70,7 @@ Each row: do this, expect that. Mark what fails and tell me the page and what yo
 5. Sign in as the new employee. Expect: forced to choose a new password, then Home with "Welcome. N things for you to finish" and a link to their checklist.
 
 ### 4.4 Time stamp (Home) and DTR
-1. As an employee: choose where you are working (Office, Field work, Remote, Client site), pick **Time In**. If the password prompt is on, enter your password. Allow location when the browser asks. Expect: "Timed in", clock changes, location saved.
+1. As an employee: choose where you are working (Office, Field work / Client site, Remote), pick **Time In**. If the password prompt is on, enter your password. Allow location when the browser asks. Expect: "Timed in", clock changes, location saved.
 2. Deny location. Expect: stamp still works but is flagged "Location denied" (or blocked, depending on the GPS policy in Settings).
 3. Take a Break, come back, **Time Out**. Expect: buttons enable only when they make sense (no Time Out before Time In).
 4. Open **DTR**. Expect: today's row with in/out, worked time, late/undertime if your schedule says so, overtime as "candidate".

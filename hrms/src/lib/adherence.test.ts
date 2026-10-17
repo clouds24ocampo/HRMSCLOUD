@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { summarize } from "./adherence";
+import { computeDailyAdherence, summarize } from "./adherence";
 import { liveState } from "./live";
 import { zonedTimeToUtc } from "./time";
 import type { DtrDay } from "./dtr";
@@ -25,6 +25,36 @@ describe("summarize", () => {
   it("a perfect record is Adhering; a few late minutes is Minor", () => {
     expect(summarize([row("2026-10-01", {})], "2026-10-06").verdict).toBe("ADHERING");
     expect(summarize([row("2026-10-01", { lateMinutes: 60 })], "2026-10-06").verdict).toBe("MINOR"); // 420/480 = 87.5
+  });
+  it("enforces 90m (1h 30m) daily break allowance and grants +15m for 2 hours overtime", () => {
+    // 90m break with 0 OT: allowed 90m -> 0 excess break
+    const r1 = computeDailyAdherence(row("2026-10-01", { breakMinutes: 90, overtimeMinutes: 0 }));
+    expect(r1.allowedBreakMinutes).toBe(90);
+    expect(r1.excessBreakMinutes).toBe(0);
+    expect(r1.adherencePct).toBe(100);
+
+    // 105m break with 0 OT: allowed 90m -> 15m unapproved excess break
+    const r2 = computeDailyAdherence(row("2026-10-01", { breakMinutes: 105, overtimeMinutes: 0 }));
+    expect(r2.allowedBreakMinutes).toBe(90);
+    expect(r2.excessBreakMinutes).toBe(15);
+    expect(r2.keptMinutes).toBe(480 - 15);
+    expect(r2.adherencePct).toBe(96.9);
+
+    // 105m break with 2 hours (120 mins) OT: allowed 90 + 15 = 105m -> 0 excess break!
+    const r3 = computeDailyAdherence(row("2026-10-01", { breakMinutes: 105, overtimeMinutes: 120 }));
+    expect(r3.allowedBreakMinutes).toBe(105);
+    expect(r3.excessBreakMinutes).toBe(0);
+    expect(r3.adherencePct).toBe(100);
+
+    // 120m break with 2 hours (120 mins) OT: allowed 105m -> 15m excess
+    const r4 = computeDailyAdherence(row("2026-10-01", { breakMinutes: 120, overtimeMinutes: 120 }));
+    expect(r4.allowedBreakMinutes).toBe(105);
+    expect(r4.excessBreakMinutes).toBe(15);
+
+    // 120m break with 4 hours (240 mins) OT: allowed 90 + 30 = 120m -> 0 excess
+    const r5 = computeDailyAdherence(row("2026-10-01", { breakMinutes: 120, overtimeMinutes: 240 }));
+    expect(r5.allowedBreakMinutes).toBe(120);
+    expect(r5.excessBreakMinutes).toBe(0);
   });
 });
 

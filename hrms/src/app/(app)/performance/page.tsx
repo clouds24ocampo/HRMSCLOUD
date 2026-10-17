@@ -6,8 +6,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { canViewEmployee, employeeScope, isHr } from "@/lib/scope";
 import { ROLES } from "@/lib/roles";
-import { formatDay, keyOfDbDate } from "@/lib/time";
+import { addDays, dayKey, formatDay, formatDuration, formatDurationPrecise, keyOfDbDate } from "@/lib/time";
 import { Badge, Card, EmptyState, PageHeader } from "@/components/ui";
+import { computeDailyAdherence, summarizeDailyAdherence, VERDICT } from "@/lib/adherence";
+import { loadDtr } from "@/lib/dtr-data";
+import { loadTeamDtr } from "@/lib/team-dtr";
+import { ScheduleAdherenceSection } from "./ScheduleAdherenceSection";
 import { AcknowledgeButton, CloseCycleButton, CreateCycleForm, GoalForm, GoalProgress, RATING_LABEL, RatingForm } from "./PerformanceForms";
 
 const STAGE = { SELF: "Waiting for self-assessment", MANAGER: "Waiting for the manager", FINAL: "Waiting for HR's final rating", DONE: "Done" } as const;
@@ -27,23 +31,29 @@ function Ratings({ r }: { r: { selfRating: number | null; selfComment: string | 
   );
 }
 
-export default async function PerformancePage({ searchParams }: { searchParams: Promise<{ employee?: string }> }) {
+export default async function PerformancePage({ searchParams }: { searchParams: Promise<{ employee?: string; days?: string }> }) {
   const me = await requireUser("/performance");
   const sp = await searchParams;
   const settings = await getOrgSettings(me.organizationId);
-  const mine = await getMyEmployee(me, settings.timezone);
-  // Opened from someone's profile: show that person's reviews and goals (read-only), never your own.
-  if (sp.employee && sp.employee !== mine.id) return <PersonPerformance meId={mine.id} employeeId={sp.employee} me={me} />;
+  const tz = settings.timezone;
+  const mine = await getMyEmployee(me, tz);
+  // Opened from someone's profile: show that person's reviews, goals, and schedule adherence (read-only), never your own.
+  if (sp.employee && sp.employee !== mine.id) return <PersonPerformance meId={mine.id} employeeId={sp.employee} me={me} daysParam={sp.days} />;
   const hr = isHr(me.role.key);
   const manager = me.role.key === ROLES.MANAGER;
   const orgId = me.organizationId;
   const fmt = (d: Date) => formatDay(keyOfDbDate(d), { month: "short", day: "numeric", year: "numeric" });
 
+  const span = [7, 14, 30].includes(Number(sp.days)) ? Number(sp.days) : 14;
+  const today = dayKey(new Date(), tz);
+  const from = addDays(today, -(span - 1));
+
   const scope = await employeeScope(me, mine.id);
   const team = hr || manager ? await prisma.employee.findMany({ where: { AND: [scope, { id: { not: mine.id } }, { status: { not: "SEPARATED" } }] }, select: { id: true, firstName: true, lastName: true, employeeNo: true }, orderBy: { lastName: "asc" }, take: 300 }) : [];
   const teamIds = team.map((t) => t.id);
 
-  const [myReviews, myGoals, waiting, finalReady, cycles, teamGoals] = await Promise.all([
+  const [myDtr, myReviews, myGoals, waiting, finalReady, cycles, teamGoals, teamDtrMap] = await Promise.all([
+    loadDtr(me, mine.id, mine.id, from, today, tz, settings.graceMinutes),
     prisma.review.findMany({ where: { organizationId: orgId, employeeId: mine.id }, include: { cycle: true }, orderBy: { cycle: { startDate: "desc" } } }),
     prisma.goal.findMany({ where: { organizationId: orgId, employeeId: mine.id }, orderBy: [{ status: "asc" }, { createdAt: "desc" }] }),
     hr || manager
@@ -55,11 +65,99 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
     hr ? prisma.review.findMany({ where: { organizationId: orgId, stage: "FINAL", cycle: { status: "OPEN" } }, include: { cycle: true, employee: { select: { firstName: true, lastName: true } } } }) : [],
     hr ? prisma.reviewCycle.findMany({ where: { organizationId: orgId }, orderBy: { startDate: "desc" }, include: { reviews: { select: { stage: true } } }, take: 12 }) : [],
     hr || manager ? prisma.goal.findMany({ where: { organizationId: orgId, employeeId: { in: teamIds } }, include: { employee: { select: { firstName: true, lastName: true } } }, orderBy: [{ status: "asc" }, { createdAt: "desc" }], take: 100 }) : [],
+    (hr || manager) && teamIds.length > 0 ? loadTeamDtr(orgId, teamIds, from, today, tz, settings.graceMinutes) : Promise.resolve(new Map()),
   ]);
+
+  const myDaily = (myDtr?.rows ?? []).map(computeDailyAdherence);
+  const mySummary = summarizeDailyAdherence(myDaily, today);
+
+  const teamAdherence = team.map((t) => {
+    const rows = teamDtrMap.get(t.id) ?? [];
+    const daily = rows.map(computeDailyAdherence);
+    const sum = summarizeDailyAdherence(daily, today);
+    return { emp: t, summary: sum };
+  });
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <PageHeader title="Performance" subtitle="Goals during the year, and review cycles: self-assessment, then your manager, then a final rating." />
+      <PageHeader title="Performance" subtitle="Schedule adherence, goals during the year, and review cycles." />
+
+      {/* Schedule Adherence & Daily Performance */}
+      <ScheduleAdherenceSection
+        daily={myDaily}
+        summary={mySummary}
+        today={today}
+        selectedDays={span}
+        baseUrl="/performance"
+        title="Schedule Adherence & Time Performance"
+        subtitle="Daily adherence to scheduled hours and break rules (1h 30m break allowance + 15m per 2 hours overtime)."
+      />
+
+      {/* Team Schedule Adherence Table for Managers/HR */}
+      {(hr || manager) && teamAdherence.length > 0 && (
+        <Card className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-3">
+            <div>
+              <h2 className="text-lg font-semibold">{hr ? "Organization Schedule Adherence" : "My Team's Schedule Adherence"}</h2>
+              <p className="text-xs text-muted">Schedule adherence across your direct downline for the past {span} days</p>
+            </div>
+            <Link href={`/schedule/analytics?days=${span}`} className="text-xs font-medium text-brand hover:underline">
+              Detailed Schedule Analytics →
+            </Link>
+          </div>
+          <div className="overflow-x-auto rounded-xl border border-line">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-line bg-surface text-xs font-semibold text-muted">
+                <tr>
+                  <th className="px-3.5 py-2.5">Employee</th>
+                  <th className="px-3 py-2.5 text-right">Adherence</th>
+                  <th className="px-3 py-2.5 text-right">Productive Work</th>
+                  <th className="px-3 py-2.5 text-right">Breaks Taken</th>
+                  <th className="px-3 py-2.5 text-right">Break Overages</th>
+                  <th className="px-3 py-2.5 text-right">Verdict</th>
+                  <th className="px-3.5 py-2.5 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {teamAdherence.map((t) => {
+                  const tv = VERDICT[t.summary.verdict];
+                  return (
+                    <tr key={t.emp.id} className="transition hover:bg-surface/60">
+                      <td className="px-3.5 py-2.5 font-medium text-ink">
+                        {t.emp.lastName}, {t.emp.firstName} <span className="text-xs text-muted">· {t.emp.employeeNo}</span>
+                      </td>
+                      <td className="px-3 py-2.5 text-right tabular-nums font-bold">
+                        {t.summary.overallAdherencePct !== null ? `${t.summary.overallAdherencePct}%` : "—"}
+                      </td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-xs text-emerald-600 font-medium">
+                        {formatDurationPrecise(t.summary.totalProductiveSeconds)}
+                      </td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-xs text-muted">
+                        {formatDuration(t.summary.totalBreakMinutes)}
+                      </td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-xs">
+                        {t.summary.totalExcessBreakMinutes > 0 ? (
+                          <Badge tone="warning">+{formatDuration(t.summary.totalExcessBreakMinutes)}</Badge>
+                        ) : (
+                          <span className="text-muted">None</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-2.5 text-right">
+                        <Badge tone={tv.tone}>{tv.label}</Badge>
+                      </td>
+                      <td className="px-3.5 py-2.5 text-right text-xs">
+                        <Link href={`/performance?employee=${t.emp.id}`} className="font-semibold text-brand hover:underline">
+                          View details
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
 
       {/* My review */}
       <Card className="space-y-4">
@@ -183,19 +281,50 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
   );
 }
 
-async function PersonPerformance({ me, meId, employeeId }: { me: Awaited<ReturnType<typeof requireUser>>; meId: string; employeeId: string }) {
+async function PersonPerformance({
+  me,
+  meId,
+  employeeId,
+  daysParam,
+}: {
+  me: Awaited<ReturnType<typeof requireUser>>;
+  meId: string;
+  employeeId: string;
+  daysParam?: string;
+}) {
   if (!(await canViewEmployee(me, meId, employeeId))) notFound();
-  const [person, reviews, goals] = await Promise.all([
-    prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, select: { id: true, firstName: true, lastName: true } }),
+  const settings = await getOrgSettings(me.organizationId);
+  const tz = settings.timezone;
+  const span = [7, 14, 30].includes(Number(daysParam)) ? Number(daysParam) : 14;
+  const today = dayKey(new Date(), tz);
+  const from = addDays(today, -(span - 1));
+
+  const [person, reviews, goals, personDtr] = await Promise.all([
+    prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, select: { id: true, firstName: true, lastName: true, employeeNo: true } }),
     prisma.review.findMany({ where: { organizationId: me.organizationId, employeeId }, include: { cycle: true }, orderBy: { cycle: { startDate: "desc" } } }),
     prisma.goal.findMany({ where: { organizationId: me.organizationId, employeeId }, orderBy: [{ status: "asc" }, { createdAt: "desc" }] }),
+    loadDtr(me, meId, employeeId, from, today, tz, settings.graceMinutes),
   ]);
   if (!person) notFound();
+
+  const daily = (personDtr?.rows ?? []).map(computeDailyAdherence);
+  const summary = summarizeDailyAdherence(daily, today);
   const fmt = (d: Date) => formatDay(keyOfDbDate(d), { month: "short", day: "numeric", year: "numeric" });
+
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6">
       <Link href={`/employees/${person.id}`} className="text-sm font-medium text-muted hover:text-ink">← {person.firstName} {person.lastName}</Link>
-      <PageHeader title={`Performance of ${person.firstName} ${person.lastName}`} subtitle="Their reviews and goals." />
+      <PageHeader title={`Performance of ${person.firstName} ${person.lastName}`} subtitle="Schedule adherence, reviews, and goals." />
+
+      <ScheduleAdherenceSection
+        daily={daily}
+        summary={summary}
+        today={today}
+        selectedDays={span}
+        baseUrl={`/performance?employee=${person.id}`}
+        title={`Schedule Adherence · ${person.firstName} ${person.lastName}`}
+        subtitle={`Daily adherence to working hours and break limits (1h 30m break allowance + 15m per 2 hours overtime).`}
+      />
       <Card className="space-y-3">
         <h2 className="text-lg font-semibold">Reviews</h2>
         {reviews.length === 0 ? <p className="text-sm text-muted">No review cycle has included them yet.</p> : reviews.map((r) => (

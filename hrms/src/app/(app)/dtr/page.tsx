@@ -27,7 +27,7 @@ const STATUS: Record<DtrStatus, { label: string; tone: "success" | "warning" | "
   DAY_OFF: { label: "Day off", tone: "neutral" },
   NO_SCHEDULE: { label: "No schedule", tone: "neutral" },
 };
-const CONTEXT = { OFFICE: "Office", FIELD: "Field work", REMOTE: "Remote", CLIENT_SITE: "Client site" } as const;
+const CONTEXT = { OFFICE: "Office", FIELD: "Field work / Client site", REMOTE: "Remote", CLIENT_SITE: "Field work / Client site" } as const;
 const isKey = (s?: string) => !!s && /^\d{4}-\d{2}-\d{2}$/.test(s);
 
 export default async function DtrPage({ searchParams }: { searchParams: Promise<{ employee?: string; from?: string; to?: string; view?: string }> }) {

@@ -41,7 +41,7 @@ export async function unlockPunch(password: string): Promise<UnlockResult> {
 
 const input = z.object({
   stampTypeId: z.string().min(1),
-  workContext: z.enum(CONTEXTS),
+  workContext: z.enum(CONTEXTS).transform((v) => (v === "CLIENT_SITE" ? "FIELD" : v)),
   note: z.string().trim().max(300).optional(),
   tripFrom: z.string().trim().max(120).optional(),
   tripTo: z.string().trim().max(120).optional(),
@@ -172,6 +172,8 @@ export async function recordTime(raw: z.input<typeof input>): Promise<ClockResul
     if ((d.note ?? "").length < 3) return { needNote: true, error: "We could not get your location. Add a short note (for example, “no signal at site”) and press again." };
   }
 
+  const effectiveContext = (stamp.defaultContext === "CLIENT_SITE" ? "FIELD" : stamp.defaultContext) ?? d.workContext;
+
   // If changing tagging or clocking out while on pause, record PAUSE_END for the previous pause first
   if (priorPauseTypeIdToClose && (type === "PAUSE_START" || type === "OUT")) {
     await prisma.timeEvent.create({
@@ -181,7 +183,7 @@ export async function recordTime(raw: z.input<typeof input>): Promise<ClockResul
         type: "PAUSE_END",
         stampTypeId: priorPauseTypeIdToClose,
         source: "WEB",
-        workContext: stamp.defaultContext ?? d.workContext,
+        workContext: effectiveContext,
         lat: geo?.lat,
         lng: geo?.lng,
         accuracy: geo?.accuracy,
@@ -205,7 +207,7 @@ export async function recordTime(raw: z.input<typeof input>): Promise<ClockResul
       type,
       stampTypeId: eventStampTypeId,
       source: "WEB",
-      workContext: stamp.defaultContext ?? d.workContext,
+      workContext: effectiveContext,
       ...(isTrip ? { tripFrom: d.tripFrom, tripTo: d.tripTo, tripReason: d.tripReason } : {}),
       lat: geo?.lat,
       lng: geo?.lng,
