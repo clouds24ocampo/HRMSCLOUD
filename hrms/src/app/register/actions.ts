@@ -7,7 +7,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { createSession } from "@/lib/session";
-import { SESSION_COOKIE } from "@/lib/auth";
+import { isCookieSecure, SESSION_COOKIE } from "@/lib/auth";
 import { isValidChoice } from "@/lib/industries";
 import { ROLES } from "@/lib/roles";
 import { createEmployee } from "@/lib/employees";
@@ -98,7 +98,7 @@ async function registerInner(_: FormState, form: FormData): Promise<FormState> {
   (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: isCookieSecure(),
     path: "/",
     expires: expiresAt,
   });

@@ -7,6 +7,14 @@ import { isDbDown } from "@/lib/db-health";
 
 export const SESSION_COOKIE = "hrms_session";
 
+// In production, cookies are secure by default, but allowed over plain HTTP if COOKIE_SECURE=false or APP_URL is http://
+export function isCookieSecure(): boolean {
+  if (process.env.COOKIE_SECURE === "false") return false;
+  if (process.env.COOKIE_SECURE === "true") return true;
+  if (process.env.APP_URL?.startsWith("http://")) return false;
+  return process.env.NODE_ENV === "production";
+}
+
 export const getUser = cache(async () => {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return null;

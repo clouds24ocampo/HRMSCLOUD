@@ -7,7 +7,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { createSession, deleteSession } from "@/lib/session";
-import { SESSION_COOKIE } from "@/lib/auth";
+import { isCookieSecure, SESSION_COOKIE } from "@/lib/auth";
 import { clearAttempts, tooManyAttempts } from "@/lib/rate-limit";
 import { DB_DOWN_MESSAGE, isDbDown } from "@/lib/db-health";
 
@@ -49,7 +49,7 @@ async function loginInner(_: FormState, form: FormData): Promise<FormState> {
   (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: isCookieSecure(),
     path: "/",
     expires: expiresAt,
   });
