@@ -44,8 +44,8 @@ test("landing and login: every link goes where it says", async ({ page }) => {
   await go("Register your organization", /\/register$/, 1); // footer link
 
   await page.goto("/login");
-  await page.getByRole("link", { name: "HRMS" }).click();
-  await expect(page).toHaveURL(/localhost:3300\/$/);
+  await page.getByRole("link", { name: "HRMS" }).first().click();
+  await expect(page).toHaveURL(/localhost:\d+\/$/);
   await page.goto("/login");
   await page.getByRole("link", { name: "Register your organization" }).click();
   await expect(page).toHaveURL(/\/register$/);
@@ -88,7 +88,7 @@ test("register wizard: every category, every Back/Continue, header links", async
   await expect(page).toHaveURL(/\/login$/);
   await page.goto("/register");
   await page.getByRole("link", { name: "HRMS" }).click();
-  await expect(page).toHaveURL(/localhost:3300\/$/);
+  await expect(page).toHaveURL(/localhost:\d+\/$/);
 });
 
 test("register, then every button inside the app", async ({ page }) => {

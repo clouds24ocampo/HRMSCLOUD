@@ -63,8 +63,8 @@ test("leader's schedule flows to the team; editing one member makes them Custom;
   await expect(page.getByText("Custom").first()).toBeVisible();
 
   // One click on a day changes just that day.
-  await page.getByRole("button", { name: /^Change \d{4}-\d{2}-\d{2}$/ }).first().click();
-  await page.getByRole("menuitem", { name: "Day off" }).click();
+  await page.getByRole("button", { name: /^Change schedule for \d{4}-\d{2}-\d{2}$/ }).first().click();
+  await page.getByRole("dialog").getByRole("button", { name: "Day off" }).click();
   await expect.poll(() => db.scheduleEntry.count({ where: { employeeId: ids.e1, shiftId: null } })).toBe(1);
 });
 

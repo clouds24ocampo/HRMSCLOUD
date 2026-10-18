@@ -47,8 +47,12 @@ test("anonymous user sees landing, protected pages redirect to login", async ({ 
 test("register an organization: pick industry, details, account -> Super Admin dashboard", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: "Register your organization" }).first().click();
-  await page.getByRole("button", { name: /Government & Public Sector/ }).click();
   const next = page.getByRole("button", { name: "Continue" });
+  // A click before the page has hydrated does nothing: press again until the second step opens.
+  await expect(async () => {
+    await page.getByRole("button", { name: /Government & Public Sector/ }).click();
+    await expect(next).toBeVisible({ timeout: 1500 });
+  }).toPass({ timeout: 15_000 });
   await expect(next).toBeDisabled(); // must pick type + size
   await page.getByRole("radio", { name: /LGU/ }).click();
   await page.getByRole("radio", { name: /20 to 200/ }).click();

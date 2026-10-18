@@ -21,8 +21,8 @@
     "graphify:tree": "cmd /c start graphify-out\\GRAPH_TREE.html"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.10.0",
-    "@prisma/client": "^7.10.0",
+    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/client": "^7.10.1",
     "@react-three/fiber": "^9.8.1",
     "bcryptjs": "^3.0.3",
     "dotenv": "^18.0.5",

@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "instrument serif",
+        "createdAt": "2026-10-18T16:02:58.152Z",
+        "reason": "user asked to make the system match the pasted sculpture hero, whose italic accent face is Instrument Serif; evidence: the user's pasted component and DEFAULTS.accentFont"
+      }
+    ]
+  }
+}

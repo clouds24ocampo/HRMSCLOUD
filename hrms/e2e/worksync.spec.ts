@@ -77,7 +77,7 @@ test("HR starts a network project, adds people and a card with a checklist", asy
   await expect.poll(() => db.wsAssignee.count({ where: { employeeId: ids.tech } })).toBe(1);
   await page.getByPlaceholder("Add a step").fill("Survey the conduit");
   await page.getByRole("button", { name: "Add", exact: true }).click();
-  await expect(page.getByText("Survey the conduit")).toBeVisible();
+  await expect(page.getByText("Survey the conduit").first()).toBeVisible();
   expect(await db.notification.count({ where: { user: { email: mail("tech") }, title: { contains: "assigned you" } } })).toBe(1);
 });
 
@@ -104,8 +104,8 @@ test("the employee works the card; finishing it records progress and tells the l
   expect(done.completedAt).not.toBeNull();
   await page.reload();
   await expect(page.getByText("100%").first()).toBeVisible();
-  await page.getByPlaceholder("Write an update or a question").fill("Fibre pulled and tested, 12 dB loss.");
-  await page.getByRole("button", { name: "Comment", exact: true }).click();
+  await page.getByPlaceholder(/Write an update/).fill("Fibre pulled and tested, 12 dB loss.");
+  await page.getByRole("button", { name: /^(Comment|Post Comment)/ }).click();
   await expect(page.getByText("Comment sent.")).toBeVisible();
   expect(await db.notification.count({ where: { user: { email: mail("hr") }, title: { contains: "moved" } } })).toBe(1);
 });
@@ -229,4 +229,87 @@ test("lists: add, rename, reorder by dragging, remove when empty; only leads can
   await t.goto(`/worksync/${projectId}`);
   await expect(t.getByRole("button", { name: "+ Add another list" })).toHaveCount(0);
   await expect(t.getByLabel(/^Settings of list/)).toHaveCount(0);
+});
+
+test("adding cards: the Add card button, Enter, and the table row all work, and the card shows who added it", async ({ page, browser }) => {
+  await signIn(page, "hr");
+  await page.goto(`/worksync/${projectId}`);
+  const list = page.getByRole("region", { name: /^Planned/ });
+  await list.getByPlaceholder("+ Add a card").fill("Order patch cables");
+  await list.getByRole("button", { name: "Add card" }).click();
+  await expect(list.getByRole("link", { name: "Order patch cables" })).toBeVisible();
+  await expect(list.getByText("Added by Hana Sync")).toBeVisible();
+  await list.getByPlaceholder("+ Add a card").fill("Label the racks");
+  await page.keyboard.press("Enter");
+  await expect(list.getByRole("link", { name: "Label the racks" })).toBeVisible();
+
+  await page.goto(`/worksync/${projectId}?view=table`);
+  const group = page.locator("details").filter({ hasText: "Planned" }).first();
+  await group.getByPlaceholder(/Add item/).fill("Test the UPS");
+  await page.keyboard.press("Enter");
+  await expect(group.getByText("Test the UPS")).toBeVisible();
+
+  // The employee on the project adds a card and it carries their name.
+  const t = await browser.newPage();
+  await signIn(t, "tech");
+  await t.goto(`/worksync/${projectId}`);
+  const tl = t.getByRole("region", { name: /^Planned/ });
+  await tl.getByPlaceholder("+ Add a card").fill("Crimp RJ45 ends");
+  await tl.getByRole("button", { name: "Add card" }).click();
+  await expect(tl.getByRole("link", { name: "Crimp RJ45 ends" })).toBeVisible();
+  await expect(tl.getByText("Added by Tito Sync")).toBeVisible();
+  await page.goto(`/worksync/${projectId}`);
+  await expect(page.getByLabel("Project board").getByText("Added by Tito Sync")).toBeVisible(); // HR sees it too
+});
+
+test("reports: who added, who resolved, who worked on it, and the progress; CSV and permissions", async ({ page, browser }) => {
+  await signIn(page, "hr");
+  const card = await db.wsCard.findFirstOrThrow({ where: { projectId, title: "Pull fibre to the second floor" } });
+  expect(card.completedById).toBe((await db.user.findFirstOrThrow({ where: { email: mail("tech") } })).id); // the employee who moved it to Handed over
+
+  // The card's own report, in its window.
+  await page.goto(`/worksync/${projectId}?card=${card.id}`);
+  const rep = page.getByRole("region", { name: "Card report" });
+  await expect(rep.getByText("Hana Sync").first()).toBeVisible(); // added by
+  await expect(rep.getByText("Tito Sync").first()).toBeVisible(); // resolved by, worked on by
+  await expect(rep).toContainText("Resolved by");
+  await page.keyboard.press("Escape");
+
+  // The project report.
+  await page.goto(`/worksync/${projectId}?view=reports`);
+  const cardsTable = page.locator("section").filter({ hasText: "Card report (" });
+  const row = cardsTable.getByRole("row").filter({ hasText: "Pull fibre to the second floor" });
+  await expect(row).toContainText("Hana Sync"); // added by
+  await expect(row).toContainText("Tito Sync"); // resolved by
+  await expect(row).toContainText("100%");
+  const people = page.locator("section").filter({ hasText: "People: who added" });
+  await expect(people.getByRole("row").filter({ hasText: "Tito Sync" })).toContainText("1"); // resolved at least one
+  await expect(page.getByText("Cards resolved")).toBeVisible();
+  await page.getByRole("link", { name: "Last 7 days" }).click();
+  await expect(page).toHaveURL(/r=7/);
+
+  // CSV: the card report for anyone on the project, the people report only for leads, managers and HR.
+  const csvRes = await page.request.get(`/worksync/${projectId}/export?r=30`);
+  expect(csvRes.status()).toBe(200);
+  expect(csvRes.headers()["content-type"]).toContain("text/csv");
+  const csv = await csvRes.text();
+  expect(csv).toContain("Card,Status (list),Added by,Added at,Resolved by");
+  expect(csv).toContain("Pull fibre to the second floor");
+  expect(await db.auditLog.count({ where: { action: "worksync.report_exported" } })).toBeGreaterThanOrEqual(1);
+  expect((await page.request.get(`/worksync/${projectId}/export?type=people`)).status()).toBe(200);
+
+  // The employee sees only their own row in the people table, and cannot download the people report.
+  const t = await browser.newPage();
+  await signIn(t, "tech");
+  await t.goto(`/worksync/${projectId}?view=reports`);
+  const tp = t.locator("section").filter({ hasText: "People: who added" });
+  await expect(tp.getByRole("row").filter({ hasText: "Tito Sync" })).toBeVisible();
+  await expect(tp.getByRole("row").filter({ hasText: "Hana Sync" })).toHaveCount(0);
+  expect((await t.request.get(`/worksync/${projectId}/export?type=people`)).status()).toBe(403);
+  expect((await t.request.get(`/worksync/${projectId}/export`)).status()).toBe(200);
+
+  // Someone not on the project gets nothing.
+  const s = await browser.newPage();
+  await signIn(s, "stranger");
+  expect((await s.request.get(`/worksync/${projectId}/export`)).status()).toBe(404);
 });

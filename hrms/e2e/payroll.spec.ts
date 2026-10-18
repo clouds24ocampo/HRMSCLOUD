@@ -277,8 +277,8 @@ test("overtime: only approved overtime is paid, and adjustments are applied on r
   const emp = await browser.newPage();
   await signIn(emp, "mo");
   await emp.goto(`/dtr?employee=${ids.mo}&from=${ot}&to=${ot}`);
-  const row = emp.locator("details").first();
-  await row.locator("summary").click();
+  const row = emp.locator("details").first(); // the range is one day, so there is one row
+  if (!(await row.evaluate((d: HTMLDetailsElement) => d.open))) await row.locator("summary").click(); // a one-day range opens by itself
   await expect(row.getByText("Overtime shown here is only a candidate")).toBeVisible();
   await row.getByLabel("Reason for overtime").fill("Month-end closing");
   await row.getByRole("button", { name: "Request 1h 00m overtime" }).click();

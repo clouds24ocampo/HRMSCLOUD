@@ -130,23 +130,21 @@ test("HR Home shows government contributions, optional to deduct; the head sees 
   await expect(page.getByRole("link", { name: "Ella Hours" }).first()).toBeVisible();
 
   // Every tab on an employee's profile opens that employee's records, not the admin's own.
-  for (const [tab, heading] of [["Performance", "Performance of Ella Hours"], ["Leave", "Leave of Ella Hours"], ["Overtime", "Overtime of Ella Hours"], ["Payslips", "Payslips of Ella Hours"], ["Digital ID", "Digital ID of Ella Hours"]]) {
+  for (const tab of ["Payslips", "Schedule", "DTR", "Cash advance", "Daily report", "Policies"]) {
     await page.goto(`/employees/${ids.emp}`);
     await page.getByRole("navigation", { name: "Ella's records" }).getByRole("link", { name: tab }).click();
-    await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`employee=${ids.emp}`));
   }
+  await page.goto(`/employees/${ids.emp}`);
+  await page.getByRole("navigation", { name: "Ella's records" }).getByRole("link", { name: "Payslips" }).click();
+  await expect(page.getByRole("heading", { name: "Payslips of Ella Hours" })).toBeVisible();
 });
 
-test("employee: 201 file is mandatory, daily report, own records", async ({ page }) => {
+test("employee: no Documents page (HR keeps the 201 file), daily report, own records", async ({ page }) => {
   await signIn(page, "emp");
-  await expect(page.getByText("Your 201 file is incomplete.")).toBeVisible();
-  await page.getByRole("link", { name: "Upload now" }).click();
-  await expect(page).toHaveURL(/\/documents/);
-  const item = page.locator("li").filter({ hasText: "NBI Clearance" }).first();
-  await item.locator("input[type=file]").setInputFiles({ name: "nbi.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n%test\n") });
-  await item.getByRole("button", { name: "Upload" }).click();
-  await expect(item.getByText("Uploaded.")).toBeVisible();
-  expect(await db.employeeDocument.count({ where: { employeeId: ids.emp, category: "201 File", title: "NBI Clearance" } })).toBe(1);
+  await expect(page.getByText("Your 201 file is incomplete.")).toHaveCount(0); // the reminder links to a page employees cannot open
+  await page.goto("/documents");
+  await expect(page).toHaveURL(/denied=1/);
 
   await page.goto("/daily-report");
   await page.getByLabel("What I worked on today").fill("Closed the month-end payroll checks.");
@@ -194,11 +192,10 @@ test("policies: the employee reads and e-signs the user agreement; HR sees who s
   await expect(hr.getByText("1 signed")).toBeVisible();
 });
 
-test("digital ID with QR, chat between colleagues, and a head position needs its department", async ({ page }) => {
+test("digital ID is closed to employees, chat between colleagues, and a head position needs its department", async ({ page }) => {
   await signIn(page, "emp");
   await page.goto("/id");
-  await expect(page.getByRole("article", { name: "Employee ID of Ella Hours" })).toBeVisible();
-  await expect(page.getByRole("img", { name: /QR code: scan to open/ })).toBeVisible();
+  await expect(page).toHaveURL(/denied=1/); // the digital ID pages are for HR and supervisors (role rule)
 
   await page.goto("/chat");
   await page.getByRole("button", { name: "Message Hana Hours" }).click();

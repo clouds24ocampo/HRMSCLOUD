@@ -96,9 +96,9 @@ test("tour: every page opens for the Super Admin, menu is grouped", async ({ pag
 test("an employee only gets their own pages", async ({ page }) => {
   await signIn(page, "e2");
   const nav = page.locator("nav:visible");
-  for (const l of ["Home", "Schedule", "DTR", "Overtime", "Leave", "My payslips", "Performance", "Learning", "Documents", "HR requests"]) await expect(nav.getByRole("link", { name: l })).toBeVisible();
-  for (const l of ["Employees", "Organization", "Recruitment", "Payroll", "Announcements", "Reports", "Settings", "Users", "Audit log"]) await expect(nav.getByRole("link", { name: l, exact: true })).toHaveCount(0);
-  for (const path of ["/settings", "/employees", "/organization", "/audit", "/payroll", "/payroll/setup", "/payroll/rules", "/payroll/holidays", "/payroll/reports", "/payroll/calculators", "/recruitment", "/reports", "/announcements", "/admin/users"]) {
+  for (const l of ["Home", "Schedule", "DTR", "My payslips", "HR requests"]) await expect(nav.getByRole("link", { name: l })).toBeVisible();
+  for (const l of ["Overtime", "Leave", "Performance", "Learning", "Documents", "Employees", "Organization", "Recruitment", "Payroll", "Announcements", "Reports", "Settings", "Users", "Audit log"]) await expect(nav.getByRole("link", { name: l, exact: true })).toHaveCount(0);
+  for (const path of ["/leave", "/overtime", "/performance", "/learning", "/documents", "/settings", "/employees", "/organization", "/audit", "/payroll", "/payroll/setup", "/payroll/rules", "/payroll/holidays", "/payroll/reports", "/payroll/calculators", "/recruitment", "/reports", "/announcements", "/admin/users"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/denied=1/);
   }
@@ -316,9 +316,11 @@ test("time clock: password unlock, then Time In, Break, End Break and Time Out w
   expect(events[0]).toMatchObject({ workContext: "FIELD", gpsStatus: "OK", source: "WEB" });
   expect(events[0].lat).toBeCloseTo(14.5995, 3);
 
-  await page.goto("/dtr");
+  // The test moves the stamps back by hours; near midnight that lands on yesterday (and last week on a Monday), so ask for both days.
+  const dayNow = dayKey(new Date(), "Asia/Manila");
+  await page.goto(`/dtr?from=${addDays(dayNow, -1)}&to=${dayNow}`);
   await h1(page, "DTR");
-  const todayRow = page.locator("details", { hasText: "today" }).first();
+  const todayRow = page.locator("details", { hasText: "Present" }).first();
   await expect(todayRow.getByText("Present")).toBeVisible();
   await todayRow.locator("summary").click();
   await expect(todayRow.getByRole("link", { name: /View location \(±12 m\)/ }).first()).toHaveAttribute("href", /openstreetmap\.org.*14\.5995/);
@@ -431,7 +433,7 @@ test("breaks are deducted from worked time, and the over-limit flag", async ({ p
   await page.goto(`/dtr?employee=${ids.e2}&from=${day}&to=${day}`);
   const row = page.locator("details").first();
   await expect(row.getByText("Over break limit 15m")).toBeVisible();
-  await row.locator("summary").click();
+  if (!(await row.evaluate((d: HTMLDetailsElement) => d.open))) await row.locator("summary").click(); // a one-day range opens by itself
   await expect(row.getByText(/Break.*30m/).first()).toBeVisible();
   await expect(row.getByText(/Meal.*1h 00m.*unpaid/)).toBeVisible();
   await expect(row.getByText("over by 15m")).toBeVisible();
@@ -572,7 +574,8 @@ test("HR corrects the record: missed punch added, then voided, both on record", 
   const row = page.locator("details", { hasText: "Manual entry" }).first();
   await row.locator("summary").click();
   await expect(row.getByText("Manual entry")).toBeVisible();
-  await row.getByRole("button", { name: "Void" }).click();
+  // Other punches of that day (from the earlier tests, moved back across midnight) have their own Void buttons: take the manual entry's.
+  await row.locator(":is(li, tr, div)", { hasText: "Manual entry" }).filter({ has: page.getByRole("button", { name: "Void" }) }).last().getByRole("button", { name: "Void" }).click();
   await row.getByLabel("Reason for voiding").fill("Entered by mistake");
   await row.getByRole("button", { name: "Void punch" }).click();
   await page.reload();
@@ -600,7 +603,9 @@ test("DTR download is a CSV and respects access", async ({ page }) => {
   expect(other.status()).toBe(404);
 });
 
-test("leave: request, validation, manager approves, DTR shows it", async ({ page }) => {
+// Employees cannot open Leave any more (role rule, src/lib/roles.ts), so nobody can file a request on this screen:
+// the overlap and balance rules stay covered by src/lib/leave.test.ts. Re-enable this together with that rule.
+test.fixme("leave: request, validation, manager approves, DTR shows it", async ({ page }) => {
   watch(page);
   await signIn(page, "e1");
   await page.goto("/leave");
@@ -645,7 +650,8 @@ test("leave: request, validation, manager approves, DTR shows it", async ({ page
   await expect(page.getByText("On leave").first()).toBeVisible();
 });
 
-test("leave: nobody approves their own, HR can reject with a reason", async ({ page }) => {
+// Needs an employee to file leave: see the note on the test above.
+test.fixme("leave: nobody approves their own, HR can reject with a reason", async ({ page }) => {
   watch(page);
   await signIn(page, "hr");
   await page.goto("/leave");
@@ -697,7 +703,6 @@ test("audit log records what happened, with who", async ({ page }) => {
   await signIn(page, "sa");
   await page.goto("/audit");
   await h1(page, "Audit log");
-  await expect(page.getByText("Leave approved").first()).toBeVisible();
   await expect(page.getByText("Employee created").first()).toBeVisible();
   await page.getByLabel("Filter").fill("shift");
   await page.getByRole("button", { name: "Filter" }).click();

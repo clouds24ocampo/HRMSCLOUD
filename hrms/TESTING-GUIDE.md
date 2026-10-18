@@ -1,182 +1,200 @@
 # HRMS Testing Guide
 
-Everything runs on your own computer. Nothing is sent anywhere.
+How to test the whole system by hand before it goes online. Everything runs on your own computer; nothing is sent anywhere. Pair it with [USER-GUIDE.md](USER-GUIDE.md), which explains each screen.
 
 - App: http://localhost:3300
 - Database (Postgres): port 3366, started for you
 
+## 0. How to use this guide
+
+Work through the sections in order. Each step says **Do** and **Expect**. When a step fails, write down: the page address, who you were signed in as, what you did, what you expected and what you saw (a screenshot helps). Tick a step only when you saw the expected result with your own eyes.
+
+Tip: use two browsers (or one normal window and one private window) so you can be an administrator and an employee at the same time. Use a phone for time stamping.
+
 ## 1. Start it
 
-| Do this | What happens |
+| Do | What happens |
 |---|---|
-| Run `npm run dev` in the `hrms` folder, or double-click `start-hrms.bat` | Starts Docker, the database, applies updates, then the app. Wait for "Ready". |
-| Run `npm run dev:phone` | Same, plus an HTTPS link for testing on a phone (needed for real GPS). Needs `cloudflared`. |
-| Open http://localhost:3300 | Landing page. |
+| Run `npm run dev` in the `hrms` folder, or double-click `start-hrms.bat` | Starts Docker, the database, applies updates, then the app. Wait for "Ready" |
+| Run `npm run dev:phone` | Same, plus an HTTPS link for a phone (real GPS needs HTTPS). Needs `cloudflared` |
+| Open http://localhost:3300 | Landing page |
 
-If the database is off you see a friendly "Database is not running" page, not a crash. Start Docker Desktop, run `npm run dev` again.
-
-After you change `prisma/schema.prisma`, run `npx prisma generate`, then restart `npm run dev`.
+If the database is off you see "Database is not running", not a crash. Start Docker Desktop and run `npm run dev` again. After you change `prisma/schema.prisma`, run `npx prisma generate` and restart.
 
 ## 2. Get test accounts
 
-Pick one.
-
-**A. Sample company (fastest).** Run `npm run demo:seed`. It makes a separate "Sample Company (DEMO-SAMPLE)" with five people, schedules, pay rates and ten days of time stamps (one late, one overtime, one absence). Password for all: `Demo-Pass-12345`.
+**A. Sample company (fastest, recommended).** Run `npm run demo:seed`. It makes "Sample Company (DEMO-SAMPLE)" with five people, schedules, pay rates, ten days of time stamps (one late, one overtime, one absence) and **two WorkSync projects: a Software board and a Network board** with cards in every state. Password for all: `Demo-Pass-12345`.
 
 | Email | Role |
 |---|---|
 | admin@demo.test | Super Admin |
-| hr@demo.test | HR Admin |
-| manager@demo.test | Manager (supervises Ella and Ben) |
+| hr@demo.test | HR Admin (Hannah Reyes) |
+| manager@demo.test | Manager (Mark Santos, supervises Ella and Ben) |
 | emp1@demo.test | Employee (Ella Cruz) |
 | emp2@demo.test | Employee (Ben Lopez) |
 
-Remove it any time with `npm run demo:remove`. It never touches your real organizations.
+Remove it with `npm run demo:remove`. It never touches your real company.
 
-**B. Your own organization.** Open the landing page, register (industry, size, name, your details). You become the Super Admin. Add people yourself from Employees. This is the real first-time experience.
+**B. Your own company.** See test 3.1. Real data, real first-time experience.
 
-Tip: use two browsers (or one normal plus one private window) so you can be an employee and a manager at the same time.
-
-## 3. Who sees what
+## 3. Who sees what (what the system enforces today)
 
 | Page | Super Admin | HR Admin | Manager | Employee |
 |---|---|---|---|---|
-| Home, DTR, Schedule, Leave, Overtime, Notifications, Performance, Learning, Documents, HR Requests, My payslips | yes | yes | yes | yes (own data) |
-| Employees | all | all | own team | no (own profile via Home link) |
-| Organization, Payroll, Recruitment, Announcements, Reports, Settings, Audit log | yes | yes | no | no |
+| Home, DTR, Schedule, WorkSync, Daily report, Cash advance, Chat, Policies, Notifications | yes | yes | yes | yes (own data) |
+| My payslips, HR requests | yes | yes | yes | yes (own data) |
+| Employees | all | all | own team | no |
+| Leave, Overtime, Performance, Learning | all | all | own team | **no** (see decision below) |
+| Documents (201 files) | yes | yes | no | **no** |
+| Digital ID pages | yes | yes | own team | no |
+| Schedule live and analytics | yes | yes | own team | no |
+| Organization, Payroll, Recruitment, Announcements (post), Reports, Activity analytics, Settings, Audit log | yes | yes | no | no |
 | Users | yes | no | no | no |
+
+**Decision needed from you:** employees currently cannot open Leave, Overtime, Performance, Learning or Documents. If employees should file their own leave and overtime and upload their own 201 file, tell the developer: it is a one-line change per page. Until then, test those flows as Manager or HR.
 
 Pages you may not open send you Home with "You do not have permission to open that page."
 
-## 4. Test, module by module
+## 4. Test scripts
 
-Each row: do this, expect that. Mark what fails and tell me the page and what you saw.
+### 4.1 Company registration (once only)
+Use a fresh database or a computer with no company registered.
+1. Open the landing page. Expect a **Register your organization** button.
+2. Register (industry, size, name, your details, password of 10+ characters). Expect: you land on Home as Super Admin.
+3. Sign out and open the landing page and the login page. Expect: **no** "Register" link anywhere.
+4. Type `/register` in the address bar. Expect: you are sent to the sign-in page.
+5. Sign in with a wrong password. Expect: "Wrong email, username or password" (the same text whether or not the email exists).
 
-### 4.1 Register and sign in
-1. Register a new organization. Expect: you land on Home as Super Admin.
-2. Sign out, sign in. Wrong password: "Wrong email or password". Right one: Home.
-3. Register with an email already used. Expect: "This email is already registered."
+### 4.2 Time stamp from the login page
+1. Sign out. On the login page open the **Time stamp** tab. Expect: the animated panel is gone on this tab.
+2. Enter an employee's ID number and password, choose **Time In**. On a phone allow location. Expect: success message with the time.
+3. Enter a wrong password. Expect: "Wrong ID number or password". Do it six times for one ID. Expect: that ID is locked for 15 minutes.
+4. Try an employee who still has a temporary password. Expect: refused, told to sign in first.
+5. On a computer choose a stamp. Expect: a QR code to confirm location with the phone, or a rough location flagged with a note.
+6. Open the employee's DTR as HR. Expect: the stamp is there with source "Kiosk", device and place.
 
-### 4.2 Organization setup (Organization, Settings)
-1. Organization: add departments and positions (one-click suggestions for your industry). Expect: they appear in lists.
-2. Settings: add or edit shifts, leave types, time stamp buttons, onboarding and offboarding tasks, GPS policy, grace minutes, "ask for password before each stamp".
-3. Add a time stamp (for example "Site Visit"). Expect: it appears on every employee's clock.
+### 4.3 Signed-in time clock, breaks, issues
+1. Employee: **Home → Time In**, allow location. Expect: "Timed in" and status "Working".
+2. Take a **Break**. Expect: status "On break" with a duration timer.
+3. Press the next stamp to resume, then a weather issue (**Heavy rain**), then resume. Expect: the status tag names the issue.
+4. **Time Out.** Expect: buttons are only enabled when they make sense.
+5. As HR open **Home** (live status). Expect: each person with the right tag and a **Worked:** figure that **excludes breaks and issues** and stops growing while someone is on a break or issue.
+6. Deny location on a phone. Expect: refused (phone) or flagged, depending on the setting in Settings → Work rules.
+7. Forget to time out (use the demo or wait). Expect: automatic time-out 30 minutes after 8 hours of work, marked "System time-out", with a place to put the reason.
 
-### 4.3 People (Employees)
-1. Add an employee. Tick "Also create a sign-in" and set a temporary password. Expect: employee number assigned, onboarding checklist created.
-2. Open the employee. Change department/position/supervisor. Expect: new line in Employment history; old lines stay (history is never overwritten).
-3. Set a regular schedule (shift + work days). Expect: warning about no schedule disappears.
-4. Change status to Separated with a note. Expect: offboarding checklist appears, their sign-in stops working.
-5. Sign in as the new employee. Expect: forced to choose a new password, then Home with "Welcome. N things for you to finish" and a link to their checklist.
+### 4.4 Pay rule: the numbers
+1. Make an employee with monthly salary **₱10,000**. Open the profile. Expect: ₱383.3865 a day, ₱47.9233 an hour.
+2. Salary **₱25,000**. Expect: ₱958.4664 a day, ₱119.8083 an hour.
+3. Employee works 8:00 to 15:00 with no breaks (7 hours) on a ₱10,000 salary. Expect: pay ₱335.4632 for that day.
+4. Add a 1-hour break inside the day. Expect: 1 hour fewer is paid (breaks and issues are deducted).
+5. Add an **On Trip** period. Expect: it counts as work.
+6. Add a weather issue, then work extra on a later day of the **same cut-off**. Expect: the lost time is shown as "Recovered" on that later day.
+7. Work past 8 hours without approval. Expect: the extra shows as "not approved" and is not paid.
+8. Cut-offs: 1st to 15th is paid on the last day of the month; 16th to the end is paid on the 15th of the next month.
 
-### 4.4 Time stamp (Home) and DTR
-1. As an employee: choose where you are working (Office, Field work / Client site, Remote), pick **Time In**. If the password prompt is on, enter your password. Allow location when the browser asks. Expect: "Timed in", clock changes, location saved.
-2. Deny location. Expect: stamp still works but is flagged "Location denied" (or blocked, depending on the GPS policy in Settings).
-3. Take a Break, come back, **Time Out**. Expect: buttons enable only when they make sense (no Time Out before Time In).
-4. Open **DTR**. Expect: today's row with in/out, worked time, late/undertime if your schedule says so, overtime as "candidate".
-5. Manager and HR can open DTR of people below them. An employee cannot open someone else's DTR by editing the URL.
-6. Use the CSV export from DTR. Expect: a file with the same numbers.
+### 4.5 DTR and DTR PDF
+1. As an employee open **DTR**. Expect: your days with time in, time out, breaks, issues, hours paid, late, undertime.
+2. Press **Download PDF**. Expect: a landscape PDF with a table of days and a **daily wage** column, a TOTAL row, and your name at the top.
+3. As HR open **DTR**, press **PDF, everyone**. Expect: one section per person, daily wage and total for each, a grand total, "Page 1 of N" on every page.
+4. As a manager press **PDF, everyone**. Expect: your team only, and **no wages** ("Pay is not shown on this copy").
+5. As an employee change the address to another person's DTR. Expect: nothing of theirs is shown.
+6. **Download CSV.** Expect: the same numbers.
 
-### 4.5 Schedule
-1. As Manager or HR: open Schedule, pick an employee and a day, assign a shift or mark a day off (override). Expect: DTR for that day uses it.
-2. As an employee: Schedule shows only your own.
+### 4.6 Payslips, payment confirmation, cash advance
+1. As an employee open **My payslips**. Expect: a cut-off picker listing only cut-offs where you have time stamps or pay, newest first.
+2. A running cut-off shows your pay so far, day by day. A finalized one shows the payslip: gross, deductions, net, with every deduction listed (government contributions marked "not deducted" when the company has that off).
+3. HR records the payment on the payslip (amount, method, proof). Expect: the employee sees "Please confirm receipt". The employee confirms or reports a problem.
+4. **Cash advance**: the employee requests it. HR approves and chooses the payslip it is deducted on. Expect: the employee's page shows only the amount, date and time and their confirmation. The payslip shows the deduction on the chosen cut-off only.
 
-### 4.6 Leave
-1. Employee: Leave, choose type, dates, reason, **Send request**. Expect: "Request sent". Balance shows after approval.
-2. Manager (or HR) gets a notification, approves or rejects (reject needs a reason). Expect: employee notified, DTR shows "Leave".
-3. You cannot approve your own request (except the Super Admin when no one else can).
+### 4.7 Daily report and comments
+1. Employee: **Daily report**, write what you did, blockers, plan, send. Expect: it cannot be edited. Send a second one: it becomes the one that counts and the first is marked replaced.
+2. Manager or HR opens the report and writes a comment. Expect: the employee is notified.
+3. The employee replies. Expect: the thread shows both, HR can join, and each is notified.
 
-### 4.7 Overtime
-1. Employee: after a day with extra time, request the overtime. Expect: needs approval.
-2. Approver approves. Expect: only approved overtime is paid in payroll.
+### 4.8 WorkSync (about 25 minutes)
+Use the demo company, or make your own two projects. Sign in as **hr@demo.test** in one browser and **emp1@demo.test** in another.
 
-### 4.8 Payroll (HR / Super Admin)
-1. **Pay setup**: add pay items (allowances, deductions), contributions and tax brackets. Nothing is built in: you enter the rates you are required to use. Have a payroll practitioner confirm them.
-2. Employee profile: **Save pay rate** (monthly, daily or hourly). Old rates stay in history.
-3. **Create pay period**, then **Calculate payroll**. Open a payslip line by line. Expect: every number explained from attendance, leave, overtime and rules.
-4. A *different* HR/Super Admin **Approve**s (the person who calculated cannot approve). Then **Finalize and lock**.
-5. Try to change a locked payroll. Expect: refused. Corrections go through an adjustment in the next run (**Add adjustment**).
-6. Employee: **My payslips** shows only their own, after finalizing.
+**A. Start projects**
+1. HR: **WorkSync → New project**, name "Test software", kind Software, a color. Expect: you land on its board with seven lists and six labels.
+2. Repeat with kind Network. Expect: six lists (Planned … Handed over).
+3. In each, **People**: add a member and a viewer. Expect: "<name> added." and they get a notification.
 
-### 4.8a Philippine payroll rules (SSS, GSIS, PhilHealth, Pag-IBIG, BIR, DOLE)
-Read [PH-COMPLIANCE.md](PH-COMPLIANCE.md) first: it says what is covered and what is not. The sample company (`npm run demo:seed`) already runs on these rules.
-1. **Pay setup → Philippine rules and wage orders**. Expect "Coverage today" with missing items. Click **Both** under "Install the starter rules". Expect "complete". Click it again: "0 rules added".
-2. Pay setup → "Rates come from" → Philippine statutory rules → Save. (It refuses if no rules are installed.)
-3. **Holiday calendar** → "Add the holidays fixed by law" for this year (15 holidays). Add the holidays proclaimed this year by hand.
-4. Rules page → **Wage orders**: add your region's daily minimum wage from the current wage order.
-5. Employee page → **Tax and contributions** → set private or government, wage factor (261, 313, 365), minimum wage earner, ID numbers. Without a profile the payslip warns.
-6. Create a monthly pay period and calculate. Open a payslip: SSS or GSIS, PhilHealth, Pag-IBIG and Withholding tax lines each explain themselves; "Tax summary" shows taxable pay. Check against the guide: ₱25,000 a month gives SSS ₱1,250, PhilHealth ₱625, Pag-IBIG ₱200, tax ₱313.80, net ₱22,611.20.
-7. Weekly or semi-monthly: the matching withholding table is used and contributions are split over the month (or taken once, see "SSS, GSIS, PhilHealth and Pag-IBIG come off pay").
-8. A daily-paid employee who works a regular holiday gets "Holiday premium"; overtime, rest-day and night pay appear as their own lines.
-9. Pay item with a special tax treatment: Pay setup → Add pay item → "Philippine tax treatment" (for example Rice subsidy as de minimis). Amounts over the limit are flagged.
-10. Create a payroll "13th month pay" (one twelfth of the year's basic pay earned). Tick **Year-end tax adjustment** on the last payroll of the year to settle the year's tax (refund or more tax).
-11. Government employees: payroll "Government bonus or incentive" (mid-year, year-end) pays only those with enough service.
-12. Approve (a second person) and finalize. Then **Reports**: SSS, GSIS, PhilHealth and Pag-IBIG remittance lists, BIR 1601-C figures, BIR 2316 data per employee, all with CSV download.
-13. A new circular: Philippine rules → "Change or add a rule": pick the rule, set "In force from", change only the numbers. The old version ends the day before, so earlier payrolls keep their old rates.
-14. **Benefit estimates**: SSS sickness and maternity, GSIS retirement, terminal leave.
-15. Statutory leave types: Philippine rules → "Statutory leave types".
+**B. Board**
+1. Add a card in a list ("+ Add a card", Enter). Expect: it appears.
+2. Open the card. Set priority High, a start and a due date, a label, a checklist of 3 steps, assign a member. Expect: the card on the board shows the label, the due badge, the checklist count and the member's face.
+3. Drag the card to another list. Expect: it stays after refresh. Drag it into **Blocked**. Expect: the leads get a notification.
+4. Drag a card to **Released / Handed over**. Expect: the project percent goes up and the card is marked finished.
+5. Add a list, rename it, change what it counts as, drag its header to reorder. Remove an empty list. Try to remove a list with cards. Expect: refused with a message.
 
-### 4.9 Recruitment (HR)
-1. Open a job. Add applicants (same email twice is refused). Move: Applied, Screening, Interview, Offer. Add notes, set interview date. Reject one.
-2. At Offer: pick supervisor and shift, optionally create sign-in, **Hire and create the employee**. Expect: employee record with department from the job, schedule, onboarding checklist. Job closes when all openings are filled.
+**C. The other views** (same project)
+1. **Table:** change status, priority and dates in the cells. Expect: saved at once. Set a start date after the due date. Expect: refused and the old date comes back.
+2. **Timeline:** Expect a bar per card between start and due, colored by status, a line for today, cards without dates listed at the bottom.
+3. **Calendar:** Expect each card on its due date. Use the arrows and **Today**.
+4. **Dashboard:** Expect the status donut, cards per list, workload per person, finished per day, and the blocked, overdue and due-soon lists.
+5. Use the search box, person, label and priority filters. Expect: every view narrows, and "Showing N of M cards" with **Clear filters**.
 
-### 4.10 Performance
-1. HR: **Start the cycle**. Expect: a review for everyone.
-2. Employee: rating 1 to 5 plus comment, **Submit my self-assessment**.
-3. Manager: sees "Evaluations waiting for you", rates, submits.
-4. HR: sets the final rating (manager's is pre-selected).
-5. Employee: reads and clicks **I have read my review**.
-6. Goals: add a goal, update progress. Managers see their team's goals; other employees never do.
+**D. Admin and employee stay in sync**
+1. As the employee open the same project. Move a card.
+2. As HR watch the board. Expect: the change appears within about 20 seconds without reloading.
+3. As HR open **Daily activity**. Expect: the employee's moves listed with times; people who did nothing listed separately.
+4. As the employee open **Daily activity**. Expect: only your own actions. Open **My cards**. Expect: only what is assigned to you.
 
-### 4.11 Learning
-1. HR: add a course (optional certificate validity in months). Manager: enroll people from their own team. HR: anyone.
-2. Mark complete. Expect: "valid until" date. Expired or soon-expiring certificates show up for HR.
+**E. Permissions**
+1. Sign in as a person who is **not** on a project. Open **WorkSync**. Expect: the project is not listed. Paste its address. Expect: "not found" and no title, no cards.
+2. As a **Viewer**: Expect no "+ Add a card", no drag, no list controls; you can comment.
+3. As a **Member**: Expect no "+ Add another list", no ⋯ list menu, no Settings changes.
+4. A manager above a member but not on the project: Expect to view and comment only.
 
-### 4.12 Documents
-1. Employee: upload an ID (PDF, PNG or JPEG, max size from `.env`). Expect: saved. Upload again with the same title: version 2, version 1 kept as older.
-2. Upload a renamed `.exe` as `.pdf`. Expect: refused (content is checked, not the name).
-3. Only the owner and HR can open a file. A manager or another employee gets "not found". HR opening someone's file is written to the Audit log.
-4. HR sees "Expiring within 60 days".
+### 4.9 Other modules (as Manager or HR, unless noted)
+- **Organization, Settings:** add departments, positions, shifts, leave types, time stamp buttons. Expect them to appear for everyone.
+- **Employees:** add one (temporary password), change department or supervisor (history keeps the old lines), set a schedule, mark Separated (their sign-in stops). Edit and delete: a person with records cannot be deleted by HR; the Super Admin can delete with records unless a payslip is finalized.
+- **Leave:** request, approve (reject needs a reason), balance, DTR shows "Leave".
+- **Overtime:** only approved overtime is paid.
+- **Payroll:** create a period, calculate, a different administrator approves, finalize and lock, try to change it (refused), add an adjustment. Philippine rules: install the starter rules, holiday calendar, wage order, tax profile; check the remittance and BIR reports. Read [PH-COMPLIANCE.md](PH-COMPLIANCE.md) first.
+- **Recruitment, Performance, Learning, Documents:** follow the screens: applicant stages and hire, review cycle (self, manager, HR, acknowledge), course enrollment, 201 uploads (a renamed `.exe` as `.pdf` is refused).
+- **Policies:** upload a policy, sign it with the e-signature as an employee, check the banner disappears.
+- **Digital ID:** employee profile picture, the ID with its QR code opens the profile for an administrator.
+- **Chat:** message and call a colleague (voice and video).
+- **HR requests, Announcements, Notifications, Reports (CSV), Users, Audit log:** each does what its page says. The audit log lists pay changes, payroll approval, document opens, project changes.
 
-### 4.13 HR Requests, Announcements, Notifications
-1. Employee: HR Requests, pick a topic, send. HR gets a notification, answers (answer required), request leaves the queue; employee sees the answer.
-2. HR: Announcements, post (optionally pinned). Everyone sees it on Home and gets a notification. Employees cannot open the posting page.
-3. The bell shows the unread count. "Mark all as read" clears it.
+### 4.10 Phone
+Run `npm run dev:phone` and open the HTTPS link. Expect: the bottom bar and **More**, no sideways scrolling, one-handed clock, real GPS on time in, and WorkSync boards that scroll sideways with **Move to** inside the card.
 
-### 4.14 Reports (HR)
-1. Pick dates. Expect: headcount, by department and status, attendance rate, lateness, overtime, leave taken, payroll cost of finalized periods.
-2. **Download CSV** for attendance.
+## 5. Security spot checks (ten minutes)
 
-### 4.15 Users and Audit (Super Admin)
-1. Users: reset someone's password (they must change it, and are signed out everywhere), deactivate/activate, change role. You cannot change or deactivate yourself; the last active Super Admin is protected.
-2. Audit log: shows who did what and when for the actions above.
-
-### 4.16 Phone
-1. Run `npm run dev:phone`, open the HTTPS link on a phone. Expect: bottom bar plus a **More** sheet, no sideways scrolling, one-handed clock. Allow location to test real GPS.
-
-## 5. Security spot checks (worth ten minutes)
-
-- Sign in as an employee and type `/payroll`, `/reports`, `/admin/users` in the address bar. Expect: sent Home with a permission message.
-- As employee A, open `/dtr?employee=<B's id>`. Expect: you see nothing of B.
-- Register a second organization. Expect: it never sees the first one's people, files or numbers.
-- Sign in with a wrong password many times. Expect: no hint whether the email exists.
+- As an employee type `/payroll`, `/reports`, `/admin/users`, `/analytics`. Expect: sent Home with a permission message.
+- As employee A open `/dtr?employee=<B's id>` and `/payslips?employee=<B's id>`. Expect: you see only your own data.
+- As an employee not on a WorkSync project, open its address and a card address. Expect: "not found".
+- With a wrong password many times (sign in and login-page stamp). Expect: no hint whether the account exists, and a lockout.
+- Registration after the first company. Expect: refused everywhere.
 
 ## 6. Run the automated tests
 
 ```
-npm run typecheck     types
-npm run lint          code style
-npm test              143 fast unit tests
-npx playwright test --workers=1     66 browser tests, about 5 minutes, needs `npm run dev` running
+npm run typecheck                  types
+npm run lint                       code style
+npm test                           unit tests (about 230)
+npx playwright test --workers=4    browser tests, about 5 minutes; it starts its own server (stop `npm run dev` first), or set PW_PORT=3301 and run `next start -p 3301` of the production build
 ```
+The browser tests create their own throwaway companies and delete them afterwards. Your real data is not touched. They start the app with `ALLOW_MULTIPLE_ORGS=true`: that setting is for tests only and must never be set when the system is online.
 
-The browser tests create their own throwaway organizations and delete them afterwards. Your real data is not touched.
+Known state at the last run (production build): 99 browser tests pass, 4 are marked `fixme` and 0 fail; the phone-size crawl of every page for all four roles finds no sideways scroll and no errors. The four `fixme` tests need employees to open Leave, Documents or Performance (employee leave request and validation, employee leave rejection, employee document upload, employee self-assessment). They come back as soon as the role rule in part 3 changes.
 
-## 7. Known limits (not built yet)
+## 7. Before you go online
 
-- Email verification and forgot-password by email (an admin resets passwords for now).
-- Native mobile app (the web app works on phones).
-- Industry-specific modules (for example government plantilla, healthcare credentials). Industries differ in starting data only; the time stamp process is the same for all.
-- Real phone GPS is not covered by automated tests. Test it with `dev:phone`.
-- Philippine rules are installed from a starter set (version PH-2026.10) that you can see, change and version. They are not a legal guarantee: confirm them with a payroll practitioner before using real pay. See PH-COMPLIANCE.md for everything not covered (claims, alphalist, agency file formats, separation pay, special groups).
+- [ ] Sections 4.1 to 4.8 pass with the demo company and then with your real company.
+- [ ] Payroll numbers confirmed by your payroll practitioner (4.4, 4.9).
+- [ ] `DB_PASSWORD` is long and random; `.env` is not shared; `ALLOW_MULTIPLE_ORGS` is not set.
+- [ ] Backups: a nightly database dump and a copy of the `storage` folder (uploaded documents and payment proofs), and a restore tried once.
+- [ ] HTTPS on your domain (phones need it for GPS). See [DEPLOY.md](DEPLOY.md).
+- [ ] You registered the company right after deploying, then checked the registration link is gone.
+- [ ] Employees were told what is recorded (time, place, device) and e-signed the privacy policy.
+
+## 8. Known limits (not built yet)
+
+- Email verification and forgot-password by email (an administrator resets passwords).
+- A native mobile app (the web app works on phones).
+- WorkSync: file attachments, @mentions, sub-items, automations (for example "when blocked, notify"), and importing from Trello.
+- Real phone GPS is not covered by automated tests: test it with `dev:phone`.
+- Philippine rules are a starter set you can see and change. Confirm them with a payroll practitioner before real payroll.
 - Reports load one DTR per person: fine for hundreds of people, needs precomputing for thousands.

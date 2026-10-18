@@ -128,14 +128,16 @@ test("on a phone, a stamp without location is refused", async ({ browser }) => {
   await ctx.close();
 });
 
-test("the animated panel shows on the sign-in tab only, not on the time stamp page", async ({ page }) => {
+test("the landing page hero is the background of both the sign-in tab and the time stamp tab", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/login");
-  await expect(page.getByText("People first. Everything else follows.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /People first/ })).toBeVisible();
   await page.getByRole("tab", { name: /Time stamp/ }).click();
-  await expect(page.getByText("People first. Everything else follows.")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: /People first/ })).toBeVisible(); // still behind the form
+  await expect(page.getByLabel("ID number")).toBeVisible();
   await page.goto("/login?stamp=1");
-  await expect(page.getByText("People first. Everything else follows.")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: /People first/ })).toBeVisible();
+  await expect(page.getByLabel("ID number")).toBeVisible();
   await page.getByRole("tab", { name: "Sign in" }).click();
-  await expect(page.getByText("People first. Everything else follows.")).toBeVisible();
+  await expect(page.getByLabel("Email or username")).toBeVisible();
 });

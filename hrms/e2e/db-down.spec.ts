@@ -81,5 +81,5 @@ test("the explanation page opens without any data", async ({ page }) => {
   await page.goto("/unavailable");
   await expect(page.getByRole("heading", { name: "We cannot reach the database" })).toBeVisible();
   await page.getByRole("link", { name: "Try again" }).click();
-  await expect(page).toHaveURL(/localhost:3300\/($|login)/);
+  await expect(page).toHaveURL(/localhost:\d+\/($|login)/);
 });

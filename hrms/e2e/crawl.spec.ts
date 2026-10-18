@@ -12,6 +12,8 @@ import { wipeOrgs } from "./helpers";
 // works, and every harmless button can be pressed without a browser error. Destructive buttons are left alone
 // (they have their own tests): delete, archive, reject, finalize, void, sign out, cancel…
 test.describe.configure({ mode: "parallel" });
+// CRAWL_MOBILE=1 runs the same crawl on a phone-sized screen and also reports any page that scrolls sideways.
+if (process.env.CRAWL_MOBILE) test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
 test.setTimeout(900_000);
 
 const stamp = `crawl${Date.now()}${Math.floor(Math.random() * 1e6)}`; // one organization per worker
@@ -112,6 +114,10 @@ async function check(page: Page, path: string, problems: string[]) {
   await page.waitForTimeout(300);
   if (res && res.status() >= 500) problems.push(`${path}: HTTP ${res.status()}`);
   if (await page.getByText(/We could not load this page|Application error|Unhandled Runtime Error/).count()) problems.push(`${path}: error screen`);
+  if ((page.viewportSize()?.width ?? 1000) < 500) {
+    const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth).catch(() => 0);
+    if (over > 2) problems.push(`${path}: scrolls sideways by ${over}px on a phone`);
+  }
   page.off("pageerror", onErr);
   page.off("console", onConsole);
   for (const e of errors) problems.push(`${path}: ${e}`);
