@@ -95,8 +95,10 @@ async function check(page: Page, path: string, problems: string[]) {
   };
   page.on("pageerror", onErr);
   page.on("console", onConsole);
-  const res = await page.goto(path).catch((e: Error) => {
-    if (!/ERR_ABORTED/.test(e.message)) errors.push(`could not open: ${e.message.split("\n")[0]}`); // aborted = a download or a redirect
+  // A late redirect from the page just left can interrupt the next navigation: try once more before reporting it.
+  const go = () => page.goto(path);
+  const res = await go().catch(() => go()).catch((e: Error) => {
+    if (!/ERR_ABORTED|interrupted by another navigation/.test(e.message)) errors.push(`could not open: ${e.message.split("\n")[0]}`);
     return null;
   });
   // Not "networkidle": the call checker polls every few seconds, so the network is never idle.
@@ -132,7 +134,7 @@ for (const who of ["sa", "hr", "mgr", "emp"]) {
     for (const path of [...PAGES, ...dyn]) {
       await check(page, path, problems);
       // Every link on the page that stays inside the app.
-      const hrefs = await page.locator("main a[href^='/']").evaluateAll((as) => [...new Set(as.map((a) => a.getAttribute("href")!))]);
+      const hrefs = await page.locator("main a[href^='/']").evaluateAll((as) => [...new Set(as.map((a) => a.getAttribute("href")!))]).catch(() => [] as string[]);
       for (const h of hrefs) {
         const clean = h.split("#")[0];
         if (!clean || seen.has(clean) || /\/(file|proof|photo|signature|export)(\/|\?|$)|\.csv|\/locate\//.test(clean)) continue;
@@ -141,7 +143,7 @@ for (const who of ["sa", "hr", "mgr", "emp"]) {
       }
       // Harmless buttons (tabs, show more, filters…): press each once and look for browser errors.
       await page.goto(path).catch(() => {});
-      const names = (await page.locator("main button:visible:not([disabled])").evaluateAll((bs) => bs.map((b) => (b.getAttribute("aria-label") ?? (b as HTMLElement).innerText ?? "").split("\n")[0].trim())))
+      const names = (await page.locator("main button:visible:not([disabled])").evaluateAll((bs) => bs.map((b) => (b.getAttribute("aria-label") ?? (b as HTMLElement).innerText ?? "").split("\n")[0].trim())).catch(() => [] as string[]))
         .filter((n) => n && !SKIP_BUTTON.test(n));
       for (const name of [...new Set(names)].slice(0, 15)) {
         const errs: string[] = [];

@@ -290,12 +290,11 @@ test("payslips: only cut-offs with time stamps are listed, and the newest opens 
   await expect(page.getByText("₱838.66").first()).toBeVisible(); // 7 h + 8 h + approved overtime, same as the payroll
 });
 
-test("cash advance: requested, approved by HR, taken in installments by payroll, with a record", async ({ browser }) => {
+test("cash advance: requested, confirmed by HR, deducted only on the payslip HR picks", async ({ browser }) => {
   const emp = await browser.newPage();
   await signIn(emp, "emp");
   await emp.goto("/cash-advance");
   await emp.getByLabel("Amount (pesos)").fill("3000");
-  await emp.getByLabel("Repay over").selectOption("2");
   await emp.getByLabel("Reason").fill("School tuition for my son");
   await emp.getByRole("button", { name: "Request cash advance" }).click();
   await expect(emp.getByText("Requested ₱3,000.00")).toBeVisible();
@@ -306,22 +305,21 @@ test("cash advance: requested, approved by HR, taken in installments by payroll,
   await expect(hr.getByText("School tuition for my son").first()).toBeVisible();
   await hr.getByRole("button", { name: "Approve" }).click();
   await expect.poll(async () => (await db.cashAdvance.findFirstOrThrow({ where: { employeeId: ids.emp } })).status).toBe("APPROVED");
-  const adv = await db.cashAdvance.findFirstOrThrow({ where: { employeeId: ids.emp } });
-  expect(adv.firstCutoff?.toISOString().slice(0, 10)).toBe(cutoffFor(addDays(cutoffFor(today).end, 1)).start); // the cut-off after today's
+  // Confirming deducts nothing: it stays "not deducted yet" until HR picks the payslip.
+  expect((await db.cashAdvance.findFirstOrThrow({ where: { employeeId: ids.emp } })).firstCutoff).toBeNull();
+  await emp.goto("/cash-advance");
+  await expect(emp.getByText("Confirmed · not deducted yet")).toBeVisible();
+  await expect(emp.getByText(/Confirmed by Hana Hours on/)).toBeVisible();
 
-  expect(adv.installments).toBe(2);
-  // HR decides: take the whole amount in the current cut-off instead.
   await hr.reload();
-  await hr.getByText("Change when it is deducted").first().click();
-  const sched = hr.locator("form", { has: hr.getByRole("button", { name: "Save schedule" }) }).first();
-  await sched.locator("select[name=firstCutoff]").selectOption(cutoffFor(today).start);
-  await sched.locator("select[name=installments]").selectOption("1");
-  await sched.getByRole("button", { name: "Save schedule" }).click();
-  await expect(hr.getByText("Schedule changed.")).toBeVisible();
+  await hr.locator("select[name=firstCutoff]").first().selectOption(cutoffFor(today).start);
+  await hr.getByRole("button", { name: "Save", exact: true }).first().click();
+  await expect.poll(async () => (await db.cashAdvance.findFirstOrThrow({ where: { employeeId: ids.emp } })).firstCutoff?.toISOString().slice(0, 10)).toBe(cutoffFor(today).start);
+
   const current = await db.payrollPeriod.findFirstOrThrow({ where: { organization: { name: `HoursPay ${stamp}` }, name: cutoffFor(today).name } });
   await hr.goto(`/payroll/${current.id}`);
   await hr.getByRole("button", { name: /Calculate/ }).click();
-  await expect.poll(async () => (await db.payslipLine.findFirst({ where: { label: "Cash advance repayment", payslip: { periodId: current.id, employeeId: ids.emp } } }))?.amountCents).toBe(300_000);
+  await expect.poll(async () => (await db.payslipLine.findFirst({ where: { label: { in: ["Cash advance", "Cash advance repayment"] }, payslip: { periodId: current.id, employeeId: ids.emp } } }))?.amountCents).toBe(300_000);
   // Standing pay on Payroll lists everyone for the cut-off, with the advance already taken off.
   await hr.goto(`/payroll?standing=${current.id}`);
   await expect(hr.getByRole("heading", { name: `Standing pay · ${current.name}` })).toBeVisible();
@@ -329,7 +327,7 @@ test("cash advance: requested, approved by HR, taken in installments by payroll,
   await ella.locator("summary").click();
   await expect(ella).toContainText("deductions ₱3,000.00");
   await emp.goto("/cash-advance");
-  await expect(emp.getByText("₱3,000.00 left")).toBeVisible(); // nothing is recorded as repaid until that payroll is finalized
+  await expect(emp.getByText(`To be deducted on the ${cutoffFor(today).name} payslip`, { exact: false })).toBeVisible();
 });
 
 test("payslip: every deduction listed (government marked not deducted), HR records the amount paid with proof, the employee confirms", async ({ browser }) => {

@@ -67,8 +67,8 @@ export async function calculatePeriod(me: Actor, periodId: string, opts: { auto?
     prisma.taxBracket.findMany({ where: { organizationId: orgId }, orderBy: { fromCents: "asc" } }),
     prisma.compensation.findMany({ where: { organizationId: orgId, effectiveFrom: { lte: period.endDate } }, orderBy: [{ effectiveFrom: "asc" }, { createdAt: "asc" }] }),
     prisma.payrollAdjustment.findMany({ where: { organizationId: orgId, periodId } }),
-    // Cash advances being repaid: only regular payrolls take installments.
-    special ? [] : prisma.cashAdvance.findMany({ where: { organizationId: orgId, status: "APPROVED", firstCutoff: { not: null, lte: period.endDate } }, select: { id: true, employeeId: true, amountCents: true, installments: true, firstCutoff: true } }),
+    // Cash advances: only regular payrolls take cash advance deductions.
+    special ? [] : prisma.cashAdvance.findMany({ where: { organizationId: orgId, status: "APPROVED", firstCutoff: { not: null, lte: period.endDate } }, select: { id: true, employeeId: true, amountCents: true, installments: true, firstCutoff: true, payments: { select: { amountCents: true } } } }),
     prisma.leaveRequest.findMany({
       where: { organizationId: orgId, status: "APPROVED", startDate: { lte: period.endDate }, endDate: { gte: period.startDate } },
       select: { employeeId: true, startDate: true, endDate: true, leaveType: { select: { paid: true } } },
@@ -196,10 +196,18 @@ export async function calculatePeriod(me: Actor, periodId: string, opts: { auto?
       if (earlier) extraWarnings.push(earlier);
     }
 
-    // This period's installments of each approved cash advance (see lib/cash-advance.ts). Recorded as paid when finalized.
+    // Cash advance deductions for this period. Recorded as paid when finalized.
     const cashDue = advances
       .filter((c) => c.employeeId === e.id)
-      .map((c) => ({ id: c.id, cents: dueInPeriod(installmentPlan(c.amountCents, c.installments, keyOfDbDate(c.firstCutoff!)), from, to) }))
+      .map((c) => {
+        const paidCents = c.payments.reduce((sum, p) => sum + p.amountCents, 0);
+        const remaining = c.amountCents - paidCents;
+        if (remaining <= 0) return { id: c.id, cents: 0 };
+        const due = dueInPeriod(installmentPlan(c.amountCents, c.installments, keyOfDbDate(c.firstCutoff!)), from, to);
+        const isPastDue = keyOfDbDate(c.firstCutoff!) < from;
+        const toDeduct = due > 0 ? due : (isPastDue ? remaining : 0);
+        return { id: c.id, cents: Math.min(remaining, toDeduct) };
+      })
       .filter((c) => c.cents > 0);
     // Government contributions switched off: still worked out (same rules, this period's share) so the payslip can show
     // them as "not deducted". Information only; nothing here touches the pay.
@@ -230,7 +238,7 @@ export async function calculatePeriod(me: Actor, periodId: string, opts: { auto?
       brackets: isPh || !deduct ? [] : brackets.map((b) => ({ fromCents: b.fromCents, rateBp: b.rateBp, fixedCents: b.fixedCents })),
       adjustments: [
         ...adjustments.filter((a) => a.employeeId === e.id).map((a) => ({ kind: a.kind, label: a.label, amountCents: a.amountCents })),
-        ...cashDue.map((c) => ({ kind: "DEDUCTION" as const, label: "Cash advance repayment", amountCents: c.cents })),
+        ...cashDue.map((c) => ({ kind: "DEDUCTION" as const, label: "Cash advance", amountCents: c.cents })),
       ],
       ph,
     };
@@ -251,6 +259,10 @@ export async function calculatePeriod(me: Actor, periodId: string, opts: { auto?
 
   await prisma.$transaction(
     async (tx) => {
+      // One save per period at a time: two page loads recalculating together would otherwise collide on the payslips.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`payroll:${periodId}`}))`;
+      // A period finalized while this ran is never overwritten.
+      if ((await tx.payrollPeriod.findUnique({ where: { id: periodId }, select: { status: true } }))?.status === "FINALIZED") return;
       await tx.payslip.deleteMany({ where: { periodId, organizationId: orgId } }); // lines go with them
       for (const s of slips) await tx.payslip.create({ data: { ...s.data, lines: { createMany: { data: s.lines } } } });
       await tx.payrollPeriod.update({

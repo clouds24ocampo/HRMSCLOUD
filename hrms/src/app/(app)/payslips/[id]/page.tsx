@@ -20,7 +20,7 @@ type Ded = { id: string; code: string; label: string; detail: string | null; amo
 type Group = "Government" | "Cash advance" | "Attendance" | "Other";
 const groupOf = (l: { code: string; label: string }): Group =>
   l.code === "CONTRIBUTION" || l.code === "TAX" || l.code === "TAX_ADJUSTMENT" ? "Government"
-  : l.label === "Cash advance repayment" ? "Cash advance"
+  : l.label === "Cash advance" || l.label === "Cash advance repayment" ? "Cash advance"
   : ["LATE", "UNDERTIME", "ABSENCE", "UNPAID_LEAVE"].includes(l.code) ? "Attendance" : "Other";
 const GROUP_TITLE: Record<Group, string> = { Government: "Government contributions and tax", "Cash advance": "Cash advance", Attendance: "Tardiness and absences", Other: "Other deductions" };
 
