@@ -38,8 +38,9 @@ export function TableView({ ctx }: { ctx: ViewCtx }) {
                   <div key={c.id} className={`grid ${COLS} items-center gap-x-2 border-b border-line/70 px-3 py-1.5 text-sm transition hover:bg-bg/60 ${ctx.selected === c.id ? "bg-brand/5" : ""}`} role="row">
                     <div className="min-w-0 pr-2">
                       <Link href={ctx.href({ card: c.id })} scroll={false} className="block truncate font-medium hover:text-brand hover:underline">{c.title}</Link>
-                      {(c.labels.length > 0 || c._count.comments > 0) && (
+                      {(
                         <div className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-muted">
+                          {ctx.names.get(c.createdById) && <span className="mr-1" title="Added by">by {ctx.names.get(c.createdById)}</span>}
                           {c.labels.map((x) => labelById.get(x.labelId)).filter((x): x is NonNullable<typeof x> => !!x).map((x) => <LabelChip key={x.id} label={x} compact />)}
                           {c._count.comments > 0 && <span><span aria-hidden>💬</span> {c._count.comments}</span>}
                         </div>

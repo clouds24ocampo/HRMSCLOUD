@@ -88,7 +88,7 @@ export function AddItemRow({ projectId, listId }: { projectId: string; listId: s
   return (
     <form {...f.formProps} className="flex items-center gap-2 border-t border-line/70 px-3 py-1.5">
       <label className="min-w-0 flex-1"><span className="sr-only">New item title</span>
-        <input name="title" required maxLength={200} placeholder="+ Add item" className="w-full rounded-md border border-transparent bg-transparent px-2 py-1.5 text-sm placeholder:text-muted hover:bg-bg focus:border-brand focus:bg-surface" />
+        <input name="title" required maxLength={200} placeholder="+ Add item (type, then press Enter)" className="w-full rounded-md border border-transparent bg-transparent px-2 py-1.5 text-sm placeholder:text-muted hover:bg-bg focus:border-brand focus:bg-surface" />
       </label>
       {f.state?.error && <span role="alert" className="text-xs text-danger">{f.state.error}</span>}
     </form>

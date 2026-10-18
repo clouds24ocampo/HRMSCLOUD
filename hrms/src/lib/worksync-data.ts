@@ -2,7 +2,8 @@ import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { descendantIds, isHr, type Actor } from "@/lib/scope";
 import { ROLES } from "@/lib/roles";
-import { accessLevel, type CardFacts, type Category, type Level, type MemberRole } from "@/lib/worksync";
+import { accessLevel, cardProgress, type CardFacts, type Category, type Level, type MemberRole } from "@/lib/worksync";
+import type { RCard, REvent } from "@/lib/worksync-report";
 
 type Db = Prisma.TransactionClient | typeof prisma;
 
@@ -64,3 +65,43 @@ export const dayOf = (d: Date | null) => (d ? d.toISOString().slice(0, 10) : nul
 
 // The clock, read in one place so pages stay free of impure calls.
 export const serverNow = () => Date.now();
+
+// ───────────── reports ─────────────
+
+// Everything the reports need for some projects: the live cards and the whole activity trail.
+export async function loadReportData(projectIds: string[]) {
+  const [cards, events] = await Promise.all([
+    prisma.wsCard.findMany({
+      where: { projectId: { in: projectIds }, archivedAt: null, list: { archivedAt: null } },
+      include: { list: { select: { name: true, category: true } }, checklist: { select: { done: true } }, assignees: { select: { employeeId: true, employee: { select: { userId: true } } } }, project: { select: { name: true } } },
+    }),
+    prisma.wsActivity.findMany({ where: { projectId: { in: projectIds } }, select: { actorId: true, type: true, detail: true, createdAt: true, cardId: true }, orderBy: { createdAt: "desc" }, take: 20_000 }),
+  ]);
+  const rcards: (RCard & { projectName: string })[] = cards.map((c) => ({
+    id: c.id,
+    projectId: c.projectId,
+    projectName: c.project.name,
+    title: c.title,
+    listName: c.list.name,
+    category: c.list.category,
+    createdById: c.createdById,
+    createdAt: c.createdAt,
+    completedById: c.completedById,
+    completedAt: c.completedAt,
+    dueDay: dayOf(c.dueDate),
+    progress: cardProgress({ category: c.list.category, checkDone: c.checklist.filter((k) => k.done).length, checkTotal: c.checklist.length }),
+    assigneeKeys: c.assignees.map((a) => a.employee.userId ?? `e:${a.employeeId}`),
+  }));
+  return { cards: rcards, events: events as REvent[] };
+}
+
+// Display names for user ids (and for "e:<employee id>" people who have no login).
+export async function nameMap(keys: string[]): Promise<Map<string, string>> {
+  const userIds = [...new Set(keys.filter((k) => !k.startsWith("e:")))];
+  const empIds = [...new Set(keys.filter((k) => k.startsWith("e:")).map((k) => k.slice(2)))];
+  const [users, emps] = await Promise.all([
+    prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, name: true } }),
+    prisma.employee.findMany({ where: { id: { in: empIds } }, select: { id: true, firstName: true, lastName: true } }),
+  ]);
+  return new Map<string, string>([...users.map((u) => [u.id, u.name] as const), ...emps.map((e) => [`e:${e.id}`, `${e.firstName} ${e.lastName}`] as const)]);
+}

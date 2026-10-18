@@ -10,8 +10,10 @@ export type ViewCtx = {
   tz: string;
   lists: { id: string; name: string; category: Category }[];
   labels: { id: string; name: string; color: string }[];
-  members: { employeeId: string; firstName: string; lastName: string; role: string }[];
+  members: { employeeId: string; userId: string | null; firstName: string; lastName: string; role: string }[];
   cards: CardRow[];
+  /** User id → display name, for "added by" labels. */
+  names: Map<string, string>;
   canEdit: boolean;
   canManage: boolean;
   selected?: string;

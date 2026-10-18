@@ -21,6 +21,7 @@ export type BoardCard = {
   comments: number;
   stuck: boolean;
   hasDescription: boolean;
+  creator: string | null;
 };
 export type BoardList = { id: string; name: string; category: Category; cards: BoardCard[] };
 
@@ -75,7 +76,7 @@ export function Board({ projectId, lists, canEdit, canManage, selected }: { proj
   };
 
   return (
-    <div className="flex items-start gap-3 overflow-x-auto pb-2" aria-label="Project board">
+    <div className="relative flex items-start gap-3 overflow-x-auto pb-2" aria-label="Project board">
       {shown.map((l) => (
         <section
           key={l.id}
@@ -120,6 +121,7 @@ export function Board({ projectId, lists, canEdit, canManage, selected }: { proj
                   {c.comments > 0 && <span title="Comments"><span aria-hidden>💬</span> {c.comments}</span>}
                   <span className="ml-auto"><Facepile people={c.assignees} size={22} /></span>
                 </div>
+                {c.creator && <p className="mt-1.5 truncate text-[11px] text-slate-400" title={`Added by ${c.creator}`}>Added by {c.creator}</p>}
               </li>
             ))}
           </ul>
@@ -142,12 +144,20 @@ export function Board({ projectId, lists, canEdit, canManage, selected }: { proj
 
 function AddCard({ projectId, listId }: { projectId: string; listId: string }) {
   const f = useKeptForm(createCard.bind(null, projectId, listId));
+  const [focused, setFocused] = useState(false);
   return (
-    <form {...f.formProps} className="mt-2 space-y-1.5">
+    <form {...f.formProps} onFocus={() => setFocused(true)} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false); }} className="mt-2 space-y-1.5">
       <label className="block"><span className="sr-only">New card title</span>
-        <input name="title" required maxLength={200} placeholder="+ Add a card" className="block w-full rounded-lg border border-transparent bg-transparent px-2.5 py-2 text-sm text-slate-700 placeholder:text-slate-500 hover:bg-slate-200/70 focus:border-brand focus:bg-white" />
+        <input name="title" required maxLength={200} autoComplete="off" placeholder="+ Add a card" className="block w-full rounded-lg border border-transparent bg-transparent px-2.5 py-2 text-sm text-slate-700 placeholder:text-slate-500 hover:bg-slate-200/70 focus:border-brand focus:bg-white" />
       </label>
+      {(focused || f.pending) && (
+        <div className="flex items-center gap-2">
+          <button disabled={f.pending} className="rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-brand-ink disabled:opacity-60">{f.pending ? "Adding…" : "Add card"}</button>
+          <span className="text-[11px] text-slate-500">or press Enter</span>
+        </div>
+      )}
       {f.state?.error && <Alert kind="error">{f.state.error}</Alert>}
+      {f.state?.ok && <p role="status" className="text-[11px] font-medium text-success">Card added.</p>}
     </form>
   );
 }

@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
 import { getOrgSettings } from "@/lib/settings";
-import { employeeScope } from "@/lib/scope";
+import { employeeScope, isHr } from "@/lib/scope";
+import { ROLES } from "@/lib/roles";
 import { dayKey, formatDay, keyOfDbDate } from "@/lib/time";
 import { filterable, dayOf, loadCards, loadProject, serverNow } from "@/lib/worksync-data";
 import { KIND_LABEL, STUCK_DAYS, dueState, filtersActive, matchesFilters, parseFilters, personName, summarize, themeGradient } from "@/lib/worksync";
@@ -18,6 +19,7 @@ import { Sheet } from "../Sheet";
 import { Facepile } from "../parts";
 import { CalendarView } from "../views/CalendarView";
 import { DashboardView } from "../views/DashboardView";
+import { ReportsView } from "../views/ReportsView";
 import { TableView } from "../views/TableView";
 import { TimelineView } from "../views/TimelineView";
 import type { ViewCtx } from "../views/types";
@@ -28,6 +30,7 @@ const VIEWS = [
   { key: "timeline", label: "Timeline", icon: "▤" },
   { key: "calendar", label: "Calendar", icon: "▣" },
   { key: "dashboard", label: "Dashboard", icon: "◔" },
+  { key: "reports", label: "Reports", icon: "▥" },
 ] as const;
 type ViewKey = (typeof VIEWS)[number]["key"];
 
@@ -54,7 +57,7 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
   // The URL of this page with some parameters changed. Filters, view and month carry over on their own.
   const href = (patch: Record<string, string | null>) => {
     const next = new URLSearchParams();
-    for (const [k, v] of Object.entries({ ...sp, ...patch })) if (v && ["view", "q", "who", "label", "pri", "m", "card", "panel"].includes(k)) next.set(k, v);
+    for (const [k, v] of Object.entries({ ...sp, ...patch })) if (v && ["view", "q", "who", "label", "pri", "m", "r", "card", "panel"].includes(k)) next.set(k, v);
     if (next.get("view") === "board") next.delete("view");
     const qs = next.toString();
     return `/worksync/${id}${qs ? `?${qs}` : ""}`;
@@ -62,10 +65,11 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
 
   const allCards = await loadCards(id);
   const cards = allCards.filter((c) => matchesFilters(filterable(c), filters, mine.id));
-  const members = project.members.map((m) => ({ employeeId: m.employeeId, firstName: m.employee.firstName, lastName: m.employee.lastName, role: m.role }));
+  const members = project.members.map((m) => ({ employeeId: m.employeeId, userId: m.employee.userId, firstName: m.employee.firstName, lastName: m.employee.lastName, role: m.role }));
   const now = serverNow();
   const stats = summarize(allCards.map(cardFacts), today, now);
-  const ctx: ViewCtx = { projectId: id, today, now, tz, lists: project.lists, labels: project.labels, members, cards, canEdit, canManage, selected: sp.card, filtered: filtersActive(filters), href };
+  const names = new Map<string, string>();
+  const ctx: ViewCtx = { projectId: id, today, now, names, tz, lists: project.lists, labels: project.labels, members, cards, canEdit, canManage, selected: sp.card, filtered: filtersActive(filters), href };
   const closeHref = href({ card: null, panel: null });
 
   // A card opened over the page (it may be one the filters hide).
@@ -76,9 +80,11 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
       })
     : null;
   const activity = panel === "activity" ? await prisma.wsActivity.findMany({ where: { projectId: id }, orderBy: { createdAt: "desc" }, take: 60 }) : [];
-  const cardActivity = open ? await prisma.wsActivity.findMany({ where: { projectId: id, cardId: open.id }, orderBy: { createdAt: "desc" }, take: 15 }) : [];
-  const userIds = [...new Set([...activity.map((a) => a.actorId), ...cardActivity.map((a) => a.actorId), ...(open?.comments.map((c) => c.authorId) ?? [])])];
+  const cardEvents = open ? await prisma.wsActivity.findMany({ where: { projectId: id, cardId: open.id }, orderBy: { createdAt: "desc" }, take: 500 }) : [];
+  const cardActivity = cardEvents.slice(0, 100);
+  const userIds = [...new Set([...allCards.map((c) => c.createdById), ...activity.map((a) => a.actorId), ...cardEvents.map((a) => a.actorId), ...(open?.completedById ? [open.completedById] : []), ...(open?.comments.map((c) => c.authorId) ?? [])])];
   const who = new Map((await prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, name: true } })).map((u) => [u.id, u.name]));
+  for (const [k, v] of who) names.set(k, v);
 
   // Who can still be added: HR anyone active in the company, a manager their own chain.
   const people = panel === "people" && canManage
@@ -109,6 +115,7 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
         comments: c._count.comments,
         stuck: l.category !== "DONE" && now - c.updatedAt.getTime() > STUCK_DAYS * 86_400_000,
         hasDescription: !!c.description,
+        creator: who.get(c.createdById) ?? null,
       };
     }),
   }));
@@ -166,10 +173,11 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
       {view === "timeline" && <TimelineView ctx={ctx} />}
       {view === "calendar" && <CalendarView ctx={ctx} month={month} />}
       {view === "dashboard" && <DashboardView ctx={ctx} />}
+      {view === "reports" && <ReportsView ctx={ctx} days={[7, 30, 90].includes(Number(sp.r)) ? Number(sp.r) : 30} showAll={canManage || isHr(me.role.key) || me.role.key === ROLES.MANAGER} meUserId={me.id} />}
 
       {open && (
         <Sheet closeHref={closeHref} label={`Card: ${open.title}`}>
-          <CardDetail ctx={ctx} card={open} who={who} activity={cardActivity} />
+          <CardDetail ctx={ctx} card={open} who={who} activity={cardActivity} events={cardEvents} />
         </Sheet>
       )}
       {!open && panel && (

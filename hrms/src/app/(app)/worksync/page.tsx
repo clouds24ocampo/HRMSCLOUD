@@ -13,7 +13,7 @@ import { Facepile } from "./parts";
 import { NewProjectForm } from "./NewProjectForm";
 import { Progress } from "./Progress";
 
-const VIEWS = [["projects", "Projects"], ["mine", "My cards"], ["today", "Daily activity"]] as const;
+const VIEWS = [["projects", "Projects"], ["mine", "My tasks"], ["today", "Daily activity"]] as const;
 const isKey = (s?: string) => !!s && /^\d{4}-\d{2}-\d{2}$/.test(s);
 const EVENT_LABEL: Record<string, string> = {
   CARD_CREATED: "added a card", MOVED: "moved", DONE: "finished", BLOCKED: "marked blocked", COMMENTED: "commented on", ASSIGNED: "changed assignees on",
@@ -41,6 +41,9 @@ export default async function WorkSyncPage({ searchParams }: { searchParams: Pro
             {label}
           </Link>
         ))}
+        <Link href="/reports?tab=worksync" className="ml-auto whitespace-nowrap rounded-lg px-4 py-2 text-muted transition hover:bg-bg hover:text-ink">
+          📊 Reports & Analytics →
+        </Link>
       </nav>
       {view === "projects" && <Projects scope={scope} today={today} />}
       {view === "mine" && <MyCards organizationId={me.organizationId} mineId={mine.id} today={today} />}
@@ -104,7 +107,19 @@ async function MyCards({ organizationId, mineId, today }: { organizationId: stri
     include: { list: { select: { name: true, category: true } }, project: { select: { id: true, name: true } } },
     orderBy: [{ dueDate: { sort: "asc", nulls: "last" } }, { updatedAt: "desc" }],
   });
-  if (cards.length === 0) return <EmptyState title="No cards assigned to you" hint="Cards assigned to you, from every project, are listed here." />;
+  if (cards.length === 0) {
+    return (
+      <EmptyState
+        title="No tasks assigned to you"
+        hint="Tasks (cards) assigned to you across all projects will appear here. Open any project to create cards and assign team members."
+        action={
+          <Link href="/worksync?view=projects" className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-brand-ink transition hover:opacity-90">
+            Open Projects →
+          </Link>
+        }
+      />
+    );
+  }
   const open = cards.filter((c) => c.list.category !== "DONE");
   const done = cards.filter((c) => c.list.category === "DONE");
   const Row = ({ c }: { c: (typeof cards)[number] }) => {

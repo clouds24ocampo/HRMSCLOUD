@@ -148,6 +148,10 @@ export async function createCard(projectId: string, listId: string, _: FormState
   const list = c.project.lists.find((l) => l.id === listId);
   if (!list) return { error: "List not found." };
   const last = await prisma.wsCard.findFirst({ where: { listId, archivedAt: null }, orderBy: { position: "desc" }, select: { position: true } });
+  const dueStr = form.get("dueDate");
+  const dueDate = typeof dueStr === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dueStr) ? dbDate(dueStr) : null;
+  const startStr = form.get("startDate");
+  const startDate = typeof startStr === "string" && /^\d{4}-\d{2}-\d{2}$/.test(startStr) ? dbDate(startStr) : null;
   const card = await prisma.wsCard.create({
     data: {
       organizationId: c.me.organizationId,
@@ -157,6 +161,9 @@ export async function createCard(projectId: string, listId: string, _: FormState
       position: positionBetween(last?.position ?? null, null),
       createdById: c.me.id,
       completedAt: list.category === "DONE" ? new Date() : null,
+      completedById: list.category === "DONE" ? c.me.id : null,
+      dueDate,
+      startDate,
     },
   });
   await logActivity(prisma, { organizationId: c.me.organizationId, projectId, cardId: card.id, cardTitle: card.title, actorId: c.me.id, type: "CARD_CREATED", detail: list.name });
@@ -168,13 +175,31 @@ export async function updateCard(cardId: string, _: FormState, form: FormData): 
   const c = await cardCtx(cardId, "EDIT");
   if (!c.ok) return { error: c.error };
   const parsed = z
-    .object({ title: z.string().trim().min(1, "Write a title.").max(200), description: optText(5000), priority: z.enum(["LOW", "NORMAL", "HIGH", "URGENT"]), startDate: optDay, dueDate: optDay })
+    .object({ title: z.string().trim().min(1, "Write a title.").max(200), description: optText(50000), priority: z.enum(["LOW", "NORMAL", "HIGH", "URGENT"]), startDate: optDay, dueDate: optDay })
     .safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const d = parsed.data;
   if (d.startDate && d.dueDate && d.startDate > d.dueDate) return { error: "The start date is after the due date." };
+
+  const changes: string[] = [];
+  if (d.title !== c.card.title) changes.push(`title: "${c.card.title}" → "${d.title}"`);
+  if ((d.description ?? null) !== (c.card.description ?? null)) changes.push("description updated");
+  if (d.priority !== c.card.priority) changes.push(`priority: ${c.card.priority} → ${d.priority}`);
+  const origStart = c.card.startDate ? c.card.startDate.toISOString().slice(0, 10) : null;
+  const origDue = c.card.dueDate ? c.card.dueDate.toISOString().slice(0, 10) : null;
+  if (d.startDate !== origStart) changes.push(`start date: ${origStart ?? "none"} → ${d.startDate ?? "none"}`);
+  if (d.dueDate !== origDue) changes.push(`due date: ${origDue ?? "none"} → ${d.dueDate ?? "none"}`);
+
   await prisma.wsCard.update({ where: { id: cardId }, data: { title: d.title, description: d.description, priority: d.priority, startDate: d.startDate ? dbDate(d.startDate) : null, dueDate: d.dueDate ? dbDate(d.dueDate) : null } });
-  await logActivity(prisma, { organizationId: c.me.organizationId, projectId: c.project.id, cardId, cardTitle: d.title, actorId: c.me.id, type: "EDITED" });
+  await logActivity(prisma, {
+    organizationId: c.me.organizationId,
+    projectId: c.project.id,
+    cardId,
+    cardTitle: d.title,
+    actorId: c.me.id,
+    type: "EDITED",
+    detail: changes.length > 0 ? changes.join("; ") : "card details updated",
+  });
   refresh(c.project.id);
   return { ok: "Saved." };
 }
@@ -193,7 +218,7 @@ async function doMove(c: CardOk, listId: string, beforeCardId: string | null) {
     data: {
       listId,
       position: positionBetween(prev?.position ?? null, next?.position ?? null),
-      ...(changedList ? { completedAt: target.category === "DONE" ? new Date() : null } : {}),
+      ...(changedList ? { completedAt: target.category === "DONE" ? new Date() : null, completedById: target.category === "DONE" ? c.me.id : null } : {}),
     },
   });
   if (!changedList) return refresh(c.project.id);
@@ -281,10 +306,17 @@ export async function setCardField(cardId: string, field: "priority" | "startDat
 export async function toggleLabel(cardId: string, labelId: string) {
   const c = await cardCtx(cardId, "EDIT");
   if (!c.ok) return;
-  if (!c.project.labels.some((l) => l.id === labelId)) return; // only this project's own labels
+  const targetLabel = c.project.labels.find((l) => l.id === labelId);
+  if (!targetLabel) return; // only this project's own labels
   const key = { cardId_labelId: { cardId, labelId } };
-  if (await prisma.wsCardLabel.findUnique({ where: key })) await prisma.wsCardLabel.delete({ where: key });
-  else await prisma.wsCardLabel.create({ data: { cardId, labelId } });
+  const existing = await prisma.wsCardLabel.findUnique({ where: key });
+  if (existing) {
+    await prisma.wsCardLabel.delete({ where: key });
+    await logActivity(prisma, { organizationId: c.me.organizationId, projectId: c.project.id, cardId, cardTitle: c.card.title, actorId: c.me.id, type: "EDITED", detail: `removed label "${targetLabel.name}"` });
+  } else {
+    await prisma.wsCardLabel.create({ data: { cardId, labelId } });
+    await logActivity(prisma, { organizationId: c.me.organizationId, projectId: c.project.id, cardId, cardTitle: c.card.title, actorId: c.me.id, type: "EDITED", detail: `added label "${targetLabel.name}"` });
+  }
   await prisma.wsCard.update({ where: { id: cardId }, data: { updatedAt: new Date() } });
   refresh(c.project.id);
 }
@@ -336,7 +368,7 @@ export async function updateList(projectId: string, listId: string, _: FormState
   await prisma.$transaction(async (tx) => {
     await tx.wsList.update({ where: { id: listId }, data: parsed.data });
     // Cards already in the list follow its new category: they become done (or stop being done) with it.
-    if (list.category !== parsed.data.category) await tx.wsCard.updateMany({ where: { listId, archivedAt: null }, data: { completedAt: parsed.data.category === "DONE" ? new Date() : null } });
+    if (list.category !== parsed.data.category) await tx.wsCard.updateMany({ where: { listId, archivedAt: null }, data: { completedAt: parsed.data.category === "DONE" ? new Date() : null, completedById: parsed.data.category === "DONE" ? c.me.id : null } });
   });
   refresh(projectId);
   return { ok: "List saved." };
@@ -390,6 +422,7 @@ export async function addCheck(cardId: string, _: FormState, form: FormData): Pr
   const last = await prisma.wsCheck.findFirst({ where: { cardId }, orderBy: { position: "desc" }, select: { position: true } });
   await prisma.wsCheck.create({ data: { cardId, text: text.data, position: (last?.position ?? 0) + 1 } });
   await prisma.wsCard.update({ where: { id: cardId }, data: { updatedAt: new Date() } });
+  await logActivity(prisma, { organizationId: c.me.organizationId, projectId: c.project.id, cardId, cardTitle: c.card.title, actorId: c.me.id, type: "CHECKED", detail: `added step: "${text.data}"` });
   refresh(c.project.id);
   return { ok: "Step added." };
 }
@@ -417,6 +450,8 @@ export async function removeCheck(checkId: string) {
   const x = await checkCtx(checkId);
   if (!x) return;
   await prisma.wsCheck.delete({ where: { id: checkId } });
+  await prisma.wsCard.update({ where: { id: x.check.cardId }, data: { updatedAt: new Date() } });
+  await logActivity(prisma, { organizationId: x.c.me.organizationId, projectId: x.c.project.id, cardId: x.check.cardId, cardTitle: x.c.card.title, actorId: x.c.me.id, type: "CHECKED", detail: `removed step: "${x.check.text}"` });
   refresh(x.c.project.id);
 }
 
@@ -424,7 +459,7 @@ export async function removeCheck(checkId: string) {
 export async function addComment(cardId: string, _: FormState, form: FormData): Promise<FormState> {
   const c = await cardCtx(cardId, "VIEW");
   if (!c.ok) return { error: c.error };
-  const body = z.string().trim().min(1, "Write a comment.").max(2000, "Keep it under 2,000 characters.").safeParse(form.get("body"));
+  const body = z.string().trim().min(1, "Write a comment.").max(50000, "Keep it under 50,000 characters.").safeParse(form.get("body"));
   if (!body.success) return { error: body.error.issues[0].message };
   await prisma.wsComment.create({ data: { cardId, authorId: c.me.id, body: body.data } });
   await prisma.wsCard.update({ where: { id: cardId }, data: { updatedAt: new Date() } });

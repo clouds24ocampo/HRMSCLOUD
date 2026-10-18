@@ -13,7 +13,7 @@ export function EditCardForm({ cardId, card }: { cardId: string; card: { title: 
   return (
     <form {...f.formProps} className="space-y-3">
       <label className="block text-sm font-medium">Title<input name="title" required maxLength={200} defaultValue={card.title} className={inputClass} /></label>
-      <label className="block text-sm font-medium">Description<textarea name="description" rows={4} maxLength={5000} defaultValue={card.description} className={inputClass} placeholder="What needs doing, links, notes" /></label>
+      <label className="block text-sm font-medium">Description<textarea name="description" rows={5} maxLength={50000} defaultValue={card.description} className={inputClass} placeholder="What needs doing, links, test documentation, reproduction steps, notes" /></label>
       <div className="grid grid-cols-3 gap-3">
         <label className="block text-sm font-medium">Priority
           <select name="priority" defaultValue={card.priority} className={inputClass}>{Object.entries(PRIORITY_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
@@ -55,10 +55,20 @@ export function CommentForm({ cardId }: { cardId: string }) {
   const f = useKeptForm(addComment.bind(null, cardId));
   return (
     <form {...f.formProps} className="space-y-2">
-      <label className="block"><span className="sr-only">Comment</span><textarea name="body" rows={2} required maxLength={2000} placeholder="Write an update or a question" className={`${inputClass} mt-0`} /></label>
+      <label className="block">
+        <span className="sr-only">Comment</span>
+        <textarea
+          name="body"
+          rows={3}
+          required
+          maxLength={50000}
+          placeholder="Write an update, question, bug report, or QA revision notes…"
+          className={`${inputClass} mt-0 font-sans`}
+        />
+      </label>
       {f.state?.error && <Alert kind="error">{f.state.error}</Alert>}
       {f.state?.ok && <Alert kind="success">{f.state.ok}</Alert>}
-      <button disabled={f.pending} className={small}>{f.pending ? "Sending…" : "Comment"}</button>
+      <button disabled={f.pending} className={small}>{f.pending ? "Sending…" : "Post Comment / Update"}</button>
     </form>
   );
 }
