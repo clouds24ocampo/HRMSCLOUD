@@ -98,6 +98,7 @@ export const ModelName = {
   Holiday: 'Holiday',
   PreviousEmployment: 'PreviousEmployment',
   DailyReport: 'DailyReport',
+  DailyReportComment: 'DailyReportComment',
   PolicyDocument: 'PolicyDocument',
   PolicySignature: 'PolicySignature',
   IdCardSettings: 'IdCardSettings',
@@ -958,6 +959,20 @@ export const DailyReportScalarFieldEnum = {
 } as const
 
 export type DailyReportScalarFieldEnum = (typeof DailyReportScalarFieldEnum)[keyof typeof DailyReportScalarFieldEnum]
+
+
+export const DailyReportCommentScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  reportId: 'reportId',
+  authorId: 'authorId',
+  parentId: 'parentId',
+  body: 'body',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DailyReportCommentScalarFieldEnum = (typeof DailyReportCommentScalarFieldEnum)[keyof typeof DailyReportCommentScalarFieldEnum]
 
 
 export const PolicyDocumentScalarFieldEnum = {

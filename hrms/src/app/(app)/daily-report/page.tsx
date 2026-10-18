@@ -9,6 +9,7 @@ import { ROLES } from "@/lib/roles";
 import { addDays, dayKey, dbDate, formatDay, formatTime, keyOfDbDate } from "@/lib/time";
 import { Badge, Card, EmptyState, PageHeader, buttonClass, inputClass } from "@/components/ui";
 import { DailyReportForm } from "./DailyReportForm";
+import { ReportComments, type Author, type Comment } from "./ReportComments";
 
 const isKey = (s?: string) => !!s && /^\d{4}-\d{2}-\d{2}$/.test(s);
 type Report = { id: string; date: Date; createdAt: Date; accomplishments: string; issues: string | null; plans: string | null };
@@ -63,9 +64,21 @@ export default async function DailyReportPage({ searchParams }: { searchParams: 
   }
   const submitted = team.filter((t) => t.report).length;
 
+  // Every comment under the reports on this page, with who wrote them.
+  const reportIds = [...history.map((r) => r.id), ...team.flatMap((t) => (t.report ? [t.report.id] : []))];
+  const allComments = reportIds.length
+    ? await prisma.dailyReportComment.findMany({ where: { organizationId: me.organizationId, reportId: { in: reportIds } }, orderBy: { createdAt: "asc" } })
+    : [];
+  const authors = new Map<string, Author>(
+    (await prisma.user.findMany({ where: { id: { in: [...new Set(allComments.map((c) => c.authorId))] } }, select: { id: true, name: true, role: { select: { name: true } } } })).map((u) => [u.id, { name: u.name, role: u.role.name }]),
+  );
+  const thread = (reportId: string) => (
+    <ReportComments reportId={reportId} comments={allComments.filter((c) => c.reportId === reportId) as Comment[]} authors={authors} meId={me.id} tz={settings.timezone} />
+  );
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <PageHeader title="Daily report" subtitle="What you did today, what got in the way, and what comes next. Sent reports are final; send a new one to correct it." />
+      <PageHeader title="Daily report" subtitle="What you did today, what got in the way, and what comes next. Sent reports are final; send a new one to correct it. Your supervisor and HR can comment, and you can reply." />
 
       {!person && (
         <Card>
@@ -92,6 +105,7 @@ export default async function DailyReportPage({ searchParams }: { searchParams: 
                     {t.report ? <Badge tone="success">Submitted</Badge> : <Badge tone="danger">Not submitted</Badge>}
                   </div>
                   {t.report && <ReportBody r={t.report} />}
+                  {t.report && thread(t.report.id)}
                 </li>
               ))}
             </ul>
@@ -113,6 +127,7 @@ export default async function DailyReportPage({ searchParams }: { searchParams: 
               <li key={r.id} className="px-3 py-3">
                 <p className="mb-1 flex flex-wrap items-center gap-2 font-medium">{fmt(r.date)} <span className="text-xs font-normal text-muted">sent {formatTime(r.createdAt, settings.timezone)}</span>{replaced.has(r.id) && <Badge>Replaced by a newer report</Badge>}</p>
                 <div className={replaced.has(r.id) ? "opacity-60" : ""}><ReportBody r={r} /></div>
+                {thread(r.id)}
               </li>
             ))}
           </ul>

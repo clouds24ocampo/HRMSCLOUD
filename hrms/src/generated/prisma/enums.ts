@@ -100,7 +100,8 @@ export const TimeSource = {
   WEB: 'WEB',
   MOBILE: 'MOBILE',
   MANUAL: 'MANUAL',
-  SYSTEM: 'SYSTEM'
+  SYSTEM: 'SYSTEM',
+  KIOSK: 'KIOSK'
 } as const
 
 export type TimeSource = (typeof TimeSource)[keyof typeof TimeSource]

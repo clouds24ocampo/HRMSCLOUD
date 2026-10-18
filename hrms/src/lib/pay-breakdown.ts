@@ -80,7 +80,7 @@ export type ActivityStamp = {
 };
 export type ActivityDay = {
   day: string; status: string; stamps: ActivityStamp[]; workedMinutes: number; paidMinutes: number; approvedOtMinutes: number; overtimeMinutes: number;
-  lateMinutes: number; undertimeMinutes: number; issueMinutes: number; recoveredMinutes: number; dayCents: number; noLocation: number; systemTimeout: boolean;
+  lateMinutes: number; undertimeMinutes: number; issueMinutes: number; breakMinutes: number; recoveredMinutes: number; dayCents: number; noLocation: number; systemTimeout: boolean;
 };
 
 // Payroll view: for everyone in a period, each day with every time stamp (what, when, where), the tags and that day's pay.
@@ -118,7 +118,7 @@ export async function teamActivity(organizationId: string, ids: string[], from: 
       const p = dayPay(d, approvedFor.get(d.day) ?? 0, s.hoursPerDay * 60, minute, s.otMultiplierBp, recovered.get(d.day) ?? 0);
       return {
         day: d.day, status: d.status, workedMinutes: d.workedMinutes, paidMinutes: p.regular, approvedOtMinutes: p.okOt, overtimeMinutes: d.overtimeMinutes,
-        lateMinutes: d.lateMinutes, undertimeMinutes: d.undertimeMinutes, issueMinutes: d.issueMinutes ?? 0, recoveredMinutes: recovered.get(d.day) ?? 0, dayCents: p.regularCents + p.otCents,
+        lateMinutes: d.lateMinutes, undertimeMinutes: d.undertimeMinutes, issueMinutes: d.issueMinutes ?? 0, breakMinutes: d.breakMinutes, recoveredMinutes: recovered.get(d.day) ?? 0, dayCents: p.regularCents + p.otCents,
         noLocation: stamps.filter((e) => e.lat == null && e.source !== "SYSTEM" && e.source !== "MANUAL").length,
         systemTimeout: stamps.some((e) => e.source === "SYSTEM"),
         stamps: stamps.map((e) => ({

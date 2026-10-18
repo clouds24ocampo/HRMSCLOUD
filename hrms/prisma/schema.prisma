@@ -70,6 +70,7 @@ model Organization {
   dailyReports   DailyReport[]
   cashAdvances   CashAdvance[]
   payouts        Payout[]
+  reportComments DailyReportComment[]
   policies       PolicyDocument[]
   signatures     PolicySignature[]
   idCard         IdCardSettings?
@@ -436,6 +437,7 @@ enum TimeSource {
   MOBILE
   MANUAL
   SYSTEM // automatic time-out: nobody timed out 30 minutes after a full day (plus approved overtime)
+  KIOSK // stamped from the login page with ID number + password, without signing in
 }
 
 // Append-only punches. Server time only. Corrections are new MANUAL rows or a void with a reason.
@@ -1263,20 +1265,39 @@ model PreviousEmployment {
 // End-of-day report: what the employee did, what blocked them, what comes next. Append-only: once sent it is never edited;
 // a correction is a new report for the same day (the latest one counts).
 model DailyReport {
-  id              String       @id @default(cuid())
+  id              String               @id @default(cuid())
   organizationId  String
-  organization    Organization @relation(fields: [organizationId], references: [id])
+  organization    Organization         @relation(fields: [organizationId], references: [id])
   employeeId      String
-  employee        Employee     @relation(fields: [employeeId], references: [id])
-  date            DateTime     @db.Date
+  employee        Employee             @relation(fields: [employeeId], references: [id])
+  date            DateTime             @db.Date
   accomplishments String
   issues          String?
   plans           String?
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  comments        DailyReportComment[]
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
 
   @@index([employeeId, date])
   @@index([organizationId, date])
+}
+
+// A conversation under a daily report: the employee, their supervisors and HR comment and reply. Append-only like the
+// report itself: a comment is never edited. parentId is set on a reply (always to the top comment: one level of replies).
+model DailyReportComment {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  reportId       String
+  report         DailyReport  @relation(fields: [reportId], references: [id])
+  authorId       String // User id; kept as plain text so a removed user never blocks the thread
+  parentId       String?
+  body           String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([reportId, createdAt])
+  @@index([organizationId])
 }
 
 // ───────────── Company policies and e-signatures ─────────────

@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
 import { getOrgSettings } from "@/lib/settings";
 import { employeeScope, isHr } from "@/lib/scope";
+import { ROLES } from "@/lib/roles";
 import { getClockInfo } from "@/lib/clock";
 import { punchLabel } from "@/lib/punch";
 import { getStampTypes } from "@/lib/stamps";
@@ -91,7 +92,11 @@ export default async function DtrPage({ searchParams }: { searchParams: Promise<
         title="DTR & Productivity"
         subtitle={`${data.employee.firstName} ${data.employee.lastName} · ${data.employee.employeeNo}. 100% timestamp precision. Working hours vs issues & breaks. Times are ${tz}.`}
         action={
-          <a href={`/dtr/export?${new URLSearchParams({ employee: employeeId, from, to })}`} className={ghostClass}>Download CSV</a>
+          <span className="flex flex-wrap gap-2">
+            <a href={`/dtr/report?${new URLSearchParams({ employee: employeeId, from, to })}`} className={ghostClass}>Download PDF</a>
+            {(hr || me.role.key === ROLES.MANAGER) && <a href={`/dtr/report?${new URLSearchParams({ employee: "all", from, to })}`} className={ghostClass}>PDF, everyone</a>}
+            <a href={`/dtr/export?${new URLSearchParams({ employee: employeeId, from, to })}`} className={ghostClass}>Download CSV</a>
+          </span>
         }
       />
 
@@ -320,6 +325,7 @@ export default async function DtrPage({ searchParams }: { searchParams: Promise<
                                   <Badge>{CONTEXT[p.workContext]}</Badge>
                                   {p.source === "MANUAL" && <Badge tone="warning">Manual entry</Badge>}
                                   {p.source === "SYSTEM" && <Badge tone="danger">System time-out (no log out)</Badge>}
+                                {p.source === "KIOSK" && <Badge>Stamped from the login page</Badge>}
                                   {p.lat != null && p.lng != null ? (
                                     <a
                                       href={`https://www.openstreetmap.org/?mlat=${p.lat}&mlon=${p.lng}#map=17/${p.lat}/${p.lng}`}

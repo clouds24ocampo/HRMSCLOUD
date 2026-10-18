@@ -20,17 +20,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const unread = await prisma.notification.count({ where: { userId: user.id, organizationId: user.organizationId, readAt: null } });
   // The 201 file is mandatory for employees: until every required document is in, a reminder sits on every page.
   const emp = isHr(user.role.key) ? null : await prisma.employee.findUnique({ where: { userId: user.id }, select: { id: true } });
-  const missing = emp ? missing201((await load201(user.organizationId, [emp.id])).get(emp.id)?.keys() ?? []).length : 0;
+  const missing = emp && canAccess(user.role.key, "/documents") ? missing201((await load201(user.organizationId, [emp.id])).get(emp.id)?.keys() ?? []).length : 0;
   // Policies to sign: the same reminder, for everyone with an employee profile (HR signs too).
   await ensurePolicies(user.organizationId, user.organization.name);
   const me = emp ?? (await prisma.employee.findUnique({ where: { userId: user.id }, select: { id: true } }));
   const toSign = me ? (await unsignedPolicies(user.organizationId, me.id)).length : 0;
   const unreadChat = await unreadMessages(user.id);
   const groups = MENU.map((g) => ({ ...g, items: g.items.filter((i) => canAccess(user.role.key, i.href)) })).filter((g) => g.items.length);
+  const mobilePrimary = canAccess(user.role.key, "/leave") ? MOBILE_PRIMARY : ["/dashboard", "/dtr", "/schedule", "/payslips"];
 
   return (
     <div className="flex min-h-dvh">
-      <Nav groups={groups} primary={MOBILE_PRIMARY} />
+      <Nav groups={groups} primary={mobilePrimary} />
       <div className="flex min-w-0 flex-1 flex-col pb-20 md:pb-0">
         <header className="flex items-center justify-between border-b border-line bg-surface px-4 py-3 sm:px-8">
           <div className="min-w-0">

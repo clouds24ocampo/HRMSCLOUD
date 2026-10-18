@@ -275,6 +275,11 @@ export type PreviousEmployment = Prisma.PreviousEmploymentModel
  */
 export type DailyReport = Prisma.DailyReportModel
 /**
+ * Model DailyReportComment
+ * 
+ */
+export type DailyReportComment = Prisma.DailyReportCommentModel
+/**
  * Model PolicyDocument
  * 
  */

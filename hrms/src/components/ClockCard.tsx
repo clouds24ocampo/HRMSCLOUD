@@ -26,17 +26,16 @@ const CONTEXTS = [
 ] as const;
 
 const TONE: Record<string, string> = {
-  blue: "border-blue-400/30 bg-blue-500/15 text-blue-300",
-  amber: "border-amber-400/30 bg-amber-500/15 text-amber-300",
-  indigo: "border-indigo-400/30 bg-indigo-500/15 text-indigo-300",
-  slate: "border-slate-400/30 bg-slate-500/15 text-slate-300",
-  teal: "border-teal-400/30 bg-teal-500/15 text-teal-300",
-  red: "border-red-400/30 bg-red-500/15 text-red-300",
-  green: "border-green-400/30 bg-green-500/15 text-green-300",
-  violet: "border-violet-400/30 bg-violet-500/15 text-violet-300",
-  pink: "border-pink-400/30 bg-pink-500/15 text-pink-300",
+  blue: "border-blue-200 bg-blue-50 text-blue-700",
+  amber: "border-amber-200 bg-amber-50 text-amber-700",
+  indigo: "border-indigo-200 bg-indigo-50 text-indigo-700",
+  slate: "border-slate-200 bg-slate-100 text-slate-700",
+  teal: "border-teal-200 bg-teal-50 text-teal-700",
+  red: "border-red-200 bg-red-50 text-red-700",
+  green: "border-green-200 bg-green-50 text-green-700",
+  violet: "border-violet-200 bg-violet-50 text-violet-700",
+  pink: "border-pink-200 bg-pink-50 text-pink-700",
 };
-
 
 const noSubscribe = () => () => {};
 const clock = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
@@ -45,7 +44,7 @@ function Step({ n, title, hint, right, children }: { n: number; title: string; h
   return (
     <div className="mt-5">
       <div className="mb-3 flex items-center gap-3">
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-photon/40 bg-photon/10 text-sm font-bold text-photon">{n}</span>
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-brand/30 bg-brand/10 text-sm font-bold text-brand">{n}</span>
         <div className="min-w-0 flex-1">
           <h3 className="font-semibold leading-tight">{title}</h3>
           {hint && <p className="text-xs text-muted">{hint}</p>}
@@ -163,22 +162,15 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
           pausedOver ? "bg-danger/15 text-danger" : "bg-warning/15 text-warning",
           `${pause?.name} · ${clock(pausedSec)} · Click Time In to resume`,
         ]
-      : ["bg-white/10 text-muted", "Not timed in"];
+      : ["bg-line/60 text-muted", "Not timed in"];
 
   return (
-    // Glass: a frosted panel over a soft colour field. The field is decoration only (aria-hidden).
-    <div className="relative isolate overflow-hidden rounded-3xl bg-[#070918] p-px shadow-2xl shadow-indigo-950/40">
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -left-16 -top-20 h-72 w-72 rounded-full bg-indigo-500/70 blur-3xl" />
-        <div className="absolute -right-10 top-1/4 h-64 w-64 rounded-full bg-fuchsia-500/50 blur-3xl" />
-        <div className="absolute -bottom-24 left-1/3 h-72 w-72 rounded-full bg-cyan-400/45 blur-3xl" />
-      </div>
-    <section aria-label="Time clock" className="theme-quantum rounded-[calc(1.5rem-1px)] border border-white/20 bg-linear-to-br from-white/[0.14] via-white/5 to-white/2 p-5 text-ink shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-2xl backdrop-saturate-150">
+    <section aria-label="Time clock" className="rounded-3xl border border-line bg-surface p-6 text-ink shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-muted">{date}</p>
+        <p className="text-sm font-medium text-muted">{date}</p>
         <span className={`rounded-full px-3 py-1 text-xs font-semibold tabular-nums ${chip[0]}`}>{chip[1]}</span>
       </div>
-      <p className="mt-2 text-5xl font-bold tracking-tight tabular-nums" aria-live="off">{time}</p>
+      <p className="mt-2 text-5xl font-bold tracking-tight tabular-nums text-ink" aria-live="off">{time}</p>
       {lastText && <p className="mt-1 text-sm text-muted">{lastText}</p>}
 
       <Step n={1} title="Where are you working?" hint={types.some((t) => t.defaultContext) ? "On Trip is always counted as field work / client site." : undefined}>
@@ -186,7 +178,11 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
           {CONTEXTS.map(([v, l]) => (
             <button
               key={v} type="button" role="radio" aria-checked={ctx === v} onClick={() => setCtx(v)}
-              className={`rounded-xl border px-4 py-2 text-sm font-medium transition active:scale-95 ${ctx === v ? "border-photon bg-photon/15 text-photon" : "border-white/15 hover:bg-white/5"}`}
+              className={`rounded-xl border px-4 py-2 text-sm font-medium transition active:scale-95 ${
+                ctx === v
+                  ? "border-brand bg-brand/10 font-semibold text-brand shadow-xs"
+                  : "border-line bg-surface text-ink hover:bg-bg"
+              }`}
             >
               {l}
             </button>
@@ -234,7 +230,11 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
           {([["PUNCH", "Punch"], ["ISSUE", "Issues"]] as const).map(([k, l]) => (
             <button
               key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
-              className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${tab === k ? "border-photon bg-photon/15 text-photon" : "border-white/15 text-muted hover:bg-white/5"}`}
+              className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
+                tab === k
+                  ? "border-brand bg-brand/10 text-brand shadow-xs"
+                  : "border-line bg-surface text-muted hover:bg-bg hover:text-ink"
+              }`}
             >
               {l}
               {k === "ISSUE" && state === "ON_PAUSE" && types.find((x) => x.id === pause?.typeId)?.page === "ISSUE" && <span className="ml-1.5 inline-block h-2 w-2 rounded-full bg-warning" aria-label="active" />}
@@ -272,17 +272,17 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
             return (
               <button
                 key={t.id} type="button" disabled={!!blocked || busy} onClick={() => press(t)} title={blocked ?? undefined}
-                className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition enabled:hover:bg-white/5 enabled:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 ${
+                className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition enabled:hover:bg-bg enabled:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 ${
                   resuming
-                    ? "border-photon bg-photon/15 ring-2 ring-photon/40"
+                    ? "border-brand bg-brand/10 ring-2 ring-brand/30 font-medium"
                     : switching
-                    ? "border-amber-400/30 bg-white/5 hover:border-amber-400/60"
-                    : "border-white/10 bg-white/3"
+                    ? "border-amber-300 bg-amber-50/70 hover:border-amber-400"
+                    : "border-line bg-surface hover:border-line/80 shadow-xs"
                 }`}
               >
                 <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border text-xl ${TONE[t.tone] ?? TONE.slate}`} aria-hidden>{t.icon}</span>
                 <span className="min-w-0">
-                  <span className="block truncate font-semibold">{buttonTitle}</span>
+                  <span className="block truncate font-semibold text-ink">{buttonTitle}</span>
                   {blocked && !blocked.startsWith("Verify") && !blocked.startsWith("Time In") ? (
                     <span className="block text-xs text-warning">{blocked}</span>
                   ) : buttonHint ? (
@@ -301,7 +301,7 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
       {trip.open && state !== "ON_PAUSE" && (
         <form
           onSubmit={(e) => { e.preventDefault(); const t = types.find((x) => x.key === "ON_TRIP"); if (t) press(t, true); }}
-          className="mt-4 space-y-3 rounded-2xl border border-photon/30 bg-photon/5 p-4"
+          className="mt-4 space-y-3 rounded-2xl border border-brand/30 bg-brand/5 p-4"
         >
           <p className="text-sm font-semibold">On Trip: where are you going?</p>
           <p className="text-xs text-muted">Date and time are stamped automatically when you press Start trip.</p>
@@ -315,7 +315,7 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
             </label>
           ))}
           <div className="flex gap-2">
-            <button disabled={busy || !unlocked} className="rounded-xl bg-photon px-4 py-2 text-sm font-semibold text-void disabled:opacity-40">Start trip</button>
+            <button disabled={busy || !unlocked} className="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-xs disabled:opacity-40">Start trip</button>
             <button type="button" onClick={() => setTrip({ open: false, from: "", to: "", reason: "" })} className="px-3 py-2 text-sm text-muted">Cancel</button>
           </div>
         </form>
@@ -324,7 +324,7 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
       {requirePassword && !unlocked && (
         <button
           type="submit" form="unlock-form" disabled={!pw || busy}
-          className="mt-5 min-h-14 w-full rounded-2xl bg-photon px-6 text-lg font-semibold text-void transition enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:bg-white/10 disabled:text-muted"
+          className="mt-5 min-h-14 w-full rounded-2xl bg-brand px-6 text-lg font-semibold text-white shadow-md shadow-brand/20 transition enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:bg-line disabled:text-muted"
         >
           {step === "verifying" ? "Checking…" : pw ? "Verify and unlock" : "Enter your password to continue"}
         </button>
@@ -346,7 +346,7 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
         </>
       )}
       {desktop && !phone.open && !phone.token && (
-        <button type="button" onClick={() => setPhone({ open: true })} className="mt-4 text-sm font-medium text-photon hover:underline">
+        <button type="button" onClick={() => setPhone({ open: true })} className="mt-4 text-sm font-medium text-brand hover:underline">
           💻 On a computer? Confirm your exact location with your phone first
         </button>
       )}
@@ -358,6 +358,5 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
       </div>
       <p className="mt-2 text-xs text-muted">Your location, device and network address are saved only when you press an action. Your supervisor chain and HR can see them.</p>
     </section>
-    </div>
   );
 }

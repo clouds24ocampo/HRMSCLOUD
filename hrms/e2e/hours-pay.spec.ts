@@ -371,3 +371,39 @@ test("a phone time stamp without location is refused", async ({ browser }) => {
   expect(await db.timeEvent.count({ where: { employee: { user: { email: mail("hr") } } } })).toBe(before);
   await ctx.close();
 });
+
+test("daily report comments: the supervisor comments, the employee replies, HR joins, and each is notified", async ({ browser }) => {
+  const report = await db.dailyReport.create({ data: { organizationId: (await db.organization.findFirstOrThrow({ where: { name: `HoursPay ${stamp}` } })).id, employeeId: ids.emp, date: new Date(`${today}T00:00:00Z`), accomplishments: "Report for the comment thread" } });
+
+  const head = await browser.newPage();
+  await signIn(head, "head");
+  await head.goto("/daily-report");
+  await head.getByText("💬 Comments").first().click();
+  await head.getByPlaceholder("Add a comment").first().fill("Please attach the ticket numbers.");
+  await head.getByRole("button", { name: "Send", exact: true }).first().click();
+  await expect(head.getByText("Comment sent.")).toBeVisible();
+  const c = await db.dailyReportComment.findFirstOrThrow({ where: { reportId: report.id } });
+  expect(c.parentId).toBeNull();
+  expect(await db.notification.count({ where: { userId: (await db.user.findFirstOrThrow({ where: { email: mail("emp") } })).id, title: { contains: "commented on" } } })).toBe(1);
+
+  const emp = await browser.newPage();
+  await signIn(emp, "emp");
+  await emp.goto("/daily-report");
+  await expect(emp.getByText("Please attach the ticket numbers.")).toBeVisible(); // the thread is open: there is a comment
+  await expect(emp.getByText("Hector Hours")).toBeVisible();
+  await emp.getByText("Reply", { exact: true }).first().click();
+  await emp.getByPlaceholder("Write a reply").fill("Done: tickets 101 to 105.");
+  await emp.getByRole("button", { name: "Reply", exact: true }).click();
+  await expect(emp.getByText("Reply sent.")).toBeVisible();
+  const reply = await db.dailyReportComment.findFirstOrThrow({ where: { reportId: report.id, parentId: c.id } });
+  expect(reply.body).toBe("Done: tickets 101 to 105.");
+
+  const hr = await browser.newPage();
+  await signIn(hr, "hr");
+  await hr.goto(`/daily-report?employee=${ids.emp}`);
+  await expect(hr.getByText("Done: tickets 101 to 105.")).toBeVisible(); // HR reads the whole thread
+  await hr.getByPlaceholder("Add a comment").first().fill("Thanks both, noted.");
+  await hr.getByRole("button", { name: "Send", exact: true }).first().click();
+  await expect(hr.getByText("Comment sent.")).toBeVisible();
+  expect(await db.dailyReportComment.count({ where: { reportId: report.id } })).toBe(3);
+});

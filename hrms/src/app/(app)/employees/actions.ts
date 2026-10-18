@@ -290,6 +290,7 @@ export async function deleteEmployee(employeeId: string, _: FormState, form: For
       await tx.employee.updateMany({ where: { managerId: id }, data: { managerId: null } }); // their people lose this supervisor
       const slips = await tx.payslip.findMany({ where: { employeeId: id }, select: { id: true } });
       await tx.payslipLine.deleteMany({ where: { payslipId: { in: slips.map((x) => x.id) } } });
+      await tx.dailyReportComment.deleteMany({ where: { report: { employeeId: id } } }); // the thread under their daily reports
       for (const m of ["payslip", "payrollAdjustment", "timeEvent", "leaveRequest", "overtimeRequest", "review", "goal", "enrollment", "employeeDocument", "hrRequest", "previousEmployment", "dailyReport", "policySignature"] as const) {
         await (tx[m] as unknown as { deleteMany: (a: { where: { employeeId: string } }) => Promise<unknown> }).deleteMany({ where: { employeeId: id } });
       }

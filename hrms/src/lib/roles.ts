@@ -31,20 +31,20 @@ export const PAGE_ACCESS: Record<string, RoleKey[]> = {
   "/schedule/live": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // who is in, late, absent right now: downline only for managers
   "/schedule/analytics": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // adherence and tardiness across the downline
   "/dtr": ALL, // everyone sees what their place in the chain allows
-  "/leave": INTERNAL,
-  "/overtime": INTERNAL,
+  "/leave": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER],
+  "/overtime": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER],
   "/notifications": ALL,
   "/payroll": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN], // includes /payroll/setup
   "/payslips": INTERNAL, // own payslips only; HR can open any
   "/settings": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
   "/audit": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
   "/recruitment": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
-  "/performance": INTERNAL, // own goals and reviews; managers see their team; HR sees all
-  "/learning": INTERNAL,
-  "/documents": INTERNAL, // own file only; HR can open any
+  "/performance": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // reviews and goals: managers see their team; HR sees all
+  "/learning": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER],
+  "/documents": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
   "/requests": INTERNAL, // own requests; HR answers all
   "/locate": ALL, // phone confirms the location of a desktop time stamp
-  "/id": ALL, // own digital ID; supervisors and HR can open their people's
+  "/id": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // supervisors and HR can open their people's
   "/id/design": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
   "/chat": ALL, // messages and calls inside the organization
   "/policies": ALL, // read and e-sign; HR uploads

@@ -17,7 +17,7 @@ describe("canAccess", () => {
     expect(canAccess(ROLES.SUBCONTRACTOR, "/schedule")).toBe(true);
     expect(canAccess(ROLES.SUBCONTRACTOR, "/daily-report")).toBe(true);
     expect(canAccess(ROLES.SUBCONTRACTOR, "/chat")).toBe(true);
-    expect(canAccess(ROLES.SUBCONTRACTOR, "/id")).toBe(true);
+    expect(canAccess(ROLES.SUBCONTRACTOR, "/id")).toBe(false);
     expect(canAccess(ROLES.SUBCONTRACTOR, "/policies")).toBe(true);
 
     expect(canAccess(ROLES.SUBCONTRACTOR, "/payslips")).toBe(false);
@@ -27,6 +27,14 @@ describe("canAccess", () => {
     expect(canAccess(ROLES.SUBCONTRACTOR, "/learning")).toBe(false);
     expect(canAccess(ROLES.SUBCONTRACTOR, "/documents")).toBe(false);
     expect(canAccess(ROLES.SUBCONTRACTOR, "/requests")).toBe(false);
+  });
+  it("hides documents, digital ID, performance, learning, leave, and overtime from Employee role", () => {
+    expect(canAccess(ROLES.EMPLOYEE, "/documents")).toBe(false);
+    expect(canAccess(ROLES.EMPLOYEE, "/id")).toBe(false);
+    expect(canAccess(ROLES.EMPLOYEE, "/performance")).toBe(false);
+    expect(canAccess(ROLES.EMPLOYEE, "/learning")).toBe(false);
+    expect(canAccess(ROLES.EMPLOYEE, "/leave")).toBe(false);
+    expect(canAccess(ROLES.EMPLOYEE, "/overtime")).toBe(false);
   });
   it("denies unlisted pages and unknown roles", () => {
     expect(canAccess(ROLES.SUPER_ADMIN, "/secret")).toBe(false);

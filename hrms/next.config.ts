@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(process.cwd(), ".."),
   },
+  // pdfkit reads its font files from disk at runtime: keep it out of the bundle.
+  serverExternalPackages: ["pdfkit"],
   // The dev-only "N" badge sits on top of the phone bottom bar and blocks taps.
   devIndicators: false,
   // Document uploads are posted through server actions: allow a little over the file limit (see DOCUMENT_MAX_MB).

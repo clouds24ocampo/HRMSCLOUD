@@ -444,6 +444,7 @@ export const ModelName = {
   Holiday: 'Holiday',
   PreviousEmployment: 'PreviousEmployment',
   DailyReport: 'DailyReport',
+  DailyReportComment: 'DailyReportComment',
   PolicyDocument: 'PolicyDocument',
   PolicySignature: 'PolicySignature',
   IdCardSettings: 'IdCardSettings',
@@ -470,7 +471,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "role" | "organization" | "user" | "session" | "auditLog" | "orgSettings" | "department" | "position" | "employee" | "employmentHistory" | "shiftTemplate" | "regularSchedule" | "scheduleEntry" | "timeStampType" | "timeEvent" | "leaveType" | "leaveRequest" | "notification" | "overtimeRequest" | "compensation" | "payComponent" | "employeeComponent" | "contributionRule" | "taxBracket" | "payrollPeriod" | "payslip" | "payslipLine" | "payrollAdjustment" | "checklistTemplate" | "checklistItem" | "jobPosting" | "applicant" | "applicantNote" | "reviewCycle" | "review" | "goal" | "course" | "enrollment" | "employeeDocument" | "hrRequest" | "announcement" | "statutoryRule" | "employeeTaxProfile" | "wageOrder" | "holiday" | "previousEmployment" | "dailyReport" | "policyDocument" | "policySignature" | "idCardSettings" | "locationLink" | "conversation" | "conversationMember" | "message" | "callSession" | "cashAdvance" | "cashAdvancePayment" | "payout"
+    modelProps: "role" | "organization" | "user" | "session" | "auditLog" | "orgSettings" | "department" | "position" | "employee" | "employmentHistory" | "shiftTemplate" | "regularSchedule" | "scheduleEntry" | "timeStampType" | "timeEvent" | "leaveType" | "leaveRequest" | "notification" | "overtimeRequest" | "compensation" | "payComponent" | "employeeComponent" | "contributionRule" | "taxBracket" | "payrollPeriod" | "payslip" | "payslipLine" | "payrollAdjustment" | "checklistTemplate" | "checklistItem" | "jobPosting" | "applicant" | "applicantNote" | "reviewCycle" | "review" | "goal" | "course" | "enrollment" | "employeeDocument" | "hrRequest" | "announcement" | "statutoryRule" | "employeeTaxProfile" | "wageOrder" | "holiday" | "previousEmployment" | "dailyReport" | "dailyReportComment" | "policyDocument" | "policySignature" | "idCardSettings" | "locationLink" | "conversation" | "conversationMember" | "message" | "callSession" | "cashAdvance" | "cashAdvancePayment" | "payout"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3952,6 +3953,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DailyReportComment: {
+      payload: Prisma.$DailyReportCommentPayload<ExtArgs>
+      fields: Prisma.DailyReportCommentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DailyReportCommentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyReportCommentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DailyReportCommentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyReportCommentPayload>
+        }
+        findFirst: {
+          args: Prisma.DailyReportCommentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyReportCommentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DailyReportCommentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyReportCommentPayload>
+        }
+        findMany: {
+          args: Prisma.DailyReportCommentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyReportCommentPayload>[]
+        }
+        create: {
+          args: Prisma.DailyReportCommentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyReportCommentPayload>
+        }
+        createMany: {
+          args: Prisma.DailyReportCommentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DailyReportCommentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyReportCommentPayload>[]
+        }
+        delete: {
+          args: Prisma.DailyReportCommentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyReportCommentPayload>
+        }
+        update: {
+          args: Prisma.DailyReportCommentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyReportCommentPayload>
+        }
+        deleteMany: {
+          args: Prisma.DailyReportCommentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DailyReportCommentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DailyReportCommentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyReportCommentPayload>[]
+        }
+        upsert: {
+          args: Prisma.DailyReportCommentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyReportCommentPayload>
+        }
+        aggregate: {
+          args: Prisma.DailyReportCommentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDailyReportComment>
+        }
+        groupBy: {
+          args: Prisma.DailyReportCommentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailyReportCommentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DailyReportCommentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailyReportCommentCountAggregateOutputType> | number
+        }
+      }
+    }
     PolicyDocument: {
       payload: Prisma.$PolicyDocumentPayload<ExtArgs>
       fields: Prisma.PolicyDocumentFieldRefs
@@ -5638,6 +5713,20 @@ export const DailyReportScalarFieldEnum = {
 export type DailyReportScalarFieldEnum = (typeof DailyReportScalarFieldEnum)[keyof typeof DailyReportScalarFieldEnum]
 
 
+export const DailyReportCommentScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  reportId: 'reportId',
+  authorId: 'authorId',
+  parentId: 'parentId',
+  body: 'body',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DailyReportCommentScalarFieldEnum = (typeof DailyReportCommentScalarFieldEnum)[keyof typeof DailyReportCommentScalarFieldEnum]
+
+
 export const PolicyDocumentScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
@@ -6682,6 +6771,7 @@ export type GlobalOmitConfig = {
   holiday?: Prisma.HolidayOmit
   previousEmployment?: Prisma.PreviousEmploymentOmit
   dailyReport?: Prisma.DailyReportOmit
+  dailyReportComment?: Prisma.DailyReportCommentOmit
   policyDocument?: Prisma.PolicyDocumentOmit
   policySignature?: Prisma.PolicySignatureOmit
   idCardSettings?: Prisma.IdCardSettingsOmit

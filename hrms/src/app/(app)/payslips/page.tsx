@@ -22,8 +22,9 @@ export default async function PayslipsPage({ searchParams }: { searchParams: Pro
   const settings = await getOrgSettings(me.organizationId);
   const tz = settings.timezone;
   const mine = await getMyEmployee(me, tz);
+  const hr = isHr(me.role.key);
   // Pay is HR-only: anyone else always sees their own, whatever the URL says.
-  const other = isHr(me.role.key) && sp.employee && sp.employee !== mine.id
+  const other = hr && sp.employee && sp.employee !== mine.id
     ? await prisma.employee.findFirst({ where: { id: sp.employee, organizationId: me.organizationId }, select: { id: true, firstName: true, lastName: true } })
     : null;
   const emp = other ?? mine;
@@ -92,7 +93,7 @@ export default async function PayslipsPage({ searchParams }: { searchParams: Pro
                 <Badge tone="warning">{cut.end >= today ? "In progress" : "Waiting for payroll to be finalized"}</Badge>
               </div>
               {live ? (
-                <PayBreakdown b={live} daysPerYear={settings.daysPerYear} hoursPerDay={settings.hoursPerDay} />
+                <PayBreakdown b={live} daysPerYear={settings.daysPerYear} hoursPerDay={settings.hoursPerDay} isAdmin={hr} today={today} />
               ) : (
                 <p className="text-sm text-muted">No pay rate on record for this cut-off yet, so the amount cannot be shown. HR sets it on the employee&apos;s profile.</p>
               )}

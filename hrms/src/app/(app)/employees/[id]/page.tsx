@@ -90,19 +90,14 @@ export default async function EmployeePage({ params, searchParams }: { params: P
   const own = e.id === mine.id;
   // Pay is personal: HR and the person themselves only.
   const breakdown = hr || own ? await payBreakdown(me, mine.id, e.id, today, settings) : null;
-  const f201 = hr || own ? items201((await load201(me.organizationId, [e.id])).get(e.id)) : null;
+  const f201 = hr ? items201((await load201(me.organizationId, [e.id])).get(e.id)) : null;
   const tabs = [
     (hr || own) && { href: own ? "/payslips" : `/payslips?employee=${e.id}`, label: "Payslips", icon: "🧾" },
     { href: `/schedule?employee=${e.id}`, label: "Schedule", icon: "📅" },
     { href: `/dtr?employee=${e.id}`, label: "DTR", icon: "⏱️" },
-    { href: own ? "/performance" : `/performance?employee=${e.id}`, label: "Performance", icon: "📈" },
-    { href: own ? "/leave" : `/leave?employee=${e.id}`, label: "Leave", icon: "🏖️" },
-    { href: own ? "/overtime" : `/overtime?employee=${e.id}`, label: "Overtime", icon: "⏰" },
     (hr || own) && { href: own ? "/cash-advance" : `/cash-advance?employee=${e.id}`, label: "Cash advance", icon: "💵" },
     { href: own ? "/daily-report" : `/daily-report?employee=${e.id}`, label: "Daily report", icon: "🗒️" },
-    { href: own ? "/id" : `/id?employee=${e.id}`, label: "Digital ID", icon: "🪪" },
     (hr || own) && { href: own ? "/policies" : `/policies?employee=${e.id}`, label: "Policies", icon: "📜" },
-    (hr || own) && { href: own ? "/documents" : `/documents?employee=${e.id}`, label: "Documents", icon: "🗂️" },
   ].filter((t): t is { href: string; label: string; icon: string } => !!t);
   const shifts = canSchedule ? await prisma.shiftTemplate.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, orderBy: { startTime: "asc" } }) : [];
 
@@ -240,7 +235,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
       {!hr && own && breakdown && (
         <Card className="space-y-3">
           <h2 className="font-semibold">My pay</h2>
-          <PayBreakdown b={breakdown} daysPerYear={settings.daysPerYear} hoursPerDay={settings.hoursPerDay} />
+          <PayBreakdown b={breakdown} daysPerYear={settings.daysPerYear} hoursPerDay={settings.hoursPerDay} isAdmin={false} today={today} />
         </Card>
       )}
 
@@ -256,7 +251,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
           {currentComp ? (
             <div className="space-y-4 text-sm">
               <p><span className="text-lg font-bold">{formatMoney(currentComp.rateCents)}</span> {PAY_TYPE[currentComp.payType]}</p>
-              {breakdown && <PayBreakdown b={breakdown} daysPerYear={settings.daysPerYear} hoursPerDay={settings.hoursPerDay} />}
+              {breakdown && <PayBreakdown b={breakdown} daysPerYear={settings.daysPerYear} hoursPerDay={settings.hoursPerDay} isAdmin={true} today={today} />}
             </div>
           ) : (
             <p className="rounded-lg border border-warning/40 bg-warning/10 px-3 py-2 text-sm text-warning">No pay rate yet. This person is skipped when payroll is calculated.</p>

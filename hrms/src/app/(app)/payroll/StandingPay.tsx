@@ -141,7 +141,10 @@ export async function StandingPay({ organizationId, today, pick, settings }: { o
         })}
       </ul>
       <p className="text-xs text-muted">The day amounts are gross for the day (hours paid plus approved overtime). Deductions such as cash advances come off once, on the payslip.</p>
-      <Link href={`/payroll/${period.id}`} className="inline-block text-sm font-semibold text-brand hover:underline">Open this payroll to calculate, approve and finalize</Link>
+      <div className="flex flex-wrap gap-x-5 gap-y-2">
+        <Link href={`/payroll/${period.id}`} className="inline-block text-sm font-semibold text-brand hover:underline">Open this payroll to calculate, approve and finalize</Link>
+        <a href={`/dtr/report?${new URLSearchParams({ employee: "all", from: keyOfDbDate(period.startDate), to: keyOfDbDate(period.endDate) })}`} className="inline-block text-sm font-semibold text-brand hover:underline">DTR report with daily wages (PDF)</a>
+      </div>
     </Card>
   );
 }

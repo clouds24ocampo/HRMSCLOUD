@@ -34,7 +34,7 @@ export function PhoneLocation({ onReady, onClose }: { onReady: (token: string, a
   }, [link, onReady]);
 
   return (
-    <div className="mt-4 rounded-2xl border border-photon/30 bg-photon/5 p-4">
+    <div className="mt-4 rounded-2xl border border-brand/30 bg-brand/5 p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-semibold">Confirm your location with your phone</p>
