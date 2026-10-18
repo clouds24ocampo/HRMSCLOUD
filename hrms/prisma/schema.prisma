@@ -71,6 +71,10 @@ model Organization {
   wsProjects     WsProject[]
   cashAdvances   CashAdvance[]
   payouts        Payout[]
+  incentives     Incentive[]
+  contracts      Contract[]
+  handbookSections HandbookSection[]
+  handbookAcks   HandbookAcknowledgment[]
   reportComments DailyReportComment[]
   policies       PolicyDocument[]
   signatures     PolicySignature[]
@@ -278,7 +282,11 @@ model Employee {
   wsMemberships  WsMember[]
   wsAssignments  WsAssignee[]
   cashAdvances   CashAdvance[]
+  incentives     Incentive[]
+  contracts      Contract[]
+  handbookAcks   HandbookAcknowledgment[]
   signatures     PolicySignature[]
+  address        String?
   createdAt      DateTime             @default(now())
   updatedAt      DateTime             @updatedAt
 
@@ -1553,6 +1561,109 @@ model Payout {
   @@index([organizationId, status])
 }
 
+// ───────────── Incentives ─────────────
+
+enum IncentiveStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  PAID
+}
+
+// Performance, attendance, or project milestone incentive awarded to an employee.
+// Employee must explicitly click accept before it is credited as an earning in payroll.
+model Incentive {
+  id             String          @id @default(cuid())
+  organizationId String
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  title          String
+  amountCents    Int
+  reason         String
+  status         IncentiveStatus @default(PENDING)
+  awardedById    String          // User id
+  awardedAt      DateTime        @default(now())
+  acceptedAt     DateTime?
+  declinedAt     DateTime?
+  employeeNote   String?
+  projectId      String?         // Optional link to WorkSync project
+  cardId         String?         // Optional link to WorkSync card
+  payslipId      String?         // Set when credited into a payslip
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([organizationId, status])
+  @@index([employeeId, status])
+}
+
+// ───────────── Contracts & Templates ─────────────
+
+enum ContractStatus {
+  DRAFT
+  ISSUED
+  SIGNED
+  VOID
+}
+
+// Employment contracts with dynamic placeholder injection: {{employee_name}}, {{address}}, {{position}}, {{salary}}, etc.
+model Contract {
+  id             String         @id @default(cuid())
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee       @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  templateKey    String         @default("REGULAR") // REGULAR, PROBATIONARY, PROJECT_BASED, CONSULTANT, CUSTOM
+  title          String
+  body           String         @db.Text
+  status         ContractStatus @default(DRAFT)
+  issuedAt       DateTime?
+  issuedById     String?
+  signedAt       DateTime?
+  signatureIp    String?
+  signatureNote  String?
+  createdById    String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([organizationId, status])
+  @@index([employeeId, status])
+}
+
+// ───────────── Company Handbook ─────────────
+
+model HandbookSection {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  sortOrder      Int          @default(0)
+  title          String
+  slug           String
+  content        String       @db.Text
+  version        Int          @default(1)
+  updatedById    String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, slug])
+  @@index([organizationId, sortOrder])
+}
+
+model HandbookAcknowledgment {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  employeeId     String
+  employee       Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  version        Int          @default(1)
+  signedAt       DateTime     @default(now())
+  signatureIp    String?
+  note           String?
+
+  @@unique([employeeId, version])
+  @@index([organizationId, version])
+}
+
 // ───────────── WorkSync: project boards (Trello-style) and daily progress ─────────────
 // One board per project. Every list maps to one category (TODO, DOING, BLOCKED, DONE) so progress, "blocked" and "overdue"
 // mean the same on every board, however the lists are named. Visibility follows the project's members, never a hidden button.
@@ -1645,6 +1756,7 @@ model WsCard {
   dueDate        DateTime?     @db.Date
   position       Float
   completedAt    DateTime?
+  completedById  String? // User id of whoever moved it into a done list: "resolved by"
   archivedAt     DateTime?
   createdById    String // User id
   assignees      WsAssignee[]

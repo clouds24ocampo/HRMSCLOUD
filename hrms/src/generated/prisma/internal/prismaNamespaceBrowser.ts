@@ -110,6 +110,10 @@ export const ModelName = {
   CashAdvance: 'CashAdvance',
   CashAdvancePayment: 'CashAdvancePayment',
   Payout: 'Payout',
+  Incentive: 'Incentive',
+  Contract: 'Contract',
+  HandbookSection: 'HandbookSection',
+  HandbookAcknowledgment: 'HandbookAcknowledgment',
   WsProject: 'WsProject',
   WsMember: 'WsMember',
   WsList: 'WsList',
@@ -276,6 +280,7 @@ export const EmployeeScalarFieldEnum = {
   photoKey: 'photoKey',
   hireDate: 'hireDate',
   status: 'status',
+  address: 'address',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1169,6 +1174,79 @@ export const PayoutScalarFieldEnum = {
 export type PayoutScalarFieldEnum = (typeof PayoutScalarFieldEnum)[keyof typeof PayoutScalarFieldEnum]
 
 
+export const IncentiveScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  employeeId: 'employeeId',
+  title: 'title',
+  amountCents: 'amountCents',
+  reason: 'reason',
+  status: 'status',
+  awardedById: 'awardedById',
+  awardedAt: 'awardedAt',
+  acceptedAt: 'acceptedAt',
+  declinedAt: 'declinedAt',
+  employeeNote: 'employeeNote',
+  projectId: 'projectId',
+  cardId: 'cardId',
+  payslipId: 'payslipId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IncentiveScalarFieldEnum = (typeof IncentiveScalarFieldEnum)[keyof typeof IncentiveScalarFieldEnum]
+
+
+export const ContractScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  employeeId: 'employeeId',
+  templateKey: 'templateKey',
+  title: 'title',
+  body: 'body',
+  status: 'status',
+  issuedAt: 'issuedAt',
+  issuedById: 'issuedById',
+  signedAt: 'signedAt',
+  signatureIp: 'signatureIp',
+  signatureNote: 'signatureNote',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContractScalarFieldEnum = (typeof ContractScalarFieldEnum)[keyof typeof ContractScalarFieldEnum]
+
+
+export const HandbookSectionScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  sortOrder: 'sortOrder',
+  title: 'title',
+  slug: 'slug',
+  content: 'content',
+  version: 'version',
+  updatedById: 'updatedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type HandbookSectionScalarFieldEnum = (typeof HandbookSectionScalarFieldEnum)[keyof typeof HandbookSectionScalarFieldEnum]
+
+
+export const HandbookAcknowledgmentScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  employeeId: 'employeeId',
+  version: 'version',
+  signedAt: 'signedAt',
+  signatureIp: 'signatureIp',
+  note: 'note'
+} as const
+
+export type HandbookAcknowledgmentScalarFieldEnum = (typeof HandbookAcknowledgmentScalarFieldEnum)[keyof typeof HandbookAcknowledgmentScalarFieldEnum]
+
+
 export const WsProjectScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
@@ -1221,6 +1299,7 @@ export const WsCardScalarFieldEnum = {
   dueDate: 'dueDate',
   position: 'position',
   completedAt: 'completedAt',
+  completedById: 'completedById',
   archivedAt: 'archivedAt',
   createdById: 'createdById',
   createdAt: 'createdAt',

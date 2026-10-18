@@ -335,6 +335,26 @@ export type CashAdvancePayment = Prisma.CashAdvancePaymentModel
  */
 export type Payout = Prisma.PayoutModel
 /**
+ * Model Incentive
+ * 
+ */
+export type Incentive = Prisma.IncentiveModel
+/**
+ * Model Contract
+ * 
+ */
+export type Contract = Prisma.ContractModel
+/**
+ * Model HandbookSection
+ * 
+ */
+export type HandbookSection = Prisma.HandbookSectionModel
+/**
+ * Model HandbookAcknowledgment
+ * 
+ */
+export type HandbookAcknowledgment = Prisma.HandbookAcknowledgmentModel
+/**
  * Model WsProject
  * 
  */

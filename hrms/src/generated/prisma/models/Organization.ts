@@ -243,6 +243,10 @@ export type OrganizationWhereInput = {
   wsProjects?: Prisma.WsProjectListRelationFilter
   cashAdvances?: Prisma.CashAdvanceListRelationFilter
   payouts?: Prisma.PayoutListRelationFilter
+  incentives?: Prisma.IncentiveListRelationFilter
+  contracts?: Prisma.ContractListRelationFilter
+  handbookSections?: Prisma.HandbookSectionListRelationFilter
+  handbookAcks?: Prisma.HandbookAcknowledgmentListRelationFilter
   reportComments?: Prisma.DailyReportCommentListRelationFilter
   policies?: Prisma.PolicyDocumentListRelationFilter
   signatures?: Prisma.PolicySignatureListRelationFilter
@@ -304,6 +308,10 @@ export type OrganizationOrderByWithRelationInput = {
   wsProjects?: Prisma.WsProjectOrderByRelationAggregateInput
   cashAdvances?: Prisma.CashAdvanceOrderByRelationAggregateInput
   payouts?: Prisma.PayoutOrderByRelationAggregateInput
+  incentives?: Prisma.IncentiveOrderByRelationAggregateInput
+  contracts?: Prisma.ContractOrderByRelationAggregateInput
+  handbookSections?: Prisma.HandbookSectionOrderByRelationAggregateInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentOrderByRelationAggregateInput
   reportComments?: Prisma.DailyReportCommentOrderByRelationAggregateInput
   policies?: Prisma.PolicyDocumentOrderByRelationAggregateInput
   signatures?: Prisma.PolicySignatureOrderByRelationAggregateInput
@@ -368,6 +376,10 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   wsProjects?: Prisma.WsProjectListRelationFilter
   cashAdvances?: Prisma.CashAdvanceListRelationFilter
   payouts?: Prisma.PayoutListRelationFilter
+  incentives?: Prisma.IncentiveListRelationFilter
+  contracts?: Prisma.ContractListRelationFilter
+  handbookSections?: Prisma.HandbookSectionListRelationFilter
+  handbookAcks?: Prisma.HandbookAcknowledgmentListRelationFilter
   reportComments?: Prisma.DailyReportCommentListRelationFilter
   policies?: Prisma.PolicyDocumentListRelationFilter
   signatures?: Prisma.PolicySignatureListRelationFilter
@@ -455,6 +467,10 @@ export type OrganizationCreateInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -516,6 +532,10 @@ export type OrganizationUncheckedCreateInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -577,6 +597,10 @@ export type OrganizationUpdateInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -638,6 +662,10 @@ export type OrganizationUncheckedUpdateInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -1411,6 +1439,62 @@ export type OrganizationUpdateOneRequiredWithoutPayoutsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutPayoutsInput, Prisma.OrganizationUpdateWithoutPayoutsInput>, Prisma.OrganizationUncheckedUpdateWithoutPayoutsInput>
 }
 
+export type OrganizationCreateNestedOneWithoutIncentivesInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutIncentivesInput, Prisma.OrganizationUncheckedCreateWithoutIncentivesInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutIncentivesInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutIncentivesNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutIncentivesInput, Prisma.OrganizationUncheckedCreateWithoutIncentivesInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutIncentivesInput
+  upsert?: Prisma.OrganizationUpsertWithoutIncentivesInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutIncentivesInput, Prisma.OrganizationUpdateWithoutIncentivesInput>, Prisma.OrganizationUncheckedUpdateWithoutIncentivesInput>
+}
+
+export type OrganizationCreateNestedOneWithoutContractsInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutContractsInput, Prisma.OrganizationUncheckedCreateWithoutContractsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutContractsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutContractsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutContractsInput, Prisma.OrganizationUncheckedCreateWithoutContractsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutContractsInput
+  upsert?: Prisma.OrganizationUpsertWithoutContractsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutContractsInput, Prisma.OrganizationUpdateWithoutContractsInput>, Prisma.OrganizationUncheckedUpdateWithoutContractsInput>
+}
+
+export type OrganizationCreateNestedOneWithoutHandbookSectionsInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutHandbookSectionsInput, Prisma.OrganizationUncheckedCreateWithoutHandbookSectionsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutHandbookSectionsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutHandbookSectionsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutHandbookSectionsInput, Prisma.OrganizationUncheckedCreateWithoutHandbookSectionsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutHandbookSectionsInput
+  upsert?: Prisma.OrganizationUpsertWithoutHandbookSectionsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutHandbookSectionsInput, Prisma.OrganizationUpdateWithoutHandbookSectionsInput>, Prisma.OrganizationUncheckedUpdateWithoutHandbookSectionsInput>
+}
+
+export type OrganizationCreateNestedOneWithoutHandbookAcksInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutHandbookAcksInput, Prisma.OrganizationUncheckedCreateWithoutHandbookAcksInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutHandbookAcksInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutHandbookAcksNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutHandbookAcksInput, Prisma.OrganizationUncheckedCreateWithoutHandbookAcksInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutHandbookAcksInput
+  upsert?: Prisma.OrganizationUpsertWithoutHandbookAcksInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutHandbookAcksInput, Prisma.OrganizationUpdateWithoutHandbookAcksInput>, Prisma.OrganizationUncheckedUpdateWithoutHandbookAcksInput>
+}
+
 export type OrganizationCreateNestedOneWithoutWsProjectsInput = {
   create?: Prisma.XOR<Prisma.OrganizationCreateWithoutWsProjectsInput, Prisma.OrganizationUncheckedCreateWithoutWsProjectsInput>
   connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutWsProjectsInput
@@ -1477,6 +1561,10 @@ export type OrganizationCreateWithoutUsersInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -1537,6 +1625,10 @@ export type OrganizationUncheckedCreateWithoutUsersInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -1613,6 +1705,10 @@ export type OrganizationUpdateWithoutUsersInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -1673,6 +1769,10 @@ export type OrganizationUncheckedUpdateWithoutUsersInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -1733,6 +1833,10 @@ export type OrganizationCreateWithoutSettingsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -1793,6 +1897,10 @@ export type OrganizationUncheckedCreateWithoutSettingsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -1869,6 +1977,10 @@ export type OrganizationUpdateWithoutSettingsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -1929,6 +2041,10 @@ export type OrganizationUncheckedUpdateWithoutSettingsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -1989,6 +2105,10 @@ export type OrganizationCreateWithoutDepartmentsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -2049,6 +2169,10 @@ export type OrganizationUncheckedCreateWithoutDepartmentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -2125,6 +2249,10 @@ export type OrganizationUpdateWithoutDepartmentsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -2185,6 +2313,10 @@ export type OrganizationUncheckedUpdateWithoutDepartmentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -2245,6 +2377,10 @@ export type OrganizationCreateWithoutPositionsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -2305,6 +2441,10 @@ export type OrganizationUncheckedCreateWithoutPositionsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -2381,6 +2521,10 @@ export type OrganizationUpdateWithoutPositionsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -2441,6 +2585,10 @@ export type OrganizationUncheckedUpdateWithoutPositionsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -2501,6 +2649,10 @@ export type OrganizationCreateWithoutEmployeesInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -2561,6 +2713,10 @@ export type OrganizationUncheckedCreateWithoutEmployeesInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -2637,6 +2793,10 @@ export type OrganizationUpdateWithoutEmployeesInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -2697,6 +2857,10 @@ export type OrganizationUncheckedUpdateWithoutEmployeesInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -2757,6 +2921,10 @@ export type OrganizationCreateWithoutHistoryInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -2817,6 +2985,10 @@ export type OrganizationUncheckedCreateWithoutHistoryInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -2893,6 +3065,10 @@ export type OrganizationUpdateWithoutHistoryInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -2953,6 +3129,10 @@ export type OrganizationUncheckedUpdateWithoutHistoryInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -3013,6 +3193,10 @@ export type OrganizationCreateWithoutShiftsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -3073,6 +3257,10 @@ export type OrganizationUncheckedCreateWithoutShiftsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -3149,6 +3337,10 @@ export type OrganizationUpdateWithoutShiftsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -3209,6 +3401,10 @@ export type OrganizationUncheckedUpdateWithoutShiftsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -3269,6 +3465,10 @@ export type OrganizationCreateWithoutRegularsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -3329,6 +3529,10 @@ export type OrganizationUncheckedCreateWithoutRegularsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -3405,6 +3609,10 @@ export type OrganizationUpdateWithoutRegularsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -3465,6 +3673,10 @@ export type OrganizationUncheckedUpdateWithoutRegularsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -3525,6 +3737,10 @@ export type OrganizationCreateWithoutScheduleInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -3585,6 +3801,10 @@ export type OrganizationUncheckedCreateWithoutScheduleInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -3661,6 +3881,10 @@ export type OrganizationUpdateWithoutScheduleInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -3721,6 +3945,10 @@ export type OrganizationUncheckedUpdateWithoutScheduleInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -3781,6 +4009,10 @@ export type OrganizationCreateWithoutStampTypesInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -3841,6 +4073,10 @@ export type OrganizationUncheckedCreateWithoutStampTypesInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -3917,6 +4153,10 @@ export type OrganizationUpdateWithoutStampTypesInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -3977,6 +4217,10 @@ export type OrganizationUncheckedUpdateWithoutStampTypesInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -4037,6 +4281,10 @@ export type OrganizationCreateWithoutTimeEventsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -4097,6 +4345,10 @@ export type OrganizationUncheckedCreateWithoutTimeEventsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -4173,6 +4425,10 @@ export type OrganizationUpdateWithoutTimeEventsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -4233,6 +4489,10 @@ export type OrganizationUncheckedUpdateWithoutTimeEventsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -4293,6 +4553,10 @@ export type OrganizationCreateWithoutLeaveTypesInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -4353,6 +4617,10 @@ export type OrganizationUncheckedCreateWithoutLeaveTypesInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -4429,6 +4697,10 @@ export type OrganizationUpdateWithoutLeaveTypesInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -4489,6 +4761,10 @@ export type OrganizationUncheckedUpdateWithoutLeaveTypesInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -4549,6 +4825,10 @@ export type OrganizationCreateWithoutLeaveRequestsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -4609,6 +4889,10 @@ export type OrganizationUncheckedCreateWithoutLeaveRequestsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -4685,6 +4969,10 @@ export type OrganizationUpdateWithoutLeaveRequestsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -4745,6 +5033,10 @@ export type OrganizationUncheckedUpdateWithoutLeaveRequestsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -4805,6 +5097,10 @@ export type OrganizationCreateWithoutNotificationsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -4865,6 +5161,10 @@ export type OrganizationUncheckedCreateWithoutNotificationsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -4941,6 +5241,10 @@ export type OrganizationUpdateWithoutNotificationsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -5001,6 +5305,10 @@ export type OrganizationUncheckedUpdateWithoutNotificationsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -5061,6 +5369,10 @@ export type OrganizationCreateWithoutOvertimeInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -5121,6 +5433,10 @@ export type OrganizationUncheckedCreateWithoutOvertimeInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -5197,6 +5513,10 @@ export type OrganizationUpdateWithoutOvertimeInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -5257,6 +5577,10 @@ export type OrganizationUncheckedUpdateWithoutOvertimeInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -5317,6 +5641,10 @@ export type OrganizationCreateWithoutCompensationsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -5377,6 +5705,10 @@ export type OrganizationUncheckedCreateWithoutCompensationsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -5453,6 +5785,10 @@ export type OrganizationUpdateWithoutCompensationsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -5513,6 +5849,10 @@ export type OrganizationUncheckedUpdateWithoutCompensationsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -5573,6 +5913,10 @@ export type OrganizationCreateWithoutPayComponentsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -5633,6 +5977,10 @@ export type OrganizationUncheckedCreateWithoutPayComponentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -5709,6 +6057,10 @@ export type OrganizationUpdateWithoutPayComponentsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -5769,6 +6121,10 @@ export type OrganizationUncheckedUpdateWithoutPayComponentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -5829,6 +6185,10 @@ export type OrganizationCreateWithoutEmpComponentsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -5889,6 +6249,10 @@ export type OrganizationUncheckedCreateWithoutEmpComponentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -5965,6 +6329,10 @@ export type OrganizationUpdateWithoutEmpComponentsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -6025,6 +6393,10 @@ export type OrganizationUncheckedUpdateWithoutEmpComponentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -6085,6 +6457,10 @@ export type OrganizationCreateWithoutContributionsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -6145,6 +6521,10 @@ export type OrganizationUncheckedCreateWithoutContributionsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -6221,6 +6601,10 @@ export type OrganizationUpdateWithoutContributionsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -6281,6 +6665,10 @@ export type OrganizationUncheckedUpdateWithoutContributionsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -6341,6 +6729,10 @@ export type OrganizationCreateWithoutTaxBracketsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -6401,6 +6793,10 @@ export type OrganizationUncheckedCreateWithoutTaxBracketsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -6477,6 +6873,10 @@ export type OrganizationUpdateWithoutTaxBracketsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -6537,6 +6937,10 @@ export type OrganizationUncheckedUpdateWithoutTaxBracketsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -6597,6 +7001,10 @@ export type OrganizationCreateWithoutPeriodsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -6657,6 +7065,10 @@ export type OrganizationUncheckedCreateWithoutPeriodsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -6733,6 +7145,10 @@ export type OrganizationUpdateWithoutPeriodsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -6793,6 +7209,10 @@ export type OrganizationUncheckedUpdateWithoutPeriodsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -6853,6 +7273,10 @@ export type OrganizationCreateWithoutPayslipsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -6913,6 +7337,10 @@ export type OrganizationUncheckedCreateWithoutPayslipsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -6989,6 +7417,10 @@ export type OrganizationUpdateWithoutPayslipsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -7049,6 +7481,10 @@ export type OrganizationUncheckedUpdateWithoutPayslipsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -7109,6 +7545,10 @@ export type OrganizationCreateWithoutAdjustmentsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -7169,6 +7609,10 @@ export type OrganizationUncheckedCreateWithoutAdjustmentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -7245,6 +7689,10 @@ export type OrganizationUpdateWithoutAdjustmentsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -7305,6 +7753,10 @@ export type OrganizationUncheckedUpdateWithoutAdjustmentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -7365,6 +7817,10 @@ export type OrganizationCreateWithoutChecklistTplInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -7425,6 +7881,10 @@ export type OrganizationUncheckedCreateWithoutChecklistTplInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -7501,6 +7961,10 @@ export type OrganizationUpdateWithoutChecklistTplInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -7561,6 +8025,10 @@ export type OrganizationUncheckedUpdateWithoutChecklistTplInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -7621,6 +8089,10 @@ export type OrganizationCreateWithoutChecklistItemsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -7681,6 +8153,10 @@ export type OrganizationUncheckedCreateWithoutChecklistItemsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -7757,6 +8233,10 @@ export type OrganizationUpdateWithoutChecklistItemsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -7817,6 +8297,10 @@ export type OrganizationUncheckedUpdateWithoutChecklistItemsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -7877,6 +8361,10 @@ export type OrganizationCreateWithoutJobsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -7937,6 +8425,10 @@ export type OrganizationUncheckedCreateWithoutJobsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -8013,6 +8505,10 @@ export type OrganizationUpdateWithoutJobsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -8073,6 +8569,10 @@ export type OrganizationUncheckedUpdateWithoutJobsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -8133,6 +8633,10 @@ export type OrganizationCreateWithoutApplicantsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -8193,6 +8697,10 @@ export type OrganizationUncheckedCreateWithoutApplicantsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -8269,6 +8777,10 @@ export type OrganizationUpdateWithoutApplicantsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -8329,6 +8841,10 @@ export type OrganizationUncheckedUpdateWithoutApplicantsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -8389,6 +8905,10 @@ export type OrganizationCreateWithoutApplicantNotesInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -8449,6 +8969,10 @@ export type OrganizationUncheckedCreateWithoutApplicantNotesInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -8525,6 +9049,10 @@ export type OrganizationUpdateWithoutApplicantNotesInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -8585,6 +9113,10 @@ export type OrganizationUncheckedUpdateWithoutApplicantNotesInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -8645,6 +9177,10 @@ export type OrganizationCreateWithoutCyclesInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -8705,6 +9241,10 @@ export type OrganizationUncheckedCreateWithoutCyclesInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -8781,6 +9321,10 @@ export type OrganizationUpdateWithoutCyclesInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -8841,6 +9385,10 @@ export type OrganizationUncheckedUpdateWithoutCyclesInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -8901,6 +9449,10 @@ export type OrganizationCreateWithoutReviewsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -8961,6 +9513,10 @@ export type OrganizationUncheckedCreateWithoutReviewsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -9037,6 +9593,10 @@ export type OrganizationUpdateWithoutReviewsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -9097,6 +9657,10 @@ export type OrganizationUncheckedUpdateWithoutReviewsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -9157,6 +9721,10 @@ export type OrganizationCreateWithoutGoalsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -9217,6 +9785,10 @@ export type OrganizationUncheckedCreateWithoutGoalsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -9293,6 +9865,10 @@ export type OrganizationUpdateWithoutGoalsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -9353,6 +9929,10 @@ export type OrganizationUncheckedUpdateWithoutGoalsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -9413,6 +9993,10 @@ export type OrganizationCreateWithoutCoursesInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -9473,6 +10057,10 @@ export type OrganizationUncheckedCreateWithoutCoursesInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -9549,6 +10137,10 @@ export type OrganizationUpdateWithoutCoursesInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -9609,6 +10201,10 @@ export type OrganizationUncheckedUpdateWithoutCoursesInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -9669,6 +10265,10 @@ export type OrganizationCreateWithoutEnrollmentsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -9729,6 +10329,10 @@ export type OrganizationUncheckedCreateWithoutEnrollmentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -9805,6 +10409,10 @@ export type OrganizationUpdateWithoutEnrollmentsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -9865,6 +10473,10 @@ export type OrganizationUncheckedUpdateWithoutEnrollmentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -9925,6 +10537,10 @@ export type OrganizationCreateWithoutDocumentsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -9985,6 +10601,10 @@ export type OrganizationUncheckedCreateWithoutDocumentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -10061,6 +10681,10 @@ export type OrganizationUpdateWithoutDocumentsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -10121,6 +10745,10 @@ export type OrganizationUncheckedUpdateWithoutDocumentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -10181,6 +10809,10 @@ export type OrganizationCreateWithoutHrRequestsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -10241,6 +10873,10 @@ export type OrganizationUncheckedCreateWithoutHrRequestsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -10317,6 +10953,10 @@ export type OrganizationUpdateWithoutHrRequestsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -10377,6 +11017,10 @@ export type OrganizationUncheckedUpdateWithoutHrRequestsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -10437,6 +11081,10 @@ export type OrganizationCreateWithoutAnnouncementsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -10497,6 +11145,10 @@ export type OrganizationUncheckedCreateWithoutAnnouncementsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -10573,6 +11225,10 @@ export type OrganizationUpdateWithoutAnnouncementsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -10633,6 +11289,10 @@ export type OrganizationUncheckedUpdateWithoutAnnouncementsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -10693,6 +11353,10 @@ export type OrganizationCreateWithoutStatutoryRulesInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -10753,6 +11417,10 @@ export type OrganizationUncheckedCreateWithoutStatutoryRulesInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -10829,6 +11497,10 @@ export type OrganizationUpdateWithoutStatutoryRulesInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -10889,6 +11561,10 @@ export type OrganizationUncheckedUpdateWithoutStatutoryRulesInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -10949,6 +11625,10 @@ export type OrganizationCreateWithoutTaxProfilesInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -11009,6 +11689,10 @@ export type OrganizationUncheckedCreateWithoutTaxProfilesInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -11085,6 +11769,10 @@ export type OrganizationUpdateWithoutTaxProfilesInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -11145,6 +11833,10 @@ export type OrganizationUncheckedUpdateWithoutTaxProfilesInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -11205,6 +11897,10 @@ export type OrganizationCreateWithoutWageOrdersInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -11265,6 +11961,10 @@ export type OrganizationUncheckedCreateWithoutWageOrdersInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -11341,6 +12041,10 @@ export type OrganizationUpdateWithoutWageOrdersInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -11401,6 +12105,10 @@ export type OrganizationUncheckedUpdateWithoutWageOrdersInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -11461,6 +12169,10 @@ export type OrganizationCreateWithoutHolidaysInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -11521,6 +12233,10 @@ export type OrganizationUncheckedCreateWithoutHolidaysInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -11597,6 +12313,10 @@ export type OrganizationUpdateWithoutHolidaysInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -11657,6 +12377,10 @@ export type OrganizationUncheckedUpdateWithoutHolidaysInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -11717,6 +12441,10 @@ export type OrganizationCreateWithoutPrevEmploymentInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -11777,6 +12505,10 @@ export type OrganizationUncheckedCreateWithoutPrevEmploymentInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -11853,6 +12585,10 @@ export type OrganizationUpdateWithoutPrevEmploymentInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -11913,6 +12649,10 @@ export type OrganizationUncheckedUpdateWithoutPrevEmploymentInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -11973,6 +12713,10 @@ export type OrganizationCreateWithoutDailyReportsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -12033,6 +12777,10 @@ export type OrganizationUncheckedCreateWithoutDailyReportsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -12109,6 +12857,10 @@ export type OrganizationUpdateWithoutDailyReportsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -12169,6 +12921,10 @@ export type OrganizationUncheckedUpdateWithoutDailyReportsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -12230,6 +12986,10 @@ export type OrganizationCreateWithoutReportCommentsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
   idCard?: Prisma.IdCardSettingsCreateNestedOneWithoutOrganizationInput
@@ -12290,6 +13050,10 @@ export type OrganizationUncheckedCreateWithoutReportCommentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
   idCard?: Prisma.IdCardSettingsUncheckedCreateNestedOneWithoutOrganizationInput
@@ -12366,6 +13130,10 @@ export type OrganizationUpdateWithoutReportCommentsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
   idCard?: Prisma.IdCardSettingsUpdateOneWithoutOrganizationNestedInput
@@ -12426,6 +13194,10 @@ export type OrganizationUncheckedUpdateWithoutReportCommentsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
   idCard?: Prisma.IdCardSettingsUncheckedUpdateOneWithoutOrganizationNestedInput
@@ -12486,6 +13258,10 @@ export type OrganizationCreateWithoutPoliciesInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
   idCard?: Prisma.IdCardSettingsCreateNestedOneWithoutOrganizationInput
@@ -12546,6 +13322,10 @@ export type OrganizationUncheckedCreateWithoutPoliciesInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
   idCard?: Prisma.IdCardSettingsUncheckedCreateNestedOneWithoutOrganizationInput
@@ -12622,6 +13402,10 @@ export type OrganizationUpdateWithoutPoliciesInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
   idCard?: Prisma.IdCardSettingsUpdateOneWithoutOrganizationNestedInput
@@ -12682,6 +13466,10 @@ export type OrganizationUncheckedUpdateWithoutPoliciesInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
   idCard?: Prisma.IdCardSettingsUncheckedUpdateOneWithoutOrganizationNestedInput
@@ -12742,6 +13530,10 @@ export type OrganizationCreateWithoutSignaturesInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   idCard?: Prisma.IdCardSettingsCreateNestedOneWithoutOrganizationInput
@@ -12802,6 +13594,10 @@ export type OrganizationUncheckedCreateWithoutSignaturesInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   idCard?: Prisma.IdCardSettingsUncheckedCreateNestedOneWithoutOrganizationInput
@@ -12878,6 +13674,10 @@ export type OrganizationUpdateWithoutSignaturesInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   idCard?: Prisma.IdCardSettingsUpdateOneWithoutOrganizationNestedInput
@@ -12938,6 +13738,10 @@ export type OrganizationUncheckedUpdateWithoutSignaturesInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   idCard?: Prisma.IdCardSettingsUncheckedUpdateOneWithoutOrganizationNestedInput
@@ -12998,6 +13802,10 @@ export type OrganizationCreateWithoutIdCardInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -13058,6 +13866,10 @@ export type OrganizationUncheckedCreateWithoutIdCardInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -13134,6 +13946,10 @@ export type OrganizationUpdateWithoutIdCardInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -13194,6 +14010,10 @@ export type OrganizationUncheckedUpdateWithoutIdCardInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -13254,6 +14074,10 @@ export type OrganizationCreateWithoutConversationsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -13314,6 +14138,10 @@ export type OrganizationUncheckedCreateWithoutConversationsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -13390,6 +14218,10 @@ export type OrganizationUpdateWithoutConversationsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -13450,6 +14282,10 @@ export type OrganizationUncheckedUpdateWithoutConversationsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -13510,6 +14346,10 @@ export type OrganizationCreateWithoutCallsInput = {
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -13570,6 +14410,10 @@ export type OrganizationUncheckedCreateWithoutCallsInput = {
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -13646,6 +14490,10 @@ export type OrganizationUpdateWithoutCallsInput = {
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -13706,6 +14554,10 @@ export type OrganizationUncheckedUpdateWithoutCallsInput = {
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -13765,6 +14617,10 @@ export type OrganizationCreateWithoutCashAdvancesInput = {
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutOrganizationInput
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -13825,6 +14681,10 @@ export type OrganizationUncheckedCreateWithoutCashAdvancesInput = {
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutOrganizationInput
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -13901,6 +14761,10 @@ export type OrganizationUpdateWithoutCashAdvancesInput = {
   dailyReports?: Prisma.DailyReportUpdateManyWithoutOrganizationNestedInput
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -13961,6 +14825,10 @@ export type OrganizationUncheckedUpdateWithoutCashAdvancesInput = {
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutOrganizationNestedInput
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -14021,6 +14889,10 @@ export type OrganizationCreateWithoutPayoutsInput = {
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutOrganizationInput
   wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -14081,6 +14953,10 @@ export type OrganizationUncheckedCreateWithoutPayoutsInput = {
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutOrganizationInput
   wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -14157,6 +15033,10 @@ export type OrganizationUpdateWithoutPayoutsInput = {
   dailyReports?: Prisma.DailyReportUpdateManyWithoutOrganizationNestedInput
   wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -14217,6 +15097,1098 @@ export type OrganizationUncheckedUpdateWithoutPayoutsInput = {
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutOrganizationNestedInput
   wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
+  policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
+  signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
+  idCard?: Prisma.IdCardSettingsUncheckedUpdateOneWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  calls?: Prisma.CallSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationCreateWithoutIncentivesInput = {
+  id?: string
+  name: string
+  categoryKey: string
+  industryKey: string
+  sizeKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutOrganizationInput
+  settings?: Prisma.OrgSettingsCreateNestedOneWithoutOrganizationInput
+  departments?: Prisma.DepartmentCreateNestedManyWithoutOrganizationInput
+  positions?: Prisma.PositionCreateNestedManyWithoutOrganizationInput
+  employees?: Prisma.EmployeeCreateNestedManyWithoutOrganizationInput
+  history?: Prisma.EmploymentHistoryCreateNestedManyWithoutOrganizationInput
+  shifts?: Prisma.ShiftTemplateCreateNestedManyWithoutOrganizationInput
+  schedule?: Prisma.ScheduleEntryCreateNestedManyWithoutOrganizationInput
+  timeEvents?: Prisma.TimeEventCreateNestedManyWithoutOrganizationInput
+  leaveTypes?: Prisma.LeaveTypeCreateNestedManyWithoutOrganizationInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutOrganizationInput
+  stampTypes?: Prisma.TimeStampTypeCreateNestedManyWithoutOrganizationInput
+  regulars?: Prisma.RegularScheduleCreateNestedManyWithoutOrganizationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutOrganizationInput
+  overtime?: Prisma.OvertimeRequestCreateNestedManyWithoutOrganizationInput
+  compensations?: Prisma.CompensationCreateNestedManyWithoutOrganizationInput
+  payComponents?: Prisma.PayComponentCreateNestedManyWithoutOrganizationInput
+  empComponents?: Prisma.EmployeeComponentCreateNestedManyWithoutOrganizationInput
+  contributions?: Prisma.ContributionRuleCreateNestedManyWithoutOrganizationInput
+  taxBrackets?: Prisma.TaxBracketCreateNestedManyWithoutOrganizationInput
+  periods?: Prisma.PayrollPeriodCreateNestedManyWithoutOrganizationInput
+  payslips?: Prisma.PayslipCreateNestedManyWithoutOrganizationInput
+  adjustments?: Prisma.PayrollAdjustmentCreateNestedManyWithoutOrganizationInput
+  checklistTpl?: Prisma.ChecklistTemplateCreateNestedManyWithoutOrganizationInput
+  checklistItems?: Prisma.ChecklistItemCreateNestedManyWithoutOrganizationInput
+  jobs?: Prisma.JobPostingCreateNestedManyWithoutOrganizationInput
+  applicants?: Prisma.ApplicantCreateNestedManyWithoutOrganizationInput
+  applicantNotes?: Prisma.ApplicantNoteCreateNestedManyWithoutOrganizationInput
+  cycles?: Prisma.ReviewCycleCreateNestedManyWithoutOrganizationInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutOrganizationInput
+  goals?: Prisma.GoalCreateNestedManyWithoutOrganizationInput
+  courses?: Prisma.CourseCreateNestedManyWithoutOrganizationInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.EmployeeDocumentCreateNestedManyWithoutOrganizationInput
+  hrRequests?: Prisma.HrRequestCreateNestedManyWithoutOrganizationInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
+  statutoryRules?: Prisma.StatutoryRuleCreateNestedManyWithoutOrganizationInput
+  taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutOrganizationInput
+  wageOrders?: Prisma.WageOrderCreateNestedManyWithoutOrganizationInput
+  holidays?: Prisma.HolidayCreateNestedManyWithoutOrganizationInput
+  prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutOrganizationInput
+  dailyReports?: Prisma.DailyReportCreateNestedManyWithoutOrganizationInput
+  wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
+  cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
+  payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
+  reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
+  policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
+  signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
+  idCard?: Prisma.IdCardSettingsCreateNestedOneWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  calls?: Prisma.CallSessionCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutIncentivesInput = {
+  id?: string
+  name: string
+  categoryKey: string
+  industryKey: string
+  sizeKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutOrganizationInput
+  settings?: Prisma.OrgSettingsUncheckedCreateNestedOneWithoutOrganizationInput
+  departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutOrganizationInput
+  positions?: Prisma.PositionUncheckedCreateNestedManyWithoutOrganizationInput
+  employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutOrganizationInput
+  history?: Prisma.EmploymentHistoryUncheckedCreateNestedManyWithoutOrganizationInput
+  shifts?: Prisma.ShiftTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+  schedule?: Prisma.ScheduleEntryUncheckedCreateNestedManyWithoutOrganizationInput
+  timeEvents?: Prisma.TimeEventUncheckedCreateNestedManyWithoutOrganizationInput
+  leaveTypes?: Prisma.LeaveTypeUncheckedCreateNestedManyWithoutOrganizationInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  stampTypes?: Prisma.TimeStampTypeUncheckedCreateNestedManyWithoutOrganizationInput
+  regulars?: Prisma.RegularScheduleUncheckedCreateNestedManyWithoutOrganizationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutOrganizationInput
+  overtime?: Prisma.OvertimeRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  compensations?: Prisma.CompensationUncheckedCreateNestedManyWithoutOrganizationInput
+  payComponents?: Prisma.PayComponentUncheckedCreateNestedManyWithoutOrganizationInput
+  empComponents?: Prisma.EmployeeComponentUncheckedCreateNestedManyWithoutOrganizationInput
+  contributions?: Prisma.ContributionRuleUncheckedCreateNestedManyWithoutOrganizationInput
+  taxBrackets?: Prisma.TaxBracketUncheckedCreateNestedManyWithoutOrganizationInput
+  periods?: Prisma.PayrollPeriodUncheckedCreateNestedManyWithoutOrganizationInput
+  payslips?: Prisma.PayslipUncheckedCreateNestedManyWithoutOrganizationInput
+  adjustments?: Prisma.PayrollAdjustmentUncheckedCreateNestedManyWithoutOrganizationInput
+  checklistTpl?: Prisma.ChecklistTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+  checklistItems?: Prisma.ChecklistItemUncheckedCreateNestedManyWithoutOrganizationInput
+  jobs?: Prisma.JobPostingUncheckedCreateNestedManyWithoutOrganizationInput
+  applicants?: Prisma.ApplicantUncheckedCreateNestedManyWithoutOrganizationInput
+  applicantNotes?: Prisma.ApplicantNoteUncheckedCreateNestedManyWithoutOrganizationInput
+  cycles?: Prisma.ReviewCycleUncheckedCreateNestedManyWithoutOrganizationInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutOrganizationInput
+  goals?: Prisma.GoalUncheckedCreateNestedManyWithoutOrganizationInput
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutOrganizationInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.EmployeeDocumentUncheckedCreateNestedManyWithoutOrganizationInput
+  hrRequests?: Prisma.HrRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
+  statutoryRules?: Prisma.StatutoryRuleUncheckedCreateNestedManyWithoutOrganizationInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutOrganizationInput
+  wageOrders?: Prisma.WageOrderUncheckedCreateNestedManyWithoutOrganizationInput
+  holidays?: Prisma.HolidayUncheckedCreateNestedManyWithoutOrganizationInput
+  prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutOrganizationInput
+  dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutOrganizationInput
+  wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
+  payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
+  reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
+  policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
+  signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
+  idCard?: Prisma.IdCardSettingsUncheckedCreateNestedOneWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  calls?: Prisma.CallSessionUncheckedCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutIncentivesInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutIncentivesInput, Prisma.OrganizationUncheckedCreateWithoutIncentivesInput>
+}
+
+export type OrganizationUpsertWithoutIncentivesInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutIncentivesInput, Prisma.OrganizationUncheckedUpdateWithoutIncentivesInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutIncentivesInput, Prisma.OrganizationUncheckedCreateWithoutIncentivesInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutIncentivesInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutIncentivesInput, Prisma.OrganizationUncheckedUpdateWithoutIncentivesInput>
+}
+
+export type OrganizationUpdateWithoutIncentivesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  industryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  sizeKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutOrganizationNestedInput
+  settings?: Prisma.OrgSettingsUpdateOneWithoutOrganizationNestedInput
+  departments?: Prisma.DepartmentUpdateManyWithoutOrganizationNestedInput
+  positions?: Prisma.PositionUpdateManyWithoutOrganizationNestedInput
+  employees?: Prisma.EmployeeUpdateManyWithoutOrganizationNestedInput
+  history?: Prisma.EmploymentHistoryUpdateManyWithoutOrganizationNestedInput
+  shifts?: Prisma.ShiftTemplateUpdateManyWithoutOrganizationNestedInput
+  schedule?: Prisma.ScheduleEntryUpdateManyWithoutOrganizationNestedInput
+  timeEvents?: Prisma.TimeEventUpdateManyWithoutOrganizationNestedInput
+  leaveTypes?: Prisma.LeaveTypeUpdateManyWithoutOrganizationNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutOrganizationNestedInput
+  stampTypes?: Prisma.TimeStampTypeUpdateManyWithoutOrganizationNestedInput
+  regulars?: Prisma.RegularScheduleUpdateManyWithoutOrganizationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutOrganizationNestedInput
+  overtime?: Prisma.OvertimeRequestUpdateManyWithoutOrganizationNestedInput
+  compensations?: Prisma.CompensationUpdateManyWithoutOrganizationNestedInput
+  payComponents?: Prisma.PayComponentUpdateManyWithoutOrganizationNestedInput
+  empComponents?: Prisma.EmployeeComponentUpdateManyWithoutOrganizationNestedInput
+  contributions?: Prisma.ContributionRuleUpdateManyWithoutOrganizationNestedInput
+  taxBrackets?: Prisma.TaxBracketUpdateManyWithoutOrganizationNestedInput
+  periods?: Prisma.PayrollPeriodUpdateManyWithoutOrganizationNestedInput
+  payslips?: Prisma.PayslipUpdateManyWithoutOrganizationNestedInput
+  adjustments?: Prisma.PayrollAdjustmentUpdateManyWithoutOrganizationNestedInput
+  checklistTpl?: Prisma.ChecklistTemplateUpdateManyWithoutOrganizationNestedInput
+  checklistItems?: Prisma.ChecklistItemUpdateManyWithoutOrganizationNestedInput
+  jobs?: Prisma.JobPostingUpdateManyWithoutOrganizationNestedInput
+  applicants?: Prisma.ApplicantUpdateManyWithoutOrganizationNestedInput
+  applicantNotes?: Prisma.ApplicantNoteUpdateManyWithoutOrganizationNestedInput
+  cycles?: Prisma.ReviewCycleUpdateManyWithoutOrganizationNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutOrganizationNestedInput
+  goals?: Prisma.GoalUpdateManyWithoutOrganizationNestedInput
+  courses?: Prisma.CourseUpdateManyWithoutOrganizationNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.EmployeeDocumentUpdateManyWithoutOrganizationNestedInput
+  hrRequests?: Prisma.HrRequestUpdateManyWithoutOrganizationNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
+  statutoryRules?: Prisma.StatutoryRuleUpdateManyWithoutOrganizationNestedInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutOrganizationNestedInput
+  wageOrders?: Prisma.WageOrderUpdateManyWithoutOrganizationNestedInput
+  holidays?: Prisma.HolidayUpdateManyWithoutOrganizationNestedInput
+  prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutOrganizationNestedInput
+  dailyReports?: Prisma.DailyReportUpdateManyWithoutOrganizationNestedInput
+  wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
+  cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
+  payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
+  reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
+  policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
+  signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
+  idCard?: Prisma.IdCardSettingsUpdateOneWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  calls?: Prisma.CallSessionUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutIncentivesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  industryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  sizeKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutOrganizationNestedInput
+  settings?: Prisma.OrgSettingsUncheckedUpdateOneWithoutOrganizationNestedInput
+  departments?: Prisma.DepartmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  positions?: Prisma.PositionUncheckedUpdateManyWithoutOrganizationNestedInput
+  employees?: Prisma.EmployeeUncheckedUpdateManyWithoutOrganizationNestedInput
+  history?: Prisma.EmploymentHistoryUncheckedUpdateManyWithoutOrganizationNestedInput
+  shifts?: Prisma.ShiftTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+  schedule?: Prisma.ScheduleEntryUncheckedUpdateManyWithoutOrganizationNestedInput
+  timeEvents?: Prisma.TimeEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  leaveTypes?: Prisma.LeaveTypeUncheckedUpdateManyWithoutOrganizationNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  stampTypes?: Prisma.TimeStampTypeUncheckedUpdateManyWithoutOrganizationNestedInput
+  regulars?: Prisma.RegularScheduleUncheckedUpdateManyWithoutOrganizationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutOrganizationNestedInput
+  overtime?: Prisma.OvertimeRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  compensations?: Prisma.CompensationUncheckedUpdateManyWithoutOrganizationNestedInput
+  payComponents?: Prisma.PayComponentUncheckedUpdateManyWithoutOrganizationNestedInput
+  empComponents?: Prisma.EmployeeComponentUncheckedUpdateManyWithoutOrganizationNestedInput
+  contributions?: Prisma.ContributionRuleUncheckedUpdateManyWithoutOrganizationNestedInput
+  taxBrackets?: Prisma.TaxBracketUncheckedUpdateManyWithoutOrganizationNestedInput
+  periods?: Prisma.PayrollPeriodUncheckedUpdateManyWithoutOrganizationNestedInput
+  payslips?: Prisma.PayslipUncheckedUpdateManyWithoutOrganizationNestedInput
+  adjustments?: Prisma.PayrollAdjustmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  checklistTpl?: Prisma.ChecklistTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+  checklistItems?: Prisma.ChecklistItemUncheckedUpdateManyWithoutOrganizationNestedInput
+  jobs?: Prisma.JobPostingUncheckedUpdateManyWithoutOrganizationNestedInput
+  applicants?: Prisma.ApplicantUncheckedUpdateManyWithoutOrganizationNestedInput
+  applicantNotes?: Prisma.ApplicantNoteUncheckedUpdateManyWithoutOrganizationNestedInput
+  cycles?: Prisma.ReviewCycleUncheckedUpdateManyWithoutOrganizationNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutOrganizationNestedInput
+  goals?: Prisma.GoalUncheckedUpdateManyWithoutOrganizationNestedInput
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutOrganizationNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.EmployeeDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
+  hrRequests?: Prisma.HrRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
+  statutoryRules?: Prisma.StatutoryRuleUncheckedUpdateManyWithoutOrganizationNestedInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutOrganizationNestedInput
+  wageOrders?: Prisma.WageOrderUncheckedUpdateManyWithoutOrganizationNestedInput
+  holidays?: Prisma.HolidayUncheckedUpdateManyWithoutOrganizationNestedInput
+  prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutOrganizationNestedInput
+  wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
+  payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
+  policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
+  signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
+  idCard?: Prisma.IdCardSettingsUncheckedUpdateOneWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  calls?: Prisma.CallSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationCreateWithoutContractsInput = {
+  id?: string
+  name: string
+  categoryKey: string
+  industryKey: string
+  sizeKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutOrganizationInput
+  settings?: Prisma.OrgSettingsCreateNestedOneWithoutOrganizationInput
+  departments?: Prisma.DepartmentCreateNestedManyWithoutOrganizationInput
+  positions?: Prisma.PositionCreateNestedManyWithoutOrganizationInput
+  employees?: Prisma.EmployeeCreateNestedManyWithoutOrganizationInput
+  history?: Prisma.EmploymentHistoryCreateNestedManyWithoutOrganizationInput
+  shifts?: Prisma.ShiftTemplateCreateNestedManyWithoutOrganizationInput
+  schedule?: Prisma.ScheduleEntryCreateNestedManyWithoutOrganizationInput
+  timeEvents?: Prisma.TimeEventCreateNestedManyWithoutOrganizationInput
+  leaveTypes?: Prisma.LeaveTypeCreateNestedManyWithoutOrganizationInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutOrganizationInput
+  stampTypes?: Prisma.TimeStampTypeCreateNestedManyWithoutOrganizationInput
+  regulars?: Prisma.RegularScheduleCreateNestedManyWithoutOrganizationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutOrganizationInput
+  overtime?: Prisma.OvertimeRequestCreateNestedManyWithoutOrganizationInput
+  compensations?: Prisma.CompensationCreateNestedManyWithoutOrganizationInput
+  payComponents?: Prisma.PayComponentCreateNestedManyWithoutOrganizationInput
+  empComponents?: Prisma.EmployeeComponentCreateNestedManyWithoutOrganizationInput
+  contributions?: Prisma.ContributionRuleCreateNestedManyWithoutOrganizationInput
+  taxBrackets?: Prisma.TaxBracketCreateNestedManyWithoutOrganizationInput
+  periods?: Prisma.PayrollPeriodCreateNestedManyWithoutOrganizationInput
+  payslips?: Prisma.PayslipCreateNestedManyWithoutOrganizationInput
+  adjustments?: Prisma.PayrollAdjustmentCreateNestedManyWithoutOrganizationInput
+  checklistTpl?: Prisma.ChecklistTemplateCreateNestedManyWithoutOrganizationInput
+  checklistItems?: Prisma.ChecklistItemCreateNestedManyWithoutOrganizationInput
+  jobs?: Prisma.JobPostingCreateNestedManyWithoutOrganizationInput
+  applicants?: Prisma.ApplicantCreateNestedManyWithoutOrganizationInput
+  applicantNotes?: Prisma.ApplicantNoteCreateNestedManyWithoutOrganizationInput
+  cycles?: Prisma.ReviewCycleCreateNestedManyWithoutOrganizationInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutOrganizationInput
+  goals?: Prisma.GoalCreateNestedManyWithoutOrganizationInput
+  courses?: Prisma.CourseCreateNestedManyWithoutOrganizationInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.EmployeeDocumentCreateNestedManyWithoutOrganizationInput
+  hrRequests?: Prisma.HrRequestCreateNestedManyWithoutOrganizationInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
+  statutoryRules?: Prisma.StatutoryRuleCreateNestedManyWithoutOrganizationInput
+  taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutOrganizationInput
+  wageOrders?: Prisma.WageOrderCreateNestedManyWithoutOrganizationInput
+  holidays?: Prisma.HolidayCreateNestedManyWithoutOrganizationInput
+  prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutOrganizationInput
+  dailyReports?: Prisma.DailyReportCreateNestedManyWithoutOrganizationInput
+  wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
+  cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
+  payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
+  reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
+  policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
+  signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
+  idCard?: Prisma.IdCardSettingsCreateNestedOneWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  calls?: Prisma.CallSessionCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutContractsInput = {
+  id?: string
+  name: string
+  categoryKey: string
+  industryKey: string
+  sizeKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutOrganizationInput
+  settings?: Prisma.OrgSettingsUncheckedCreateNestedOneWithoutOrganizationInput
+  departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutOrganizationInput
+  positions?: Prisma.PositionUncheckedCreateNestedManyWithoutOrganizationInput
+  employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutOrganizationInput
+  history?: Prisma.EmploymentHistoryUncheckedCreateNestedManyWithoutOrganizationInput
+  shifts?: Prisma.ShiftTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+  schedule?: Prisma.ScheduleEntryUncheckedCreateNestedManyWithoutOrganizationInput
+  timeEvents?: Prisma.TimeEventUncheckedCreateNestedManyWithoutOrganizationInput
+  leaveTypes?: Prisma.LeaveTypeUncheckedCreateNestedManyWithoutOrganizationInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  stampTypes?: Prisma.TimeStampTypeUncheckedCreateNestedManyWithoutOrganizationInput
+  regulars?: Prisma.RegularScheduleUncheckedCreateNestedManyWithoutOrganizationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutOrganizationInput
+  overtime?: Prisma.OvertimeRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  compensations?: Prisma.CompensationUncheckedCreateNestedManyWithoutOrganizationInput
+  payComponents?: Prisma.PayComponentUncheckedCreateNestedManyWithoutOrganizationInput
+  empComponents?: Prisma.EmployeeComponentUncheckedCreateNestedManyWithoutOrganizationInput
+  contributions?: Prisma.ContributionRuleUncheckedCreateNestedManyWithoutOrganizationInput
+  taxBrackets?: Prisma.TaxBracketUncheckedCreateNestedManyWithoutOrganizationInput
+  periods?: Prisma.PayrollPeriodUncheckedCreateNestedManyWithoutOrganizationInput
+  payslips?: Prisma.PayslipUncheckedCreateNestedManyWithoutOrganizationInput
+  adjustments?: Prisma.PayrollAdjustmentUncheckedCreateNestedManyWithoutOrganizationInput
+  checklistTpl?: Prisma.ChecklistTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+  checklistItems?: Prisma.ChecklistItemUncheckedCreateNestedManyWithoutOrganizationInput
+  jobs?: Prisma.JobPostingUncheckedCreateNestedManyWithoutOrganizationInput
+  applicants?: Prisma.ApplicantUncheckedCreateNestedManyWithoutOrganizationInput
+  applicantNotes?: Prisma.ApplicantNoteUncheckedCreateNestedManyWithoutOrganizationInput
+  cycles?: Prisma.ReviewCycleUncheckedCreateNestedManyWithoutOrganizationInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutOrganizationInput
+  goals?: Prisma.GoalUncheckedCreateNestedManyWithoutOrganizationInput
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutOrganizationInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.EmployeeDocumentUncheckedCreateNestedManyWithoutOrganizationInput
+  hrRequests?: Prisma.HrRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
+  statutoryRules?: Prisma.StatutoryRuleUncheckedCreateNestedManyWithoutOrganizationInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutOrganizationInput
+  wageOrders?: Prisma.WageOrderUncheckedCreateNestedManyWithoutOrganizationInput
+  holidays?: Prisma.HolidayUncheckedCreateNestedManyWithoutOrganizationInput
+  prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutOrganizationInput
+  dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutOrganizationInput
+  wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
+  payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
+  reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
+  policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
+  signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
+  idCard?: Prisma.IdCardSettingsUncheckedCreateNestedOneWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  calls?: Prisma.CallSessionUncheckedCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutContractsInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutContractsInput, Prisma.OrganizationUncheckedCreateWithoutContractsInput>
+}
+
+export type OrganizationUpsertWithoutContractsInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutContractsInput, Prisma.OrganizationUncheckedUpdateWithoutContractsInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutContractsInput, Prisma.OrganizationUncheckedCreateWithoutContractsInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutContractsInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutContractsInput, Prisma.OrganizationUncheckedUpdateWithoutContractsInput>
+}
+
+export type OrganizationUpdateWithoutContractsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  industryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  sizeKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutOrganizationNestedInput
+  settings?: Prisma.OrgSettingsUpdateOneWithoutOrganizationNestedInput
+  departments?: Prisma.DepartmentUpdateManyWithoutOrganizationNestedInput
+  positions?: Prisma.PositionUpdateManyWithoutOrganizationNestedInput
+  employees?: Prisma.EmployeeUpdateManyWithoutOrganizationNestedInput
+  history?: Prisma.EmploymentHistoryUpdateManyWithoutOrganizationNestedInput
+  shifts?: Prisma.ShiftTemplateUpdateManyWithoutOrganizationNestedInput
+  schedule?: Prisma.ScheduleEntryUpdateManyWithoutOrganizationNestedInput
+  timeEvents?: Prisma.TimeEventUpdateManyWithoutOrganizationNestedInput
+  leaveTypes?: Prisma.LeaveTypeUpdateManyWithoutOrganizationNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutOrganizationNestedInput
+  stampTypes?: Prisma.TimeStampTypeUpdateManyWithoutOrganizationNestedInput
+  regulars?: Prisma.RegularScheduleUpdateManyWithoutOrganizationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutOrganizationNestedInput
+  overtime?: Prisma.OvertimeRequestUpdateManyWithoutOrganizationNestedInput
+  compensations?: Prisma.CompensationUpdateManyWithoutOrganizationNestedInput
+  payComponents?: Prisma.PayComponentUpdateManyWithoutOrganizationNestedInput
+  empComponents?: Prisma.EmployeeComponentUpdateManyWithoutOrganizationNestedInput
+  contributions?: Prisma.ContributionRuleUpdateManyWithoutOrganizationNestedInput
+  taxBrackets?: Prisma.TaxBracketUpdateManyWithoutOrganizationNestedInput
+  periods?: Prisma.PayrollPeriodUpdateManyWithoutOrganizationNestedInput
+  payslips?: Prisma.PayslipUpdateManyWithoutOrganizationNestedInput
+  adjustments?: Prisma.PayrollAdjustmentUpdateManyWithoutOrganizationNestedInput
+  checklistTpl?: Prisma.ChecklistTemplateUpdateManyWithoutOrganizationNestedInput
+  checklistItems?: Prisma.ChecklistItemUpdateManyWithoutOrganizationNestedInput
+  jobs?: Prisma.JobPostingUpdateManyWithoutOrganizationNestedInput
+  applicants?: Prisma.ApplicantUpdateManyWithoutOrganizationNestedInput
+  applicantNotes?: Prisma.ApplicantNoteUpdateManyWithoutOrganizationNestedInput
+  cycles?: Prisma.ReviewCycleUpdateManyWithoutOrganizationNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutOrganizationNestedInput
+  goals?: Prisma.GoalUpdateManyWithoutOrganizationNestedInput
+  courses?: Prisma.CourseUpdateManyWithoutOrganizationNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.EmployeeDocumentUpdateManyWithoutOrganizationNestedInput
+  hrRequests?: Prisma.HrRequestUpdateManyWithoutOrganizationNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
+  statutoryRules?: Prisma.StatutoryRuleUpdateManyWithoutOrganizationNestedInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutOrganizationNestedInput
+  wageOrders?: Prisma.WageOrderUpdateManyWithoutOrganizationNestedInput
+  holidays?: Prisma.HolidayUpdateManyWithoutOrganizationNestedInput
+  prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutOrganizationNestedInput
+  dailyReports?: Prisma.DailyReportUpdateManyWithoutOrganizationNestedInput
+  wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
+  cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
+  payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
+  reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
+  policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
+  signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
+  idCard?: Prisma.IdCardSettingsUpdateOneWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  calls?: Prisma.CallSessionUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutContractsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  industryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  sizeKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutOrganizationNestedInput
+  settings?: Prisma.OrgSettingsUncheckedUpdateOneWithoutOrganizationNestedInput
+  departments?: Prisma.DepartmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  positions?: Prisma.PositionUncheckedUpdateManyWithoutOrganizationNestedInput
+  employees?: Prisma.EmployeeUncheckedUpdateManyWithoutOrganizationNestedInput
+  history?: Prisma.EmploymentHistoryUncheckedUpdateManyWithoutOrganizationNestedInput
+  shifts?: Prisma.ShiftTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+  schedule?: Prisma.ScheduleEntryUncheckedUpdateManyWithoutOrganizationNestedInput
+  timeEvents?: Prisma.TimeEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  leaveTypes?: Prisma.LeaveTypeUncheckedUpdateManyWithoutOrganizationNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  stampTypes?: Prisma.TimeStampTypeUncheckedUpdateManyWithoutOrganizationNestedInput
+  regulars?: Prisma.RegularScheduleUncheckedUpdateManyWithoutOrganizationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutOrganizationNestedInput
+  overtime?: Prisma.OvertimeRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  compensations?: Prisma.CompensationUncheckedUpdateManyWithoutOrganizationNestedInput
+  payComponents?: Prisma.PayComponentUncheckedUpdateManyWithoutOrganizationNestedInput
+  empComponents?: Prisma.EmployeeComponentUncheckedUpdateManyWithoutOrganizationNestedInput
+  contributions?: Prisma.ContributionRuleUncheckedUpdateManyWithoutOrganizationNestedInput
+  taxBrackets?: Prisma.TaxBracketUncheckedUpdateManyWithoutOrganizationNestedInput
+  periods?: Prisma.PayrollPeriodUncheckedUpdateManyWithoutOrganizationNestedInput
+  payslips?: Prisma.PayslipUncheckedUpdateManyWithoutOrganizationNestedInput
+  adjustments?: Prisma.PayrollAdjustmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  checklistTpl?: Prisma.ChecklistTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+  checklistItems?: Prisma.ChecklistItemUncheckedUpdateManyWithoutOrganizationNestedInput
+  jobs?: Prisma.JobPostingUncheckedUpdateManyWithoutOrganizationNestedInput
+  applicants?: Prisma.ApplicantUncheckedUpdateManyWithoutOrganizationNestedInput
+  applicantNotes?: Prisma.ApplicantNoteUncheckedUpdateManyWithoutOrganizationNestedInput
+  cycles?: Prisma.ReviewCycleUncheckedUpdateManyWithoutOrganizationNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutOrganizationNestedInput
+  goals?: Prisma.GoalUncheckedUpdateManyWithoutOrganizationNestedInput
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutOrganizationNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.EmployeeDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
+  hrRequests?: Prisma.HrRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
+  statutoryRules?: Prisma.StatutoryRuleUncheckedUpdateManyWithoutOrganizationNestedInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutOrganizationNestedInput
+  wageOrders?: Prisma.WageOrderUncheckedUpdateManyWithoutOrganizationNestedInput
+  holidays?: Prisma.HolidayUncheckedUpdateManyWithoutOrganizationNestedInput
+  prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutOrganizationNestedInput
+  wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
+  payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
+  policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
+  signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
+  idCard?: Prisma.IdCardSettingsUncheckedUpdateOneWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  calls?: Prisma.CallSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationCreateWithoutHandbookSectionsInput = {
+  id?: string
+  name: string
+  categoryKey: string
+  industryKey: string
+  sizeKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutOrganizationInput
+  settings?: Prisma.OrgSettingsCreateNestedOneWithoutOrganizationInput
+  departments?: Prisma.DepartmentCreateNestedManyWithoutOrganizationInput
+  positions?: Prisma.PositionCreateNestedManyWithoutOrganizationInput
+  employees?: Prisma.EmployeeCreateNestedManyWithoutOrganizationInput
+  history?: Prisma.EmploymentHistoryCreateNestedManyWithoutOrganizationInput
+  shifts?: Prisma.ShiftTemplateCreateNestedManyWithoutOrganizationInput
+  schedule?: Prisma.ScheduleEntryCreateNestedManyWithoutOrganizationInput
+  timeEvents?: Prisma.TimeEventCreateNestedManyWithoutOrganizationInput
+  leaveTypes?: Prisma.LeaveTypeCreateNestedManyWithoutOrganizationInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutOrganizationInput
+  stampTypes?: Prisma.TimeStampTypeCreateNestedManyWithoutOrganizationInput
+  regulars?: Prisma.RegularScheduleCreateNestedManyWithoutOrganizationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutOrganizationInput
+  overtime?: Prisma.OvertimeRequestCreateNestedManyWithoutOrganizationInput
+  compensations?: Prisma.CompensationCreateNestedManyWithoutOrganizationInput
+  payComponents?: Prisma.PayComponentCreateNestedManyWithoutOrganizationInput
+  empComponents?: Prisma.EmployeeComponentCreateNestedManyWithoutOrganizationInput
+  contributions?: Prisma.ContributionRuleCreateNestedManyWithoutOrganizationInput
+  taxBrackets?: Prisma.TaxBracketCreateNestedManyWithoutOrganizationInput
+  periods?: Prisma.PayrollPeriodCreateNestedManyWithoutOrganizationInput
+  payslips?: Prisma.PayslipCreateNestedManyWithoutOrganizationInput
+  adjustments?: Prisma.PayrollAdjustmentCreateNestedManyWithoutOrganizationInput
+  checklistTpl?: Prisma.ChecklistTemplateCreateNestedManyWithoutOrganizationInput
+  checklistItems?: Prisma.ChecklistItemCreateNestedManyWithoutOrganizationInput
+  jobs?: Prisma.JobPostingCreateNestedManyWithoutOrganizationInput
+  applicants?: Prisma.ApplicantCreateNestedManyWithoutOrganizationInput
+  applicantNotes?: Prisma.ApplicantNoteCreateNestedManyWithoutOrganizationInput
+  cycles?: Prisma.ReviewCycleCreateNestedManyWithoutOrganizationInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutOrganizationInput
+  goals?: Prisma.GoalCreateNestedManyWithoutOrganizationInput
+  courses?: Prisma.CourseCreateNestedManyWithoutOrganizationInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.EmployeeDocumentCreateNestedManyWithoutOrganizationInput
+  hrRequests?: Prisma.HrRequestCreateNestedManyWithoutOrganizationInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
+  statutoryRules?: Prisma.StatutoryRuleCreateNestedManyWithoutOrganizationInput
+  taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutOrganizationInput
+  wageOrders?: Prisma.WageOrderCreateNestedManyWithoutOrganizationInput
+  holidays?: Prisma.HolidayCreateNestedManyWithoutOrganizationInput
+  prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutOrganizationInput
+  dailyReports?: Prisma.DailyReportCreateNestedManyWithoutOrganizationInput
+  wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
+  cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
+  payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
+  reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
+  policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
+  signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
+  idCard?: Prisma.IdCardSettingsCreateNestedOneWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  calls?: Prisma.CallSessionCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutHandbookSectionsInput = {
+  id?: string
+  name: string
+  categoryKey: string
+  industryKey: string
+  sizeKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutOrganizationInput
+  settings?: Prisma.OrgSettingsUncheckedCreateNestedOneWithoutOrganizationInput
+  departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutOrganizationInput
+  positions?: Prisma.PositionUncheckedCreateNestedManyWithoutOrganizationInput
+  employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutOrganizationInput
+  history?: Prisma.EmploymentHistoryUncheckedCreateNestedManyWithoutOrganizationInput
+  shifts?: Prisma.ShiftTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+  schedule?: Prisma.ScheduleEntryUncheckedCreateNestedManyWithoutOrganizationInput
+  timeEvents?: Prisma.TimeEventUncheckedCreateNestedManyWithoutOrganizationInput
+  leaveTypes?: Prisma.LeaveTypeUncheckedCreateNestedManyWithoutOrganizationInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  stampTypes?: Prisma.TimeStampTypeUncheckedCreateNestedManyWithoutOrganizationInput
+  regulars?: Prisma.RegularScheduleUncheckedCreateNestedManyWithoutOrganizationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutOrganizationInput
+  overtime?: Prisma.OvertimeRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  compensations?: Prisma.CompensationUncheckedCreateNestedManyWithoutOrganizationInput
+  payComponents?: Prisma.PayComponentUncheckedCreateNestedManyWithoutOrganizationInput
+  empComponents?: Prisma.EmployeeComponentUncheckedCreateNestedManyWithoutOrganizationInput
+  contributions?: Prisma.ContributionRuleUncheckedCreateNestedManyWithoutOrganizationInput
+  taxBrackets?: Prisma.TaxBracketUncheckedCreateNestedManyWithoutOrganizationInput
+  periods?: Prisma.PayrollPeriodUncheckedCreateNestedManyWithoutOrganizationInput
+  payslips?: Prisma.PayslipUncheckedCreateNestedManyWithoutOrganizationInput
+  adjustments?: Prisma.PayrollAdjustmentUncheckedCreateNestedManyWithoutOrganizationInput
+  checklistTpl?: Prisma.ChecklistTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+  checklistItems?: Prisma.ChecklistItemUncheckedCreateNestedManyWithoutOrganizationInput
+  jobs?: Prisma.JobPostingUncheckedCreateNestedManyWithoutOrganizationInput
+  applicants?: Prisma.ApplicantUncheckedCreateNestedManyWithoutOrganizationInput
+  applicantNotes?: Prisma.ApplicantNoteUncheckedCreateNestedManyWithoutOrganizationInput
+  cycles?: Prisma.ReviewCycleUncheckedCreateNestedManyWithoutOrganizationInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutOrganizationInput
+  goals?: Prisma.GoalUncheckedCreateNestedManyWithoutOrganizationInput
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutOrganizationInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.EmployeeDocumentUncheckedCreateNestedManyWithoutOrganizationInput
+  hrRequests?: Prisma.HrRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
+  statutoryRules?: Prisma.StatutoryRuleUncheckedCreateNestedManyWithoutOrganizationInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutOrganizationInput
+  wageOrders?: Prisma.WageOrderUncheckedCreateNestedManyWithoutOrganizationInput
+  holidays?: Prisma.HolidayUncheckedCreateNestedManyWithoutOrganizationInput
+  prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutOrganizationInput
+  dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutOrganizationInput
+  wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
+  payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
+  reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
+  policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
+  signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
+  idCard?: Prisma.IdCardSettingsUncheckedCreateNestedOneWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  calls?: Prisma.CallSessionUncheckedCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutHandbookSectionsInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutHandbookSectionsInput, Prisma.OrganizationUncheckedCreateWithoutHandbookSectionsInput>
+}
+
+export type OrganizationUpsertWithoutHandbookSectionsInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutHandbookSectionsInput, Prisma.OrganizationUncheckedUpdateWithoutHandbookSectionsInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutHandbookSectionsInput, Prisma.OrganizationUncheckedCreateWithoutHandbookSectionsInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutHandbookSectionsInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutHandbookSectionsInput, Prisma.OrganizationUncheckedUpdateWithoutHandbookSectionsInput>
+}
+
+export type OrganizationUpdateWithoutHandbookSectionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  industryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  sizeKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutOrganizationNestedInput
+  settings?: Prisma.OrgSettingsUpdateOneWithoutOrganizationNestedInput
+  departments?: Prisma.DepartmentUpdateManyWithoutOrganizationNestedInput
+  positions?: Prisma.PositionUpdateManyWithoutOrganizationNestedInput
+  employees?: Prisma.EmployeeUpdateManyWithoutOrganizationNestedInput
+  history?: Prisma.EmploymentHistoryUpdateManyWithoutOrganizationNestedInput
+  shifts?: Prisma.ShiftTemplateUpdateManyWithoutOrganizationNestedInput
+  schedule?: Prisma.ScheduleEntryUpdateManyWithoutOrganizationNestedInput
+  timeEvents?: Prisma.TimeEventUpdateManyWithoutOrganizationNestedInput
+  leaveTypes?: Prisma.LeaveTypeUpdateManyWithoutOrganizationNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutOrganizationNestedInput
+  stampTypes?: Prisma.TimeStampTypeUpdateManyWithoutOrganizationNestedInput
+  regulars?: Prisma.RegularScheduleUpdateManyWithoutOrganizationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutOrganizationNestedInput
+  overtime?: Prisma.OvertimeRequestUpdateManyWithoutOrganizationNestedInput
+  compensations?: Prisma.CompensationUpdateManyWithoutOrganizationNestedInput
+  payComponents?: Prisma.PayComponentUpdateManyWithoutOrganizationNestedInput
+  empComponents?: Prisma.EmployeeComponentUpdateManyWithoutOrganizationNestedInput
+  contributions?: Prisma.ContributionRuleUpdateManyWithoutOrganizationNestedInput
+  taxBrackets?: Prisma.TaxBracketUpdateManyWithoutOrganizationNestedInput
+  periods?: Prisma.PayrollPeriodUpdateManyWithoutOrganizationNestedInput
+  payslips?: Prisma.PayslipUpdateManyWithoutOrganizationNestedInput
+  adjustments?: Prisma.PayrollAdjustmentUpdateManyWithoutOrganizationNestedInput
+  checklistTpl?: Prisma.ChecklistTemplateUpdateManyWithoutOrganizationNestedInput
+  checklistItems?: Prisma.ChecklistItemUpdateManyWithoutOrganizationNestedInput
+  jobs?: Prisma.JobPostingUpdateManyWithoutOrganizationNestedInput
+  applicants?: Prisma.ApplicantUpdateManyWithoutOrganizationNestedInput
+  applicantNotes?: Prisma.ApplicantNoteUpdateManyWithoutOrganizationNestedInput
+  cycles?: Prisma.ReviewCycleUpdateManyWithoutOrganizationNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutOrganizationNestedInput
+  goals?: Prisma.GoalUpdateManyWithoutOrganizationNestedInput
+  courses?: Prisma.CourseUpdateManyWithoutOrganizationNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.EmployeeDocumentUpdateManyWithoutOrganizationNestedInput
+  hrRequests?: Prisma.HrRequestUpdateManyWithoutOrganizationNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
+  statutoryRules?: Prisma.StatutoryRuleUpdateManyWithoutOrganizationNestedInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutOrganizationNestedInput
+  wageOrders?: Prisma.WageOrderUpdateManyWithoutOrganizationNestedInput
+  holidays?: Prisma.HolidayUpdateManyWithoutOrganizationNestedInput
+  prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutOrganizationNestedInput
+  dailyReports?: Prisma.DailyReportUpdateManyWithoutOrganizationNestedInput
+  wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
+  cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
+  payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
+  reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
+  policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
+  signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
+  idCard?: Prisma.IdCardSettingsUpdateOneWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  calls?: Prisma.CallSessionUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutHandbookSectionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  industryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  sizeKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutOrganizationNestedInput
+  settings?: Prisma.OrgSettingsUncheckedUpdateOneWithoutOrganizationNestedInput
+  departments?: Prisma.DepartmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  positions?: Prisma.PositionUncheckedUpdateManyWithoutOrganizationNestedInput
+  employees?: Prisma.EmployeeUncheckedUpdateManyWithoutOrganizationNestedInput
+  history?: Prisma.EmploymentHistoryUncheckedUpdateManyWithoutOrganizationNestedInput
+  shifts?: Prisma.ShiftTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+  schedule?: Prisma.ScheduleEntryUncheckedUpdateManyWithoutOrganizationNestedInput
+  timeEvents?: Prisma.TimeEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  leaveTypes?: Prisma.LeaveTypeUncheckedUpdateManyWithoutOrganizationNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  stampTypes?: Prisma.TimeStampTypeUncheckedUpdateManyWithoutOrganizationNestedInput
+  regulars?: Prisma.RegularScheduleUncheckedUpdateManyWithoutOrganizationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutOrganizationNestedInput
+  overtime?: Prisma.OvertimeRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  compensations?: Prisma.CompensationUncheckedUpdateManyWithoutOrganizationNestedInput
+  payComponents?: Prisma.PayComponentUncheckedUpdateManyWithoutOrganizationNestedInput
+  empComponents?: Prisma.EmployeeComponentUncheckedUpdateManyWithoutOrganizationNestedInput
+  contributions?: Prisma.ContributionRuleUncheckedUpdateManyWithoutOrganizationNestedInput
+  taxBrackets?: Prisma.TaxBracketUncheckedUpdateManyWithoutOrganizationNestedInput
+  periods?: Prisma.PayrollPeriodUncheckedUpdateManyWithoutOrganizationNestedInput
+  payslips?: Prisma.PayslipUncheckedUpdateManyWithoutOrganizationNestedInput
+  adjustments?: Prisma.PayrollAdjustmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  checklistTpl?: Prisma.ChecklistTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+  checklistItems?: Prisma.ChecklistItemUncheckedUpdateManyWithoutOrganizationNestedInput
+  jobs?: Prisma.JobPostingUncheckedUpdateManyWithoutOrganizationNestedInput
+  applicants?: Prisma.ApplicantUncheckedUpdateManyWithoutOrganizationNestedInput
+  applicantNotes?: Prisma.ApplicantNoteUncheckedUpdateManyWithoutOrganizationNestedInput
+  cycles?: Prisma.ReviewCycleUncheckedUpdateManyWithoutOrganizationNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutOrganizationNestedInput
+  goals?: Prisma.GoalUncheckedUpdateManyWithoutOrganizationNestedInput
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutOrganizationNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.EmployeeDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
+  hrRequests?: Prisma.HrRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
+  statutoryRules?: Prisma.StatutoryRuleUncheckedUpdateManyWithoutOrganizationNestedInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutOrganizationNestedInput
+  wageOrders?: Prisma.WageOrderUncheckedUpdateManyWithoutOrganizationNestedInput
+  holidays?: Prisma.HolidayUncheckedUpdateManyWithoutOrganizationNestedInput
+  prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutOrganizationNestedInput
+  wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
+  payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
+  policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
+  signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
+  idCard?: Prisma.IdCardSettingsUncheckedUpdateOneWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  calls?: Prisma.CallSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationCreateWithoutHandbookAcksInput = {
+  id?: string
+  name: string
+  categoryKey: string
+  industryKey: string
+  sizeKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutOrganizationInput
+  settings?: Prisma.OrgSettingsCreateNestedOneWithoutOrganizationInput
+  departments?: Prisma.DepartmentCreateNestedManyWithoutOrganizationInput
+  positions?: Prisma.PositionCreateNestedManyWithoutOrganizationInput
+  employees?: Prisma.EmployeeCreateNestedManyWithoutOrganizationInput
+  history?: Prisma.EmploymentHistoryCreateNestedManyWithoutOrganizationInput
+  shifts?: Prisma.ShiftTemplateCreateNestedManyWithoutOrganizationInput
+  schedule?: Prisma.ScheduleEntryCreateNestedManyWithoutOrganizationInput
+  timeEvents?: Prisma.TimeEventCreateNestedManyWithoutOrganizationInput
+  leaveTypes?: Prisma.LeaveTypeCreateNestedManyWithoutOrganizationInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutOrganizationInput
+  stampTypes?: Prisma.TimeStampTypeCreateNestedManyWithoutOrganizationInput
+  regulars?: Prisma.RegularScheduleCreateNestedManyWithoutOrganizationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutOrganizationInput
+  overtime?: Prisma.OvertimeRequestCreateNestedManyWithoutOrganizationInput
+  compensations?: Prisma.CompensationCreateNestedManyWithoutOrganizationInput
+  payComponents?: Prisma.PayComponentCreateNestedManyWithoutOrganizationInput
+  empComponents?: Prisma.EmployeeComponentCreateNestedManyWithoutOrganizationInput
+  contributions?: Prisma.ContributionRuleCreateNestedManyWithoutOrganizationInput
+  taxBrackets?: Prisma.TaxBracketCreateNestedManyWithoutOrganizationInput
+  periods?: Prisma.PayrollPeriodCreateNestedManyWithoutOrganizationInput
+  payslips?: Prisma.PayslipCreateNestedManyWithoutOrganizationInput
+  adjustments?: Prisma.PayrollAdjustmentCreateNestedManyWithoutOrganizationInput
+  checklistTpl?: Prisma.ChecklistTemplateCreateNestedManyWithoutOrganizationInput
+  checklistItems?: Prisma.ChecklistItemCreateNestedManyWithoutOrganizationInput
+  jobs?: Prisma.JobPostingCreateNestedManyWithoutOrganizationInput
+  applicants?: Prisma.ApplicantCreateNestedManyWithoutOrganizationInput
+  applicantNotes?: Prisma.ApplicantNoteCreateNestedManyWithoutOrganizationInput
+  cycles?: Prisma.ReviewCycleCreateNestedManyWithoutOrganizationInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutOrganizationInput
+  goals?: Prisma.GoalCreateNestedManyWithoutOrganizationInput
+  courses?: Prisma.CourseCreateNestedManyWithoutOrganizationInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.EmployeeDocumentCreateNestedManyWithoutOrganizationInput
+  hrRequests?: Prisma.HrRequestCreateNestedManyWithoutOrganizationInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
+  statutoryRules?: Prisma.StatutoryRuleCreateNestedManyWithoutOrganizationInput
+  taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutOrganizationInput
+  wageOrders?: Prisma.WageOrderCreateNestedManyWithoutOrganizationInput
+  holidays?: Prisma.HolidayCreateNestedManyWithoutOrganizationInput
+  prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutOrganizationInput
+  dailyReports?: Prisma.DailyReportCreateNestedManyWithoutOrganizationInput
+  wsProjects?: Prisma.WsProjectCreateNestedManyWithoutOrganizationInput
+  cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
+  payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
+  policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
+  signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
+  idCard?: Prisma.IdCardSettingsCreateNestedOneWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  calls?: Prisma.CallSessionCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutHandbookAcksInput = {
+  id?: string
+  name: string
+  categoryKey: string
+  industryKey: string
+  sizeKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutOrganizationInput
+  settings?: Prisma.OrgSettingsUncheckedCreateNestedOneWithoutOrganizationInput
+  departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutOrganizationInput
+  positions?: Prisma.PositionUncheckedCreateNestedManyWithoutOrganizationInput
+  employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutOrganizationInput
+  history?: Prisma.EmploymentHistoryUncheckedCreateNestedManyWithoutOrganizationInput
+  shifts?: Prisma.ShiftTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+  schedule?: Prisma.ScheduleEntryUncheckedCreateNestedManyWithoutOrganizationInput
+  timeEvents?: Prisma.TimeEventUncheckedCreateNestedManyWithoutOrganizationInput
+  leaveTypes?: Prisma.LeaveTypeUncheckedCreateNestedManyWithoutOrganizationInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  stampTypes?: Prisma.TimeStampTypeUncheckedCreateNestedManyWithoutOrganizationInput
+  regulars?: Prisma.RegularScheduleUncheckedCreateNestedManyWithoutOrganizationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutOrganizationInput
+  overtime?: Prisma.OvertimeRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  compensations?: Prisma.CompensationUncheckedCreateNestedManyWithoutOrganizationInput
+  payComponents?: Prisma.PayComponentUncheckedCreateNestedManyWithoutOrganizationInput
+  empComponents?: Prisma.EmployeeComponentUncheckedCreateNestedManyWithoutOrganizationInput
+  contributions?: Prisma.ContributionRuleUncheckedCreateNestedManyWithoutOrganizationInput
+  taxBrackets?: Prisma.TaxBracketUncheckedCreateNestedManyWithoutOrganizationInput
+  periods?: Prisma.PayrollPeriodUncheckedCreateNestedManyWithoutOrganizationInput
+  payslips?: Prisma.PayslipUncheckedCreateNestedManyWithoutOrganizationInput
+  adjustments?: Prisma.PayrollAdjustmentUncheckedCreateNestedManyWithoutOrganizationInput
+  checklistTpl?: Prisma.ChecklistTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+  checklistItems?: Prisma.ChecklistItemUncheckedCreateNestedManyWithoutOrganizationInput
+  jobs?: Prisma.JobPostingUncheckedCreateNestedManyWithoutOrganizationInput
+  applicants?: Prisma.ApplicantUncheckedCreateNestedManyWithoutOrganizationInput
+  applicantNotes?: Prisma.ApplicantNoteUncheckedCreateNestedManyWithoutOrganizationInput
+  cycles?: Prisma.ReviewCycleUncheckedCreateNestedManyWithoutOrganizationInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutOrganizationInput
+  goals?: Prisma.GoalUncheckedCreateNestedManyWithoutOrganizationInput
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutOrganizationInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.EmployeeDocumentUncheckedCreateNestedManyWithoutOrganizationInput
+  hrRequests?: Prisma.HrRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
+  statutoryRules?: Prisma.StatutoryRuleUncheckedCreateNestedManyWithoutOrganizationInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutOrganizationInput
+  wageOrders?: Prisma.WageOrderUncheckedCreateNestedManyWithoutOrganizationInput
+  holidays?: Prisma.HolidayUncheckedCreateNestedManyWithoutOrganizationInput
+  prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutOrganizationInput
+  dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutOrganizationInput
+  wsProjects?: Prisma.WsProjectUncheckedCreateNestedManyWithoutOrganizationInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
+  payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
+  policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
+  signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
+  idCard?: Prisma.IdCardSettingsUncheckedCreateNestedOneWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  calls?: Prisma.CallSessionUncheckedCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutHandbookAcksInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutHandbookAcksInput, Prisma.OrganizationUncheckedCreateWithoutHandbookAcksInput>
+}
+
+export type OrganizationUpsertWithoutHandbookAcksInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutHandbookAcksInput, Prisma.OrganizationUncheckedUpdateWithoutHandbookAcksInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutHandbookAcksInput, Prisma.OrganizationUncheckedCreateWithoutHandbookAcksInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutHandbookAcksInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutHandbookAcksInput, Prisma.OrganizationUncheckedUpdateWithoutHandbookAcksInput>
+}
+
+export type OrganizationUpdateWithoutHandbookAcksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  industryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  sizeKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutOrganizationNestedInput
+  settings?: Prisma.OrgSettingsUpdateOneWithoutOrganizationNestedInput
+  departments?: Prisma.DepartmentUpdateManyWithoutOrganizationNestedInput
+  positions?: Prisma.PositionUpdateManyWithoutOrganizationNestedInput
+  employees?: Prisma.EmployeeUpdateManyWithoutOrganizationNestedInput
+  history?: Prisma.EmploymentHistoryUpdateManyWithoutOrganizationNestedInput
+  shifts?: Prisma.ShiftTemplateUpdateManyWithoutOrganizationNestedInput
+  schedule?: Prisma.ScheduleEntryUpdateManyWithoutOrganizationNestedInput
+  timeEvents?: Prisma.TimeEventUpdateManyWithoutOrganizationNestedInput
+  leaveTypes?: Prisma.LeaveTypeUpdateManyWithoutOrganizationNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutOrganizationNestedInput
+  stampTypes?: Prisma.TimeStampTypeUpdateManyWithoutOrganizationNestedInput
+  regulars?: Prisma.RegularScheduleUpdateManyWithoutOrganizationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutOrganizationNestedInput
+  overtime?: Prisma.OvertimeRequestUpdateManyWithoutOrganizationNestedInput
+  compensations?: Prisma.CompensationUpdateManyWithoutOrganizationNestedInput
+  payComponents?: Prisma.PayComponentUpdateManyWithoutOrganizationNestedInput
+  empComponents?: Prisma.EmployeeComponentUpdateManyWithoutOrganizationNestedInput
+  contributions?: Prisma.ContributionRuleUpdateManyWithoutOrganizationNestedInput
+  taxBrackets?: Prisma.TaxBracketUpdateManyWithoutOrganizationNestedInput
+  periods?: Prisma.PayrollPeriodUpdateManyWithoutOrganizationNestedInput
+  payslips?: Prisma.PayslipUpdateManyWithoutOrganizationNestedInput
+  adjustments?: Prisma.PayrollAdjustmentUpdateManyWithoutOrganizationNestedInput
+  checklistTpl?: Prisma.ChecklistTemplateUpdateManyWithoutOrganizationNestedInput
+  checklistItems?: Prisma.ChecklistItemUpdateManyWithoutOrganizationNestedInput
+  jobs?: Prisma.JobPostingUpdateManyWithoutOrganizationNestedInput
+  applicants?: Prisma.ApplicantUpdateManyWithoutOrganizationNestedInput
+  applicantNotes?: Prisma.ApplicantNoteUpdateManyWithoutOrganizationNestedInput
+  cycles?: Prisma.ReviewCycleUpdateManyWithoutOrganizationNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutOrganizationNestedInput
+  goals?: Prisma.GoalUpdateManyWithoutOrganizationNestedInput
+  courses?: Prisma.CourseUpdateManyWithoutOrganizationNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.EmployeeDocumentUpdateManyWithoutOrganizationNestedInput
+  hrRequests?: Prisma.HrRequestUpdateManyWithoutOrganizationNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
+  statutoryRules?: Prisma.StatutoryRuleUpdateManyWithoutOrganizationNestedInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutOrganizationNestedInput
+  wageOrders?: Prisma.WageOrderUpdateManyWithoutOrganizationNestedInput
+  holidays?: Prisma.HolidayUpdateManyWithoutOrganizationNestedInput
+  prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutOrganizationNestedInput
+  dailyReports?: Prisma.DailyReportUpdateManyWithoutOrganizationNestedInput
+  wsProjects?: Prisma.WsProjectUpdateManyWithoutOrganizationNestedInput
+  cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
+  payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
+  policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
+  signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
+  idCard?: Prisma.IdCardSettingsUpdateOneWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  calls?: Prisma.CallSessionUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutHandbookAcksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  industryKey?: Prisma.StringFieldUpdateOperationsInput | string
+  sizeKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutOrganizationNestedInput
+  settings?: Prisma.OrgSettingsUncheckedUpdateOneWithoutOrganizationNestedInput
+  departments?: Prisma.DepartmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  positions?: Prisma.PositionUncheckedUpdateManyWithoutOrganizationNestedInput
+  employees?: Prisma.EmployeeUncheckedUpdateManyWithoutOrganizationNestedInput
+  history?: Prisma.EmploymentHistoryUncheckedUpdateManyWithoutOrganizationNestedInput
+  shifts?: Prisma.ShiftTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+  schedule?: Prisma.ScheduleEntryUncheckedUpdateManyWithoutOrganizationNestedInput
+  timeEvents?: Prisma.TimeEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  leaveTypes?: Prisma.LeaveTypeUncheckedUpdateManyWithoutOrganizationNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  stampTypes?: Prisma.TimeStampTypeUncheckedUpdateManyWithoutOrganizationNestedInput
+  regulars?: Prisma.RegularScheduleUncheckedUpdateManyWithoutOrganizationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutOrganizationNestedInput
+  overtime?: Prisma.OvertimeRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  compensations?: Prisma.CompensationUncheckedUpdateManyWithoutOrganizationNestedInput
+  payComponents?: Prisma.PayComponentUncheckedUpdateManyWithoutOrganizationNestedInput
+  empComponents?: Prisma.EmployeeComponentUncheckedUpdateManyWithoutOrganizationNestedInput
+  contributions?: Prisma.ContributionRuleUncheckedUpdateManyWithoutOrganizationNestedInput
+  taxBrackets?: Prisma.TaxBracketUncheckedUpdateManyWithoutOrganizationNestedInput
+  periods?: Prisma.PayrollPeriodUncheckedUpdateManyWithoutOrganizationNestedInput
+  payslips?: Prisma.PayslipUncheckedUpdateManyWithoutOrganizationNestedInput
+  adjustments?: Prisma.PayrollAdjustmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  checklistTpl?: Prisma.ChecklistTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+  checklistItems?: Prisma.ChecklistItemUncheckedUpdateManyWithoutOrganizationNestedInput
+  jobs?: Prisma.JobPostingUncheckedUpdateManyWithoutOrganizationNestedInput
+  applicants?: Prisma.ApplicantUncheckedUpdateManyWithoutOrganizationNestedInput
+  applicantNotes?: Prisma.ApplicantNoteUncheckedUpdateManyWithoutOrganizationNestedInput
+  cycles?: Prisma.ReviewCycleUncheckedUpdateManyWithoutOrganizationNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutOrganizationNestedInput
+  goals?: Prisma.GoalUncheckedUpdateManyWithoutOrganizationNestedInput
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutOrganizationNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.EmployeeDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
+  hrRequests?: Prisma.HrRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
+  statutoryRules?: Prisma.StatutoryRuleUncheckedUpdateManyWithoutOrganizationNestedInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutOrganizationNestedInput
+  wageOrders?: Prisma.WageOrderUncheckedUpdateManyWithoutOrganizationNestedInput
+  holidays?: Prisma.HolidayUncheckedUpdateManyWithoutOrganizationNestedInput
+  prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutOrganizationNestedInput
+  wsProjects?: Prisma.WsProjectUncheckedUpdateManyWithoutOrganizationNestedInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
+  payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -14277,6 +16249,10 @@ export type OrganizationCreateWithoutWsProjectsInput = {
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutOrganizationInput
@@ -14337,6 +16313,10 @@ export type OrganizationUncheckedCreateWithoutWsProjectsInput = {
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutOrganizationInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutOrganizationInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutOrganizationInput
+  incentives?: Prisma.IncentiveUncheckedCreateNestedManyWithoutOrganizationInput
+  contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookSections?: Prisma.HandbookSectionUncheckedCreateNestedManyWithoutOrganizationInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedCreateNestedManyWithoutOrganizationInput
   reportComments?: Prisma.DailyReportCommentUncheckedCreateNestedManyWithoutOrganizationInput
   policies?: Prisma.PolicyDocumentUncheckedCreateNestedManyWithoutOrganizationInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutOrganizationInput
@@ -14413,6 +16393,10 @@ export type OrganizationUpdateWithoutWsProjectsInput = {
   dailyReports?: Prisma.DailyReportUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutOrganizationNestedInput
@@ -14473,6 +16457,10 @@ export type OrganizationUncheckedUpdateWithoutWsProjectsInput = {
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutOrganizationNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutOrganizationNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutOrganizationNestedInput
+  incentives?: Prisma.IncentiveUncheckedUpdateManyWithoutOrganizationNestedInput
+  contracts?: Prisma.ContractUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookSections?: Prisma.HandbookSectionUncheckedUpdateManyWithoutOrganizationNestedInput
+  handbookAcks?: Prisma.HandbookAcknowledgmentUncheckedUpdateManyWithoutOrganizationNestedInput
   reportComments?: Prisma.DailyReportCommentUncheckedUpdateManyWithoutOrganizationNestedInput
   policies?: Prisma.PolicyDocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -14531,6 +16519,10 @@ export type OrganizationCountOutputType = {
   wsProjects: number
   cashAdvances: number
   payouts: number
+  incentives: number
+  contracts: number
+  handbookSections: number
+  handbookAcks: number
   reportComments: number
   policies: number
   signatures: number
@@ -14583,6 +16575,10 @@ export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Exte
   wsProjects?: boolean | OrganizationCountOutputTypeCountWsProjectsArgs
   cashAdvances?: boolean | OrganizationCountOutputTypeCountCashAdvancesArgs
   payouts?: boolean | OrganizationCountOutputTypeCountPayoutsArgs
+  incentives?: boolean | OrganizationCountOutputTypeCountIncentivesArgs
+  contracts?: boolean | OrganizationCountOutputTypeCountContractsArgs
+  handbookSections?: boolean | OrganizationCountOutputTypeCountHandbookSectionsArgs
+  handbookAcks?: boolean | OrganizationCountOutputTypeCountHandbookAcksArgs
   reportComments?: boolean | OrganizationCountOutputTypeCountReportCommentsArgs
   policies?: boolean | OrganizationCountOutputTypeCountPoliciesArgs
   signatures?: boolean | OrganizationCountOutputTypeCountSignaturesArgs
@@ -14911,6 +16907,34 @@ export type OrganizationCountOutputTypeCountPayoutsArgs<ExtArgs extends runtime.
 /**
  * OrganizationCountOutputType without action
  */
+export type OrganizationCountOutputTypeCountIncentivesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IncentiveWhereInput
+}
+
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountContractsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContractWhereInput
+}
+
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountHandbookSectionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.HandbookSectionWhereInput
+}
+
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountHandbookAcksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.HandbookAcknowledgmentWhereInput
+}
+
+/**
+ * OrganizationCountOutputType without action
+ */
 export type OrganizationCountOutputTypeCountReportCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.DailyReportCommentWhereInput
 }
@@ -14997,6 +17021,10 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   wsProjects?: boolean | Prisma.Organization$wsProjectsArgs<ExtArgs>
   cashAdvances?: boolean | Prisma.Organization$cashAdvancesArgs<ExtArgs>
   payouts?: boolean | Prisma.Organization$payoutsArgs<ExtArgs>
+  incentives?: boolean | Prisma.Organization$incentivesArgs<ExtArgs>
+  contracts?: boolean | Prisma.Organization$contractsArgs<ExtArgs>
+  handbookSections?: boolean | Prisma.Organization$handbookSectionsArgs<ExtArgs>
+  handbookAcks?: boolean | Prisma.Organization$handbookAcksArgs<ExtArgs>
   reportComments?: boolean | Prisma.Organization$reportCommentsArgs<ExtArgs>
   policies?: boolean | Prisma.Organization$policiesArgs<ExtArgs>
   signatures?: boolean | Prisma.Organization$signaturesArgs<ExtArgs>
@@ -15083,6 +17111,10 @@ export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.Interna
   wsProjects?: boolean | Prisma.Organization$wsProjectsArgs<ExtArgs>
   cashAdvances?: boolean | Prisma.Organization$cashAdvancesArgs<ExtArgs>
   payouts?: boolean | Prisma.Organization$payoutsArgs<ExtArgs>
+  incentives?: boolean | Prisma.Organization$incentivesArgs<ExtArgs>
+  contracts?: boolean | Prisma.Organization$contractsArgs<ExtArgs>
+  handbookSections?: boolean | Prisma.Organization$handbookSectionsArgs<ExtArgs>
+  handbookAcks?: boolean | Prisma.Organization$handbookAcksArgs<ExtArgs>
   reportComments?: boolean | Prisma.Organization$reportCommentsArgs<ExtArgs>
   policies?: boolean | Prisma.Organization$policiesArgs<ExtArgs>
   signatures?: boolean | Prisma.Organization$signaturesArgs<ExtArgs>
@@ -15142,6 +17174,10 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     wsProjects: Prisma.$WsProjectPayload<ExtArgs>[]
     cashAdvances: Prisma.$CashAdvancePayload<ExtArgs>[]
     payouts: Prisma.$PayoutPayload<ExtArgs>[]
+    incentives: Prisma.$IncentivePayload<ExtArgs>[]
+    contracts: Prisma.$ContractPayload<ExtArgs>[]
+    handbookSections: Prisma.$HandbookSectionPayload<ExtArgs>[]
+    handbookAcks: Prisma.$HandbookAcknowledgmentPayload<ExtArgs>[]
     reportComments: Prisma.$DailyReportCommentPayload<ExtArgs>[]
     policies: Prisma.$PolicyDocumentPayload<ExtArgs>[]
     signatures: Prisma.$PolicySignaturePayload<ExtArgs>[]
@@ -15596,6 +17632,10 @@ export interface Prisma__OrganizationClient<T, Null = never, ExtArgs extends run
   wsProjects<T extends Prisma.Organization$wsProjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$wsProjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WsProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cashAdvances<T extends Prisma.Organization$cashAdvancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$cashAdvancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CashAdvancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payouts<T extends Prisma.Organization$payoutsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$payoutsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PayoutPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  incentives<T extends Prisma.Organization$incentivesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$incentivesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IncentivePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  contracts<T extends Prisma.Organization$contractsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$contractsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContractPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  handbookSections<T extends Prisma.Organization$handbookSectionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$handbookSectionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HandbookSectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  handbookAcks<T extends Prisma.Organization$handbookAcksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$handbookAcksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HandbookAcknowledgmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reportComments<T extends Prisma.Organization$reportCommentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$reportCommentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DailyReportCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   policies<T extends Prisma.Organization$policiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$policiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PolicyDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   signatures<T extends Prisma.Organization$signaturesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$signaturesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PolicySignaturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -17103,6 +19143,102 @@ export type Organization$payoutsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.PayoutScalarFieldEnum | Prisma.PayoutScalarFieldEnum[]
+}
+
+/**
+ * Organization.incentives
+ */
+export type Organization$incentivesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Incentive
+   */
+  select?: Prisma.IncentiveSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Incentive
+   */
+  omit?: Prisma.IncentiveOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IncentiveInclude<ExtArgs> | null
+  where?: Prisma.IncentiveWhereInput
+  orderBy?: Prisma.IncentiveOrderByWithRelationInput | Prisma.IncentiveOrderByWithRelationInput[]
+  cursor?: Prisma.IncentiveWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IncentiveScalarFieldEnum | Prisma.IncentiveScalarFieldEnum[]
+}
+
+/**
+ * Organization.contracts
+ */
+export type Organization$contractsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Contract
+   */
+  select?: Prisma.ContractSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Contract
+   */
+  omit?: Prisma.ContractOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContractInclude<ExtArgs> | null
+  where?: Prisma.ContractWhereInput
+  orderBy?: Prisma.ContractOrderByWithRelationInput | Prisma.ContractOrderByWithRelationInput[]
+  cursor?: Prisma.ContractWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContractScalarFieldEnum | Prisma.ContractScalarFieldEnum[]
+}
+
+/**
+ * Organization.handbookSections
+ */
+export type Organization$handbookSectionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the HandbookSection
+   */
+  select?: Prisma.HandbookSectionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the HandbookSection
+   */
+  omit?: Prisma.HandbookSectionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.HandbookSectionInclude<ExtArgs> | null
+  where?: Prisma.HandbookSectionWhereInput
+  orderBy?: Prisma.HandbookSectionOrderByWithRelationInput | Prisma.HandbookSectionOrderByWithRelationInput[]
+  cursor?: Prisma.HandbookSectionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.HandbookSectionScalarFieldEnum | Prisma.HandbookSectionScalarFieldEnum[]
+}
+
+/**
+ * Organization.handbookAcks
+ */
+export type Organization$handbookAcksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the HandbookAcknowledgment
+   */
+  select?: Prisma.HandbookAcknowledgmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the HandbookAcknowledgment
+   */
+  omit?: Prisma.HandbookAcknowledgmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.HandbookAcknowledgmentInclude<ExtArgs> | null
+  where?: Prisma.HandbookAcknowledgmentWhereInput
+  orderBy?: Prisma.HandbookAcknowledgmentOrderByWithRelationInput | Prisma.HandbookAcknowledgmentOrderByWithRelationInput[]
+  cursor?: Prisma.HandbookAcknowledgmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.HandbookAcknowledgmentScalarFieldEnum | Prisma.HandbookAcknowledgmentScalarFieldEnum[]
 }
 
 /**

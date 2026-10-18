@@ -368,6 +368,26 @@ export const PayoutStatus = {
 export type PayoutStatus = (typeof PayoutStatus)[keyof typeof PayoutStatus]
 
 
+export const IncentiveStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+  PAID: 'PAID'
+} as const
+
+export type IncentiveStatus = (typeof IncentiveStatus)[keyof typeof IncentiveStatus]
+
+
+export const ContractStatus = {
+  DRAFT: 'DRAFT',
+  ISSUED: 'ISSUED',
+  SIGNED: 'SIGNED',
+  VOID: 'VOID'
+} as const
+
+export type ContractStatus = (typeof ContractStatus)[keyof typeof ContractStatus]
+
+
 export const WsKind = {
   PROGRAMMING: 'PROGRAMMING',
   NETWORK: 'NETWORK',

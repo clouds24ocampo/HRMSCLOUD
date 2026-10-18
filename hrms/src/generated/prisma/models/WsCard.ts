@@ -46,6 +46,7 @@ export type WsCardMinAggregateOutputType = {
   dueDate: Date | null
   position: number | null
   completedAt: Date | null
+  completedById: string | null
   archivedAt: Date | null
   createdById: string | null
   createdAt: Date | null
@@ -64,6 +65,7 @@ export type WsCardMaxAggregateOutputType = {
   dueDate: Date | null
   position: number | null
   completedAt: Date | null
+  completedById: string | null
   archivedAt: Date | null
   createdById: string | null
   createdAt: Date | null
@@ -82,6 +84,7 @@ export type WsCardCountAggregateOutputType = {
   dueDate: number
   position: number
   completedAt: number
+  completedById: number
   archivedAt: number
   createdById: number
   createdAt: number
@@ -110,6 +113,7 @@ export type WsCardMinAggregateInputType = {
   dueDate?: true
   position?: true
   completedAt?: true
+  completedById?: true
   archivedAt?: true
   createdById?: true
   createdAt?: true
@@ -128,6 +132,7 @@ export type WsCardMaxAggregateInputType = {
   dueDate?: true
   position?: true
   completedAt?: true
+  completedById?: true
   archivedAt?: true
   createdById?: true
   createdAt?: true
@@ -146,6 +151,7 @@ export type WsCardCountAggregateInputType = {
   dueDate?: true
   position?: true
   completedAt?: true
+  completedById?: true
   archivedAt?: true
   createdById?: true
   createdAt?: true
@@ -251,6 +257,7 @@ export type WsCardGroupByOutputType = {
   dueDate: Date | null
   position: number
   completedAt: Date | null
+  completedById: string | null
   archivedAt: Date | null
   createdById: string
   createdAt: Date
@@ -292,6 +299,7 @@ export type WsCardWhereInput = {
   dueDate?: Prisma.DateTimeNullableFilter<"WsCard"> | Date | string | null
   position?: Prisma.FloatFilter<"WsCard"> | number
   completedAt?: Prisma.DateTimeNullableFilter<"WsCard"> | Date | string | null
+  completedById?: Prisma.StringNullableFilter<"WsCard"> | string | null
   archivedAt?: Prisma.DateTimeNullableFilter<"WsCard"> | Date | string | null
   createdById?: Prisma.StringFilter<"WsCard"> | string
   createdAt?: Prisma.DateTimeFilter<"WsCard"> | Date | string
@@ -316,6 +324,7 @@ export type WsCardOrderByWithRelationInput = {
   dueDate?: Prisma.SortOrderInput | Prisma.SortOrder
   position?: Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedById?: Prisma.SortOrderInput | Prisma.SortOrder
   archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -343,6 +352,7 @@ export type WsCardWhereUniqueInput = Prisma.AtLeast<{
   dueDate?: Prisma.DateTimeNullableFilter<"WsCard"> | Date | string | null
   position?: Prisma.FloatFilter<"WsCard"> | number
   completedAt?: Prisma.DateTimeNullableFilter<"WsCard"> | Date | string | null
+  completedById?: Prisma.StringNullableFilter<"WsCard"> | string | null
   archivedAt?: Prisma.DateTimeNullableFilter<"WsCard"> | Date | string | null
   createdById?: Prisma.StringFilter<"WsCard"> | string
   createdAt?: Prisma.DateTimeFilter<"WsCard"> | Date | string
@@ -367,6 +377,7 @@ export type WsCardOrderByWithAggregationInput = {
   dueDate?: Prisma.SortOrderInput | Prisma.SortOrder
   position?: Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedById?: Prisma.SortOrderInput | Prisma.SortOrder
   archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -393,6 +404,7 @@ export type WsCardScalarWhereWithAggregatesInput = {
   dueDate?: Prisma.DateTimeNullableWithAggregatesFilter<"WsCard"> | Date | string | null
   position?: Prisma.FloatWithAggregatesFilter<"WsCard"> | number
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"WsCard"> | Date | string | null
+  completedById?: Prisma.StringNullableWithAggregatesFilter<"WsCard"> | string | null
   archivedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"WsCard"> | Date | string | null
   createdById?: Prisma.StringWithAggregatesFilter<"WsCard"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"WsCard"> | Date | string
@@ -409,6 +421,7 @@ export type WsCardCreateInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -433,6 +446,7 @@ export type WsCardUncheckedCreateInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -453,6 +467,7 @@ export type WsCardUpdateInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -477,6 +492,7 @@ export type WsCardUncheckedUpdateInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -499,6 +515,7 @@ export type WsCardCreateManyInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -515,6 +532,7 @@ export type WsCardUpdateManyMutationInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -533,6 +551,7 @@ export type WsCardUncheckedUpdateManyInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -561,6 +580,7 @@ export type WsCardCountOrderByAggregateInput = {
   dueDate?: Prisma.SortOrder
   position?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
+  completedById?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -583,6 +603,7 @@ export type WsCardMaxOrderByAggregateInput = {
   dueDate?: Prisma.SortOrder
   position?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
+  completedById?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -601,6 +622,7 @@ export type WsCardMinOrderByAggregateInput = {
   dueDate?: Prisma.SortOrder
   position?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
+  completedById?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -778,6 +800,7 @@ export type WsCardCreateWithoutProjectInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -800,6 +823,7 @@ export type WsCardUncheckedCreateWithoutProjectInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -851,6 +875,7 @@ export type WsCardScalarWhereInput = {
   dueDate?: Prisma.DateTimeNullableFilter<"WsCard"> | Date | string | null
   position?: Prisma.FloatFilter<"WsCard"> | number
   completedAt?: Prisma.DateTimeNullableFilter<"WsCard"> | Date | string | null
+  completedById?: Prisma.StringNullableFilter<"WsCard"> | string | null
   archivedAt?: Prisma.DateTimeNullableFilter<"WsCard"> | Date | string | null
   createdById?: Prisma.StringFilter<"WsCard"> | string
   createdAt?: Prisma.DateTimeFilter<"WsCard"> | Date | string
@@ -867,6 +892,7 @@ export type WsCardCreateWithoutListInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -889,6 +915,7 @@ export type WsCardUncheckedCreateWithoutListInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -935,6 +962,7 @@ export type WsCardCreateWithoutAssigneesInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -958,6 +986,7 @@ export type WsCardUncheckedCreateWithoutAssigneesInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -993,6 +1022,7 @@ export type WsCardUpdateWithoutAssigneesInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1016,6 +1046,7 @@ export type WsCardUncheckedUpdateWithoutAssigneesInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1035,6 +1066,7 @@ export type WsCardCreateWithoutChecklistInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -1058,6 +1090,7 @@ export type WsCardUncheckedCreateWithoutChecklistInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -1093,6 +1126,7 @@ export type WsCardUpdateWithoutChecklistInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1116,6 +1150,7 @@ export type WsCardUncheckedUpdateWithoutChecklistInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1135,6 +1170,7 @@ export type WsCardCreateWithoutCommentsInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -1158,6 +1194,7 @@ export type WsCardUncheckedCreateWithoutCommentsInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -1193,6 +1230,7 @@ export type WsCardUpdateWithoutCommentsInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1216,6 +1254,7 @@ export type WsCardUncheckedUpdateWithoutCommentsInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1235,6 +1274,7 @@ export type WsCardCreateWithoutLabelsInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -1258,6 +1298,7 @@ export type WsCardUncheckedCreateWithoutLabelsInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -1293,6 +1334,7 @@ export type WsCardUpdateWithoutLabelsInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1316,6 +1358,7 @@ export type WsCardUncheckedUpdateWithoutLabelsInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1336,6 +1379,7 @@ export type WsCardCreateManyProjectInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -1352,6 +1396,7 @@ export type WsCardUpdateWithoutProjectInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1374,6 +1419,7 @@ export type WsCardUncheckedUpdateWithoutProjectInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1395,6 +1441,7 @@ export type WsCardUncheckedUpdateManyWithoutProjectInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1412,6 +1459,7 @@ export type WsCardCreateManyListInput = {
   dueDate?: Date | string | null
   position: number
   completedAt?: Date | string | null
+  completedById?: string | null
   archivedAt?: Date | string | null
   createdById: string
   createdAt?: Date | string
@@ -1428,6 +1476,7 @@ export type WsCardUpdateWithoutListInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1450,6 +1499,7 @@ export type WsCardUncheckedUpdateWithoutListInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1471,6 +1521,7 @@ export type WsCardUncheckedUpdateManyWithoutListInput = {
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   position?: Prisma.FloatFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1547,6 +1598,7 @@ export type WsCardSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   dueDate?: boolean
   position?: boolean
   completedAt?: boolean
+  completedById?: boolean
   archivedAt?: boolean
   createdById?: boolean
   createdAt?: boolean
@@ -1572,6 +1624,7 @@ export type WsCardSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   dueDate?: boolean
   position?: boolean
   completedAt?: boolean
+  completedById?: boolean
   archivedAt?: boolean
   createdById?: boolean
   createdAt?: boolean
@@ -1592,6 +1645,7 @@ export type WsCardSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   dueDate?: boolean
   position?: boolean
   completedAt?: boolean
+  completedById?: boolean
   archivedAt?: boolean
   createdById?: boolean
   createdAt?: boolean
@@ -1612,13 +1666,14 @@ export type WsCardSelectScalar = {
   dueDate?: boolean
   position?: boolean
   completedAt?: boolean
+  completedById?: boolean
   archivedAt?: boolean
   createdById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type WsCardOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "projectId" | "listId" | "title" | "description" | "priority" | "startDate" | "dueDate" | "position" | "completedAt" | "archivedAt" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["wsCard"]>
+export type WsCardOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "projectId" | "listId" | "title" | "description" | "priority" | "startDate" | "dueDate" | "position" | "completedAt" | "completedById" | "archivedAt" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["wsCard"]>
 export type WsCardInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.WsProjectDefaultArgs<ExtArgs>
   list?: boolean | Prisma.WsListDefaultArgs<ExtArgs>
@@ -1659,6 +1714,7 @@ export type $WsCardPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     dueDate: Date | null
     position: number
     completedAt: Date | null
+    completedById: string | null
     archivedAt: Date | null
     createdById: string
     createdAt: Date
@@ -2103,6 +2159,7 @@ export interface WsCardFieldRefs {
   readonly dueDate: Prisma.FieldRef<"WsCard", 'DateTime'>
   readonly position: Prisma.FieldRef<"WsCard", 'Float'>
   readonly completedAt: Prisma.FieldRef<"WsCard", 'DateTime'>
+  readonly completedById: Prisma.FieldRef<"WsCard", 'String'>
   readonly archivedAt: Prisma.FieldRef<"WsCard", 'DateTime'>
   readonly createdById: Prisma.FieldRef<"WsCard", 'String'>
   readonly createdAt: Prisma.FieldRef<"WsCard", 'DateTime'>
