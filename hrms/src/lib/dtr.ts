@@ -55,6 +55,8 @@ export type DtrDay = {
   shift: ShiftTimes | null;
   flex?: boolean; // flexible schedule: no shift times, judged on hours worked instead
   workedSeconds?: number;
+  // Open session only: worked time so far = baseSec, plus (now - sinceIso) while running. Breaks and issues are already out.
+  liveWork?: { baseSec: number; sinceIso: string; running: boolean };
   breakSeconds?: number; // total break time in seconds (meals, bio, rest breaks)
   issueMinutes?: number; // time spent on issues/calamities (not counted in productivity)
   issueSeconds?: number;
@@ -259,6 +261,21 @@ export function buildDtr(input: {
     const breakSec = secs(breakMs);
     const workedSec = secs(workedMs);
 
+    // Time in operation right now: the open session counts from its time in, minus every break/issue already finished
+    // in it, and stops growing while a break or issue is open.
+    let liveWork: DtrDay["liveWork"];
+    const openSession = sessions.find((s) => !s.outAt);
+    if (openSession) {
+      const doneMs = sessions.filter((s) => s.outAt).reduce((n, s) => n + (s.outAt!.getTime() - s.inAt.getTime()), 0)
+        - sessions.filter((s) => s.outAt).flatMap((s) => s.pauses).filter((p) => p.category !== "TRIP").reduce((n, p) => n + pauseMs(p), 0);
+      const closedMs = openSession.pauses.filter((p) => p.category !== "TRIP").reduce((n, p) => n + pauseMs(p), 0);
+      const paused = openPause(openSession);
+      const baseMs = Math.max(0, doneMs) - closedMs;
+      liveWork = paused
+        ? { baseSec: secs(Math.max(0, baseMs + (paused.startAt.getTime() - openSession.inAt.getTime()))), sinceIso: paused.startAt.toISOString(), running: false }
+        : { baseSec: Math.round(baseMs / 1000), sinceIso: openSession.inAt.toISOString(), running: true }; // may be negative: the time in is added back below
+    }
+
     const activeWorkAndIssueSec = prodSec + issueSec;
     const productivityRate = activeWorkAndIssueSec > 0
       ? Math.round((prodSec / activeWorkAndIssueSec) * 1000) / 10
@@ -287,6 +304,7 @@ export function buildDtr(input: {
       lastOut,
       workedMinutes: mins(workedMs),
       workedSeconds: workedSec,
+      liveWork,
       breakMinutes: mins(unpaidMs),
       breakSeconds: breakSec,
       issueMinutes: mins(issueMs),

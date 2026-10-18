@@ -312,3 +312,53 @@ export type CashAdvancePayment = Prisma.CashAdvancePaymentModel
  * 
  */
 export type Payout = Prisma.PayoutModel
+/**
+ * Model WsProject
+ * 
+ */
+export type WsProject = Prisma.WsProjectModel
+/**
+ * Model WsMember
+ * 
+ */
+export type WsMember = Prisma.WsMemberModel
+/**
+ * Model WsList
+ * 
+ */
+export type WsList = Prisma.WsListModel
+/**
+ * Model WsCard
+ * 
+ */
+export type WsCard = Prisma.WsCardModel
+/**
+ * Model WsAssignee
+ * 
+ */
+export type WsAssignee = Prisma.WsAssigneeModel
+/**
+ * Model WsCheck
+ * 
+ */
+export type WsCheck = Prisma.WsCheckModel
+/**
+ * Model WsComment
+ * 
+ */
+export type WsComment = Prisma.WsCommentModel
+/**
+ * Model WsActivity
+ * 
+ */
+export type WsActivity = Prisma.WsActivityModel
+/**
+ * Model WsLabel
+ * 
+ */
+export type WsLabel = Prisma.WsLabelModel
+/**
+ * Model WsCardLabel
+ * 
+ */
+export type WsCardLabel = Prisma.WsCardLabelModel

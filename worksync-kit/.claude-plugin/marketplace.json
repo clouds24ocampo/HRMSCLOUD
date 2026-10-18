@@ -1,0 +1,12 @@
+{
+  "name": "worksync-local",
+  "owner": { "name": "WorkSync team" },
+  "description": "Local marketplace for the WorkSync engineering plugin.",
+  "plugins": [
+    {
+      "name": "worksync",
+      "source": "./plugin/worksync",
+      "description": "Role agents, project skills, slash commands and guard hooks for building WorkSync."
+    }
+  ]
+}

@@ -33,6 +33,7 @@ export const PAGE_ACCESS: Record<string, RoleKey[]> = {
   "/dtr": ALL, // everyone sees what their place in the chain allows
   "/leave": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER],
   "/overtime": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER],
+  "/worksync": ALL, // project boards: what each person sees is decided by project membership, on the server
   "/notifications": ALL,
   "/payroll": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN], // includes /payroll/setup
   "/payslips": INTERNAL, // own payslips only; HR can open any

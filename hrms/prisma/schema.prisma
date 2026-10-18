@@ -68,6 +68,7 @@ model Organization {
   holidays       Holiday[]
   prevEmployment PreviousEmployment[]
   dailyReports   DailyReport[]
+  wsProjects     WsProject[]
   cashAdvances   CashAdvance[]
   payouts        Payout[]
   reportComments DailyReportComment[]
@@ -274,6 +275,8 @@ model Employee {
   taxProfiles    EmployeeTaxProfile[]
   prevEmployment PreviousEmployment[]
   dailyReports   DailyReport[]
+  wsMemberships  WsMember[]
+  wsAssignments  WsAssignee[]
   cashAdvances   CashAdvance[]
   signatures     PolicySignature[]
   createdAt      DateTime             @default(now())
@@ -1548,4 +1551,183 @@ model Payout {
 
   @@index([payslipId])
   @@index([organizationId, status])
+}
+
+// ───────────── WorkSync: project boards (Trello-style) and daily progress ─────────────
+// One board per project. Every list maps to one category (TODO, DOING, BLOCKED, DONE) so progress, "blocked" and "overdue"
+// mean the same on every board, however the lists are named. Visibility follows the project's members, never a hidden button.
+
+enum WsKind {
+  PROGRAMMING
+  NETWORK
+  OTHER
+}
+
+enum WsCategory {
+  TODO
+  DOING
+  BLOCKED
+  DONE
+}
+
+enum WsMemberRole {
+  LEAD // runs the project: members, lists, archive
+  MEMBER // works the cards
+  VIEWER // read only
+}
+
+enum WsPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+model WsProject {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  name           String
+  kind           WsKind       @default(PROGRAMMING)
+  description    String?
+  dueDate        DateTime?    @db.Date
+  color          String       @default("indigo") // board theme, see WS_THEMES
+  createdById    String // User id; plain text so a removed user never blocks the project
+  archivedAt     DateTime?
+  labels         WsLabel[]
+  members        WsMember[]
+  lists          WsList[]
+  cards          WsCard[]
+  activity       WsActivity[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId, archivedAt])
+}
+
+model WsMember {
+  id         String       @id @default(cuid())
+  projectId  String
+  project    WsProject    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  employeeId String
+  employee   Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  role       WsMemberRole @default(MEMBER)
+  createdAt  DateTime     @default(now())
+
+  @@unique([projectId, employeeId])
+  @@index([employeeId])
+}
+
+model WsList {
+  id         String     @id @default(cuid())
+  projectId  String
+  project    WsProject  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name       String
+  category   WsCategory
+  position   Int
+  archivedAt DateTime?
+  cards      WsCard[]
+
+  @@index([projectId, position])
+}
+
+model WsCard {
+  id             String        @id @default(cuid())
+  organizationId String
+  projectId      String
+  project        WsProject     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  listId         String
+  list           WsList        @relation(fields: [listId], references: [id])
+  title          String
+  description    String?
+  priority       WsPriority    @default(NORMAL)
+  startDate      DateTime?     @db.Date
+  dueDate        DateTime?     @db.Date
+  position       Float
+  completedAt    DateTime?
+  archivedAt     DateTime?
+  createdById    String // User id
+  assignees      WsAssignee[]
+  labels         WsCardLabel[]
+  checklist      WsCheck[]
+  comments       WsComment[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([projectId, listId, position])
+  @@index([organizationId, archivedAt])
+}
+
+model WsAssignee {
+  cardId     String
+  card       WsCard   @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@id([cardId, employeeId])
+  @@index([employeeId])
+}
+
+model WsCheck {
+  id       String    @id @default(cuid())
+  cardId   String
+  card     WsCard    @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  text     String
+  done     Boolean   @default(false)
+  doneAt   DateTime?
+  position Int
+
+  @@index([cardId, position])
+}
+
+model WsComment {
+  id        String   @id @default(cuid())
+  cardId    String
+  card      WsCard   @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  authorId  String // User id
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([cardId, createdAt])
+}
+
+// What happened on a board, in order. Only things a person did on purpose (moved, finished, commented, assigned): this is
+// the "who did what today" feed. Not a score, and nothing is recorded in the background.
+model WsActivity {
+  id             String    @id @default(cuid())
+  organizationId String
+  projectId      String
+  project        WsProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  cardId         String?
+  cardTitle      String? // kept so the line still reads after a card is archived
+  actorId        String // User id
+  type           String // CARD_CREATED, MOVED, DONE, BLOCKED, COMMENTED, ASSIGNED, CHECKED, EDITED, ARCHIVED, MEMBER_ADDED …
+  detail         String?
+  createdAt      DateTime  @default(now())
+
+  @@index([projectId, createdAt])
+  @@index([organizationId, createdAt])
+  @@index([actorId, createdAt])
+}
+
+// Colored tags, per project (Bug, Feature, Install, Outage …). A card can carry several.
+model WsLabel {
+  id        String        @id @default(cuid())
+  projectId String
+  project   WsProject     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name      String
+  color     String // key of WS_LABEL_COLORS
+  cards     WsCardLabel[]
+
+  @@index([projectId])
+}
+
+model WsCardLabel {
+  cardId  String
+  card    WsCard  @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  labelId String
+  label   WsLabel @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([cardId, labelId])
+  @@index([labelId])
 }

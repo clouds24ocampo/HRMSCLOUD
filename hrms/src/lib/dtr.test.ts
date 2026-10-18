@@ -97,6 +97,24 @@ describe("buildDtr", () => {
     expect(r.lastOut).toBeNull();
   });
 
+  it("live worked time of an open day leaves out finished breaks, and stops during an open one", () => {
+    const secAt = (hm: string) => at("2026-10-05", hm).getTime();
+    const worked = (w: NonNullable<ReturnType<typeof run>[number]["liveWork"]>, nowHm: string) =>
+      w.baseSec + (w.running ? (secAt(nowHm) - new Date(w.sinceIso).getTime()) / 1000 : 0);
+    // In 08:00, meal 10:00-11:00 finished, still working: at 12:00 that is 4h in minus 1h meal = 3h worked.
+    const [a] = run([p("IN", "2026-10-05", "08:00"), p("PAUSE_START", "2026-10-05", "10:00", MEAL), p("PAUSE_END", "2026-10-05", "11:00", MEAL)], ["2026-10-05"], [["2026-10-05", day]]);
+    expect(a.liveWork?.running).toBe(true);
+    expect(worked(a.liveWork!, "12:00")).toBe(3 * 3600);
+    // An issue still open since 10:00: worked time is frozen at 2h, whatever the clock says.
+    const ISSUE: StampInfo = { id: "iss", name: "Weather", paid: false, allowedMinutes: null, category: "ISSUE" };
+    const [b] = run([p("IN", "2026-10-05", "08:00"), p("PAUSE_START", "2026-10-05", "10:00", ISSUE)], ["2026-10-05"], [["2026-10-05", day]]);
+    expect(b.liveWork?.running).toBe(false);
+    expect(worked(b.liveWork!, "15:00")).toBe(2 * 3600);
+    // A closed day has no live figure.
+    const [c] = run([p("IN", "2026-10-05", "08:00"), p("OUT", "2026-10-05", "17:00")], ["2026-10-05"], [["2026-10-05", day]]);
+    expect(c.liveWork).toBeUndefined();
+  });
+
   it("marks a scheduled past day with no punches absent, unless on leave", () => {
     const sched: [string, ShiftTimes | null][] = [["2026-10-05", day], ["2026-10-06", day], ["2026-10-07", null]];
     const rows = run([], ["2026-10-05", "2026-10-06", "2026-10-07", "2026-10-20"], sched, ["2026-10-06"]);

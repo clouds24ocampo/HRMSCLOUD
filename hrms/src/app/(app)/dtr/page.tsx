@@ -218,7 +218,7 @@ export default async function DtrPage({ searchParams }: { searchParams: Promise<
                 const prodRate = r.productivityRate ?? 0;
                 return (
                   <li key={r.day}>
-                    <details className="group">
+                    <details className="group" open={data.rows.length === 1 ? true : undefined}>
                       <summary className="flex cursor-pointer list-none flex-wrap items-center gap-x-4 gap-y-1 px-5 py-3 transition marker:hidden hover:bg-bg">
                         <span className="w-24 shrink-0 font-medium">
                           {formatDay(r.day)}{r.day === today && <span className="ml-1 text-xs text-brand">today</span>}

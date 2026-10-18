@@ -1,0 +1,66 @@
+# Enable at the end of W1. Steps are skipped until the thing they check exists, so the
+# pipeline is green on an empty repo and tightens as the project grows.
+# TODO(devops): pin every action and image below to an immutable SHA/digest.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks (full history)
+        run: docker run --rm -v "$GITHUB_WORKSPACE:/repo" zricethezav/gitleaks:latest git --redact --no-banner /repo
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: package-lock.json
+        if: hashFiles('package-lock.json') != ''
+      - name: install
+        if: hashFiles('package-lock.json') != ''
+        run: npm ci
+      - name: typecheck
+        if: hashFiles('package-lock.json') != ''
+        run: npm run typecheck
+      - name: lint
+        if: hashFiles('package-lock.json') != ''
+        run: npm run lint
+      - name: unit and integration tests (includes the authz matrix)
+        if: hashFiles('package-lock.json') != ''
+        run: npm test
+      - name: authorization lint
+        run: node scripts/authz-guard.mjs
+      - name: agent files in sync
+        run: node scripts/gen-agents.mjs --check
+      - name: plugin copy in sync
+        run: node scripts/build-plugin.mjs --check
+      - name: kit tests (authz lint and hooks)
+        run: node --test scripts/authz-guard.test.mjs scripts/hooks.test.mjs
+      - name: dependency audit
+        if: hashFiles('package-lock.json') != ''
+        run: npm audit --audit-level=high
+      - name: build
+        if: hashFiles('package-lock.json') != ''
+        run: npm run build --if-present
+
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: trivy filesystem and config scan
+        run: docker run --rm -v "$GITHUB_WORKSPACE:/src" aquasec/trivy:latest fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL --exit-code 1 /src

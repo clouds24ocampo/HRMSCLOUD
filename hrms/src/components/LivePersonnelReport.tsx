@@ -29,6 +29,7 @@ export type PersonnelLiveItem = {
   firstInIso: string | null;
   lastOutTime: string | null;
   workedMinutes: number;
+  liveWork: { baseSec: number; sinceIso: string; running: boolean } | null;
   pause?: {
     name: string;
     icon: string;
@@ -103,6 +104,13 @@ function formatElapsedSeconds(totalSeconds: number): string {
   if (hrs > 0) return `${hrs}h ${String(mins).padStart(2, "0")}m ${String(secs).padStart(2, "0")}s`;
   if (mins > 0) return `${mins}m ${String(secs).padStart(2, "0")}s`;
   return `${secs}s`;
+}
+
+// Time in operation: breaks and issues are never counted, and the figure stops while one is open.
+function workedSeconds(item: { workedMinutes: number; liveWork: { baseSec: number; sinceIso: string; running: boolean } | null }, now: number): number {
+  const w = item.liveWork;
+  if (!w) return item.workedMinutes * 60;
+  return Math.max(0, w.baseSec + (w.running ? (now - new Date(w.sinceIso).getTime()) / 1000 : 0));
 }
 
 function formatMinutes(min: number): string {
@@ -633,9 +641,8 @@ export function LivePersonnelReport({
 
               // Live elapsed duration calculation
               let liveTimerText: string | null = null;
-              if (item.isWorking && item.firstInIso) {
-                const elapsedSec = (now - new Date(item.firstInIso).getTime()) / 1000;
-                liveTimerText = `Elapsed: ${formatElapsedSeconds(elapsedSec)}`;
+              if (item.isWorking && item.liveWork) {
+                liveTimerText = `Worked: ${formatElapsedSeconds(workedSeconds(item, now))}`;
               } else if ((item.isBreak || item.isIssue) && item.pause?.sinceIso) {
                 const elapsedSec = (now - new Date(item.pause.sinceIso).getTime()) / 1000;
                 liveTimerText = `Duration: ${formatElapsedSeconds(elapsedSec)}`;
@@ -716,7 +723,7 @@ export function LivePersonnelReport({
                       <div>
                         <span className="block text-[10px] uppercase font-semibold text-muted">Worked Today</span>
                         <span className="font-medium tabular-nums text-ink">
-                          {item.workedMinutes > 0 ? formatMinutes(item.workedMinutes) : "0m"}
+                          {formatMinutes(Math.floor(workedSeconds(item, now) / 60)) || "0m"}
                         </span>
                       </div>
                     </div>
@@ -888,7 +895,7 @@ export function LivePersonnelReport({
                         {item.lastOutTime || "—"}
                       </td>
                       <td className="py-3 px-4 font-mono text-xs tabular-nums font-semibold text-ink">
-                        {item.workedMinutes > 0 ? formatMinutes(item.workedMinutes) : "—"}
+                        {workedSeconds(item, now) >= 60 ? formatMinutes(Math.floor(workedSeconds(item, now) / 60)) : "—"}
                       </td>
                       <td className="py-3 px-4 text-xs">
                         {item.location ? (

@@ -119,7 +119,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
         <EmptyState title="No one to schedule yet" hint={canEdit ? "Add employees first." : undefined} />
       ) : (
         <Card className="overflow-x-auto p-0">
-          <table className="w-full min-w-[44rem] text-sm">
+          <table className="w-full min-w-176 text-sm">
             <thead>
               <tr className="border-b border-line text-left text-muted">
                 <th className="px-4 py-3 font-medium">Person</th>
@@ -238,7 +238,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
                                   Leave
                                 </span>
                               ) : d < today ? (
-                                <span className="text-xs text-muted/60">Rest day</span>
+                                <span className="inline-block rounded-lg px-2 py-1 text-xs text-muted/60 transition group-hover/cell:text-ink group-hover/cell:bg-bg">Rest day</span>
                               ) : d === today ? (
                                 <span
                                   title="Flexible schedule: minimum 8 hours per working day"
@@ -277,9 +277,9 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
                                   Leave
                                 </span>
                               ) : r ? (
-                                <span className={`text-xs ${r.source === "override" ? "font-semibold text-warning" : "text-muted"}`}>Off</span>
+                                <span className={`inline-block rounded-lg px-2 py-1 text-xs ${r.source === "override" ? "font-semibold text-warning" : "text-muted transition group-hover/cell:text-ink group-hover/cell:bg-bg"}`}>Off</span>
                               ) : (
-                                <span className="text-muted/50">—</span>
+                                <span className="inline-block rounded-lg px-2 py-1 text-xs text-muted/50 transition group-hover/cell:text-ink group-hover/cell:bg-bg">—</span>
                               )
                             )}
                           </CellEditor>
@@ -296,7 +296,11 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
             <span className="flex items-center gap-1.5"><Badge tone="brand">blue</Badge> Regular shift / flexible active</span>
             <span className="flex items-center gap-1.5"><Badge tone="warning">orange</Badge> Changed for that day</span>
             <span className="flex items-center gap-1.5"><Badge tone="neutral">purple</Badge> Approved leave</span>
-            {canEdit ? <span className="ml-auto text-muted">Click any day to view details or change schedule</span> : <span className="ml-auto text-muted">Click any day to view transaction timeline</span>}
+            {canEdit ? (
+              <span className="ml-auto text-muted">Click any schedule to view all timestamps & activity · hover ✏️ to edit</span>
+            ) : (
+              <span className="ml-auto text-muted">Click any schedule to view all timestamps & activity</span>
+            )}
           </div>
         </Card>
       )}

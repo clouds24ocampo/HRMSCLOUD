@@ -13,6 +13,8 @@ export async function wipeOrgs(stamp: string | number) {
       // Child tables without an organizationId of their own.
       await q(`DELETE FROM "PayslipLine" WHERE "payslipId" IN (SELECT "id" FROM "Payslip" WHERE "organizationId" = ANY($1::text[]))`);
       await q(`DELETE FROM "Session" WHERE "userId" IN (SELECT "id" FROM "User" WHERE "organizationId" = ANY($1::text[]))`);
+      for (const [t, col, parent] of [["WsAssignee", "cardId", "WsCard"], ["WsCheck", "cardId", "WsCard"], ["WsComment", "cardId", "WsCard"], ["WsCardLabel", "cardId", "WsCard"], ["WsLabel", "projectId", "WsProject"], ["WsMember", "projectId", "WsProject"], ["WsList", "projectId", "WsProject"]])
+        await q(`DELETE FROM "${t}" WHERE "${col}" IN (SELECT "id" FROM "${parent}" WHERE "organizationId" = ANY($1::text[]))`);
       const tables = await tx.$queryRawUnsafe<{ table_name: string }[]>(
         `SELECT table_name FROM information_schema.columns WHERE table_schema = 'public' AND column_name = 'organizationId' AND table_name <> 'Organization'`,
       );

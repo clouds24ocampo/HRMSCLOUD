@@ -10,8 +10,12 @@ const person = (n: string, days: ReportDay[]): ReportPerson => ({
 });
 const report = (people: ReportPerson[], wages = true): DtrReport => ({ organization: "Acme Corp", from: "2026-10-01", to: "2026-10-15", timezone: "Asia/Manila", wages, people, grandWageCents: wages ? people.reduce((a, p) => a + (p.totals.wageCents ?? 0), 0) : null, generatedAt: new Date("2026-10-16T01:00:00Z") });
 
-// Standard-font PDFs store text as hex strings: decode them all to read what was written.
-const text = (pdf: Buffer) => [...pdf.toString("latin1").matchAll(/<([0-9a-fA-F]{4,})>/g)].map((m) => Buffer.from(m[1], "hex").toString("latin1")).join(" ");
+// Standard-font PDFs store text as hex strings inside TJ arrays, with kerning numbers between letters: join the pieces
+// of each array back into the words that were written.
+const text = (pdf: Buffer) =>
+  [...pdf.toString("latin1").matchAll(/\[([^\]]*)\]\s*TJ/g)]
+    .map((m) => [...m[1].matchAll(/<([0-9a-fA-F]+)>/g)].map((h) => Buffer.from(h[1], "hex").toString("latin1")).join(""))
+    .join(" ");
 
 describe("DTR PDF", () => {
   it("is a real PDF with every person, each day's wage and the totals", async () => {

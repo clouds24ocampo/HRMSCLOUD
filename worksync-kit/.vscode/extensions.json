@@ -1,0 +1,18 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "editorconfig.editorconfig",
+    "vitest.explorer",
+    "ms-playwright.playwright",
+    "ms-azuretools.vscode-docker",
+    "redhat.vscode-yaml",
+    "bradlc.vscode-tailwindcss",
+    "github.vscode-github-actions",
+    "github.vscode-pull-request-github",
+    "sonarsource.sonarlint-vscode",
+    "42crunch.vscode-openapi",
+    "streetsidesoftware.code-spell-checker"
+  ],
+  "unwantedRecommendations": []
+}

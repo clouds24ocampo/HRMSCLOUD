@@ -3,9 +3,11 @@ import { LoginShell } from "./LoginShell";
 import { HeroScene } from "@/components/HeroScene";
 import { Logo } from "@/components/Logo";
 import { redirectIfSignedIn } from "@/lib/auth";
+import { registrationOpen } from "@/lib/registration";
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ stamp?: string }> }) {
   await redirectIfSignedIn();
+  const open = await registrationOpen();
   const { stamp } = await searchParams; // /login?stamp=1 opens on the time stamp tab: a handy phone shortcut
   return (
     <LoginShell
@@ -22,12 +24,14 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       bottom={
         <>
           <p className="mt-4 text-center text-xs text-muted">Employees: use the email and temporary password from your administrator.</p>
-          <p className="mt-6 text-center text-sm text-muted">
-            New here?{" "}
-            <Link href="/register" className="font-semibold text-brand hover:underline">
-              Register your organization
-            </Link>
-          </p>
+          {open && (
+            <p className="mt-6 text-center text-sm text-muted">
+              New here?{" "}
+              <Link href="/register" className="font-semibold text-brand hover:underline">
+                Register your organization
+              </Link>
+            </p>
+          )}
         </>
       }
       hero={

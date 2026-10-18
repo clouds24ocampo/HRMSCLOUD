@@ -13,6 +13,7 @@ import { ROLES } from "@/lib/roles";
 import { createEmployee } from "@/lib/employees";
 import { dbDate, dayKey } from "@/lib/time";
 import { isLimited, recordHit } from "@/lib/rate-limit";
+import { MULTI_ORG, registrationOpen } from "@/lib/registration";
 import { DB_DOWN_MESSAGE, isDbDown } from "@/lib/db-health";
 import type { FormState } from "@/app/login/actions";
 
@@ -32,6 +33,8 @@ const schema = z
   })
   .refine((d) => d.password === d.confirm, { message: "Passwords do not match." });
 
+const CLOSED = "A company is already registered on this system. Registration is closed. Sign in instead.";
+
 export async function registerOrganization(prev: FormState, form: FormData): Promise<FormState> {
   try {
     return await registerInner(prev, form);
@@ -46,6 +49,8 @@ async function registerInner(_: FormState, form: FormData): Promise<FormState> {
   const limitKey = `register:${ip}`;
   const max = Number(process.env.REGISTER_LIMIT_PER_HOUR ?? 10);
   if (isLimited(limitKey, max)) return { error: "Too many registrations. Try again later." };
+
+  if (!(await registrationOpen())) return { error: CLOSED };
 
   const parsed = schema.safeParse({
     categoryKey: form.get("categoryKey"),
@@ -67,7 +72,10 @@ async function registerInner(_: FormState, form: FormData): Promise<FormState> {
   if (!role) return { error: "System is not set up yet. Run the database seed." };
 
   // Organization and its first Super Admin are created together or not at all.
-  const { org, user } = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
+    // Serialise concurrent submissions so two people cannot both pass the "no company yet" check.
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(7301)`;
+    if (!MULTI_ORG && (await tx.organization.count()) > 0) return null;
     const org = await tx.organization.create({
       data: { name: d.orgName, categoryKey: d.categoryKey, industryKey: d.industryKey, sizeKey: d.sizeKey },
     });
@@ -91,6 +99,8 @@ async function registerInner(_: FormState, form: FormData): Promise<FormState> {
     }, { checklist: false });
     return { org, user };
   });
+  if (!result) return { error: CLOSED };
+  const { org, user } = result;
   recordHit(limitKey, 60 * 60_000); // only successful registrations count
   await audit(user.id, "organization.registered", "Organization", org.id, { name: org.name }, org.id);
 

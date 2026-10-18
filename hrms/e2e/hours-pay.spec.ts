@@ -407,3 +407,31 @@ test("daily report comments: the supervisor comments, the employee replies, HR j
   await expect(hr.getByText("Comment sent.")).toBeVisible();
   expect(await db.dailyReportComment.count({ where: { reportId: report.id } })).toBe(3);
 });
+
+test("DTR PDF report: HR gets wages, the head a no-wage copy, an employee only their own", async ({ browser }) => {
+  const url = (who: string) => `/dtr/report?employee=${who}&from=${prev.start}&to=${prev.end}`;
+  const fetchPdf = async (who: string, target: string) => {
+    const page = await browser.newPage();
+    await signIn(page, who);
+    const res = await page.request.get(url(target));
+    const body = await res.body();
+    await page.close();
+    return { res, body };
+  };
+
+  const hr = await fetchPdf("hr", "all");
+  expect(hr.res.status()).toBe(200);
+  expect(hr.res.headers()["content-type"]).toBe("application/pdf");
+  expect(hr.res.headers()["content-disposition"]).toContain("attachment");
+  expect(hr.body.subarray(0, 5).toString()).toBe("%PDF-");
+
+  const head = await fetchPdf("head", "all");
+  expect(head.res.status()).toBe(200);
+  expect(head.body.subarray(0, 5).toString()).toBe("%PDF-");
+  expect((await db.auditLog.count({ where: { action: "dtr_report.downloaded" } })) >= 2).toBe(true);
+
+  const own = await fetchPdf("emp", ids.emp);
+  expect(own.res.status()).toBe(200);
+  const other = await fetchPdf("emp", ids.hr);
+  expect(other.res.status()).toBe(404);
+});

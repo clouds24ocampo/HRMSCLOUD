@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useActionState } from "react";
+import Link from "next/link";
 import { assignSchedule, copyLastWeek, relinkToLeader } from "./actions";
 
 type Opt = { id: string; label: string };
@@ -27,7 +28,8 @@ export type CellActivity = {
   }[];
 };
 
-// One click on a day opens transaction details and (if manager) options to pick a shift, day off, or back to regular.
+// Every schedule cell is clickable and routes to all timestamps and activity for that employee and day.
+// For managers with edit rights, a quick-action pencil trigger allows changing shifts on the spot.
 export function CellEditor({
   employeeId,
   day,
@@ -49,8 +51,7 @@ export function CellEditor({
   const [msg, setMsg] = useState<string>();
   const [pending, start] = useTransition();
 
-  const isInteractive = !locked || !!activity;
-  if (!isInteractive) return <>{children}</>;
+  const dtrUrl = `/dtr?employee=${employeeId}&from=${day}&to=${day}`;
 
   const save = (shift: string) => {
     const fd = new FormData();
@@ -67,125 +68,112 @@ export function CellEditor({
   };
 
   return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        aria-label={`Details for ${day}`}
-        className="w-full rounded-lg transition hover:ring-2 hover:ring-brand/40 focus:outline-none"
+    <div className="relative group/cell flex items-center justify-center">
+      <Link
+        href={dtrUrl}
+        aria-label={`View timestamps and activity for ${day}`}
+        title={
+          activity?.isFinished
+            ? `Finished transaction (${activity.firstIn}–${activity.lastOut} · ${activity.workedDuration}) · Click to view all timestamps and activity`
+            : activity?.isInProgress
+            ? `In progress (${activity.firstIn}–Now) · Click to view all timestamps and activity`
+            : `Click to view all timestamps and activity for ${day}`
+        }
+        className="block w-full cursor-pointer rounded-lg p-0.5 transition duration-150 hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-brand/40"
       >
         {children}
-      </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} aria-hidden="true" />
-          <div
-            role="dialog"
-            aria-label={`Schedule and activity for ${day}`}
-            className="absolute left-1/2 z-30 mt-1 w-64 -translate-x-1/2 rounded-2xl border border-line bg-surface p-3 text-left text-xs shadow-xl"
-          >
-            <div className="flex items-center justify-between border-b border-line pb-2 mb-2">
-              <span className="font-semibold text-ink">{day}</span>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="text-muted hover:text-ink text-xs font-medium"
-              >
-                ✕
-              </button>
-            </div>
+      </Link>
 
-            {activity && (
-              <div className="mb-3 space-y-2">
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50/80 p-2 text-emerald-900">
-                  <div className="flex items-center justify-between font-semibold">
-                    <span>
-                      {activity.isFinished
-                        ? "Finished transaction"
-                        : activity.isInProgress
-                        ? "In progress"
-                        : "Activity recorded"}
-                    </span>
-                    {activity.workedDuration && (
-                      <span className="font-mono text-emerald-700">{activity.workedDuration}</span>
-                    )}
-                  </div>
-                  {activity.firstIn && (
-                    <p className="mt-0.5 text-[11px] text-emerald-800">
-                      {activity.firstIn} {activity.lastOut ? `– ${activity.lastOut}` : "– Now"}
-                    </p>
-                  )}
+      {!locked && (
+        <div className="absolute -top-1 -right-1 z-10">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setOpen((o) => !o);
+            }}
+            aria-expanded={open}
+            aria-label={`Change schedule for ${day}`}
+            title={`Change schedule for ${day}`}
+            className="flex h-5 w-5 items-center justify-center rounded-full border border-line bg-surface text-[10px] text-muted shadow-xs transition hover:border-brand/40 hover:bg-bg hover:text-ink opacity-0 group-hover/cell:opacity-100 max-sm:opacity-70 focus:opacity-100"
+          >
+            ✏️
+          </button>
+          {open && (
+            <>
+              <div
+                className="fixed inset-0 z-20"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpen(false);
+                }}
+                aria-hidden="true"
+              />
+              <div
+                role="dialog"
+                aria-label={`Change schedule for ${day}`}
+                className="absolute right-0 z-30 mt-1 w-64 rounded-2xl border border-line bg-surface p-3 text-left text-xs shadow-xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between border-b border-line pb-2 mb-2">
+                  <span className="font-semibold text-ink">{day}</span>
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    className="text-muted hover:text-ink text-xs font-medium"
+                  >
+                    ✕
+                  </button>
                 </div>
 
-                {activity.events && activity.events.length > 0 && (
-                  <div>
-                    <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Timeline</p>
-                    <div className="space-y-1.5 max-h-40 overflow-y-auto">
-                      {activity.events.map((ev, i) => (
-                        <div key={i} className="flex items-start justify-between gap-1 text-[11px]">
-                          <span className="flex items-center gap-1.5 text-ink min-w-0">
-                            <span>{ev.icon}</span>
-                            <span className="font-medium truncate">{ev.name}</span>
-                            {ev.note && <span className="text-[10px] text-muted italic truncate">({ev.note})</span>}
-                          </span>
-                          <span className="font-mono text-muted shrink-0">{ev.time}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {activity.pauses && activity.pauses.length > 0 && (
-                  <div className="border-t border-line/60 pt-1.5 text-[11px] text-muted">
-                    <span className="font-medium text-ink">Pauses & breaks: </span>
-                    {activity.pauses.map((pa, idx) => (
-                      <span key={idx}>
-                        {pa.name} ({pa.minutes}m){idx < activity.pauses!.length - 1 ? ", " : ""}
-                      </span>
+                <div>
+                  <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Change schedule</p>
+                  <div className="space-y-0.5">
+                    {shifts.map((s) => (
+                      <button
+                        key={s.id}
+                        type="button"
+                        disabled={pending}
+                        onClick={() => save(s.id)}
+                        className="block w-full rounded-lg px-2 py-1 text-left text-xs transition hover:bg-bg"
+                      >
+                        {s.label}
+                      </button>
                     ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!locked && (
-              <div className={activity ? "border-t border-line pt-2" : ""}>
-                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Change schedule</p>
-                <div className="space-y-0.5">
-                  {shifts.map((s) => (
                     <button
-                      key={s.id}
                       type="button"
                       disabled={pending}
-                      onClick={() => save(s.id)}
-                      className="block w-full rounded-lg px-2 py-1 text-left text-xs transition hover:bg-bg"
+                      onClick={() => save("OFF")}
+                      className="block w-full rounded-lg px-2 py-1 text-left text-xs font-medium text-amber-700 hover:bg-amber-50"
                     >
-                      {s.label}
+                      Day off
                     </button>
-                  ))}
-                  <button
-                    type="button"
-                    disabled={pending}
-                    onClick={() => save("OFF")}
-                    className="block w-full rounded-lg px-2 py-1 text-left text-xs font-medium text-amber-700 hover:bg-amber-50"
-                  >
-                    Day off
-                  </button>
-                  <button
-                    type="button"
-                    disabled={pending}
-                    onClick={() => save("CLEAR")}
-                    className="block w-full rounded-lg px-2 py-1 text-left text-xs text-muted hover:bg-bg"
-                  >
-                    Back to regular
-                  </button>
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => save("CLEAR")}
+                      className="block w-full rounded-lg px-2 py-1 text-left text-xs text-muted hover:bg-bg"
+                    >
+                      Back to regular
+                    </button>
+                  </div>
+                  {msg && <p role="alert" className="mt-1 text-danger">{msg}</p>}
                 </div>
-                {msg && <p role="alert" className="mt-1 text-danger">{msg}</p>}
+
+                <div className="mt-3 border-t border-line pt-2">
+                  <Link
+                    href={dtrUrl}
+                    className="flex items-center justify-between rounded-lg px-2 py-1 text-xs font-semibold text-brand hover:bg-brand/10 transition"
+                  >
+                    <span>View timestamps & activity</span>
+                    <span>→</span>
+                  </Link>
+                </div>
               </div>
-            )}
-          </div>
-        </>
+            </>
+          )}
+        </div>
       )}
     </div>
   );

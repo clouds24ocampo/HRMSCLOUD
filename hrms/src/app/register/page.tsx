@@ -2,10 +2,13 @@ import Link from "next/link";
 import { RegisterWizard } from "./RegisterWizard";
 import { HeroScene } from "@/components/HeroScene";
 import { Logo } from "@/components/Logo";
+import { redirect } from "next/navigation";
 import { redirectIfSignedIn } from "@/lib/auth";
+import { registrationOpen } from "@/lib/registration";
 
 export default async function RegisterPage() {
   await redirectIfSignedIn();
+  if (!(await registrationOpen())) redirect("/login");
   return (
     <div className="theme-quantum relative isolate min-h-dvh overflow-x-clip bg-void bg-[radial-gradient(60%_50%_at_50%_30%,rgba(99,102,241,0.2),transparent),radial-gradient(40%_40%_at_90%_95%,rgba(232,121,249,0.10),transparent)] px-4 py-6 sm:px-8">
       <HeroScene className="pointer-events-none absolute inset-0 -z-10 opacity-50" />

@@ -5,6 +5,7 @@ import { db } from "../src/lib/db-client";
 import { ROLES } from "../src/lib/roles";
 import { cutoffFor } from "../src/lib/cutoffs";
 import { addDays, dayKey } from "../src/lib/time";
+import { TEMPLATES } from "../src/lib/worksync";
 import { wipeOrgs } from "./helpers";
 
 // Every page, for every role: it opens without a server error or a crash, every link inside it leads somewhere that
@@ -67,6 +68,11 @@ test.beforeAll(async () => {
   ids.chat = c.id;
   const job = await db.jobPosting.create({ data: { organizationId: org.id, title: "Agent", departmentId: dept.id } });
   ids.job = job.id;
+  // A WorkSync project with a few cards, so every view of it is crawled.
+  const ws = await db.wsProject.create({ data: { organizationId: org.id, name: "Crawl board", kind: "PROGRAMMING", createdById: ids.hrUser, members: { create: [{ employeeId: ids.hr, role: "LEAD" }, { employeeId: ids.emp }, { employeeId: ids.mgr, role: "VIEWER" }] }, lists: { create: TEMPLATES.PROGRAMMING.map((l, position) => ({ ...l, position })) }, labels: { create: [{ name: "Bug", color: "red" }] } }, include: { lists: { orderBy: { position: "asc" } }, labels: true } });
+  const wc = await db.wsCard.create({ data: { organizationId: org.id, projectId: ws.id, listId: ws.lists[2].id, title: "Crawl card", position: 1, createdById: ids.hrUser, startDate: new Date(`${addDays(today, -1)}T00:00:00Z`), dueDate: new Date(`${addDays(today, 3)}T00:00:00Z`), assignees: { create: { employeeId: ids.emp } }, labels: { create: { labelId: ws.labels[0].id } }, checklist: { create: { text: "Step", position: 1 } } } });
+  ids.ws = ws.id;
+  ids.wsCard = wc.id;
 });
 test.afterAll(async () => {
   await wipeOrgs(stamp);
@@ -115,7 +121,7 @@ async function check(page: Page, path: string, problems: string[]) {
 const PAGES = [
   "/dashboard", "/employees", "/organization", "/recruitment", "/documents", "/policies", "/id", "/id/design", "/schedule", "/schedule/live", "/schedule/analytics",
   "/dtr", "/overtime", "/leave", "/daily-report", "/payroll", "/payroll/setup", "/payroll/rules", "/payroll/holidays", "/payroll/reports", "/payroll/calculators",
-  "/payslips", "/cash-advance", "/performance", "/learning", "/chat", "/requests", "/announcements", "/reports", "/analytics", "/settings", "/admin/users",
+  "/worksync", "/payslips", "/cash-advance", "/performance", "/learning", "/chat", "/requests", "/announcements", "/reports", "/analytics", "/settings", "/admin/users",
   "/audit", "/notifications", "/change-password",
 ];
 
@@ -123,7 +129,7 @@ for (const who of ["sa", "hr", "mgr", "emp"]) {
   test(`every page and its links work for ${who}`, async ({ page }) => {
     const problems: string[] = [];
     await signIn(page, who);
-    const dyn = [`/employees/${ids.emp}`, `/organization/heads/${ids.mgr}`, `/chat/${ids.chat}`, `/recruitment/${ids.job}`];
+    const dyn = [...["board", "table", "timeline", "calendar", "dashboard"].map((v) => `/worksync/${ids.ws}?view=${v}`), `/worksync/${ids.ws}?card=${ids.wsCard}`, `/worksync/${ids.ws}?panel=people`, `/employees/${ids.emp}`, `/organization/heads/${ids.mgr}`, `/chat/${ids.chat}`, `/recruitment/${ids.job}`];
     const period = await db.payrollPeriod.findFirst({ where: { organizationId: ids.org, name: cutoffFor(today).name } });
     if (period) dyn.push(`/payroll/${period.id}`);
     const policy = await db.policyDocument.findFirst({ where: { organizationId: ids.org } });
@@ -137,7 +143,7 @@ for (const who of ["sa", "hr", "mgr", "emp"]) {
       const hrefs = await page.locator("main a[href^='/']").evaluateAll((as) => [...new Set(as.map((a) => a.getAttribute("href")!))]).catch(() => [] as string[]);
       for (const h of hrefs) {
         const clean = h.split("#")[0];
-        if (!clean || seen.has(clean) || /\/(file|proof|photo|signature|export)(\/|\?|$)|\.csv|\/locate\//.test(clean)) continue;
+        if (!clean || seen.has(clean) || /\/(file|proof|photo|signature|export)(\/|\?|$)|\.csv|\/dtr\/report|\/locate\//.test(clean)) continue;
         seen.add(clean);
         await check(page, clean, problems);
       }

@@ -25,8 +25,14 @@ export function LoginShell({ startOnStamp, top, bottom, hero }: { startOnStamp: 
             {btn("signin", "Sign in")}
             {btn("stamp", "⏱️ Time stamp")}
           </div>
-          {tab === "signin" ? <LoginForm /> : <TimeStampPanel />}
-          {bottom}
+          {tab === "signin" ? (
+            <>
+              <LoginForm />
+              {bottom}
+            </>
+          ) : (
+            <TimeStampPanel />
+          )}
         </div>
       </section>
       {tab === "signin" && hero}

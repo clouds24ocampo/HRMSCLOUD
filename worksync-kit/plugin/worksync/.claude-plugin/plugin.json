@@ -1,0 +1,7 @@
+{
+  "name": "worksync",
+  "version": "0.1.0",
+  "description": "WorkSync engineering kit: 20 role agents, 15 project skills, slash commands (/ws-gate, /ws-review, /ws-authz, /ws-adr, /ws-template), and hooks that block secrets and re-run the authorization lint after API edits.",
+  "author": { "name": "WorkSync team" },
+  "keywords": ["work-management", "progress-reporting", "authorization", "offline-sync", "privacy"]
+}

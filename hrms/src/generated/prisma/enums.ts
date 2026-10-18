@@ -366,3 +366,41 @@ export const PayoutStatus = {
 } as const
 
 export type PayoutStatus = (typeof PayoutStatus)[keyof typeof PayoutStatus]
+
+
+export const WsKind = {
+  PROGRAMMING: 'PROGRAMMING',
+  NETWORK: 'NETWORK',
+  OTHER: 'OTHER'
+} as const
+
+export type WsKind = (typeof WsKind)[keyof typeof WsKind]
+
+
+export const WsCategory = {
+  TODO: 'TODO',
+  DOING: 'DOING',
+  BLOCKED: 'BLOCKED',
+  DONE: 'DONE'
+} as const
+
+export type WsCategory = (typeof WsCategory)[keyof typeof WsCategory]
+
+
+export const WsMemberRole = {
+  LEAD: 'LEAD',
+  MEMBER: 'MEMBER',
+  VIEWER: 'VIEWER'
+} as const
+
+export type WsMemberRole = (typeof WsMemberRole)[keyof typeof WsMemberRole]
+
+
+export const WsPriority = {
+  LOW: 'LOW',
+  NORMAL: 'NORMAL',
+  HIGH: 'HIGH',
+  URGENT: 'URGENT'
+} as const
+
+export type WsPriority = (typeof WsPriority)[keyof typeof WsPriority]

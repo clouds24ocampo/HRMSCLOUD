@@ -1,0 +1,54 @@
+# Production: Postgres + the app + Caddy (automatic HTTPS). Only Caddy is published; the app and database are private.
+# Run:  cp .env.production.example .env.production  (fill it in)  then
+#       docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      retries: 10
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_TURN_URL: ${NEXT_PUBLIC_TURN_URL:-}
+        NEXT_PUBLIC_TURN_USER: ${NEXT_PUBLIC_TURN_USER:-}
+        NEXT_PUBLIC_TURN_PASS: ${NEXT_PUBLIC_TURN_PASS:-}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      APP_URL: https://${DOMAIN}
+      COOKIE_SECURE: "true"
+      SESSION_TTL_HOURS: ${SESSION_TTL_HOURS:-8}
+      REGISTER_LIMIT_PER_HOUR: ${REGISTER_LIMIT_PER_HOUR:-10}
+      DOCUMENT_MAX_MB: ${DOCUMENT_MAX_MB:-5}
+      STORAGE_DIR: /data/storage
+    volumes:
+      - storage:/data/storage
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [app]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+volumes:
+  pgdata:
+  storage:
+  caddy_data:

@@ -1,0 +1,13 @@
+node_modules
+.next
+.env
+.env.*
+!.env.example
+storage
+backups
+test-results
+e2e
+graphify-out
+*.log
+*.png
+.git

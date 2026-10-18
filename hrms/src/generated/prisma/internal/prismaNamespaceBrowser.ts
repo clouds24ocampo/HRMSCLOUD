@@ -109,7 +109,17 @@ export const ModelName = {
   CallSession: 'CallSession',
   CashAdvance: 'CashAdvance',
   CashAdvancePayment: 'CashAdvancePayment',
-  Payout: 'Payout'
+  Payout: 'Payout',
+  WsProject: 'WsProject',
+  WsMember: 'WsMember',
+  WsList: 'WsList',
+  WsCard: 'WsCard',
+  WsAssignee: 'WsAssignee',
+  WsCheck: 'WsCheck',
+  WsComment: 'WsComment',
+  WsActivity: 'WsActivity',
+  WsLabel: 'WsLabel',
+  WsCardLabel: 'WsCardLabel'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1157,6 +1167,131 @@ export const PayoutScalarFieldEnum = {
 } as const
 
 export type PayoutScalarFieldEnum = (typeof PayoutScalarFieldEnum)[keyof typeof PayoutScalarFieldEnum]
+
+
+export const WsProjectScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  kind: 'kind',
+  description: 'description',
+  dueDate: 'dueDate',
+  color: 'color',
+  createdById: 'createdById',
+  archivedAt: 'archivedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WsProjectScalarFieldEnum = (typeof WsProjectScalarFieldEnum)[keyof typeof WsProjectScalarFieldEnum]
+
+
+export const WsMemberScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  employeeId: 'employeeId',
+  role: 'role',
+  createdAt: 'createdAt'
+} as const
+
+export type WsMemberScalarFieldEnum = (typeof WsMemberScalarFieldEnum)[keyof typeof WsMemberScalarFieldEnum]
+
+
+export const WsListScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  name: 'name',
+  category: 'category',
+  position: 'position',
+  archivedAt: 'archivedAt'
+} as const
+
+export type WsListScalarFieldEnum = (typeof WsListScalarFieldEnum)[keyof typeof WsListScalarFieldEnum]
+
+
+export const WsCardScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  projectId: 'projectId',
+  listId: 'listId',
+  title: 'title',
+  description: 'description',
+  priority: 'priority',
+  startDate: 'startDate',
+  dueDate: 'dueDate',
+  position: 'position',
+  completedAt: 'completedAt',
+  archivedAt: 'archivedAt',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WsCardScalarFieldEnum = (typeof WsCardScalarFieldEnum)[keyof typeof WsCardScalarFieldEnum]
+
+
+export const WsAssigneeScalarFieldEnum = {
+  cardId: 'cardId',
+  employeeId: 'employeeId'
+} as const
+
+export type WsAssigneeScalarFieldEnum = (typeof WsAssigneeScalarFieldEnum)[keyof typeof WsAssigneeScalarFieldEnum]
+
+
+export const WsCheckScalarFieldEnum = {
+  id: 'id',
+  cardId: 'cardId',
+  text: 'text',
+  done: 'done',
+  doneAt: 'doneAt',
+  position: 'position'
+} as const
+
+export type WsCheckScalarFieldEnum = (typeof WsCheckScalarFieldEnum)[keyof typeof WsCheckScalarFieldEnum]
+
+
+export const WsCommentScalarFieldEnum = {
+  id: 'id',
+  cardId: 'cardId',
+  authorId: 'authorId',
+  body: 'body',
+  createdAt: 'createdAt'
+} as const
+
+export type WsCommentScalarFieldEnum = (typeof WsCommentScalarFieldEnum)[keyof typeof WsCommentScalarFieldEnum]
+
+
+export const WsActivityScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  projectId: 'projectId',
+  cardId: 'cardId',
+  cardTitle: 'cardTitle',
+  actorId: 'actorId',
+  type: 'type',
+  detail: 'detail',
+  createdAt: 'createdAt'
+} as const
+
+export type WsActivityScalarFieldEnum = (typeof WsActivityScalarFieldEnum)[keyof typeof WsActivityScalarFieldEnum]
+
+
+export const WsLabelScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  name: 'name',
+  color: 'color'
+} as const
+
+export type WsLabelScalarFieldEnum = (typeof WsLabelScalarFieldEnum)[keyof typeof WsLabelScalarFieldEnum]
+
+
+export const WsCardLabelScalarFieldEnum = {
+  cardId: 'cardId',
+  labelId: 'labelId'
+} as const
+
+export type WsCardLabelScalarFieldEnum = (typeof WsCardLabelScalarFieldEnum)[keyof typeof WsCardLabelScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -247,6 +247,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       firstInIso: row?.firstIn?.at ? row.firstIn.at.toISOString() : null,
       lastOutTime: row?.lastOut?.at ? formatTimePrecise(row.lastOut.at, tz) : null,
       workedMinutes: row?.today?.workedMinutes ?? 0,
+      liveWork: row?.today?.liveWork ?? null,
       pause: row?.live?.pause
         ? {
             name: row.live.pause.name,

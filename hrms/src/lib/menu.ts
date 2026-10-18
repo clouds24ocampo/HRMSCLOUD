@@ -26,6 +26,10 @@ export const MENU: NavGroup[] = [
     ],
   },
   {
+    title: "Work",
+    items: [{ href: "/worksync", label: "WorkSync", icon: "🗂️" }],
+  },
+  {
     title: "Pay",
     items: [
       { href: "/payroll", label: "Payroll", icon: "💰" },

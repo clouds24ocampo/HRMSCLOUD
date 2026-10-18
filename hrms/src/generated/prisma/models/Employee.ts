@@ -312,6 +312,8 @@ export type EmployeeWhereInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileListRelationFilter
   prevEmployment?: Prisma.PreviousEmploymentListRelationFilter
   dailyReports?: Prisma.DailyReportListRelationFilter
+  wsMemberships?: Prisma.WsMemberListRelationFilter
+  wsAssignments?: Prisma.WsAssigneeListRelationFilter
   cashAdvances?: Prisma.CashAdvanceListRelationFilter
   signatures?: Prisma.PolicySignatureListRelationFilter
 }
@@ -361,6 +363,8 @@ export type EmployeeOrderByWithRelationInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileOrderByRelationAggregateInput
   prevEmployment?: Prisma.PreviousEmploymentOrderByRelationAggregateInput
   dailyReports?: Prisma.DailyReportOrderByRelationAggregateInput
+  wsMemberships?: Prisma.WsMemberOrderByRelationAggregateInput
+  wsAssignments?: Prisma.WsAssigneeOrderByRelationAggregateInput
   cashAdvances?: Prisma.CashAdvanceOrderByRelationAggregateInput
   signatures?: Prisma.PolicySignatureOrderByRelationAggregateInput
 }
@@ -414,6 +418,8 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   taxProfiles?: Prisma.EmployeeTaxProfileListRelationFilter
   prevEmployment?: Prisma.PreviousEmploymentListRelationFilter
   dailyReports?: Prisma.DailyReportListRelationFilter
+  wsMemberships?: Prisma.WsMemberListRelationFilter
+  wsAssignments?: Prisma.WsAssigneeListRelationFilter
   cashAdvances?: Prisma.CashAdvanceListRelationFilter
   signatures?: Prisma.PolicySignatureListRelationFilter
 }, "id" | "userId" | "organizationId_employeeNo">
@@ -506,6 +512,8 @@ export type EmployeeCreateInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -550,6 +558,8 @@ export type EmployeeUncheckedCreateInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -594,6 +604,8 @@ export type EmployeeUpdateInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -638,6 +650,8 @@ export type EmployeeUncheckedUpdateInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -1318,6 +1332,34 @@ export type EmployeeUpdateOneRequiredWithoutCashAdvancesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutCashAdvancesInput, Prisma.EmployeeUpdateWithoutCashAdvancesInput>, Prisma.EmployeeUncheckedUpdateWithoutCashAdvancesInput>
 }
 
+export type EmployeeCreateNestedOneWithoutWsMembershipsInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutWsMembershipsInput, Prisma.EmployeeUncheckedCreateWithoutWsMembershipsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutWsMembershipsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+}
+
+export type EmployeeUpdateOneRequiredWithoutWsMembershipsNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutWsMembershipsInput, Prisma.EmployeeUncheckedCreateWithoutWsMembershipsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutWsMembershipsInput
+  upsert?: Prisma.EmployeeUpsertWithoutWsMembershipsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutWsMembershipsInput, Prisma.EmployeeUpdateWithoutWsMembershipsInput>, Prisma.EmployeeUncheckedUpdateWithoutWsMembershipsInput>
+}
+
+export type EmployeeCreateNestedOneWithoutWsAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutWsAssignmentsInput, Prisma.EmployeeUncheckedCreateWithoutWsAssignmentsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutWsAssignmentsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+}
+
+export type EmployeeUpdateOneRequiredWithoutWsAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutWsAssignmentsInput, Prisma.EmployeeUncheckedCreateWithoutWsAssignmentsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutWsAssignmentsInput
+  upsert?: Prisma.EmployeeUpsertWithoutWsAssignmentsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutWsAssignmentsInput, Prisma.EmployeeUpdateWithoutWsAssignmentsInput>, Prisma.EmployeeUncheckedUpdateWithoutWsAssignmentsInput>
+}
+
 export type EmployeeCreateWithoutOrganizationInput = {
   id?: string
   employeeNo: string
@@ -1357,6 +1399,8 @@ export type EmployeeCreateWithoutOrganizationInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -1400,6 +1444,8 @@ export type EmployeeUncheckedCreateWithoutOrganizationInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -1493,6 +1539,8 @@ export type EmployeeCreateWithoutUserInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -1536,6 +1584,8 @@ export type EmployeeUncheckedCreateWithoutUserInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -1595,6 +1645,8 @@ export type EmployeeUpdateWithoutUserInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -1638,6 +1690,8 @@ export type EmployeeUncheckedUpdateWithoutUserInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -1681,6 +1735,8 @@ export type EmployeeCreateWithoutDepartmentInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -1724,6 +1780,8 @@ export type EmployeeUncheckedCreateWithoutDepartmentInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -1793,6 +1851,8 @@ export type EmployeeCreateWithoutPositionInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -1836,6 +1896,8 @@ export type EmployeeUncheckedCreateWithoutPositionInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -1905,6 +1967,8 @@ export type EmployeeCreateWithoutReportsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -1948,6 +2012,8 @@ export type EmployeeUncheckedCreateWithoutReportsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -1996,6 +2062,8 @@ export type EmployeeCreateWithoutManagerInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -2039,6 +2107,8 @@ export type EmployeeUncheckedCreateWithoutManagerInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -2103,6 +2173,8 @@ export type EmployeeUpdateWithoutReportsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -2146,6 +2218,8 @@ export type EmployeeUncheckedUpdateWithoutReportsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -2205,6 +2279,8 @@ export type EmployeeCreateWithoutHistoryInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -2248,6 +2324,8 @@ export type EmployeeUncheckedCreateWithoutHistoryInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -2307,6 +2385,8 @@ export type EmployeeUpdateWithoutHistoryInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -2350,6 +2430,8 @@ export type EmployeeUncheckedUpdateWithoutHistoryInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -2393,6 +2475,8 @@ export type EmployeeCreateWithoutRegularsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -2436,6 +2520,8 @@ export type EmployeeUncheckedCreateWithoutRegularsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -2495,6 +2581,8 @@ export type EmployeeUpdateWithoutRegularsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -2538,6 +2626,8 @@ export type EmployeeUncheckedUpdateWithoutRegularsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -2581,6 +2671,8 @@ export type EmployeeCreateWithoutScheduleInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -2624,6 +2716,8 @@ export type EmployeeUncheckedCreateWithoutScheduleInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -2683,6 +2777,8 @@ export type EmployeeUpdateWithoutScheduleInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -2726,6 +2822,8 @@ export type EmployeeUncheckedUpdateWithoutScheduleInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -2769,6 +2867,8 @@ export type EmployeeCreateWithoutTimeEventsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -2812,6 +2912,8 @@ export type EmployeeUncheckedCreateWithoutTimeEventsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -2871,6 +2973,8 @@ export type EmployeeUpdateWithoutTimeEventsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -2914,6 +3018,8 @@ export type EmployeeUncheckedUpdateWithoutTimeEventsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -2957,6 +3063,8 @@ export type EmployeeCreateWithoutLeaveRequestsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -3000,6 +3108,8 @@ export type EmployeeUncheckedCreateWithoutLeaveRequestsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -3059,6 +3169,8 @@ export type EmployeeUpdateWithoutLeaveRequestsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -3102,6 +3214,8 @@ export type EmployeeUncheckedUpdateWithoutLeaveRequestsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -3145,6 +3259,8 @@ export type EmployeeCreateWithoutOvertimeInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -3188,6 +3304,8 @@ export type EmployeeUncheckedCreateWithoutOvertimeInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -3247,6 +3365,8 @@ export type EmployeeUpdateWithoutOvertimeInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -3290,6 +3410,8 @@ export type EmployeeUncheckedUpdateWithoutOvertimeInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -3333,6 +3455,8 @@ export type EmployeeCreateWithoutCompensationsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -3376,6 +3500,8 @@ export type EmployeeUncheckedCreateWithoutCompensationsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -3435,6 +3561,8 @@ export type EmployeeUpdateWithoutCompensationsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -3478,6 +3606,8 @@ export type EmployeeUncheckedUpdateWithoutCompensationsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -3521,6 +3651,8 @@ export type EmployeeCreateWithoutComponentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -3564,6 +3696,8 @@ export type EmployeeUncheckedCreateWithoutComponentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -3623,6 +3757,8 @@ export type EmployeeUpdateWithoutComponentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -3666,6 +3802,8 @@ export type EmployeeUncheckedUpdateWithoutComponentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -3709,6 +3847,8 @@ export type EmployeeCreateWithoutPayslipsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -3752,6 +3892,8 @@ export type EmployeeUncheckedCreateWithoutPayslipsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -3811,6 +3953,8 @@ export type EmployeeUpdateWithoutPayslipsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -3854,6 +3998,8 @@ export type EmployeeUncheckedUpdateWithoutPayslipsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -3897,6 +4043,8 @@ export type EmployeeCreateWithoutAdjustmentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -3940,6 +4088,8 @@ export type EmployeeUncheckedCreateWithoutAdjustmentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -3999,6 +4149,8 @@ export type EmployeeUpdateWithoutAdjustmentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -4042,6 +4194,8 @@ export type EmployeeUncheckedUpdateWithoutAdjustmentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -4085,6 +4239,8 @@ export type EmployeeCreateWithoutChecklistItemsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -4128,6 +4284,8 @@ export type EmployeeUncheckedCreateWithoutChecklistItemsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -4187,6 +4345,8 @@ export type EmployeeUpdateWithoutChecklistItemsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -4230,6 +4390,8 @@ export type EmployeeUncheckedUpdateWithoutChecklistItemsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -4273,6 +4435,8 @@ export type EmployeeCreateWithoutApplicantInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -4316,6 +4480,8 @@ export type EmployeeUncheckedCreateWithoutApplicantInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -4375,6 +4541,8 @@ export type EmployeeUpdateWithoutApplicantInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -4418,6 +4586,8 @@ export type EmployeeUncheckedUpdateWithoutApplicantInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -4461,6 +4631,8 @@ export type EmployeeCreateWithoutReviewsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -4504,6 +4676,8 @@ export type EmployeeUncheckedCreateWithoutReviewsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -4563,6 +4737,8 @@ export type EmployeeUpdateWithoutReviewsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -4606,6 +4782,8 @@ export type EmployeeUncheckedUpdateWithoutReviewsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -4649,6 +4827,8 @@ export type EmployeeCreateWithoutGoalsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -4692,6 +4872,8 @@ export type EmployeeUncheckedCreateWithoutGoalsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -4751,6 +4933,8 @@ export type EmployeeUpdateWithoutGoalsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -4794,6 +4978,8 @@ export type EmployeeUncheckedUpdateWithoutGoalsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -4837,6 +5023,8 @@ export type EmployeeCreateWithoutEnrollmentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -4880,6 +5068,8 @@ export type EmployeeUncheckedCreateWithoutEnrollmentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -4939,6 +5129,8 @@ export type EmployeeUpdateWithoutEnrollmentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -4982,6 +5174,8 @@ export type EmployeeUncheckedUpdateWithoutEnrollmentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -5025,6 +5219,8 @@ export type EmployeeCreateWithoutDocumentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -5068,6 +5264,8 @@ export type EmployeeUncheckedCreateWithoutDocumentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -5127,6 +5325,8 @@ export type EmployeeUpdateWithoutDocumentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -5170,6 +5370,8 @@ export type EmployeeUncheckedUpdateWithoutDocumentsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -5213,6 +5415,8 @@ export type EmployeeCreateWithoutHrRequestsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -5256,6 +5460,8 @@ export type EmployeeUncheckedCreateWithoutHrRequestsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -5315,6 +5521,8 @@ export type EmployeeUpdateWithoutHrRequestsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -5358,6 +5566,8 @@ export type EmployeeUncheckedUpdateWithoutHrRequestsInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -5401,6 +5611,8 @@ export type EmployeeCreateWithoutTaxProfilesInput = {
   hrRequests?: Prisma.HrRequestCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -5444,6 +5656,8 @@ export type EmployeeUncheckedCreateWithoutTaxProfilesInput = {
   hrRequests?: Prisma.HrRequestUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -5503,6 +5717,8 @@ export type EmployeeUpdateWithoutTaxProfilesInput = {
   hrRequests?: Prisma.HrRequestUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -5546,6 +5762,8 @@ export type EmployeeUncheckedUpdateWithoutTaxProfilesInput = {
   hrRequests?: Prisma.HrRequestUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -5589,6 +5807,8 @@ export type EmployeeCreateWithoutPrevEmploymentInput = {
   hrRequests?: Prisma.HrRequestCreateNestedManyWithoutEmployeeInput
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -5632,6 +5852,8 @@ export type EmployeeUncheckedCreateWithoutPrevEmploymentInput = {
   hrRequests?: Prisma.HrRequestUncheckedCreateNestedManyWithoutEmployeeInput
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -5691,6 +5913,8 @@ export type EmployeeUpdateWithoutPrevEmploymentInput = {
   hrRequests?: Prisma.HrRequestUpdateManyWithoutEmployeeNestedInput
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -5734,6 +5958,8 @@ export type EmployeeUncheckedUpdateWithoutPrevEmploymentInput = {
   hrRequests?: Prisma.HrRequestUncheckedUpdateManyWithoutEmployeeNestedInput
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -5777,6 +6003,8 @@ export type EmployeeCreateWithoutDailyReportsInput = {
   hrRequests?: Prisma.HrRequestCreateNestedManyWithoutEmployeeInput
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
@@ -5820,6 +6048,8 @@ export type EmployeeUncheckedCreateWithoutDailyReportsInput = {
   hrRequests?: Prisma.HrRequestUncheckedCreateNestedManyWithoutEmployeeInput
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
@@ -5879,6 +6109,8 @@ export type EmployeeUpdateWithoutDailyReportsInput = {
   hrRequests?: Prisma.HrRequestUpdateManyWithoutEmployeeNestedInput
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -5922,6 +6154,8 @@ export type EmployeeUncheckedUpdateWithoutDailyReportsInput = {
   hrRequests?: Prisma.HrRequestUncheckedUpdateManyWithoutEmployeeNestedInput
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -5966,6 +6200,8 @@ export type EmployeeCreateWithoutSignaturesInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
 }
 
@@ -6009,6 +6245,8 @@ export type EmployeeUncheckedCreateWithoutSignaturesInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
@@ -6068,6 +6306,8 @@ export type EmployeeUpdateWithoutSignaturesInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
 }
 
@@ -6111,6 +6351,8 @@ export type EmployeeUncheckedUpdateWithoutSignaturesInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
@@ -6154,6 +6396,8 @@ export type EmployeeCreateWithoutCashAdvancesInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
 }
 
@@ -6197,6 +6441,8 @@ export type EmployeeUncheckedCreateWithoutCashAdvancesInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
   dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
   signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
@@ -6256,6 +6502,8 @@ export type EmployeeUpdateWithoutCashAdvancesInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
 
@@ -6299,6 +6547,400 @@ export type EmployeeUncheckedUpdateWithoutCashAdvancesInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
+  signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
+}
+
+export type EmployeeCreateWithoutWsMembershipsInput = {
+  id?: string
+  employeeNo: string
+  firstName: string
+  lastName: string
+  email?: string | null
+  phone?: string | null
+  scheduleLinked?: boolean
+  flexible?: boolean
+  photoKey?: string | null
+  hireDate: Date | string
+  status?: $Enums.EmployeeStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutEmployeesInput
+  user?: Prisma.UserCreateNestedOneWithoutEmployeeInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutEmployeesInput
+  position?: Prisma.PositionCreateNestedOneWithoutEmployeesInput
+  manager?: Prisma.EmployeeCreateNestedOneWithoutReportsInput
+  reports?: Prisma.EmployeeCreateNestedManyWithoutManagerInput
+  history?: Prisma.EmploymentHistoryCreateNestedManyWithoutEmployeeInput
+  schedule?: Prisma.ScheduleEntryCreateNestedManyWithoutEmployeeInput
+  regulars?: Prisma.RegularScheduleCreateNestedManyWithoutEmployeeInput
+  timeEvents?: Prisma.TimeEventCreateNestedManyWithoutEmployeeInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutEmployeeInput
+  overtime?: Prisma.OvertimeRequestCreateNestedManyWithoutEmployeeInput
+  compensations?: Prisma.CompensationCreateNestedManyWithoutEmployeeInput
+  components?: Prisma.EmployeeComponentCreateNestedManyWithoutEmployeeInput
+  payslips?: Prisma.PayslipCreateNestedManyWithoutEmployeeInput
+  adjustments?: Prisma.PayrollAdjustmentCreateNestedManyWithoutEmployeeInput
+  checklistItems?: Prisma.ChecklistItemCreateNestedManyWithoutEmployeeInput
+  applicant?: Prisma.ApplicantCreateNestedOneWithoutEmployeeInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutEmployeeInput
+  goals?: Prisma.GoalCreateNestedManyWithoutEmployeeInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutEmployeeInput
+  documents?: Prisma.EmployeeDocumentCreateNestedManyWithoutEmployeeInput
+  hrRequests?: Prisma.HrRequestCreateNestedManyWithoutEmployeeInput
+  taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
+  prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
+  dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeCreateNestedManyWithoutEmployeeInput
+  cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
+  signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeUncheckedCreateWithoutWsMembershipsInput = {
+  id?: string
+  organizationId: string
+  userId?: string | null
+  employeeNo: string
+  firstName: string
+  lastName: string
+  email?: string | null
+  phone?: string | null
+  departmentId?: string | null
+  positionId?: string | null
+  managerId?: string | null
+  scheduleLinked?: boolean
+  flexible?: boolean
+  photoKey?: string | null
+  hireDate: Date | string
+  status?: $Enums.EmployeeStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reports?: Prisma.EmployeeUncheckedCreateNestedManyWithoutManagerInput
+  history?: Prisma.EmploymentHistoryUncheckedCreateNestedManyWithoutEmployeeInput
+  schedule?: Prisma.ScheduleEntryUncheckedCreateNestedManyWithoutEmployeeInput
+  regulars?: Prisma.RegularScheduleUncheckedCreateNestedManyWithoutEmployeeInput
+  timeEvents?: Prisma.TimeEventUncheckedCreateNestedManyWithoutEmployeeInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
+  overtime?: Prisma.OvertimeRequestUncheckedCreateNestedManyWithoutEmployeeInput
+  compensations?: Prisma.CompensationUncheckedCreateNestedManyWithoutEmployeeInput
+  components?: Prisma.EmployeeComponentUncheckedCreateNestedManyWithoutEmployeeInput
+  payslips?: Prisma.PayslipUncheckedCreateNestedManyWithoutEmployeeInput
+  adjustments?: Prisma.PayrollAdjustmentUncheckedCreateNestedManyWithoutEmployeeInput
+  checklistItems?: Prisma.ChecklistItemUncheckedCreateNestedManyWithoutEmployeeInput
+  applicant?: Prisma.ApplicantUncheckedCreateNestedOneWithoutEmployeeInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutEmployeeInput
+  goals?: Prisma.GoalUncheckedCreateNestedManyWithoutEmployeeInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
+  documents?: Prisma.EmployeeDocumentUncheckedCreateNestedManyWithoutEmployeeInput
+  hrRequests?: Prisma.HrRequestUncheckedCreateNestedManyWithoutEmployeeInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
+  prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
+  dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedCreateNestedManyWithoutEmployeeInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
+  signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeCreateOrConnectWithoutWsMembershipsInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutWsMembershipsInput, Prisma.EmployeeUncheckedCreateWithoutWsMembershipsInput>
+}
+
+export type EmployeeUpsertWithoutWsMembershipsInput = {
+  update: Prisma.XOR<Prisma.EmployeeUpdateWithoutWsMembershipsInput, Prisma.EmployeeUncheckedUpdateWithoutWsMembershipsInput>
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutWsMembershipsInput, Prisma.EmployeeUncheckedCreateWithoutWsMembershipsInput>
+  where?: Prisma.EmployeeWhereInput
+}
+
+export type EmployeeUpdateToOneWithWhereWithoutWsMembershipsInput = {
+  where?: Prisma.EmployeeWhereInput
+  data: Prisma.XOR<Prisma.EmployeeUpdateWithoutWsMembershipsInput, Prisma.EmployeeUncheckedUpdateWithoutWsMembershipsInput>
+}
+
+export type EmployeeUpdateWithoutWsMembershipsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeNo?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  flexible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutEmployeesNestedInput
+  user?: Prisma.UserUpdateOneWithoutEmployeeNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutEmployeesNestedInput
+  position?: Prisma.PositionUpdateOneWithoutEmployeesNestedInput
+  manager?: Prisma.EmployeeUpdateOneWithoutReportsNestedInput
+  reports?: Prisma.EmployeeUpdateManyWithoutManagerNestedInput
+  history?: Prisma.EmploymentHistoryUpdateManyWithoutEmployeeNestedInput
+  schedule?: Prisma.ScheduleEntryUpdateManyWithoutEmployeeNestedInput
+  regulars?: Prisma.RegularScheduleUpdateManyWithoutEmployeeNestedInput
+  timeEvents?: Prisma.TimeEventUpdateManyWithoutEmployeeNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutEmployeeNestedInput
+  overtime?: Prisma.OvertimeRequestUpdateManyWithoutEmployeeNestedInput
+  compensations?: Prisma.CompensationUpdateManyWithoutEmployeeNestedInput
+  components?: Prisma.EmployeeComponentUpdateManyWithoutEmployeeNestedInput
+  payslips?: Prisma.PayslipUpdateManyWithoutEmployeeNestedInput
+  adjustments?: Prisma.PayrollAdjustmentUpdateManyWithoutEmployeeNestedInput
+  checklistItems?: Prisma.ChecklistItemUpdateManyWithoutEmployeeNestedInput
+  applicant?: Prisma.ApplicantUpdateOneWithoutEmployeeNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutEmployeeNestedInput
+  goals?: Prisma.GoalUpdateManyWithoutEmployeeNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutEmployeeNestedInput
+  documents?: Prisma.EmployeeDocumentUpdateManyWithoutEmployeeNestedInput
+  hrRequests?: Prisma.HrRequestUpdateManyWithoutEmployeeNestedInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
+  prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
+  dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
+  cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
+  signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
+}
+
+export type EmployeeUncheckedUpdateWithoutWsMembershipsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeNo?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  flexible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reports?: Prisma.EmployeeUncheckedUpdateManyWithoutManagerNestedInput
+  history?: Prisma.EmploymentHistoryUncheckedUpdateManyWithoutEmployeeNestedInput
+  schedule?: Prisma.ScheduleEntryUncheckedUpdateManyWithoutEmployeeNestedInput
+  regulars?: Prisma.RegularScheduleUncheckedUpdateManyWithoutEmployeeNestedInput
+  timeEvents?: Prisma.TimeEventUncheckedUpdateManyWithoutEmployeeNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
+  overtime?: Prisma.OvertimeRequestUncheckedUpdateManyWithoutEmployeeNestedInput
+  compensations?: Prisma.CompensationUncheckedUpdateManyWithoutEmployeeNestedInput
+  components?: Prisma.EmployeeComponentUncheckedUpdateManyWithoutEmployeeNestedInput
+  payslips?: Prisma.PayslipUncheckedUpdateManyWithoutEmployeeNestedInput
+  adjustments?: Prisma.PayrollAdjustmentUncheckedUpdateManyWithoutEmployeeNestedInput
+  checklistItems?: Prisma.ChecklistItemUncheckedUpdateManyWithoutEmployeeNestedInput
+  applicant?: Prisma.ApplicantUncheckedUpdateOneWithoutEmployeeNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutEmployeeNestedInput
+  goals?: Prisma.GoalUncheckedUpdateManyWithoutEmployeeNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
+  documents?: Prisma.EmployeeDocumentUncheckedUpdateManyWithoutEmployeeNestedInput
+  hrRequests?: Prisma.HrRequestUncheckedUpdateManyWithoutEmployeeNestedInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
+  prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
+  dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
+  signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
+}
+
+export type EmployeeCreateWithoutWsAssignmentsInput = {
+  id?: string
+  employeeNo: string
+  firstName: string
+  lastName: string
+  email?: string | null
+  phone?: string | null
+  scheduleLinked?: boolean
+  flexible?: boolean
+  photoKey?: string | null
+  hireDate: Date | string
+  status?: $Enums.EmployeeStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutEmployeesInput
+  user?: Prisma.UserCreateNestedOneWithoutEmployeeInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutEmployeesInput
+  position?: Prisma.PositionCreateNestedOneWithoutEmployeesInput
+  manager?: Prisma.EmployeeCreateNestedOneWithoutReportsInput
+  reports?: Prisma.EmployeeCreateNestedManyWithoutManagerInput
+  history?: Prisma.EmploymentHistoryCreateNestedManyWithoutEmployeeInput
+  schedule?: Prisma.ScheduleEntryCreateNestedManyWithoutEmployeeInput
+  regulars?: Prisma.RegularScheduleCreateNestedManyWithoutEmployeeInput
+  timeEvents?: Prisma.TimeEventCreateNestedManyWithoutEmployeeInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutEmployeeInput
+  overtime?: Prisma.OvertimeRequestCreateNestedManyWithoutEmployeeInput
+  compensations?: Prisma.CompensationCreateNestedManyWithoutEmployeeInput
+  components?: Prisma.EmployeeComponentCreateNestedManyWithoutEmployeeInput
+  payslips?: Prisma.PayslipCreateNestedManyWithoutEmployeeInput
+  adjustments?: Prisma.PayrollAdjustmentCreateNestedManyWithoutEmployeeInput
+  checklistItems?: Prisma.ChecklistItemCreateNestedManyWithoutEmployeeInput
+  applicant?: Prisma.ApplicantCreateNestedOneWithoutEmployeeInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutEmployeeInput
+  goals?: Prisma.GoalCreateNestedManyWithoutEmployeeInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutEmployeeInput
+  documents?: Prisma.EmployeeDocumentCreateNestedManyWithoutEmployeeInput
+  hrRequests?: Prisma.HrRequestCreateNestedManyWithoutEmployeeInput
+  taxProfiles?: Prisma.EmployeeTaxProfileCreateNestedManyWithoutEmployeeInput
+  prevEmployment?: Prisma.PreviousEmploymentCreateNestedManyWithoutEmployeeInput
+  dailyReports?: Prisma.DailyReportCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberCreateNestedManyWithoutEmployeeInput
+  cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutEmployeeInput
+  signatures?: Prisma.PolicySignatureCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeUncheckedCreateWithoutWsAssignmentsInput = {
+  id?: string
+  organizationId: string
+  userId?: string | null
+  employeeNo: string
+  firstName: string
+  lastName: string
+  email?: string | null
+  phone?: string | null
+  departmentId?: string | null
+  positionId?: string | null
+  managerId?: string | null
+  scheduleLinked?: boolean
+  flexible?: boolean
+  photoKey?: string | null
+  hireDate: Date | string
+  status?: $Enums.EmployeeStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reports?: Prisma.EmployeeUncheckedCreateNestedManyWithoutManagerInput
+  history?: Prisma.EmploymentHistoryUncheckedCreateNestedManyWithoutEmployeeInput
+  schedule?: Prisma.ScheduleEntryUncheckedCreateNestedManyWithoutEmployeeInput
+  regulars?: Prisma.RegularScheduleUncheckedCreateNestedManyWithoutEmployeeInput
+  timeEvents?: Prisma.TimeEventUncheckedCreateNestedManyWithoutEmployeeInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
+  overtime?: Prisma.OvertimeRequestUncheckedCreateNestedManyWithoutEmployeeInput
+  compensations?: Prisma.CompensationUncheckedCreateNestedManyWithoutEmployeeInput
+  components?: Prisma.EmployeeComponentUncheckedCreateNestedManyWithoutEmployeeInput
+  payslips?: Prisma.PayslipUncheckedCreateNestedManyWithoutEmployeeInput
+  adjustments?: Prisma.PayrollAdjustmentUncheckedCreateNestedManyWithoutEmployeeInput
+  checklistItems?: Prisma.ChecklistItemUncheckedCreateNestedManyWithoutEmployeeInput
+  applicant?: Prisma.ApplicantUncheckedCreateNestedOneWithoutEmployeeInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutEmployeeInput
+  goals?: Prisma.GoalUncheckedCreateNestedManyWithoutEmployeeInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
+  documents?: Prisma.EmployeeDocumentUncheckedCreateNestedManyWithoutEmployeeInput
+  hrRequests?: Prisma.HrRequestUncheckedCreateNestedManyWithoutEmployeeInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUncheckedCreateNestedManyWithoutEmployeeInput
+  prevEmployment?: Prisma.PreviousEmploymentUncheckedCreateNestedManyWithoutEmployeeInput
+  dailyReports?: Prisma.DailyReportUncheckedCreateNestedManyWithoutEmployeeInput
+  wsMemberships?: Prisma.WsMemberUncheckedCreateNestedManyWithoutEmployeeInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutEmployeeInput
+  signatures?: Prisma.PolicySignatureUncheckedCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeCreateOrConnectWithoutWsAssignmentsInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutWsAssignmentsInput, Prisma.EmployeeUncheckedCreateWithoutWsAssignmentsInput>
+}
+
+export type EmployeeUpsertWithoutWsAssignmentsInput = {
+  update: Prisma.XOR<Prisma.EmployeeUpdateWithoutWsAssignmentsInput, Prisma.EmployeeUncheckedUpdateWithoutWsAssignmentsInput>
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutWsAssignmentsInput, Prisma.EmployeeUncheckedCreateWithoutWsAssignmentsInput>
+  where?: Prisma.EmployeeWhereInput
+}
+
+export type EmployeeUpdateToOneWithWhereWithoutWsAssignmentsInput = {
+  where?: Prisma.EmployeeWhereInput
+  data: Prisma.XOR<Prisma.EmployeeUpdateWithoutWsAssignmentsInput, Prisma.EmployeeUncheckedUpdateWithoutWsAssignmentsInput>
+}
+
+export type EmployeeUpdateWithoutWsAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeNo?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  flexible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutEmployeesNestedInput
+  user?: Prisma.UserUpdateOneWithoutEmployeeNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutEmployeesNestedInput
+  position?: Prisma.PositionUpdateOneWithoutEmployeesNestedInput
+  manager?: Prisma.EmployeeUpdateOneWithoutReportsNestedInput
+  reports?: Prisma.EmployeeUpdateManyWithoutManagerNestedInput
+  history?: Prisma.EmploymentHistoryUpdateManyWithoutEmployeeNestedInput
+  schedule?: Prisma.ScheduleEntryUpdateManyWithoutEmployeeNestedInput
+  regulars?: Prisma.RegularScheduleUpdateManyWithoutEmployeeNestedInput
+  timeEvents?: Prisma.TimeEventUpdateManyWithoutEmployeeNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutEmployeeNestedInput
+  overtime?: Prisma.OvertimeRequestUpdateManyWithoutEmployeeNestedInput
+  compensations?: Prisma.CompensationUpdateManyWithoutEmployeeNestedInput
+  components?: Prisma.EmployeeComponentUpdateManyWithoutEmployeeNestedInput
+  payslips?: Prisma.PayslipUpdateManyWithoutEmployeeNestedInput
+  adjustments?: Prisma.PayrollAdjustmentUpdateManyWithoutEmployeeNestedInput
+  checklistItems?: Prisma.ChecklistItemUpdateManyWithoutEmployeeNestedInput
+  applicant?: Prisma.ApplicantUpdateOneWithoutEmployeeNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutEmployeeNestedInput
+  goals?: Prisma.GoalUpdateManyWithoutEmployeeNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutEmployeeNestedInput
+  documents?: Prisma.EmployeeDocumentUpdateManyWithoutEmployeeNestedInput
+  hrRequests?: Prisma.HrRequestUpdateManyWithoutEmployeeNestedInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
+  prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
+  dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
+  signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
+}
+
+export type EmployeeUncheckedUpdateWithoutWsAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeNo?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  positionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduleLinked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  flexible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reports?: Prisma.EmployeeUncheckedUpdateManyWithoutManagerNestedInput
+  history?: Prisma.EmploymentHistoryUncheckedUpdateManyWithoutEmployeeNestedInput
+  schedule?: Prisma.ScheduleEntryUncheckedUpdateManyWithoutEmployeeNestedInput
+  regulars?: Prisma.RegularScheduleUncheckedUpdateManyWithoutEmployeeNestedInput
+  timeEvents?: Prisma.TimeEventUncheckedUpdateManyWithoutEmployeeNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
+  overtime?: Prisma.OvertimeRequestUncheckedUpdateManyWithoutEmployeeNestedInput
+  compensations?: Prisma.CompensationUncheckedUpdateManyWithoutEmployeeNestedInput
+  components?: Prisma.EmployeeComponentUncheckedUpdateManyWithoutEmployeeNestedInput
+  payslips?: Prisma.PayslipUncheckedUpdateManyWithoutEmployeeNestedInput
+  adjustments?: Prisma.PayrollAdjustmentUncheckedUpdateManyWithoutEmployeeNestedInput
+  checklistItems?: Prisma.ChecklistItemUncheckedUpdateManyWithoutEmployeeNestedInput
+  applicant?: Prisma.ApplicantUncheckedUpdateOneWithoutEmployeeNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutEmployeeNestedInput
+  goals?: Prisma.GoalUncheckedUpdateManyWithoutEmployeeNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
+  documents?: Prisma.EmployeeDocumentUncheckedUpdateManyWithoutEmployeeNestedInput
+  hrRequests?: Prisma.HrRequestUncheckedUpdateManyWithoutEmployeeNestedInput
+  taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
+  prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
+  dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
@@ -6361,6 +7003,8 @@ export type EmployeeUpdateWithoutOrganizationInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -6404,6 +7048,8 @@ export type EmployeeUncheckedUpdateWithoutOrganizationInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -6487,6 +7133,8 @@ export type EmployeeUpdateWithoutDepartmentInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -6530,6 +7178,8 @@ export type EmployeeUncheckedUpdateWithoutDepartmentInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -6613,6 +7263,8 @@ export type EmployeeUpdateWithoutPositionInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -6656,6 +7308,8 @@ export type EmployeeUncheckedUpdateWithoutPositionInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -6739,6 +7393,8 @@ export type EmployeeUpdateWithoutManagerInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUpdateManyWithoutEmployeeNestedInput
 }
@@ -6782,6 +7438,8 @@ export type EmployeeUncheckedUpdateWithoutManagerInput = {
   taxProfiles?: Prisma.EmployeeTaxProfileUncheckedUpdateManyWithoutEmployeeNestedInput
   prevEmployment?: Prisma.PreviousEmploymentUncheckedUpdateManyWithoutEmployeeNestedInput
   dailyReports?: Prisma.DailyReportUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsMemberships?: Prisma.WsMemberUncheckedUpdateManyWithoutEmployeeNestedInput
+  wsAssignments?: Prisma.WsAssigneeUncheckedUpdateManyWithoutEmployeeNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutEmployeeNestedInput
   signatures?: Prisma.PolicySignatureUncheckedUpdateManyWithoutEmployeeNestedInput
 }
@@ -6832,6 +7490,8 @@ export type EmployeeCountOutputType = {
   taxProfiles: number
   prevEmployment: number
   dailyReports: number
+  wsMemberships: number
+  wsAssignments: number
   cashAdvances: number
   signatures: number
 }
@@ -6857,6 +7517,8 @@ export type EmployeeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   taxProfiles?: boolean | EmployeeCountOutputTypeCountTaxProfilesArgs
   prevEmployment?: boolean | EmployeeCountOutputTypeCountPrevEmploymentArgs
   dailyReports?: boolean | EmployeeCountOutputTypeCountDailyReportsArgs
+  wsMemberships?: boolean | EmployeeCountOutputTypeCountWsMembershipsArgs
+  wsAssignments?: boolean | EmployeeCountOutputTypeCountWsAssignmentsArgs
   cashAdvances?: boolean | EmployeeCountOutputTypeCountCashAdvancesArgs
   signatures?: boolean | EmployeeCountOutputTypeCountSignaturesArgs
 }
@@ -7014,6 +7676,20 @@ export type EmployeeCountOutputTypeCountDailyReportsArgs<ExtArgs extends runtime
 /**
  * EmployeeCountOutputType without action
  */
+export type EmployeeCountOutputTypeCountWsMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WsMemberWhereInput
+}
+
+/**
+ * EmployeeCountOutputType without action
+ */
+export type EmployeeCountOutputTypeCountWsAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WsAssigneeWhereInput
+}
+
+/**
+ * EmployeeCountOutputType without action
+ */
 export type EmployeeCountOutputTypeCountCashAdvancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.CashAdvanceWhereInput
 }
@@ -7071,6 +7747,8 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   taxProfiles?: boolean | Prisma.Employee$taxProfilesArgs<ExtArgs>
   prevEmployment?: boolean | Prisma.Employee$prevEmploymentArgs<ExtArgs>
   dailyReports?: boolean | Prisma.Employee$dailyReportsArgs<ExtArgs>
+  wsMemberships?: boolean | Prisma.Employee$wsMembershipsArgs<ExtArgs>
+  wsAssignments?: boolean | Prisma.Employee$wsAssignmentsArgs<ExtArgs>
   cashAdvances?: boolean | Prisma.Employee$cashAdvancesArgs<ExtArgs>
   signatures?: boolean | Prisma.Employee$signaturesArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
@@ -7177,6 +7855,8 @@ export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   taxProfiles?: boolean | Prisma.Employee$taxProfilesArgs<ExtArgs>
   prevEmployment?: boolean | Prisma.Employee$prevEmploymentArgs<ExtArgs>
   dailyReports?: boolean | Prisma.Employee$dailyReportsArgs<ExtArgs>
+  wsMemberships?: boolean | Prisma.Employee$wsMembershipsArgs<ExtArgs>
+  wsAssignments?: boolean | Prisma.Employee$wsAssignmentsArgs<ExtArgs>
   cashAdvances?: boolean | Prisma.Employee$cashAdvancesArgs<ExtArgs>
   signatures?: boolean | Prisma.Employee$signaturesArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
@@ -7225,6 +7905,8 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     taxProfiles: Prisma.$EmployeeTaxProfilePayload<ExtArgs>[]
     prevEmployment: Prisma.$PreviousEmploymentPayload<ExtArgs>[]
     dailyReports: Prisma.$DailyReportPayload<ExtArgs>[]
+    wsMemberships: Prisma.$WsMemberPayload<ExtArgs>[]
+    wsAssignments: Prisma.$WsAssigneePayload<ExtArgs>[]
     cashAdvances: Prisma.$CashAdvancePayload<ExtArgs>[]
     signatures: Prisma.$PolicySignaturePayload<ExtArgs>[]
   }
@@ -7667,6 +8349,8 @@ export interface Prisma__EmployeeClient<T, Null = never, ExtArgs extends runtime
   taxProfiles<T extends Prisma.Employee$taxProfilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$taxProfilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmployeeTaxProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   prevEmployment<T extends Prisma.Employee$prevEmploymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$prevEmploymentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PreviousEmploymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   dailyReports<T extends Prisma.Employee$dailyReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$dailyReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DailyReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  wsMemberships<T extends Prisma.Employee$wsMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$wsMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WsMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  wsAssignments<T extends Prisma.Employee$wsAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$wsAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WsAssigneePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cashAdvances<T extends Prisma.Employee$cashAdvancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$cashAdvancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CashAdvancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   signatures<T extends Prisma.Employee$signaturesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$signaturesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PolicySignaturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -8689,6 +9373,54 @@ export type Employee$dailyReportsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.DailyReportScalarFieldEnum | Prisma.DailyReportScalarFieldEnum[]
+}
+
+/**
+ * Employee.wsMemberships
+ */
+export type Employee$wsMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WsMember
+   */
+  select?: Prisma.WsMemberSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WsMember
+   */
+  omit?: Prisma.WsMemberOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WsMemberInclude<ExtArgs> | null
+  where?: Prisma.WsMemberWhereInput
+  orderBy?: Prisma.WsMemberOrderByWithRelationInput | Prisma.WsMemberOrderByWithRelationInput[]
+  cursor?: Prisma.WsMemberWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WsMemberScalarFieldEnum | Prisma.WsMemberScalarFieldEnum[]
+}
+
+/**
+ * Employee.wsAssignments
+ */
+export type Employee$wsAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WsAssignee
+   */
+  select?: Prisma.WsAssigneeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WsAssignee
+   */
+  omit?: Prisma.WsAssigneeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WsAssigneeInclude<ExtArgs> | null
+  where?: Prisma.WsAssigneeWhereInput
+  orderBy?: Prisma.WsAssigneeOrderByWithRelationInput | Prisma.WsAssigneeOrderByWithRelationInput[]
+  cursor?: Prisma.WsAssigneeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WsAssigneeScalarFieldEnum | Prisma.WsAssigneeScalarFieldEnum[]
 }
 
 /**
