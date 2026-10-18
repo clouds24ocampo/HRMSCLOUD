@@ -21,7 +21,7 @@ const done = () => {
 
 // The employee asks for the overtime the DTR measured on one day. The amount is whatever the DTR shows, not what the browser says.
 export async function requestOvertime(day: string, _: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/overtime");
+  const me = await requireUser("/dtr"); // asked from the DTR page, which every employee can open; deciding stays on /overtime
   const reason = z.string().trim().min(3, "Give a short reason.").max(300).safeParse(form.get("reason"));
   if (!reason.success) return { error: reason.error.issues[0].message };
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return { error: "Invalid day." };
@@ -52,7 +52,7 @@ export async function requestOvertime(day: string, _: FormState, form: FormData)
 }
 
 export async function cancelOvertime(id: string) {
-  const me = await requireUser("/overtime");
+  const me = await requireUser("/dtr");
   const emp = await getMyEmployee(me);
   const r = await prisma.overtimeRequest.findFirst({ where: { id, employeeId: emp.id, organizationId: me.organizationId, status: "PENDING" } });
   if (!r) return;

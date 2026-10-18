@@ -10,6 +10,7 @@ import { addDays, dayKey } from "../src/lib/time";
 import { PACK, PACK_VERSION } from "../src/lib/ph/pack";
 import { standardHolidays } from "../src/lib/ph/holidays";
 import { leavePresetsFor } from "../src/lib/ph/leaves";
+import { DEFAULT_LABELS, TEMPLATES } from "../src/lib/worksync";
 import { wipeOrgs } from "../e2e/helpers";
 
 const TAG = "DEMO-SAMPLE";
@@ -33,7 +34,7 @@ async function seed() {
   await db.shiftTemplate.createMany({ data: shiftPresetFor("bpo-it").map((s) => ({ ...s, organizationId: id })) });
   await db.department.createMany({ data: DEPARTMENT_SUGGESTIONS["bpo-it"].slice(0, 3).map((name) => ({ name, organizationId: id })) });
   const positions = positionSuggestionsFor("bpo-it");
-  await db.position.createMany({ data: positions.map((p) => ({ ...p, organizationId: id })) });
+  await db.position.createMany({ data: positions.map(({ title, level }) => ({ title, level, organizationId: id })) });
   await ensureTemplates(db, id);
 
   const [dept, shift, stampIn, stampOut] = await Promise.all([
@@ -84,6 +85,50 @@ async function seed() {
   await db.holiday.createMany({ data: standardHolidays(Number(today.slice(0, 4))).map((h) => ({ organizationId: id, date: new Date(`${h.date}T00:00:00Z`), name: h.name, type: h.type })), skipDuplicates: true });
   await db.wageOrder.create({ data: { organizationId: id, region: "NCR", orderNo: "SAMPLE (not a real wage order)", dailyMinimumCents: 69500, effectiveFrom: hired } });
   await db.leaveType.createMany({ data: leavePresetsFor("PRIVATE").map((l) => ({ organizationId: id, name: l.name, annualDays: l.annualDays, paid: l.paid })), skipDuplicates: true });
+
+  // WorkSync: one Software and one Network project with cards in every state, so the boards, table, timeline, calendar and dashboard have something to show.
+  const hrEmp = staff[1];
+  const dd = (n: number) => new Date(`${addDays(today, n)}T00:00:00Z`);
+  const sample = async (name: string, kind: "PROGRAMMING" | "NETWORK", color: string, about: string, cards: [number, string, { pri?: "LOW" | "HIGH" | "URGENT"; s?: number; e?: number; who?: number[]; chk?: [number, number]; lab?: number; done?: number; desc?: string }][]) => {
+    const p = await db.wsProject.create({
+      data: {
+        organizationId: id, name, kind, color, description: about, dueDate: dd(40), createdById: hrEmp.userId!,
+        members: { create: [{ employeeId: hrEmp.id, role: "LEAD" }, { employeeId: mgr.id, role: "LEAD" }, { employeeId: emps[0].id }, { employeeId: emps[1].id }] },
+        labels: { create: DEFAULT_LABELS[kind] }, lists: { create: TEMPLATES[kind].map((l, position) => ({ ...l, position })) },
+      },
+      include: { lists: { orderBy: { position: "asc" } }, labels: { orderBy: { name: "asc" } } },
+    });
+    for (const [i, [li, title, o]] of cards.entries()) {
+      const finished = p.lists[li].category === "DONE" ? dd(-(o.done ?? 1)) : null;
+      const c = await db.wsCard.create({
+        data: {
+          organizationId: id, projectId: p.id, listId: p.lists[li].id, title, description: o.desc ?? null, position: 1000 + i, priority: o.pri ?? "NORMAL",
+          startDate: o.s != null ? dd(o.s) : null, dueDate: o.e != null ? dd(o.e) : null, createdById: hrEmp.userId!, completedAt: finished, ...(finished ? { updatedAt: finished } : {}),
+        },
+      });
+      for (const w of o.who ?? []) await db.wsAssignee.create({ data: { cardId: c.id, employeeId: emps[w].id } });
+      if (o.lab != null) await db.wsCardLabel.create({ data: { cardId: c.id, labelId: p.labels[o.lab].id } });
+      if (o.chk) for (let k = 0; k < o.chk[1]; k++) await db.wsCheck.create({ data: { cardId: c.id, text: `Step ${k + 1}`, done: k < o.chk[0], position: k } });
+    }
+  };
+  await sample("Customer portal v2", "PROGRAMMING", "indigo", "Rebuild the customer portal with single sign-on, invoices and a mobile-friendly dashboard.", [
+    [0, "Invoice PDF export", { lab: 0, s: 12, e: 20, pri: "LOW" }],
+    [1, "Password reset email", { who: [1], lab: 0, s: 3, e: 8 }],
+    [2, "SSO login with Azure AD", { pri: "HIGH", s: -3, e: 6, who: [0], chk: [2, 5], lab: 0, desc: "Tenant config, callback URL, group claims." }],
+    [2, "Invoice list API", { who: [0, 1], chk: [1, 3], s: -2, e: 9, lab: 0 }],
+    [3, "Session timeout fix", { who: [0], lab: 1, s: -6, e: 1, pri: "HIGH" }],
+    [5, "Waiting for client API keys", { pri: "URGENT", s: -9, e: -2, who: [0], lab: 3 }],
+    [6, "Login page redesign", { who: [1], lab: 5, s: -14, e: -5, done: 5 }],
+    [6, "Fix duplicate emails", { who: [0], lab: 1, s: -10, e: -7, done: 1 }],
+  ]);
+  await sample("Branch fibre rollout", "NETWORK", "ocean", "Fibre backbone and Wi-Fi rollout for the regional branches.", [
+    [0, "Cebu branch survey", { s: 5, e: 8, lab: 1 }],
+    [1, "Davao site survey", { who: [0], s: -2, e: 3, lab: 1, chk: [1, 4] }],
+    [2, "Install core switch, Manila", { who: [1], s: -4, e: 5, pri: "HIGH", lab: 0, chk: [3, 6] }],
+    [3, "Wi-Fi coverage test, HQ", { who: [0], s: -1, e: 2, lab: 2 }],
+    [4, "ISP handoff delayed", { who: [1], pri: "URGENT", s: -6, e: -1, lab: 3 }],
+    [5, "HQ backbone", { who: [0], s: -20, e: -10, done: 8, lab: 0 }],
+  ]);
 
   console.log(`Demo company ready. Sign in at http://localhost:3300/login with password ${DEMO_PASSWORD}`);
   for (const k of ["admin", "hr", "manager", "emp1", "emp2"]) console.log(`  ${mail(k)}`);

@@ -14,7 +14,7 @@ export function PageHeader({ title, subtitle, action }: { title: string; subtitl
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   // min-w-0: a wide table inside (it scrolls on its own) must never stretch a grid column past the screen.
-  return <section className={`min-w-0 rounded-2xl border border-line bg-surface p-5 shadow-sm ${className}`}>{children}</section>;
+  return <section className={`relative min-w-0 rounded-2xl border border-line bg-surface p-5 shadow-sm ${className}`}>{children}</section>;
 }
 
 export function EmptyState({ title, hint, action }: { title: string; hint?: string; action?: ReactNode }) {
