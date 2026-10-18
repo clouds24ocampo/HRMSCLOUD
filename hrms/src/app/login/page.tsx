@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { LoginShell } from "./LoginShell";
-import { HeroScene } from "@/components/HeroScene";
+import { SculptureHero } from "@/components/ui/liquid-sculpture-hero";
 import { Logo } from "@/components/Logo";
 import { redirectIfSignedIn } from "@/lib/auth";
 import { registrationOpen } from "@/lib/registration";
@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <Link href="/" className="mb-10 flex items-center gap-2 font-headline text-lg font-medium text-brand">
             <Logo className="h-6 w-6" /> HRMS
           </Link>
-          <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
+          <h2 className="text-3xl font-bold tracking-tight">Welcome back</h2>
           <p className="mt-2 mb-6 text-muted">Sign in to your HR workspace, or just time stamp.</p>
         </>
       }
@@ -35,12 +35,28 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </>
       }
       hero={
-        <section className="relative hidden overflow-hidden bg-void bg-[radial-gradient(60%_55%_at_50%_45%,rgba(99,102,241,0.25),transparent)] md:block">
-          <HeroScene className="absolute inset-0" />
-          <p className="absolute inset-x-0 bottom-10 px-10 text-center font-headline text-lg font-medium text-halo/80">
-            People first. Everything else follows.
-          </p>
-        </section>
+        <SculptureHero
+          theme="dark"
+          themeToggle={false}
+          height="100%"
+          darkBackground="#111110"
+          src="/hero/sculpture-light.webp"
+          darkSrc="/hero/sculpture-dark.webp"
+          mobileSrc="/hero/sculpture-light-mobile.webp"
+          mobileDarkSrc="/hero/sculpture-dark-mobile.webp"
+          brand="HRMS"
+          brandHref="/"
+          navLinks={[]}
+          navCta={{ label: "Back to home", href: "/" }}
+          eyebrow="Sign in or time stamp"
+          headline={"People first.\nEverything else follows."}
+          headlineAccent="Everything else follows."
+          body=""
+          primaryCta={null}
+          secondaryCta={null}
+          hint="Move across the form"
+          hintTouch="Touch the form"
+        />
       }
     />
   );

@@ -5,7 +5,8 @@ import { LoginForm } from "./LoginForm";
 import { TimeStampPanel } from "./TimeStampPanel";
 
 // The login page has two doors: sign in to the workspace, or just time stamp with an ID number and password.
-// The animated panel belongs to the sign-in door only: the time stamp page is a plain, centered form.
+// The landing page hero (the liquid sculpture) is the background of both doors; the form is a card on top of it.
+// The card section lets pointer events through outside the card, so the sculpture still reacts to the cursor.
 export function LoginShell({ startOnStamp, top, bottom, hero }: { startOnStamp: boolean; top: ReactNode; bottom: ReactNode; hero: ReactNode }) {
   const [tab, setTab] = useState<"signin" | "stamp">(startOnStamp ? "stamp" : "signin");
   const btn = (k: "signin" | "stamp", text: string) => (
@@ -17,9 +18,10 @@ export function LoginShell({ startOnStamp, top, bottom, hero }: { startOnStamp: 
     </button>
   );
   return (
-    <main className={`grid min-h-dvh ${tab === "signin" ? "md:grid-cols-2" : ""}`}>
-      <section className="flex flex-col justify-center px-6 py-12 sm:px-12">
-        <div className="mx-auto w-full max-w-sm">
+    <main className="relative min-h-dvh overflow-hidden bg-[#111110]">
+      <div className="absolute inset-0">{hero}</div>
+      <section className="pointer-events-none relative z-10 flex min-h-dvh items-center justify-center px-4 py-10 lg:justify-end lg:pr-[8vw]">
+        <div className="pointer-events-auto w-full max-w-sm rounded-3xl bg-surface/95 p-7 shadow-2xl ring-1 ring-white/10 backdrop-blur-md sm:p-8">
           {top}
           <div role="tablist" aria-label="Sign in or time stamp" className="mb-6 flex gap-1 rounded-xl bg-line/50 p-1">
             {btn("signin", "Sign in")}
@@ -35,7 +37,6 @@ export function LoginShell({ startOnStamp, top, bottom, hero }: { startOnStamp: 
           )}
         </div>
       </section>
-      {tab === "signin" && hero}
     </main>
   );
 }
