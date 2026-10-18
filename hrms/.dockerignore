@@ -6,7 +6,6 @@ node_modules
 storage
 backups
 test-results
-e2e
 graphify-out
 *.log
 *.png
