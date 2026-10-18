@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
-import { isHr } from "@/lib/scope";
+import { canViewEmployee, isHr } from "@/lib/scope";
+import { getMyEmployee } from "@/lib/employees";
+import { loadProject } from "@/lib/worksync-data";
 import { ROLES } from "@/lib/roles";
 import { acceptIncentive, awardIncentive, declineIncentive } from "@/lib/incentives";
 import type { FormState } from "@/app/login/actions";
@@ -28,6 +30,15 @@ export async function awardIncentiveAction(_: FormState, form: FormData): Promis
 
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const d = parsed.data;
+
+  // HR may award anyone in the company; a manager only people in their own chain.
+  const mine = await getMyEmployee(me);
+  if (!(await canViewEmployee(me, mine.id, d.employeeId))) return { error: "Employee not found." };
+  // A project link needs edit rights on that project.
+  if (d.projectId) {
+    const p = await loadProject(me, mine.id, d.projectId);
+    if (!p || p.level === "VIEW") return { error: "You cannot link an incentive to that project." };
+  }
 
   try {
     const amountCents = Math.round(d.amount * 100);

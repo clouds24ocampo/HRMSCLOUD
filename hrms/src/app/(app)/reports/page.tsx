@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
@@ -65,6 +66,9 @@ export default async function ReportsPage({
   const fmt = (k: string) => formatDay(k, { month: "short", day: "numeric", year: "numeric" });
   const hr = isHr(me.role.key);
   const isManager = me.role.key === ROLES.MANAGER;
+  // The route already limits /reports to HR and Super Admin; these tabs hold pay and personal-document data, so they check again here
+  // in case the route rule is ever widened (pay data is visible to HR and the person only).
+  if ((activeTab === "documents" || activeTab === "payroll") && !hr) notFound();
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
@@ -118,7 +122,7 @@ export default async function ReportsPage({
 
       {/* Tab 3: Payroll & Compensation */}
       {activeTab === "payroll" && (
-        <PayrollReport orgId={orgId} from={from} to={to} tz={tz} hr={hr || isManager} />
+        <PayrollReport orgId={orgId} from={from} to={to} tz={tz} hr={hr} />
       )}
 
       {/* Tab 4: WorkSync Cross-Project Tasks */}

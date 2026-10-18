@@ -12,12 +12,13 @@ import { CONTRACT_TEMPLATES, interpolateContract, type ContractTemplateKey, type
  */
 export async function getEmployeeContractContext(employeeId: string, organizationId: string) {
   const [employee, org, comp] = await Promise.all([
-    prisma.employee.findUnique({
-      where: { id: employeeId },
+    // Inside the organization only: an employee id from another company is "not found".
+    prisma.employee.findFirst({
+      where: { id: employeeId, organizationId },
       include: {
         position: true,
         department: true,
-        user: true,
+        user: { select: { id: true, email: true, name: true } },
       },
     }),
     prisma.organization.findUnique({
@@ -134,6 +135,10 @@ export async function signContract(contractId: string, employeeUserId: string, n
   }
   if (contract.status === "VOID") {
     throw new Error("This contract has been voided.");
+  }
+  // Only a contract HR has issued can be signed: a draft is not open to the employee yet.
+  if (contract.status !== "ISSUED") {
+    throw new Error("This contract is not available for signing.");
   }
 
   const updated = await prisma.contract.update({

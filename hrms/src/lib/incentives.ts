@@ -20,11 +20,17 @@ export type AwardIncentiveParams = {
 export async function awardIncentive(params: AwardIncentiveParams) {
   const { organizationId, employeeId, title, amountCents, reason, awardedById, projectId, cardId } = params;
 
-  const employee = await prisma.employee.findUnique({
-    where: { id: employeeId },
+  // Always inside the caller's own organization: an id from another company is "not found".
+  const employee = await prisma.employee.findFirst({
+    where: { id: employeeId, organizationId },
     select: { id: true, firstName: true, lastName: true, userId: true },
   });
   if (!employee) throw new Error("Employee not found.");
+  if (employee.userId && employee.userId === awardedById) throw new Error("You cannot award an incentive to yourself.");
+
+  // A card link must be a real card of that project in this organization; otherwise it is dropped, never trusted.
+  const card = projectId && cardId ? await prisma.wsCard.findFirst({ where: { id: cardId, projectId, organizationId }, select: { title: true } }) : null;
+  if (projectId && cardId && !card) throw new Error("That card is not part of this project.");
 
   const awarder = await prisma.user.findUnique({
     where: { id: awardedById },
@@ -40,8 +46,8 @@ export async function awardIncentive(params: AwardIncentiveParams) {
       reason: reason.trim(),
       status: "PENDING",
       awardedById,
-      projectId: projectId || null,
-      cardId: cardId || null,
+      projectId: card ? projectId : null,
+      cardId: card ? cardId : null,
     },
   });
 
@@ -64,13 +70,12 @@ export async function awardIncentive(params: AwardIncentiveParams) {
   );
 
   // If tied to a WorkSync card, log activity on the card
-  if (projectId && cardId) {
-    const card = await prisma.wsCard.findUnique({ where: { id: cardId }, select: { title: true } });
+  if (projectId && cardId && card) {
     await logActivity(prisma, {
       organizationId,
       projectId,
       cardId,
-      cardTitle: card?.title ?? "Card",
+      cardTitle: card.title,
       actorId: awardedById,
       type: "EDITED",
       detail: `🎁 awarded ₱${(amountCents / 100).toLocaleString("en-PH", { minimumFractionDigits: 2 })} incentive to ${employee.firstName} ${employee.lastName}: ${title}`,

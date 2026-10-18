@@ -6,10 +6,10 @@ import { notify } from "./notify";
 
 vi.mock("./prisma", () => ({
   prisma: {
-    employee: { findUnique: vi.fn() },
+    employee: { findFirst: vi.fn() },
     user: { findUnique: vi.fn() },
     incentive: { create: vi.fn(), findUnique: vi.fn(), update: vi.fn() },
-    wsCard: { findUnique: vi.fn() },
+    wsCard: { findFirst: vi.fn() },
   },
 }));
 
@@ -32,7 +32,7 @@ describe("Employee Incentive System", () => {
 
   describe("awardIncentive", () => {
     it("creates a PENDING incentive, logs audit trail, and notifies employee", async () => {
-      vi.mocked(prisma.employee.findUnique).mockResolvedValueOnce({
+      vi.mocked(prisma.employee.findFirst).mockResolvedValueOnce({
         id: "emp-1",
         firstName: "Maria",
         lastName: "Santos",
@@ -97,7 +97,7 @@ describe("Employee Incentive System", () => {
     });
 
     it("throws error if employee does not exist", async () => {
-      vi.mocked(prisma.employee.findUnique).mockResolvedValueOnce(null);
+      vi.mocked(prisma.employee.findFirst).mockResolvedValueOnce(null);
 
       await expect(
         awardIncentive({
@@ -109,6 +109,25 @@ describe("Employee Incentive System", () => {
           awardedById: "usr-lead-1",
         }),
       ).rejects.toThrow("Employee not found.");
+    });
+  });
+
+  describe("awardIncentive guards", () => {
+    it("looks the employee up inside the organization only", async () => {
+      vi.mocked(prisma.employee.findFirst).mockResolvedValueOnce(null);
+      await expect(awardIncentive({ organizationId: "org-1", employeeId: "emp-of-another-company", title: "Bonus", amountCents: 100, reason: "x y z", awardedById: "usr-lead-1" })).rejects.toThrow("Employee not found.");
+      expect(vi.mocked(prisma.employee.findFirst).mock.calls[0][0]).toMatchObject({ where: { id: "emp-of-another-company", organizationId: "org-1" } });
+      expect(prisma.incentive.create).not.toHaveBeenCalled();
+    });
+    it("refuses to award yourself", async () => {
+      vi.mocked(prisma.employee.findFirst).mockResolvedValueOnce({ id: "emp-9", firstName: "A", lastName: "B", userId: "usr-lead-1" } as never);
+      await expect(awardIncentive({ organizationId: "org-1", employeeId: "emp-9", title: "Bonus", amountCents: 100, reason: "x y z", awardedById: "usr-lead-1" })).rejects.toThrow("yourself");
+    });
+    it("refuses a card that is not part of the project", async () => {
+      vi.mocked(prisma.employee.findFirst).mockResolvedValueOnce({ id: "emp-1", firstName: "A", lastName: "B", userId: "usr-1" } as never);
+      vi.mocked(prisma.wsCard.findFirst).mockResolvedValueOnce(null);
+      await expect(awardIncentive({ organizationId: "org-1", employeeId: "emp-1", title: "Bonus", amountCents: 100, reason: "x y z", awardedById: "usr-lead-1", projectId: "p1", cardId: "card-of-another-project" })).rejects.toThrow("not part of this project");
+      expect(prisma.incentive.create).not.toHaveBeenCalled();
     });
   });
 
