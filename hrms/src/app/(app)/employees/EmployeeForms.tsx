@@ -28,7 +28,7 @@ function Select({ id, label, value, onChange, options, empty }: { id: string; la
   );
 }
 
-const empty = { firstName: "", lastName: "", email: "", phone: "", departmentId: "", positionId: "", managerId: "", username: "", password: "", monthlySalary: "" };
+const empty = { firstName: "", lastName: "", email: "", phone: "", address: "", departmentId: "", positionId: "", managerId: "", username: "", password: "", monthlySalary: "" };
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 // Same formula as the payroll: monthly × 12 ÷ days a year, then ÷ hours a day.
@@ -77,6 +77,9 @@ export function AddEmployeeForm(p: { departments: Opt[]; positions: Opt[]; manag
           <Select id="departmentId" label="Department" empty="Not set" options={p.departments} value={v.departmentId} onChange={pickSel("departmentId")} />
           <Select id="positionId" label="Position" empty="Not set" options={p.positions} value={v.positionId} onChange={pickSel("positionId")} />
           <Select id="managerId" label="Immediate supervisor" empty="No supervisor" options={p.managers} value={v.managerId} onChange={pickSel("managerId")} />
+          <div className="sm:col-span-2">
+            <Field label="Complete residential address (optional)" id="address" placeholder="Unit, Street, Barangay, City, Province" {...bind("address")} />
+          </div>
           <label htmlFor="hireDate" className="block text-sm font-medium">
             Hire date
             <input id="hireDate" name="hireDate" type="date" required defaultValue={p.today} className={inputClass} />
@@ -202,7 +205,7 @@ export function AssignmentForm(p: {
 
 export function EditDetailsForm(p: {
   employeeId: string; hasLogin: boolean;
-  current: { firstName: string; lastName: string; email: string; phone: string; hireDate: string; username: string };
+  current: { firstName: string; lastName: string; email: string; phone: string; address?: string; hireDate: string; username: string };
 }) {
   const { state, pending, formProps } = useKeptForm(updateDetails.bind(null, p.employeeId));
   const c = p.current;
@@ -213,6 +216,9 @@ export function EditDetailsForm(p: {
         <Field label="Last name" id="lastName" required defaultValue={c.lastName} />
         <Field label={p.hasLogin ? "Email (sign-in)" : "Email (optional)"} id="email" type="email" required={p.hasLogin} defaultValue={c.email} />
         <Field label="Phone (optional)" id="phone" type="tel" defaultValue={c.phone} />
+        <div className="sm:col-span-2">
+          <Field label="Complete residential address (optional)" id="address" defaultValue={c.address ?? ""} placeholder="Unit, Street, Barangay, City, Province" />
+        </div>
         <Field label="Hire date" id="hireDate" type="date" required defaultValue={c.hireDate} />
         {p.hasLogin && <Field label="Username (optional)" id="username" autoCapitalize="none" spellCheck={false} autoComplete="off" defaultValue={c.username} />}
       </div>

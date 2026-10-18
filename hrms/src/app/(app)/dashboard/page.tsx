@@ -31,6 +31,7 @@ import { AttendanceBoard } from "@/components/AttendanceBoard";
 import { statusTag } from "@/components/LiveStatus";
 import { LivePersonnelReport, type PersonnelLiveItem } from "@/components/LivePersonnelReport";
 import { loadAttendanceBoard, loadTeamDtr, type BoardRow } from "@/lib/team-dtr";
+import { AcceptIncentiveForm } from "@/app/(app)/incentives/IncentiveForms";
 
 const label = (action: string) => {
   const s = action.replace(/[._]/g, " ");
@@ -62,7 +63,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     }
   }
 
-  const [myTasks, news, clock, myShift, myReport, comp, myDtr] = await Promise.all([
+  const [myTasks, news, clock, myShift, myReport, comp, myDtr, pendingIncentives] = await Promise.all([
     prisma.checklistItem.findMany({
       where: { employeeId: emp.id, organizationId: me.organizationId, kind: "ONBOARDING", owner: "EMPLOYEE", doneAt: null },
       select: { id: true, title: true },
@@ -77,7 +78,15 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     prisma.dailyReport.findFirst({ where: { organizationId: me.organizationId, employeeId: emp.id, date: dbDate(today) }, select: { id: true } }),
     prisma.compensation.findFirst({ where: { employeeId: emp.id, organizationId: me.organizationId, effectiveFrom: { lte: dbDate(today) } }, orderBy: [{ effectiveFrom: "desc" }, { createdAt: "desc" }] }),
     loadDtr(me, emp.id, emp.id, cut.start, today, tz, settings.graceMinutes),
+    prisma.incentive.findMany({
+      where: { organizationId: me.organizationId, employeeId: emp.id, status: "PENDING" },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
+
+  const awarderUserIds = Array.from(new Set(pendingIncentives.map((i) => i.awardedById)));
+  const awarderUsers = awarderUserIds.length > 0 ? await prisma.user.findMany({ where: { id: { in: awarderUserIds } }, select: { id: true, name: true } }) : [];
+  const awarderMap = new Map(awarderUsers.map((u) => [u.id, u.name]));
 
   // My cut-off so far: logged hours (a day counts up to the normal hours), and what they come to.
   const approvedOt = await prisma.overtimeRequest.findMany({ where: { organizationId: me.organizationId, employeeId: emp.id, status: "APPROVED", date: { gte: dbDate(cut.start), lte: dbDate(today) } }, select: { date: true, minutes: true } });
@@ -314,6 +323,50 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       </div>
 
       {denied && <Alert kind="error">You do not have permission to open that page.</Alert>}
+
+      {/* PENDING INCENTIVES RECOGNITION BANNER */}
+      {pendingIncentives.length > 0 && (
+        <section aria-label="Incentives awaiting your acceptance" className="rounded-2xl border-2 border-emerald-500/40 bg-linear-to-r from-emerald-500/10 via-teal-500/10 to-transparent p-5 shadow-sm">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                <span>🎁</span> INCENTIVE RECOGNITION
+              </div>
+              <h2 className="mt-2 text-xl font-bold tracking-tight text-ink">
+                You have {pendingIncentives.length} incentive award{pendingIncentives.length > 1 ? "s" : ""} awaiting your acceptance!
+              </h2>
+              <p className="mt-1 text-sm text-muted">
+                Accept below to confirm receipt and credit this to your next semi-monthly payslip. All acceptances are recorded with an audit trail.
+              </p>
+            </div>
+            <Link href="/incentives" className="rounded-xl border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-ink shadow-sm hover:border-brand hover:text-brand">
+              View All Incentives →
+            </Link>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {pendingIncentives.map((inc) => (
+              <div key={inc.id} className="flex flex-col justify-between rounded-xl border border-line bg-surface p-4 shadow-sm">
+                <div>
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-bold text-ink">{inc.title}</h3>
+                    <span className="rounded-lg bg-emerald-500/15 px-2.5 py-1 text-sm font-black text-emerald-600 dark:text-emerald-400">
+                      {formatMoney(inc.amountCents)}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs text-muted line-clamp-3 whitespace-pre-wrap">{inc.reason}</p>
+                  <p className="mt-2 text-[11px] text-muted">
+                    Awarded by: {awarderMap.get(inc.awardedById) ?? "Management"} · {formatDay(keyOfDbDate(inc.createdAt))}
+                  </p>
+                </div>
+                <div className="mt-3 pt-3 border-t border-line">
+                  <AcceptIncentiveForm incentiveId={inc.id} title={inc.title} amount={formatMoney(inc.amountCents)} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* LIVE PERSONNEL REPORT: BIG AND SEE IT FIRST */}
       {personnelLiveItems.length > 0 && (

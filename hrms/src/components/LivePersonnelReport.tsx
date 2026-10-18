@@ -233,7 +233,7 @@ export function LivePersonnelReport({
       className="overflow-hidden rounded-3xl border-2 border-brand/20 bg-surface shadow-xl shadow-brand/5"
     >
       {/* Top Header Banner */}
-      <div className="relative border-b border-line bg-gradient-to-r from-brand/10 via-brand/5 to-surface px-6 py-5">
+      <div className="relative border-b border-line bg-linear-to-r from-brand/10 via-brand/5 to-surface px-6 py-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2.5">
@@ -658,7 +658,7 @@ export function LivePersonnelReport({
                     <div className="flex items-start gap-3">
                       {/* Avatar initials with status dot */}
                       <div className="relative shrink-0">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand/10 to-brand/20 text-sm font-bold text-brand shadow-inner">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-brand/10 to-brand/20 text-sm font-bold text-brand shadow-inner">
                           {getInitials(item.name)}
                         </div>
                         <span
@@ -793,7 +793,7 @@ export function LivePersonnelReport({
                             {item.events.map((e) => (
                               <li key={e.id} className="relative">
                                 <span
-                                  className={`absolute -left-[17px] top-1 h-2 w-2 rounded-full ${
+                                  className={`absolute -left-4.25 top-1 h-2 w-2 rounded-full ${
                                     e.page === "ISSUE"
                                       ? "bg-danger"
                                       : e.type === "IN"
@@ -843,7 +843,7 @@ export function LivePersonnelReport({
         ) : (
           /* TABLE VIEW */
           <div className="overflow-x-auto rounded-2xl border border-line bg-surface">
-            <table className="w-full min-w-[750px] text-left text-sm">
+            <table className="w-full min-w-187.5 text-left text-sm">
               <thead className="border-b border-line bg-bg/60 text-xs font-semibold text-muted uppercase tracking-wider">
                 <tr>
                   <th className="py-3 px-4">Employee</th>

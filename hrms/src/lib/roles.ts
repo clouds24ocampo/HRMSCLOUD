@@ -49,8 +49,11 @@ export const PAGE_ACCESS: Record<string, RoleKey[]> = {
   "/id/design": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
   "/chat": ALL, // messages and calls inside the organization
   "/policies": ALL, // read and e-sign; HR uploads
+  "/handbook": ALL, // company handbook: read and acknowledge; HR manages
+  "/contracts": ALL, // employment contracts: read and sign; HR/managers create & issue
   "/daily-report": ALL, // own report; managers read their downline, HR reads everyone
   "/cash-advance": ALL, // own requests; HR decides and sees every record
+  "/incentives": ALL, // own incentives to accept; HR/managers award and see records
   "/announcements": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN], // posting. Everyone reads them on Home
   "/reports": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
   "/analytics": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN], // all activity in the system

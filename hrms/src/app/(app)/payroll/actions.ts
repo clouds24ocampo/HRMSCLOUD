@@ -91,6 +91,18 @@ export async function finalize(periodId: string): Promise<FormState> {
   // Cash advance installments taken by this payroll become repayment records. Once only, even if finalize runs twice.
   const payments = slips.flatMap((s) => ((s.inputs as { cashAdvances?: { id: string; cents: number }[] } | null)?.cashAdvances ?? []).map((c) => ({ advanceId: c.id, payslipId: s.id, amountCents: c.cents, paidOn: p.payDate })));
   if (payments.length) await prisma.cashAdvancePayment.createMany({ data: payments, skipDuplicates: true });
+
+  // Mark all included accepted incentives as PAID and link to their payslip
+  for (const s of slips) {
+    const incIds = (s.inputs as { incentiveIds?: string[] } | null)?.incentiveIds ?? [];
+    if (incIds.length > 0) {
+      await prisma.incentive.updateMany({
+        where: { id: { in: incIds }, organizationId: me.organizationId, status: "ACCEPTED" },
+        data: { status: "PAID", payslipId: s.id },
+      });
+    }
+  }
+
   for (const s of slips) if (s.employee.userId) await notify(me.organizationId, [s.employee.userId], { title: `Your payslip for ${p.name} is ready`, href: `/payslips/${s.id}` }, me.id);
   done(p.id);
   return { ok: "Finalized. The numbers are locked and employees can see their payslips." };

@@ -8,6 +8,8 @@ export const MENU: NavGroup[] = [
     title: "People",
     items: [
       { href: "/employees", label: "Employees", icon: "👤" },
+      { href: "/contracts", label: "Contracts", icon: "📝" },
+      { href: "/handbook", label: "Company Handbook", icon: "📖" },
       { href: "/organization", label: "Organization", icon: "🏢" },
       { href: "/recruitment", label: "Recruitment", icon: "🎯" },
       { href: "/documents", label: "Documents", icon: "🗂️" },
@@ -35,6 +37,7 @@ export const MENU: NavGroup[] = [
       { href: "/payroll", label: "Payroll", icon: "💰" },
       { href: "/payslips", label: "My payslips", icon: "🧾" },
       { href: "/cash-advance", label: "Cash advance", icon: "💵" },
+      { href: "/incentives", label: "Incentives", icon: "🎁" },
     ],
   },
   {

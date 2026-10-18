@@ -145,6 +145,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
               ["Position", e.position ? `${e.position.title} (${LEVEL_LABEL[e.position.level]})` : "Not set"],
               ["Department", e.department?.name ?? "Not set"],
               ["Supervisor", e.manager ? `${e.manager.firstName} ${e.manager.lastName}` : "None"],
+              ["Residential Address", e.address ?? "Not set"],
               ["Email", e.email ?? "Not set"],
               ["Phone", e.phone ?? "Not set"],
               ["Sign-in", e.user ? `${e.user.username ? `${e.user.username} · ` : ""}${e.user.email} · ${e.user.role.name}` : "No sign-in"],
@@ -158,6 +159,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
           <div className="mt-5 flex flex-wrap gap-2">
             <Link href={`/dtr?employee=${e.id}`} className={buttonClass}>View DTR</Link>
             <Link href={`/schedule?employee=${e.id}`} className="rounded-lg border border-line px-4 py-2.5 font-semibold transition hover:bg-bg">View schedule</Link>
+            {hr && <Link href={`/contracts?employee=${e.id}`} className="rounded-lg border border-line px-4 py-2.5 font-semibold transition hover:border-brand hover:text-brand">📝 Contract</Link>}
           </div>
         </Card>
 
@@ -350,7 +352,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
           <EditDetailsForm
             employeeId={e.id}
             hasLogin={!!e.user}
-            current={{ firstName: e.firstName, lastName: e.lastName, email: e.user?.email ?? e.email ?? "", phone: e.phone ?? "", hireDate: keyOfDbDate(e.hireDate), username: e.user?.username ?? "" }}
+            current={{ firstName: e.firstName, lastName: e.lastName, email: e.user?.email ?? e.email ?? "", phone: e.phone ?? "", address: e.address ?? "", hireDate: keyOfDbDate(e.hireDate), username: e.user?.username ?? "" }}
           />
         </Card>
       )}

@@ -41,6 +41,7 @@ export type NewEmployee = {
   employeeNo?: string | null;
   email?: string | null;
   phone?: string | null;
+  address?: string | null;
   departmentId?: string | null;
   positionId?: string | null;
   managerId?: string | null;

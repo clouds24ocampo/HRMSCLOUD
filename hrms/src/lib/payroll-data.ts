@@ -57,7 +57,7 @@ export async function calculatePeriod(me: Actor, periodId: string, opts: { auto?
   };
   const yearStart = `${payYear}-01-01`;
 
-  const [employees, contributions, brackets, comps, adjustments, advances, leave, overtime, assigned, profiles, wageOrders, holidays, ytdSlips, previous, unfinalized] = await Promise.all([
+  const [employees, contributions, brackets, comps, adjustments, advances, leave, overtime, assigned, profiles, wageOrders, holidays, ytdSlips, previous, unfinalized, acceptedIncentives] = await Promise.all([
     prisma.employee.findMany({
       where: { organizationId: orgId, status: { not: "SEPARATED" }, hireDate: { lte: period.endDate } },
       select: { id: true, employeeNo: true, firstName: true, lastName: true, hireDate: true },
@@ -92,6 +92,10 @@ export async function calculatePeriod(me: Actor, periodId: string, opts: { auto?
       : [],
     isPh ? prisma.previousEmployment.findMany({ where: { organizationId: orgId, year: payYear } }) : [],
     isPh ? prisma.payrollPeriod.findMany({ where: { organizationId: orgId, id: { not: periodId }, status: { not: "FINALIZED" }, payDate: { gte: new Date(`${yearStart}T00:00:00Z`), lte: period.payDate } }, select: { name: true } }) : [],
+    prisma.incentive.findMany({
+      where: { organizationId: orgId, status: "ACCEPTED", payslipId: null, acceptedAt: { lte: period.endDate } },
+      select: { id: true, employeeId: true, title: true, amountCents: true },
+    }),
   ]);
 
   const premium = isPh ? params("PREMIUMS", "PREMIUM_PAY") : null;
@@ -222,6 +226,7 @@ export async function calculatePeriod(me: Actor, periodId: string, opts: { auto?
         { label: "Pag-IBIG", cents: share(g.pagibig.ee) }, { label: "Withholding tax", cents: share(g.taxCents) },
       ];
     }
+    const empIncentives = acceptedIncentives.filter((inc) => inc.employeeId === e.id);
     const input: PayInput = {
       payType: comp?.payType ?? "MONTHLY",
       rateCents: comp?.rateCents ?? 0,
@@ -238,6 +243,7 @@ export async function calculatePeriod(me: Actor, periodId: string, opts: { auto?
       brackets: isPh || !deduct ? [] : brackets.map((b) => ({ fromCents: b.fromCents, rateBp: b.rateBp, fixedCents: b.fixedCents })),
       adjustments: [
         ...adjustments.filter((a) => a.employeeId === e.id).map((a) => ({ kind: a.kind, label: a.label, amountCents: a.amountCents })),
+        ...empIncentives.map((inc) => ({ kind: "EARNING" as const, label: `Incentive: ${inc.title}`, amountCents: inc.amountCents })),
         ...cashDue.map((c) => ({ kind: "DEDUCTION" as const, label: "Cash advance", amountCents: c.cents })),
       ],
       ph,
@@ -251,7 +257,7 @@ export async function calculatePeriod(me: Actor, periodId: string, opts: { auto?
         grossCents: result.grossCents, deductionsCents: result.deductionsCents, netCents: result.netCents, employerCostCents: result.employerCostCents,
         taxableCents: t?.taxableCents ?? 0, taxWithheldCents: t?.taxWithheldCents ?? 0, nonTaxableCents: t?.nonTaxableCents ?? 0, mweExemptCents: t?.mweExemptCents ?? 0,
         mandatoryEeCents: t?.mandatoryEeCents ?? 0, benefitsExemptCents: t?.benefitsExemptCents ?? 0, benefitsTaxableCents: t?.benefitsTaxableCents ?? 0, basicEarnedCents: t?.basicEarnedCents ?? 0,
-        inputs: { ...input, warnings, days: days.length, tax: t, cashAdvances: cashDue, statutoryDeducted: deduct, govNotDeducted } as unknown as Prisma.InputJsonValue,
+        inputs: { ...input, warnings, days: days.length, tax: t, cashAdvances: cashDue, incentiveIds: empIncentives.map((i) => i.id), statutoryDeducted: deduct, govNotDeducted } as unknown as Prisma.InputJsonValue,
       },
       lines: result.lines.map((l, i) => ({ kind: l.kind, code: l.code, label: l.label, amountCents: l.amountCents, detail: l.detail ?? null, sortOrder: i })),
     });

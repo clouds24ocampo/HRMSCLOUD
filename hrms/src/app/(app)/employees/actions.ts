@@ -26,6 +26,7 @@ const createSchema = z.object({
   lastName: text("a last name"),
   email: optional,
   phone: optional,
+  address: optional,
   departmentId: pick,
   positionId: pick,
   managerId: pick,
@@ -104,6 +105,7 @@ export async function createEmployeeAction(_: FormState, form: FormData): Promis
 
     const created = await createEmployee(tx, me.organizationId, me.id, {
       firstName: d.firstName, lastName: d.lastName, employeeNo: customId, email: d.email ?? null, phone: d.phone ?? null,
+      address: d.address ?? null,
       departmentId: d.departmentId, positionId: d.positionId, managerId: d.managerId, hireDate: dbDate(d.hireDate), userId: user?.id, flexible,
     });
     await tx.compensation.create({
@@ -186,7 +188,7 @@ export async function updateDetails(employeeId: string, _: FormState, form: Form
   if (!isHr(me.role.key)) return { error: "Only HR can edit employees." };
   const parsed = z
     .object({
-      firstName: text("a first name"), lastName: text("a last name"), email: optional, phone: optional,
+      firstName: text("a first name"), lastName: text("a last name"), email: optional, phone: optional, address: optional,
       hireDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose the hire date."),
       username: z.string().trim().toLowerCase().optional().transform((v) => v || undefined),
       newPassword: z.string().optional().transform((v) => v || undefined),
@@ -221,9 +223,9 @@ export async function updateDetails(employeeId: string, _: FormState, form: Form
     }
   }
 
-  const before = { firstName: emp.firstName, lastName: emp.lastName, email: emp.email, phone: emp.phone, hireDate: emp.hireDate.toISOString().slice(0, 10), username: user?.username ?? null, loginEmail: user?.email ?? null };
+  const before = { firstName: emp.firstName, lastName: emp.lastName, email: emp.email, phone: emp.phone, address: emp.address, hireDate: emp.hireDate.toISOString().slice(0, 10), username: user?.username ?? null, loginEmail: user?.email ?? null };
   await prisma.$transaction(async (tx) => {
-    await tx.employee.update({ where: { id: emp.id }, data: { firstName: d.firstName, lastName: d.lastName, email: d.email ?? null, phone: d.phone ?? null, hireDate: dbDate(d.hireDate) } });
+    await tx.employee.update({ where: { id: emp.id }, data: { firstName: d.firstName, lastName: d.lastName, email: d.email ?? null, phone: d.phone ?? null, address: d.address ?? null, hireDate: dbDate(d.hireDate) } });
     if (user) {
       await tx.user.update({ where: { id: user.id }, data: userData });
       if (d.newPassword) await tx.session.deleteMany({ where: { userId: user.id } }); // signed out everywhere
