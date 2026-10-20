@@ -4,7 +4,12 @@ export async function register() {
   const g = globalThis as { __hrmsSweep?: ReturnType<typeof setInterval> };
   if (g.__hrmsSweep) return; // dev reloads call register again: keep one timer
   const { sweepAutoTimeouts } = await import("@/lib/auto-timeout");
-  const tick = () => sweepAutoTimeouts().catch((e) => console.error("[hrms] automatic time-out failed", e));
+  const { isDbDown } = await import("@/lib/db-health");
+  // A stopped database is a known state (the app shows its own page): one short line, not a stack trace every minute.
+  const tick = () =>
+    sweepAutoTimeouts().catch((e) =>
+      isDbDown(e) ? console.warn("[hrms] automatic time-out skipped: database unreachable") : console.error("[hrms] automatic time-out failed", e),
+    );
   g.__hrmsSweep = setInterval(tick, 60_000);
   setTimeout(tick, 10_000);
 }
