@@ -1,0 +1,55 @@
+# Checks every push and pull request: lint, types and the full test suite against a real Postgres.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  hrms:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hrms
+    env:
+      DATABASE_URL: postgresql://hrms:ci-only-password@localhost:5432/hrms
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: hrms
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: hrms
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U hrms -d hrms"
+          --health-interval 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: hrms/package-lock.json
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npx prisma migrate deploy
+      - run: npx next typegen
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npx vitest run
+      - run: npm audit --omit=dev --audit-level=high
+
+  worksync-kit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test worksync-kit/scripts/authz-guard.test.mjs worksync-kit/scripts/hooks.test.mjs

@@ -14,3 +14,5 @@ Notes
   Database: `docker compose -f docker-compose.prod.yml --env-file .env.production exec db pg_dump -U hrms hrms > backup.sql`
 - Update: pull the new code and rerun step 3. Migrations run on start.
 - Tests only: `ALLOW_MULTIPLE_ORGS=true` lets many companies register. Never set it in production.
+- Health: `GET /api/health` returns `{"status":"ok"}` (503 when the database is unreachable). Docker uses it to mark the app healthy, and Caddy only starts once it is. Point an uptime monitor at `https://<DOMAIN>/api/health`.
+- Back up both volumes on a schedule (for example a nightly cron running the `pg_dump` above, plus a copy of the `storage` volume), keep copies off the server, and test a restore before you rely on it.
