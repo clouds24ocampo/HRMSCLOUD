@@ -1,6 +1,7 @@
 // Automatic time-out. Someone who forgets to time out is timed out by the system 30 minutes after a full working day
 // (hours per day, plus any overtime already approved for that day). The punch is marked SYSTEM with the reason, so HR and
 // payroll can see it was not the person: only the hours up to the normal day are paid, the rest needs approved overtime.
+import { DEFAULT_TIMEZONE } from "@/lib/locale";
 import { prisma } from "@/lib/prisma";
 import { toSessions, type Session } from "@/lib/dtr";
 import { STAMP_SELECT, toPunch } from "@/lib/punch";
@@ -52,7 +53,7 @@ export async function sweepAutoTimeouts(organizationId?: string) {
     if (!open || open.outAt) continue;
     const orgId = evs[0].organizationId;
     const settings = await prisma.orgSettings.findUnique({ where: { organizationId: orgId }, select: { hoursPerDay: true, timezone: true } });
-    const tz = settings?.timezone ?? "Asia/Manila";
+    const tz = settings?.timezone ?? DEFAULT_TIMEZONE;
     const ot = await prisma.overtimeRequest.findFirst({ where: { employeeId, status: "APPROVED", date: dbDate(dayKey(open.inAt, tz)) }, select: { minutes: true } });
     const at = autoTimeoutAt(open, now, (settings?.hoursPerDay ?? 8) * 60 + (ot?.minutes ?? 0) + AUTO_TIMEOUT_GRACE_MIN);
     if (!at) continue;

@@ -1,3 +1,4 @@
+import { DEFAULT_TIMEZONE } from "@/lib/locale";
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { dbDate, dayKey } from "@/lib/time";
@@ -5,7 +6,7 @@ import { createChecklist } from "@/lib/checklists";
 
 type Db = Prisma.TransactionClient;
 
-export async function nextEmployeeNo(db: Db, organizationId: string, at: Date = new Date(), tz = "Asia/Manila"): Promise<string> {
+export async function nextEmployeeNo(db: Db, organizationId: string, at: Date = new Date(), tz = DEFAULT_TIMEZONE): Promise<string> {
   const prefix = dayKey(at, tz).replace(/-/g, ""); // "YYYYMMDD"
   const existing = await db.employee.findMany({
     where: { organizationId, employeeNo: { startsWith: `${prefix}-` } },
@@ -68,7 +69,7 @@ export async function createEmployee(db: Db, organizationId: string, actorId: st
 
 // Every signed-in person has an employee profile (time clock, schedule and leave hang off it).
 // Created on first use for accounts that were made before profiles existed.
-export async function getMyEmployee(actor: { id: string; organizationId: string; name: string; role?: { key: string } }, tz = "Asia/Manila") {
+export async function getMyEmployee(actor: { id: string; organizationId: string; name: string; role?: { key: string } }, tz = DEFAULT_TIMEZONE) {
   const found = await prisma.employee.findUnique({ where: { userId: actor.id } });
   if (found) return found;
   const [firstName, ...rest] = actor.name.trim().split(/\s+/);

@@ -1,5 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
+import { config } from "@/lib/config";
 
 // Reuse one client across dev hot-reloads, but refresh if new models were generated.
 const g = globalThis as unknown as { prisma?: PrismaClient };
@@ -12,7 +13,7 @@ if (g.prisma && (!("incentive" in g.prisma) || !("contract" in g.prisma))) {
 export const prisma =
   g.prisma ??
   new PrismaClient({
-    adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
+    adapter: new PrismaPg({ connectionString: config.databaseUrl }),
   });
 
-if (process.env.NODE_ENV !== "production") g.prisma = prisma;
+if (!config.isProduction) g.prisma = prisma;

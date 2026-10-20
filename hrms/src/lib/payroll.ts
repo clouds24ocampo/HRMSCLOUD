@@ -53,7 +53,9 @@ export type PayResult = { lines: Line[]; grossCents: number; deductionsCents: nu
 
 const round = (n: number) => Math.round(n);
 const peso = (c: number) => (c / 100).toFixed(2);
+// A centavo rate as pesos with 4 decimals, truncated (never rounded up) so a displayed rate never overstates pay.
 export const rate4 = (c: number) => (Math.floor(c * 100 + 1e-6) / 10000).toFixed(4);
+// Minutes as "8h 05m".
 export const hm = (m: number) => `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m`;
 
 // Turns the DTR rows of a period into the numbers payroll needs.
@@ -79,6 +81,7 @@ export function recoveryCredit(rows: RecoveryRow[], approvedOvertime: Map<string
   return out;
 }
 
+// Totals a period of DTR rows into the Attendance numbers payslips use. Leave days come from the two sets; overtime counts only when approved and never beyond what the DTR measured.
 export function buildAttendance(
   rows: DtrDay[],
   paidLeave: Set<string>,
@@ -112,6 +115,7 @@ export function buildAttendance(
   return a;
 }
 
+// The one payroll calculation: pay type, rate, attendance, rules and adjustments in, itemized lines and totals out. Pure and deterministic, so a payslip can always be reproduced from its inputs. Delegates to computePh when the Philippine profile is on.
 export function computePayslip(input: PayInput): PayResult {
   if (input.ph) return computePh(input);
   const { payType, rateCents, attendance: a, factors: f } = input;

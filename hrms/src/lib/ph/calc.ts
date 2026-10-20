@@ -2,17 +2,20 @@
 // Money is whole centavos; each result is rounded half-up on its own.
 import type { Bracket, DeMinimisParams, Frequency, PercentParams, SssParams, TableParams } from "@/lib/ph/rules";
 
+// Whole centavos, half rounded up. Every Philippine result is rounded with this on its own.
 export const round = (n: number) => Math.round(n);
 
 // ───────────── Wage factors (NWPC/DOLE equivalent-monthly-rate factors) ─────────────
 
 export type WageBasis = "SIX_DAY_313" | "FIVE_DAY_261" | "ALL_DAYS_365" | "CUSTOM";
+// Text shown to HR for each wage basis.
 export const WAGE_BASIS_LABEL: Record<WageBasis, string> = {
   SIX_DAY_313: "6-day week (rest day not paid): 313 days a year",
   FIVE_DAY_261: "5-day week (Saturday and Sunday not paid): 261 days a year",
   ALL_DAYS_365: "Paid every calendar day: 365 days a year",
   CUSTOM: "Custom number of days a year",
 };
+// Paid days per year for a wage basis; null when CUSTOM is chosen without a value between 200 and 366.
 export const annualFactor = (basis: WageBasis, custom?: number | null): number | null =>
   basis === "SIX_DAY_313" ? 313 : basis === "FIVE_DAY_261" ? 261 : basis === "ALL_DAYS_365" ? 365 : custom && custom >= 200 && custom <= 366 ? custom : null;
 
@@ -20,6 +23,7 @@ export const annualFactor = (basis: WageBasis, custom?: number | null): number |
 export const suggestBasis = (workDaysPerWeek: number): WageBasis => (workDaysPerWeek >= 7 ? "ALL_DAYS_365" : workDaysPerWeek === 6 ? "SIX_DAY_313" : "FIVE_DAY_261");
 
 export type PayType = "MONTHLY" | "DAILY" | "HOURLY";
+// Daily, hourly and monthly rates (centavos) derived from the one pay rate and the wage factor.
 export function rates(payType: PayType, rateCents: number, factor: number, hoursPerDay: number) {
   const daily = payType === "DAILY" ? rateCents : payType === "MONTHLY" ? (rateCents * 12) / factor : rateCents * hoursPerDay;
   const hourly = payType === "HOURLY" ? rateCents : daily / hoursPerDay;
@@ -46,6 +50,7 @@ export function sssContribution(monthlyPayCents: number, p: SssParams): SssResul
 }
 
 export type PercentResult = { baseCents: number; employeeCents: number; employerCents: number; employeeBp: number; employerBp: number };
+// PhilHealth/Pag-IBIG style contribution: a percentage of pay held between a floor and ceiling base, using the tier that covers that base.
 export function percentContribution(monthlyPayCents: number, p: PercentParams): PercentResult {
   const base = Math.min(p.ceilingBaseCents ?? Number.MAX_SAFE_INTEGER, Math.max(p.floorBaseCents, monthlyPayCents));
   const t = p.tiers.find((x) => x.upToCents === null || base <= x.upToCents) ?? p.tiers[p.tiers.length - 1];
@@ -69,8 +74,11 @@ export function bracketTax(brackets: Bracket[], taxableCents: number): number {
   return hit ? hit.fixedCents + round(((taxableCents - hit.fromCents) * hit.rateBp) / 10000) : 0;
 }
 
+// Pay frequency from how many periods fall in a month; a single-day period is DAILY.
 export const frequencyOf = (periodsPerMonth: number, singleDay: boolean): Frequency => (singleDay ? "DAILY" : periodsPerMonth === 1 ? "MONTHLY" : periodsPerMonth === 2 ? "SEMI_MONTHLY" : "WEEKLY");
+// Pay periods in a year for a frequency; DAILY uses the annual factor (paid days).
 export const periodsPerYearOf = (f: Frequency, annualFactorDays: number) => (f === "MONTHLY" ? 12 : f === "SEMI_MONTHLY" ? 24 : f === "WEEKLY" ? 52 : annualFactorDays);
+// Code of the withholding-tax table for a frequency, as stored in StatutoryRule.
 export const tableCodeOf = (f: Frequency) => `WT_${f}`;
 
 // ───────────── De minimis and the yearly benefits exemption ─────────────

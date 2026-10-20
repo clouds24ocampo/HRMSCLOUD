@@ -49,3 +49,6 @@ test-results/
 playwright-report/
 tunnel.log
 storage/
+
+# prisma client (rebuild with: npm run generate)
+/src/generated/

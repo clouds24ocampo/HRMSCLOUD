@@ -1,3 +1,4 @@
+import { mapUrl } from "@/lib/locale";
 import Link from "next/link";
 import type { BoardRow, StampPlace } from "@/lib/team-dtr";
 import { formatDuration, formatTime } from "@/lib/time";
@@ -7,7 +8,6 @@ import { StatusTag, statusTag } from "@/components/LiveStatus";
 const SOURCE: Record<string, string> = { GPS: "phone GPS", WIFI: "browser (Wi-Fi)", PHONE_LINK: "confirmed by phone", NONE: "no location" };
 const DEVICE_ICON: Record<string, string> = { PHONE: "📱", TABLET: "📱", DESKTOP: "💻" };
 
-export const mapUrl = (lat: number, lng: number) => `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=18/${lat}/${lng}`;
 
 // One stamp: the time, and where it was made (map link, accuracy, how the location was found).
 export function Place({ p, tz }: { p: StampPlace | null; tz: string }) {

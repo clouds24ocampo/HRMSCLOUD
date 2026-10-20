@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { mapUrl } from "@/components/AttendanceBoard";
+import { mapUrl } from "@/lib/locale";
 
 export type PersonnelLiveItem = {
   id: string;

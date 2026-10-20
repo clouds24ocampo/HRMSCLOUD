@@ -1,5 +1,6 @@
 // Server-side evidence about the device behind a request. The user agent can be faked, so this is a record, not a gate.
 import { headers } from "next/headers";
+import { config } from "@/lib/config";
 
 export function deviceOf(ua: string): "PHONE" | "TABLET" | "DESKTOP" {
   if (/iPad|Tablet/i.test(ua) || (/Android/i.test(ua) && !/Mobile/i.test(ua))) return "TABLET";
@@ -15,5 +16,5 @@ export async function requestEvidence() {
   const proto = h.get("x-forwarded-proto") ?? "http";
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3300";
   // APP_URL wins when set, so links shown on a computer at localhost still open on a phone (LAN address or tunnel).
-  return { userAgent: ua || null, ipAddress: ip, device: deviceOf(ua), origin: process.env.APP_URL?.replace(/\/$/, "") || `${proto}://${host}` };
+  return { userAgent: ua || null, ipAddress: ip, device: deviceOf(ua), origin: config.appUrl || `${proto}://${host}` };
 }

@@ -4,12 +4,13 @@ import { randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { prisma } from "@/lib/prisma";
+import { config } from "@/lib/config";
 import { FILE_201, FILE_201_CATEGORY } from "@/lib/file201";
 
 export const DOC_CATEGORIES = ["201 File", "Identification", "Contract", "Certificate", "Education", "Medical", "Other"] as const;
-export const MAX_BYTES = Number(process.env.DOCUMENT_MAX_MB ?? 5) * 1024 * 1024;
+export const MAX_BYTES = config.documentMaxMb * 1024 * 1024;
 
-const root = () => path.resolve(/*turbopackIgnore: true*/ process.cwd(), process.env.STORAGE_DIR ?? "storage");
+const root = () => path.resolve(/*turbopackIgnore: true*/ process.cwd(), config.storageDir);
 
 // Decide the real type from the first bytes. The browser's file name and type are not trusted.
 export function sniffType(b: Uint8Array): { mime: string; ext: string } | null {

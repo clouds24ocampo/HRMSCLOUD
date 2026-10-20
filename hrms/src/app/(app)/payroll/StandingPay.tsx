@@ -4,7 +4,7 @@ import { regularMinutesOf, type Attendance } from "@/lib/payroll";
 import { formatMoney } from "@/lib/money";
 import { teamActivity, type ActivityDay } from "@/lib/pay-breakdown";
 import { dbDate, formatDay, formatDuration, formatTime, keyOfDbDate } from "@/lib/time";
-import { mapUrl } from "@/components/AttendanceBoard";
+import { mapUrl } from "@/lib/locale";
 import { Badge, Card } from "@/components/ui";
 
 const short = (d: Date) => formatDay(keyOfDbDate(d), { month: "short", day: "numeric" });

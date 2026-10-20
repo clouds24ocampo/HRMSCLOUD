@@ -1,5 +1,6 @@
 "use server";
 
+import { DEFAULT_TIMEZONE } from "@/lib/locale";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -95,7 +96,7 @@ export async function setInterview(id: string, _: FormState, form: FormData): Pr
   if (!a) return { error: "Applicant not found." };
   // The browser sends local time without a zone; it is read in the organization's timezone.
   const settings = await prisma.orgSettings.findUnique({ where: { organizationId: me.organizationId } });
-  const at = new Date(`${when.data}:00${offsetOf(settings?.timezone ?? "Asia/Manila", when.data)}`);
+  const at = new Date(`${when.data}:00${offsetOf(settings?.timezone ?? DEFAULT_TIMEZONE, when.data)}`);
   if (Number.isNaN(at.getTime())) return { error: "That date and time is not valid." };
   await prisma.$transaction([
     prisma.applicant.update({ where: { id }, data: { interviewAt: at, stage: a.stage === "APPLIED" || a.stage === "SCREENING" ? "INTERVIEW" : a.stage } }),

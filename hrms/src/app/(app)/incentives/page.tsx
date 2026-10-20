@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE } from "@/lib/locale";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
@@ -63,7 +64,7 @@ export default async function IncentivesPage() {
   const who = new Map(users.map((u) => [u.id, u.name]));
 
   const formatPhp = (cents: number) =>
-    `₱${(cents / 100).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    `₱${(cents / 100).toLocaleString(DEFAULT_LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   const totalAwardedCents = allIncentives.reduce((sum, i) => sum + i.amountCents, 0);
   const pendingCount = allIncentives.filter((i) => i.status === "PENDING").length;

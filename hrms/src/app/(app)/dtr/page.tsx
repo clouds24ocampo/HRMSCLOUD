@@ -1,3 +1,4 @@
+import { mapUrl } from "@/lib/locale";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -328,7 +329,7 @@ export default async function DtrPage({ searchParams }: { searchParams: Promise<
                                 {p.source === "KIOSK" && <Badge>Stamped from the login page</Badge>}
                                   {p.lat != null && p.lng != null ? (
                                     <a
-                                      href={`https://www.openstreetmap.org/?mlat=${p.lat}&mlon=${p.lng}#map=17/${p.lat}/${p.lng}`}
+                                      href={mapUrl(p.lat, p.lng, 17)}
                                       target="_blank" rel="noopener noreferrer"
                                       className="text-brand underline-offset-2 hover:underline"
                                     >

@@ -1,10 +1,11 @@
 // Draws a DtrReport as a PDF (A4, landscape). One section per person: a row per day, then the person's total.
 // Built-in PDF fonts cannot show the peso sign, so amounts are written "PHP 1,234.56".
+import { DEFAULT_LOCALE } from "@/lib/locale";
 import PDFDocument from "pdfkit";
 import type { DtrReport, ReportDay, ReportPerson } from "@/lib/dtr-report";
 import { formatDay, formatTime } from "@/lib/time";
 
-const php = (cents: number) => `PHP ${(cents / 100).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const php = (cents: number) => `PHP ${(cents / 100).toLocaleString(DEFAULT_LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const hm = (m: number) => (m <= 0 ? "-" : `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m`);
 // The standard PDF fonts only know Latin-1: anything else (emoji, other scripts) becomes "?" instead of garbage.
 const safe = (s: string) => s.replace(/[^\x20-\x7E -ÿ]/g, "?");

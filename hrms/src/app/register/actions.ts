@@ -1,5 +1,6 @@
 "use server";
 
+import { DEFAULT_TIMEZONE } from "@/lib/locale";
 import bcrypt from "bcryptjs";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -15,6 +16,7 @@ import { dbDate, dayKey } from "@/lib/time";
 import { isLimited, recordHit } from "@/lib/rate-limit";
 import { MULTI_ORG, registrationOpen } from "@/lib/registration";
 import { DB_DOWN_MESSAGE, isDbDown } from "@/lib/db-health";
+import { config } from "@/lib/config";
 import type { FormState } from "@/app/login/actions";
 
 const schema = z
@@ -47,8 +49,7 @@ export async function registerOrganization(prev: FormState, form: FormData): Pro
 async function registerInner(_: FormState, form: FormData): Promise<FormState> {
   const ip = (await headers()).get("x-forwarded-for") ?? "local";
   const limitKey = `register:${ip}`;
-  const max = Number(process.env.REGISTER_LIMIT_PER_HOUR ?? 10);
-  if (isLimited(limitKey, max)) return { error: "Too many registrations. Try again later." };
+  if (isLimited(limitKey, config.registerLimitPerHour)) return { error: "Too many registrations. Try again later." };
 
   if (!(await registrationOpen())) return { error: CLOSED };
 
@@ -94,7 +95,7 @@ async function registerInner(_: FormState, form: FormData): Promise<FormState> {
       lastName: rest.join(" ") || "-",
       employeeNo: "superadmin001",
       email: d.email,
-      hireDate: dbDate(dayKey(new Date(), "Asia/Manila")),
+      hireDate: dbDate(dayKey(new Date(), DEFAULT_TIMEZONE)),
       userId: user.id,
     }, { checklist: false });
     return { org, user };

@@ -4,15 +4,15 @@ import { redirect } from "next/navigation";
 import { findSession } from "@/lib/session";
 import { canAccess } from "@/lib/roles";
 import { isDbDown } from "@/lib/db-health";
+import { config } from "@/lib/config";
 
 export const SESSION_COOKIE = "hrms_session";
 
 // In production, cookies are secure by default, but allowed over plain HTTP if COOKIE_SECURE=false or APP_URL is http://
 export function isCookieSecure(): boolean {
-  if (process.env.COOKIE_SECURE === "false") return false;
-  if (process.env.COOKIE_SECURE === "true") return true;
-  if (process.env.APP_URL?.startsWith("http://")) return false;
-  return process.env.NODE_ENV === "production";
+  if (config.cookieSecure !== undefined) return config.cookieSecure;
+  if (config.appUrl.startsWith("http://")) return false;
+  return config.isProduction;
 }
 
 export const getUser = cache(async () => {

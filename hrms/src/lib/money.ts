@@ -1,9 +1,10 @@
 // Money is always whole centavos in the database and in calculations. Only the screen shows pesos.
+import { DEFAULT_CURRENCY, DEFAULT_LOCALE } from "@/lib/locale";
 
-export const DEFAULT_CURRENCY = "PHP";
+export { DEFAULT_CURRENCY };
 
 export function formatMoney(cents: number, currency = DEFAULT_CURRENCY): string {
-  return new Intl.NumberFormat("en-PH", { style: "currency", currency, minimumFractionDigits: 2 }).format(cents / 100);
+  return new Intl.NumberFormat(DEFAULT_LOCALE, { style: "currency", currency, minimumFractionDigits: 2 }).format(cents / 100);
 }
 
 // "1,234.50" -> 123450. Returns null for anything that is not a plain amount with at most 2 decimals.
@@ -32,7 +33,7 @@ export const formatPercent = (bp: number) => `${(bp / 100).toFixed(2).replace(/\
 // Pay rates carry more precision than centavos. Shown to 4 decimals, cut rather than rounded, so they match a hand
 // calculation: ₱10,000 a month × 12 ÷ 313 = 383.3865 a day; ÷ 8 = 47.9233 an hour. The amount actually paid is rounded once, to the centavo.
 export const formatRate = (cents: number) =>
-  `₱${(Math.floor(cents * 100 + 1e-6) / 10000).toLocaleString("en-PH", { minimumFractionDigits: 4, maximumFractionDigits: 4 })}`;
+  `₱${(Math.floor(cents * 100 + 1e-6) / 10000).toLocaleString(DEFAULT_LOCALE, { minimumFractionDigits: 4, maximumFractionDigits: 4 })}`;
 
 // Pay for logged minutes of a monthly salary, in one step so no rounding happens on the way: monthly × 12 × minutes ÷ (days a year × hours a day × 60).
 export const payForMinutes = (monthlyCents: number, minutes: number, daysPerYear: number, hoursPerDay: number) =>

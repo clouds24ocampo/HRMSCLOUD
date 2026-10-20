@@ -1,8 +1,9 @@
 import { createHash, randomBytes } from "node:crypto";
 import { prisma } from "@/lib/prisma";
+import { config } from "@/lib/config";
 
 const hash = (token: string) => createHash("sha256").update(token).digest("hex");
-const ttlMs = () => Number(process.env.SESSION_TTL_HOURS ?? 8) * 3600_000;
+const ttlMs = () => config.sessionTtlHours * 3600_000;
 
 export async function createSession(userId: string) {
   const token = randomBytes(32).toString("base64url");

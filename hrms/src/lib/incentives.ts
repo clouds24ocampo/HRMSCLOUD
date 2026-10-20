@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE } from "@/lib/locale";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { notify } from "@/lib/notify";
@@ -78,7 +79,7 @@ export async function awardIncentive(params: AwardIncentiveParams) {
       cardTitle: card.title,
       actorId: awardedById,
       type: "EDITED",
-      detail: `🎁 awarded ₱${(amountCents / 100).toLocaleString("en-PH", { minimumFractionDigits: 2 })} incentive to ${employee.firstName} ${employee.lastName}: ${title}`,
+      detail: `🎁 awarded ₱${(amountCents / 100).toLocaleString(DEFAULT_LOCALE, { minimumFractionDigits: 2 })} incentive to ${employee.firstName} ${employee.lastName}: ${title}`,
     });
   }
 
@@ -88,7 +89,7 @@ export async function awardIncentive(params: AwardIncentiveParams) {
       organizationId,
       [employee.userId],
       {
-        title: `🎁 Incentive Award: ₱${(amountCents / 100).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`,
+        title: `🎁 Incentive Award: ₱${(amountCents / 100).toLocaleString(DEFAULT_LOCALE, { minimumFractionDigits: 2 })}`,
         body: `${awarder?.name ?? "Management"} awarded you an incentive for "${title}". Click to accept.`,
         href: "/incentives",
       },
@@ -146,7 +147,7 @@ export async function acceptIncentive(incentiveId: string, employeeUserId: strin
     [incentive.awardedById],
     {
       title: `Incentive Accepted by ${incentive.employee.firstName} ${incentive.employee.lastName}`,
-      body: `Accepted ₱${(incentive.amountCents / 100).toLocaleString("en-PH", { minimumFractionDigits: 2 })} for "${incentive.title}". Credited to upcoming payroll.`,
+      body: `Accepted ₱${(incentive.amountCents / 100).toLocaleString(DEFAULT_LOCALE, { minimumFractionDigits: 2 })} for "${incentive.title}". Credited to upcoming payroll.`,
       href: "/incentives",
     },
     employeeUserId,

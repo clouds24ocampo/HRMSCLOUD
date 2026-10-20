@@ -3,6 +3,7 @@
 ## Run
 1. `docker compose up -d` (Postgres)
 2. `npm install`
+   (the Prisma client in `src/generated/` is not committed; `npm run typecheck`, `npm test` and `npm run generate` rebuild it)
 3. `npx prisma migrate deploy && npm run db:seed` (tables + roles)
 4. `npm run dev` (starts Docker, the database and the app in one go), open http://localhost:3300 and click **Register your organization** (you become its Super Administrator; registration closes after the first company). Going online: see [DEPLOY.md](DEPLOY.md)
 

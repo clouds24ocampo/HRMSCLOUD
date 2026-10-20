@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { BoardRow, LiveEvent, LiveRow } from "@/lib/team-dtr";
-import { mapUrl } from "@/components/AttendanceBoard";
+import { mapUrl } from "@/lib/locale";
 import { formatDuration, formatTime } from "@/lib/time";
 
 type Tone = "success" | "brand" | "warning" | "danger" | "neutral";
