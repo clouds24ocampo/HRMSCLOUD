@@ -10,3 +10,10 @@ graphify-out
 *.log
 *.png
 .git
+*.md
+.impeccable
+.agents
+docker-compose*.yml
+Caddyfile
+start-hrms.bat
+playwright-report

@@ -48,3 +48,9 @@ backups/
 
 # Generated knowledge graph (rebuild with: npm run graphify --prefix hrms)
 /graphify-out/
+
+# AI agent tooling and editor scratch (not part of the app or deployment)
+/.agents/
+/~/
+hrms/.impeccable/
+*.stackdump
