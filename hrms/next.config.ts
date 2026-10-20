@@ -32,6 +32,24 @@ const nextConfig: NextConfig = {
           // Browsers only honor this over HTTPS, so plain-HTTP development is unaffected.
           { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
           { key: "X-Content-Type-Options", value: "nosniff" },
+          // Report-only: browsers log violations in the console but block nothing. Check the console on every page
+          // for a while, tighten the sources, then rename the header to Content-Security-Policy to enforce it.
+          {
+            key: "Content-Security-Policy-Report-Only",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              "img-src 'self' data: blob: https://cdn.21st.dev https://*.tile.openstreetmap.org",
+              "media-src 'self' blob:",
+              "connect-src 'self' ws: wss:",
+              "worker-src 'self' blob:",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "frame-ancestors 'self'",
+            ].join("; "),
+          },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self)" },
         ],

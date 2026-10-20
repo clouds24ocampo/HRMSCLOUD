@@ -12,6 +12,10 @@ ENV NEXT_PUBLIC_TURN_URL=$NEXT_PUBLIC_TURN_URL NEXT_PUBLIC_TURN_USER=$NEXT_PUBLI
 # prisma generate and next build need a DATABASE_URL to parse; no connection is made.
 RUN DATABASE_URL=postgresql://x:x@localhost:5432/x npx prisma generate && DATABASE_URL=postgresql://x:x@localhost:5432/x npm run build
 ENV NODE_ENV=production
+# Run as the unprivileged "node" user. It owns the build output and the upload folder, so a named volume mounted
+# at /data/storage starts out writable by it.
+RUN mkdir -p /data/storage && chown -R node:node /app/.next /data/storage
+USER node
 EXPOSE 3300
 # Healthy once the app answers and can reach the database (see src/app/api/health).
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 CMD wget -qO- http://127.0.0.1:3300/api/health >/dev/null || exit 1

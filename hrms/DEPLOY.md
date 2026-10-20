@@ -3,7 +3,7 @@
 Needs: a Linux VPS with Docker, and a domain whose DNS **A record** points at the VPS IP. Ports 80 and 443 open.
 
 1. Copy the project to the server (git clone or scp).
-2. `cp .env.production.example .env.production`, then set `DOMAIN` and a long random `DB_PASSWORD`.
+2. `cp .env.production.example .env.production`, then set `DOMAIN` and `DB_PASSWORD` (use `openssl rand -hex 24`: letters and digits only, because it is placed in a connection URL).
 3. `docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build`
 4. Open `https://<DOMAIN>/register` and create the company. This is the only company: registration closes right after.
 5. Phones need HTTPS for GPS and the camera: Caddy gets the certificate automatically.
