@@ -1,6 +1,6 @@
 # Philippine payroll compliance: what is coded, how it is checked, what is not
 
-Source documents: `taxation.md`, `Payrollguidel.md`, `benefitsguide.md` (project root). Figures were also spot-checked against the BIR Annex E withholding table (RR 11-2018), the SSS 2025 schedule and BIR RR 29-2025.
+Source documents: `taxation.md`, `Payrollguidel.md`, `benefitsguide.md` (`docs/` at the project root). Figures were also spot-checked against the BIR Annex E withholding table (RR 11-2018), the SSS 2025 schedule and BIR RR 29-2025.
 
 **Read this first.** Code cannot make payroll "100% compliant" by itself. Rates and rules change by circular, and some rules depend on facts only your company knows. So the system is built to *follow dated rules you can see and change*, to *warn instead of guess*, and to *explain every number*. Have a payroll practitioner confirm the installed rules and run a trial payroll next to your current computation before the first real payroll.
 
