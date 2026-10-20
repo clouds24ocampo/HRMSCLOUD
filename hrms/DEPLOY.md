@@ -17,19 +17,27 @@ Notes
 - Health: `GET /api/health` returns `{"status":"ok"}` (503 when the database is unreachable). Docker uses it to mark the app healthy, and Caddy only starts once it is. Point an uptime monitor at `https://<DOMAIN>/api/health`.
 - Back up both volumes on a schedule (for example a nightly cron running the `pg_dump` above, plus a copy of the `storage` volume), keep copies off the server, and test a restore before you rely on it.
 
-## Deploy from GitHub (optional, replaces copying files by hand)
-`.github/workflows/deploy.yml` updates the server after CI passes. Nothing secret is stored in the repo: put it in GitHub under **Settings > Secrets and variables > Actions** (the **Secrets** tab for secrets, the **Variables** tab for variables).
+## Automatic updates from GitHub
+The server pulls: it checks GitHub every 5 minutes and updates itself to the latest commit of `main`. Nothing is stored in GitHub secrets. All settings stay in `hrms/.env.production` on the server (create it as in step 2 above).
 
-| Kind | Name | Value |
-|---|---|---|
-| Secret | `VPS_HOST` | the VPS IP address |
-| Secret | `VPS_USER` | the SSH user (for example `root`) |
-| Secret | `VPS_SSH_KEY` | the private key of a deploy-only key pair (see below) |
-| Secret | `VPS_KNOWN_HOSTS` | output of `ssh-keyscan -t ed25519 <VPS-IP>` run from your computer |
-| Secret | `DB_PASSWORD` | the database password (letters and digits only). It must equal the one the database was first created with |
-| Variable | `DOMAIN` | `worksync-hrms.cloudandecho.tech` |
-| Variable | `AUTO_DEPLOY` | `true` to deploy on every green push to main; leave unset to deploy only by hand |
+One-time setup on the VPS, after the first manual deploy (steps 1-3 above):
 
-Optional variables: `VPS_APP_DIR` (default `HRMSCLOUD`), `SESSION_TTL_HOURS`, `REGISTER_LIMIT_PER_HOUR`, `DOCUMENT_MAX_MB`, `TURN_URL`; optional secrets `TURN_USER`, `TURN_PASS`.
+```bash
+apt-get install -y git curl
+chmod +x ~/HRMSCLOUD/hrms/scripts/auto-update.sh
+crontab -e     # add this line:
+*/5 * * * * ~/HRMSCLOUD/hrms/scripts/auto-update.sh >> /var/log/hrms-update.log 2>&1
+```
 
-Deploy key: on your computer run `ssh-keygen -t ed25519 -f deploy_key -N ""`, append `deploy_key.pub` to `~/.ssh/authorized_keys` on the server, paste the contents of `deploy_key` into `VPS_SSH_KEY`, then delete both local files. The server must already have the project cloned (see the steps above). Run it by hand from the **Actions > deploy > Run workflow** button.
+What `hrms/scripts/auto-update.sh` does on each run:
+1. Fetches `origin/main`. If there is nothing new, it exits quietly.
+2. Waits until GitHub CI is green for that exact commit (tests, lint, types, audit). A failed or still-running CI means no deploy yet.
+3. Fast-forwards the server to the commit and runs `docker compose up -d --build`.
+4. Waits up to 6 minutes for `/api/health`. If the new version never becomes healthy it returns to the previous commit and does not retry the broken one until a newer commit arrives.
+
+Watch it with `tail -f /var/log/hrms-update.log`. To deploy right now, run the script by hand. To skip the CI wait, put `REQUIRE_CI=false` in front of the cron command.
+
+Notes
+- Do not edit tracked files on the server; the update refuses to overwrite local changes and logs a message instead. Keep `.env.production` as the only local file.
+- A rollback does not undo database migrations. Keep migrations backward compatible, and back up before risky ones.
+- The script reads the public repo and CI status without a token. If the repo is made private, give the server a read-only deploy key and set `REPO` / use `REQUIRE_CI=false`.
