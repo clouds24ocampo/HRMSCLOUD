@@ -1,0 +1,79 @@
+# Deploys to the VPS after CI passes on main (or by hand: Actions > deploy > Run workflow).
+# Settings live in GitHub, not in the repo: Settings > Environments > production.
+#   Secrets:   VPS_HOST, VPS_USER, VPS_SSH_KEY, VPS_KNOWN_HOSTS, DB_PASSWORD
+#              (optional, video calls: TURN_USER, TURN_PASS)
+#   Variables: DOMAIN (required). Optional: VPS_APP_DIR, SESSION_TTL_HOURS, REGISTER_LIMIT_PER_HOUR,
+#              DOCUMENT_MAX_MB, TURN_URL
+# DB_PASSWORD must be the password the database was first created with (letters and digits only).
+name: deploy
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Automatic deploys are off until the repo variable AUTO_DEPLOY is set to true (Settings > Secrets and variables > Actions > Variables).
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && vars.AUTO_DEPLOY == 'true')
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      VPS_APP_DIR: ${{ vars.VPS_APP_DIR || 'HRMSCLOUD' }}
+      DOMAIN: ${{ vars.DOMAIN }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      SESSION_TTL_HOURS: ${{ vars.SESSION_TTL_HOURS || '8' }}
+      REGISTER_LIMIT_PER_HOUR: ${{ vars.REGISTER_LIMIT_PER_HOUR || '10' }}
+      DOCUMENT_MAX_MB: ${{ vars.DOCUMENT_MAX_MB || '5' }}
+      NEXT_PUBLIC_TURN_URL: ${{ vars.TURN_URL }}
+      NEXT_PUBLIC_TURN_USER: ${{ secrets.TURN_USER }}
+      NEXT_PUBLIC_TURN_PASS: ${{ secrets.TURN_PASS }}
+    steps:
+      - name: Check settings
+        run: |
+          for v in VPS_HOST VPS_USER DOMAIN DB_PASSWORD; do
+            [ -n "${!v}" ] || { echo "::error::$v is not set in the production environment"; exit 1; }
+          done
+          case "$DB_PASSWORD" in *[!A-Za-z0-9]*) echo "::error::DB_PASSWORD must be letters and digits only"; exit 1;; esac
+
+      - name: Set up SSH
+        env:
+          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          [ -n "$SSH_KEY" ] && [ -n "$KNOWN_HOSTS" ] || { echo "::error::VPS_SSH_KEY and VPS_KNOWN_HOSTS are required"; exit 1; }
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy && chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Write settings and update the server
+        run: |
+          ssh -i ~/.ssh/id_deploy "$VPS_USER@$VPS_HOST" "cd ~/$VPS_APP_DIR && git pull --ff-only"
+          {
+            printf 'DOMAIN=%s\nDB_USER=hrms\nDB_NAME=hrms\nDB_PASSWORD=%s\n' "$DOMAIN" "$DB_PASSWORD"
+            printf 'SESSION_TTL_HOURS=%s\nREGISTER_LIMIT_PER_HOUR=%s\nDOCUMENT_MAX_MB=%s\n' "$SESSION_TTL_HOURS" "$REGISTER_LIMIT_PER_HOUR" "$DOCUMENT_MAX_MB"
+            printf 'NEXT_PUBLIC_TURN_URL=%s\nNEXT_PUBLIC_TURN_USER=%s\nNEXT_PUBLIC_TURN_PASS=%s\n' "$NEXT_PUBLIC_TURN_URL" "$NEXT_PUBLIC_TURN_USER" "$NEXT_PUBLIC_TURN_PASS"
+          } | ssh -i ~/.ssh/id_deploy "$VPS_USER@$VPS_HOST" "umask 077 && cat > ~/$VPS_APP_DIR/hrms/.env.production"
+
+      - name: Build and start
+        run: |
+          ssh -i ~/.ssh/id_deploy "$VPS_USER@$VPS_HOST" "cd ~/$VPS_APP_DIR/hrms && docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build && docker image prune -f >/dev/null"
+
+      - name: Wait for the site to be healthy
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS "https://$DOMAIN/api/health" | grep -q '"ok"'; then echo "healthy"; exit 0; fi
+            echo "waiting ($i/30)"; sleep 10
+          done
+          echo "::error::https://$DOMAIN/api/health did not report ok"; exit 1
