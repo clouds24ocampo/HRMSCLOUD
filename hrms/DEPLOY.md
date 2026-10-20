@@ -18,7 +18,7 @@ Notes
 - Back up both volumes on a schedule (for example a nightly cron running the `pg_dump` above, plus a copy of the `storage` volume), keep copies off the server, and test a restore before you rely on it.
 
 ## Deploy from GitHub (optional, replaces copying files by hand)
-`.github/workflows/deploy.yml` updates the server after CI passes. Nothing secret is stored in the repo: put it in GitHub under **Settings > Environments > production** (create the environment first).
+`.github/workflows/deploy.yml` updates the server after CI passes. Nothing secret is stored in the repo: put it in GitHub under **Settings > Secrets and variables > Actions** (the **Secrets** tab for secrets, the **Variables** tab for variables).
 
 | Kind | Name | Value |
 |---|---|---|
@@ -28,7 +28,7 @@ Notes
 | Secret | `VPS_KNOWN_HOSTS` | output of `ssh-keyscan -t ed25519 <VPS-IP>` run from your computer |
 | Secret | `DB_PASSWORD` | the database password (letters and digits only). It must equal the one the database was first created with |
 | Variable | `DOMAIN` | `worksync-hrms.cloudandecho.tech` |
-| Variable (repo level) | `AUTO_DEPLOY` | `true` to deploy on every green push to main; leave unset to deploy only by hand |
+| Variable | `AUTO_DEPLOY` | `true` to deploy on every green push to main; leave unset to deploy only by hand |
 
 Optional variables: `VPS_APP_DIR` (default `HRMSCLOUD`), `SESSION_TTL_HOURS`, `REGISTER_LIMIT_PER_HOUR`, `DOCUMENT_MAX_MB`, `TURN_URL`; optional secrets `TURN_USER`, `TURN_PASS`.
 

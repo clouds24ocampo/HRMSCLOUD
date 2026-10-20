@@ -1,5 +1,5 @@
 # Deploys to the VPS after CI passes on main (or by hand: Actions > deploy > Run workflow).
-# Settings live in GitHub, not in the repo: Settings > Environments > production.
+# Settings live in GitHub, not in the repo: Settings > Secrets and variables > Actions (repository level).
 #   Secrets:   VPS_HOST, VPS_USER, VPS_SSH_KEY, VPS_KNOWN_HOSTS, DB_PASSWORD
 #              (optional, video calls: TURN_USER, TURN_PASS)
 #   Variables: DOMAIN (required). Optional: VPS_APP_DIR, SESSION_TTL_HOURS, REGISTER_LIMIT_PER_HOUR,
@@ -26,7 +26,6 @@ jobs:
     # Automatic deploys are off until the repo variable AUTO_DEPLOY is set to true (Settings > Secrets and variables > Actions > Variables).
     if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && vars.AUTO_DEPLOY == 'true')
     runs-on: ubuntu-latest
-    environment: production
     env:
       VPS_HOST: ${{ secrets.VPS_HOST }}
       VPS_USER: ${{ secrets.VPS_USER }}
@@ -43,7 +42,7 @@ jobs:
       - name: Check settings
         run: |
           for v in VPS_HOST VPS_USER DOMAIN DB_PASSWORD; do
-            [ -n "${!v}" ] || { echo "::error::$v is not set in the production environment"; exit 1; }
+            [ -n "${!v}" ] || { echo "::error::$v is not set (Settings > Secrets and variables > Actions)"; exit 1; }
           done
           case "$DB_PASSWORD" in *[!A-Za-z0-9]*) echo "::error::DB_PASSWORD must be letters and digits only"; exit 1;; esac
 
