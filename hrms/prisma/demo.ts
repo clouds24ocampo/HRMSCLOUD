@@ -134,4 +134,10 @@ async function seed() {
   for (const k of ["admin", "hr", "manager", "emp1", "emp2"]) console.log(`  ${mail(k)}`);
 }
 
+// The demo people share a published password, so never create them on a production database.
+if (process.argv[2] !== "remove" && process.env.NODE_ENV === "production") {
+  console.error("Refusing to seed demo data: NODE_ENV is production.");
+  process.exit(1);
+}
+
 (process.argv[2] === "remove" ? wipeOrgs(TAG).then(() => console.log("Demo company removed.")) : seed()).finally(() => db.$disconnect());

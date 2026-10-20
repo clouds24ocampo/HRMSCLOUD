@@ -17,3 +17,5 @@ docker-compose*.yml
 Caddyfile
 start-hrms.bat
 playwright-report
+*.stackdump
+*.pem
