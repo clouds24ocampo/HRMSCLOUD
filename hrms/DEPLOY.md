@@ -2,7 +2,8 @@
 
 Needs: a Linux VPS with Docker, and a domain whose DNS **A record** points at the VPS IP. Ports 80 and 443 open.
 
-1. Copy the project to the server (git clone or scp).
+1. Get only the app onto the server. A sparse clone leaves out `worksync-kit/`, `docs/` and the AI tooling, which the server does not need (the Docker image is built from `hrms/` alone). `git pull` and the auto-updater below keep working with it:
+   `git clone --filter=blob:none --sparse https://github.com/clouds24ocampo/HRMSCLOUD.git && cd HRMSCLOUD && git sparse-checkout set hrms`
 2. `cp .env.production.example .env.production`, then set `DOMAIN` and `DB_PASSWORD` (use `openssl rand -hex 24`: letters and digits only, because it is placed in a connection URL).
 3. `docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build`
 4. Open `https://<DOMAIN>/register` and create the company. This is the only company: registration closes right after.
