@@ -1,5 +1,7 @@
 # Deploy online (one VPS)
 
+> The steps below use Caddy for HTTPS and need ports 80/443 free. If nginx already runs other sites on the server, follow **Shared server: nginx already owns ports 80/443** further down instead.
+
 Needs: a Linux VPS with Docker, and a domain whose DNS **A record** points at the VPS IP. Ports 80 and 443 open.
 
 1. Get only the app onto the server. A sparse clone leaves out `worksync-kit/`, `docs/` and the AI tooling, which the server does not need (the Docker image is built from `hrms/` alone). `git pull` and the auto-updater below keep working with it:
@@ -10,13 +12,29 @@ Needs: a Linux VPS with Docker, and a domain whose DNS **A record** points at th
 5. Phones need HTTPS for GPS and the camera: Caddy gets the certificate automatically.
 
 Notes
-- Only Caddy is published. The app and Postgres stay on the private Docker network (the app trusts `X-Forwarded-For` from Caddy, so never publish port 3300).
+- Only the proxy in front (Caddy or nginx) is public. The app listens on `127.0.0.1:3300` and Postgres stays on the private Docker network (the app trusts `X-Forwarded-For` from the proxy, so never publish port 3300 on a public address).
 - Data lives in the Docker volumes `pgdata` (database) and `storage` (uploaded documents, payment proofs). Back both up.
   Database: `docker compose -f docker-compose.prod.yml --env-file .env.production exec db pg_dump -U hrms hrms > backup.sql`
 - Update: pull the new code and rerun step 3. Migrations run on start.
 - Tests only: `ALLOW_MULTIPLE_ORGS=true` lets many companies register. Never set it in production.
 - Health: `GET /api/health` returns `{"status":"ok"}` (503 when the database is unreachable). Docker uses it to mark the app healthy, and Caddy only starts once it is. Point an uptime monitor at `https://<DOMAIN>/api/health`.
 - Back up both volumes on a schedule (for example a nightly cron running the `pg_dump` above, plus a copy of the `storage` volume), keep copies off the server, and test a restore before you rely on it.
+
+## Shared server: nginx already owns ports 80/443
+If the VPS already hosts other sites behind nginx, do not stop nginx and do not enable Caddy. Run HRMS on the loopback port and add one nginx site. (Caddy mode is `COMPOSE_PROFILES=caddy` in `.env.production`, only for a server where nothing else uses 80/443.)
+
+1. Make sure port 3300 is free: `ss -tlnp | grep 3300` should print nothing. If it is taken, set `APP_PORT=<free port>` in `.env.production` and use the same port in the nginx file.
+2. Start the app: `docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build`, then `curl -s http://127.0.0.1:3300/api/health` must print `{"status":"ok"}`.
+3. Add the nginx site and HTTPS:
+   ```bash
+   cp deploy/nginx-worksync-hrms.conf /etc/nginx/sites-available/worksync-hrms
+   ln -s /etc/nginx/sites-available/worksync-hrms /etc/nginx/sites-enabled/worksync-hrms
+   nginx -t && systemctl reload nginx          # reload only if the test passes: other sites keep running
+   certbot --nginx -d worksync-hrms.cloudandecho.tech
+   ```
+4. Open `https://worksync-hrms.cloudandecho.tech/register`.
+
+The build is heavy (about 2 GB of RAM while compiling). On a shared server check `free -h` and `df -h` first, and watch the other sites during the first build.
 
 ## Automatic updates from GitHub
 The server pulls: it checks GitHub every 5 minutes and updates itself to the latest commit of `main`. Nothing is stored in GitHub secrets. All settings stay in `hrms/.env.production` on the server (create it as in step 2 above).

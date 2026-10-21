@@ -34,9 +34,14 @@ services:
       REGISTER_LIMIT_PER_HOUR: ${REGISTER_LIMIT_PER_HOUR:-10}
       DOCUMENT_MAX_MB: ${DOCUMENT_MAX_MB:-5}
       STORAGE_DIR: /data/storage
+    # Reachable only from this machine: put a reverse proxy in front (the server's nginx, or the optional Caddy below).
+    ports:
+      - "127.0.0.1:${APP_PORT:-3300}:3300"
     volumes:
       - storage:/data/storage
+  # Optional: automatic HTTPS when nothing else owns ports 80/443. Turn on with COMPOSE_PROFILES=caddy in .env.production.
   caddy:
+    profiles: ["caddy"]
     image: caddy:2-alpine
     restart: unless-stopped
     depends_on:
