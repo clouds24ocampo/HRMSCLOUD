@@ -3,7 +3,10 @@ import QRCode from "qrcode";
 import { prisma } from "@/lib/prisma";
 import { requestEvidence } from "@/lib/device";
 import { formatDay, keyOfDbDate } from "@/lib/time";
+import { initialsOf, readableOn } from "@/lib/id-card-style";
 import type { IdCardData } from "@/app/(app)/id/IdCard";
+
+export const DEFAULT_ACCENT = "#2563eb";
 
 export const idDesign = (organizationId: string) => prisma.idCardSettings.findUnique({ where: { organizationId } });
 
@@ -20,7 +23,9 @@ export async function idCardFor(organizationId: string, employeeId: string): Pro
   // Scanning the code opens the profile. Only someone allowed to see this person (HR, their supervisors) gets past sign-in.
   const url = `${(await requestEvidence()).origin}/employees/${e.id}?via=id`;
   return {
-    org: org.name, title: s?.title ?? "EMPLOYEE ID", accent: s?.accent ?? "#2563eb", footer: s?.footer ?? null,
+    org: org.name, orgInitials: initialsOf(org.name), title: s?.title ?? "EMPLOYEE ID", footer: s?.footer ?? null,
+    accent: s?.accent ?? DEFAULT_ACCENT, onAccent: readableOn(s?.accent ?? DEFAULT_ACCENT),
+    logoUrl: s?.logoKey ? `/id/logo?v=${s.logoKey.slice(-8)}` : null,
     name: `${e.firstName} ${e.lastName}`,
     employeeNo: s?.showEmployeeNo === false ? null : e.employeeNo,
     position: s?.showPosition === false ? null : e.position?.title ?? null,

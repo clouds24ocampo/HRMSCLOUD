@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
-import { idCardFor, idDesign } from "@/lib/id-card";
+import { DEFAULT_ACCENT, idCardFor, idDesign } from "@/lib/id-card";
 import { Card, PageHeader } from "@/components/ui";
 import { IdCard } from "../IdCard";
 import { IdDesignForm } from "../IdForms";
@@ -14,12 +14,12 @@ export default async function IdDesignPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <Link href="/id" className="text-sm font-medium text-muted hover:text-ink">← Digital ID</Link>
-      <PageHeader title="ID design" subtitle="What every employee's digital ID shows: title, color, fields, signatory and signature. The QR code is always on it." />
+      <PageHeader title="ID design" subtitle="What every employee's digital ID shows: company logo, title, color, fields, signatory and signature. The QR code is always on it." />
       <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
         <Card>
           <IdDesignForm
             d={{
-              title: d?.title ?? "EMPLOYEE ID", accent: d?.accent ?? "#2563eb",
+              title: d?.title ?? "EMPLOYEE ID", accent: d?.accent ?? DEFAULT_ACCENT, hasLogo: !!d?.logoKey,
               showPosition: d?.showPosition ?? true, showDepartment: d?.showDepartment ?? true, showHireDate: d?.showHireDate ?? true, showEmployeeNo: d?.showEmployeeNo ?? true,
               signatoryName: d?.signatoryName ?? "", signatoryTitle: d?.signatoryTitle ?? "", footer: d?.footer ?? "",
             }}

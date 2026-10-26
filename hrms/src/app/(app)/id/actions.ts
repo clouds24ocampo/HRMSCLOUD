@@ -46,9 +46,17 @@ export async function saveIdDesign(_: FormState, form: FormData): Promise<FormSt
     if ("error" in r) return r;
     signatureKey = r.key;
   }
-  const data = { ...parsed.data, ...flags, ...(signatureKey ? { signatureKey } : {}) };
+  // Company logo: a new file replaces it; the tick box removes it; otherwise it stays as it is.
+  let logoKey: string | null | undefined;
+  const logo = form.get("logo");
+  if (logo instanceof File && logo.size > 0) {
+    const r = await saveImage(me.organizationId, logo);
+    if ("error" in r) return r;
+    logoKey = r.key;
+  } else if (form.get("removeLogo") === "on") logoKey = null;
+  const data = { ...parsed.data, ...flags, ...(signatureKey ? { signatureKey } : {}), ...(logoKey !== undefined ? { logoKey } : {}) };
   await prisma.idCardSettings.upsert({ where: { organizationId: me.organizationId }, update: data, create: { organizationId: me.organizationId, ...data } });
-  await audit(me.id, "id_card.design_saved", "IdCardSettings", undefined, { ...parsed.data, ...flags, signature: !!signatureKey }, me.organizationId);
+  await audit(me.id, "id_card.design_saved", "IdCardSettings", undefined, { ...parsed.data, ...flags, signature: !!signatureKey, logo: logoKey === undefined ? "kept" : logoKey ? "changed" : "removed" }, me.organizationId);
   revalidatePath("/id", "layout");
   return { ok: "Saved. Every employee's ID now uses this design." };
 }

@@ -20,7 +20,7 @@ export function PhotoForm({ employeeId }: { employeeId: string }) {
   );
 }
 
-type Design = { title: string; accent: string; showPosition: boolean; showDepartment: boolean; showHireDate: boolean; showEmployeeNo: boolean; signatoryName: string; signatoryTitle: string; footer: string };
+type Design = { title: string; accent: string; showPosition: boolean; showDepartment: boolean; showHireDate: boolean; showEmployeeNo: boolean; hasLogo: boolean; signatoryName: string; signatoryTitle: string; footer: string };
 
 export function IdDesignForm({ d }: { d: Design }) {
   const f = useKeptForm(saveIdDesign);
@@ -31,6 +31,17 @@ export function IdDesignForm({ d }: { d: Design }) {
   );
   return (
     <form {...f.formProps} encType="multipart/form-data" className="space-y-4">
+      <div className="space-y-2">
+        <label className="block text-sm font-medium">
+          Company logo (PNG or JPEG, up to 3 MB; a square picture on a plain or transparent background works best)
+          <input type="file" name="logo" accept="image/png,image/jpeg" className={`${inputClass} file:mr-3 file:rounded-md file:border-0 file:bg-brand/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand`} />
+        </label>
+        {d.hasLogo && (
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="removeLogo" className="h-4 w-4 accent-brand" /> Remove the current logo (the company initials are shown instead)
+          </label>
+        )}
+      </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Card title" id="title" required maxLength={40} defaultValue={d.title} />
         <label className="block text-sm font-medium">
