@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert, Field, SubmitButton } from "@/components/Fields";
@@ -36,20 +37,24 @@ export function CreatePeriodForm({ defaults, ph = false, incentives = [] }: { de
               <option value="GOV_INCENTIVE">Government bonus or incentive</option>
             </select>
           </label>
-          {kind === "GOV_INCENTIVE" && (
+          {kind === "GOV_INCENTIVE" && (incentives.length > 0 ? (
             <label className="block text-sm font-medium">
               Which one
-              <select name="incentiveCode" defaultValue="" className={inputClass}>
+              <select name="incentiveCode" defaultValue="" required className={inputClass}>
                 <option value="" disabled>Choose…</option>
                 {incentives.map((i) => <option key={i.code} value={i.code}>{i.name}</option>)}
               </select>
             </label>
-          )}
+          ) : (
+            <p role="status" className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
+              No government bonus rules are installed yet, so there is nothing to choose. <Link href="/payroll/rules" className="font-semibold text-brand hover:underline">Install the Government rules</Link> first, then come back.
+            </p>
+          ))}
           <label className="flex items-start gap-2 text-sm"><input type="checkbox" name="yearEnd" className="mt-0.5 h-4 w-4 accent-[var(--brand)]" /><span>Year-end tax adjustment: true up this year&apos;s withholding tax on this payroll (use it on the last payroll of the year, or when someone leaves)</span></label>
         </>
       )}
       {f.state?.error && <Alert kind="error">{f.state.error}</Alert>}
-      <SubmitButton pending={f.pending}>Create pay period</SubmitButton>
+      <SubmitButton pending={f.pending} disabled={kind === "GOV_INCENTIVE" && incentives.length === 0}>Create pay period</SubmitButton>
     </form>
   );
 }

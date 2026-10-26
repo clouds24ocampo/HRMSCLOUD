@@ -64,6 +64,7 @@ export async function getClockInfo(organizationId: string, employeeId: string, t
     types: clockTypes,
     requirePassword: settings.requirePunchPassword,
     unlockSeconds: settings.punchUnlockSeconds,
-    unlockedUntil: until && until.getTime() > Date.now() ? until.getTime() : null,
+    // Seconds, not a timestamp: the browser counts from its own clock, which may differ from the server's.
+    unlockSecondsLeft: until ? Math.max(0, Math.ceil((until.getTime() - Date.now()) / 1000)) : 0,
   };
 }

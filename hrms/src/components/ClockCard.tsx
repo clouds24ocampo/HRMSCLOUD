@@ -17,7 +17,7 @@ type Props = {
   requirePassword: boolean;
   timezone: string;
   lastText: string | null;
-  unlockedUntil?: number | null; // what is left of the server-side password unlock, so a refresh keeps it
+  unlockSecondsLeft?: number; // what is left of the server-side password unlock, so a refresh keeps it
 };
 
 const CONTEXTS = [
@@ -57,13 +57,13 @@ function Step({ n, title, hint, right, children }: { n: number; title: string; h
   );
 }
 
-export function ClockCard({ state, pause, types, requirePassword, timezone, lastText, unlockedUntil: serverUnlock = null }: Props) {
+export function ClockCard({ state, pause, types, requirePassword, timezone, lastText, unlockSecondsLeft = 0 }: Props) {
   const router = useRouter();
   const [now, setNow] = useState<number | null>(null);
   const [ctx, setCtx] = useState("OFFICE");
   const [note, setNote] = useState("");
   const [pw, setPw] = useState("");
-  const [unlockedUntil, setUnlockedUntil] = useState<number | null>(serverUnlock);
+  const [unlockedUntil, setUnlockedUntil] = useState<number | null>(() => (unlockSecondsLeft > 0 ? Date.now() + unlockSecondsLeft * 1000 : null));
   const [unlockError, setUnlockError] = useState<string>();
   const [result, setResult] = useState<ClockResult>();
   const [step, setStep] = useState<"idle" | "verifying" | "locating">("idle");
