@@ -41,9 +41,9 @@ export function Badge({ tone = "neutral", children }: { tone?: keyof typeof TONE
 
 export function Stat({ label, value, hint, tone }: { label: string; value: ReactNode; hint?: string; tone?: keyof typeof TONES }) {
   return (
-    <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
+    <div className="min-w-0 rounded-2xl border border-line bg-surface p-4 shadow-sm">
       <p className="text-sm text-muted">{label}</p>
-      <p className="mt-1 text-3xl font-bold tracking-tight">{value}</p>
+      <p className="mt-1 text-2xl font-bold tracking-tight [overflow-wrap:anywhere] sm:text-3xl">{value}</p>
       {hint && <div className="mt-1"><Badge tone={tone}>{hint}</Badge></div>}
     </div>
   );

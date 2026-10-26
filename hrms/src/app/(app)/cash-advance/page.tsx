@@ -106,7 +106,7 @@ export default async function CashAdvancePage({ searchParams }: { searchParams: 
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           <Stat label="Waiting for confirmation" value={pending.length} tone={pending.length ? "warning" : "success"} hint={pending.length ? "Below" : "All clear"} />
           <Stat label="Approved advances" value={all.filter((r) => r.status === "APPROVED").length} />
-          <Stat label="Total approved" value={formatMoney(all.filter((r) => r.status === "APPROVED").reduce((n, r) => n + r.amountCents, 0))} />
+          <div className="col-span-2 md:col-span-1"><Stat label="Total approved" value={formatMoney(all.filter((r) => r.status === "APPROVED").reduce((n, r) => n + r.amountCents, 0))} /></div>
         </div>
       )}
 

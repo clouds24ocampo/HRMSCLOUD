@@ -19,7 +19,7 @@ export function AddCourseForm() {
   return (
     <form {...f.formProps} className="space-y-3">
       <Field label="Course" id="title" required />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-3">
         <Field label="Hours (optional)" id="hours" type="number" min={1} />
         <Field label="Certificate valid for (months, optional)" id="validityMonths" type="number" min={1} />
       </div>
