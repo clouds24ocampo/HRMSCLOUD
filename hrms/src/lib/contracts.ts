@@ -106,7 +106,7 @@ export async function createContract(params: {
       organizationId,
       [employee.userId],
       {
-        title: "📝 Employment Contract Issued",
+        title: "Employment Contract Issued",
         body: `Your ${CONTRACT_TEMPLATES[templateKey]?.name || "Employment Contract"} is ready for review and signature.`,
         href: `/contracts/${contract.id}`,
       },

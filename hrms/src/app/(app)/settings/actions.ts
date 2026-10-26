@@ -102,7 +102,7 @@ export async function addStampType(_: FormState, form: FormData): Promise<FormSt
   const parsed = z
     .object({
       name: z.string().trim().min(2, "Enter a name.").max(30, "Keep the name under 30 characters."),
-      icon: z.enum(STAMP_ICONS as [string, ...string[]]),
+      icon: z.enum(STAMP_ICONS),
       tone: z.enum(STAMP_TONES),
       allowedMinutes: z.string().optional().transform((v) => (v ? Number(v) : null)).pipe(z.number().int().min(1, "Allowed time is at least 1 minute.").max(720).nullable()),
       defaultContext: z

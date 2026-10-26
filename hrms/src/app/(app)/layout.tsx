@@ -13,6 +13,7 @@ import { isHr } from "@/lib/scope";
 import { load201 } from "@/lib/documents";
 import { missing201 } from "@/lib/file201";
 import { ensurePolicies, unsignedPolicies } from "@/lib/policies";
+import { Icon } from "@/components/Icon";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getUser();
@@ -39,12 +40,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <p className="truncate text-xs text-muted">{user.organization.name} · {user.role.name}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/chat" aria-label={unreadChat ? `Chat, ${unreadChat} unread` : "Chat"} className="relative rounded-lg px-2.5 py-1.5 text-lg transition hover:bg-bg">
-              <span aria-hidden>💬</span>
+            <Link href="/chat" aria-label={unreadChat ? `Chat, ${unreadChat} unread` : "Chat"} className="relative rounded-lg px-2.5 py-2 text-muted transition hover:bg-bg hover:text-ink">
+              <Icon name="chat" className="h-5 w-5" />
               {unreadChat > 0 && <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1 text-[11px] font-bold text-white">{unreadChat > 9 ? "9+" : unreadChat}</span>}
             </Link>
-            <Link href="/notifications" aria-label={unread ? `Notifications, ${unread} unread` : "Notifications"} className="relative rounded-lg px-2.5 py-1.5 text-lg transition hover:bg-bg">
-              <span aria-hidden>🔔</span>
+            <Link href="/notifications" aria-label={unread ? `Notifications, ${unread} unread` : "Notifications"} className="relative rounded-lg px-2.5 py-2 text-muted transition hover:bg-bg hover:text-ink">
+              <Icon name="notification" className="h-5 w-5" />
               {unread > 0 && <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1 text-[11px] font-bold text-white">{unread > 9 ? "9+" : unread}</span>}
             </Link>
             <Link href="/change-password" className="hidden rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition hover:text-ink sm:block">

@@ -1,3 +1,4 @@
+import type { IconName } from "@/components/Icon";
 // Starting points chosen from the industry picked at registration. Everything here is editable data afterwards.
 // The time-stamp engine is identical for all organizations; only these values differ.
 
@@ -84,24 +85,25 @@ export const DEFAULT_STAMP_TYPES: {
   allowedMinutes?: number; requiresNote?: boolean; defaultContext?: "OFFICE" | "FIELD" | "REMOTE" | "CLIENT_SITE"; sortOrder: number; locked?: boolean;
   page?: "PUNCH" | "ISSUE"; maxPerDay?: number; dailyCapMinutes?: number; requiresOvertimeOver?: number;
 }[] = [
-  { key: "TIME_IN", name: "Time In", icon: "➡️", tone: "blue", kind: "IN", paid: true, sortOrder: 10, locked: true },
-  { key: "BREAK", name: "Break 1", icon: "☕", tone: "amber", kind: "PAUSE", paid: false, allowedMinutes: 15, maxPerDay: 1, sortOrder: 20 },
-  { key: "BREAK_2", name: "Break 2", icon: "☕", tone: "amber", kind: "PAUSE", paid: false, allowedMinutes: 15, maxPerDay: 1, sortOrder: 21 },
-  { key: "BREAK_3", name: "Break 3", icon: "☕", tone: "amber", kind: "PAUSE", paid: false, allowedMinutes: 15, maxPerDay: 1, requiresOvertimeOver: 120, sortOrder: 22 },
-  { key: "MEAL", name: "Meal", icon: "🍽️", tone: "indigo", kind: "PAUSE", paid: false, allowedMinutes: 60, maxPerDay: 1, sortOrder: 30 }, // one 60-minute meal a work day
-  { key: "BIO_BREAK", name: "Bio Break", icon: "🚻", tone: "slate", kind: "PAUSE", paid: false, dailyCapMinutes: 10, sortOrder: 40 },
-  { key: "ON_TRIP", name: "On Trip", icon: "📍", tone: "blue", kind: "PAUSE", paid: true, defaultContext: "FIELD", sortOrder: 70 },
-  { key: "CLINIC_BREAK", name: "Clinic Break", icon: "🩺", tone: "teal", kind: "PAUSE", paid: false, allowedMinutes: 30, page: "ISSUE", sortOrder: 50 },
-  { key: "SYSTEM_ISSUE", name: "System Issue", icon: "⚠️", tone: "red", kind: "PAUSE", paid: false, requiresNote: true, page: "ISSUE", sortOrder: 60 },
+  { key: "TIME_IN", name: "Time In", icon: "login", tone: "blue", kind: "IN", paid: true, sortOrder: 10, locked: true },
+  { key: "BREAK", name: "Break 1", icon: "coffee", tone: "amber", kind: "PAUSE", paid: false, allowedMinutes: 15, maxPerDay: 1, sortOrder: 20 },
+  { key: "BREAK_2", name: "Break 2", icon: "coffee", tone: "amber", kind: "PAUSE", paid: false, allowedMinutes: 15, maxPerDay: 1, sortOrder: 21 },
+  { key: "BREAK_3", name: "Break 3", icon: "coffee", tone: "amber", kind: "PAUSE", paid: false, allowedMinutes: 15, maxPerDay: 1, requiresOvertimeOver: 120, sortOrder: 22 },
+  { key: "MEAL", name: "Meal", icon: "meal", tone: "indigo", kind: "PAUSE", paid: false, allowedMinutes: 60, maxPerDay: 1, sortOrder: 30 }, // one 60-minute meal a work day
+  { key: "BIO_BREAK", name: "Bio Break", icon: "restroom", tone: "slate", kind: "PAUSE", paid: false, dailyCapMinutes: 10, sortOrder: 40 },
+  { key: "ON_TRIP", name: "On Trip", icon: "location", tone: "blue", kind: "PAUSE", paid: true, defaultContext: "FIELD", sortOrder: 70 },
+  { key: "CLINIC_BREAK", name: "Clinic Break", icon: "clinic", tone: "teal", kind: "PAUSE", paid: false, allowedMinutes: 30, page: "ISSUE", sortOrder: 50 },
+  { key: "SYSTEM_ISSUE", name: "System Issue", icon: "warning", tone: "red", kind: "PAUSE", paid: false, requiresNote: true, page: "ISSUE", sortOrder: 60 },
   // Weather and calamities: they explain lost or interrupted work time. Same rows are added to existing organizations by migration.
-  { key: "HEAVY_RAIN", name: "Heavy Rain / Flood", icon: "🌧️", tone: "blue", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 61 },
-  { key: "EXTREME_HEAT", name: "Extreme Heat", icon: "🌡️", tone: "amber", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 62 },
-  { key: "TYPHOON", name: "Typhoon / Storm Signal", icon: "🌀", tone: "indigo", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 63 },
-  { key: "EARTHQUAKE", name: "Earthquake", icon: "🫨", tone: "red", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 64 },
-  { key: "POWER_OUTAGE", name: "Power Outage", icon: "⚡", tone: "slate", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 65 },
-  { key: "CALAMITY", name: "Other Calamity", icon: "🆘", tone: "red", kind: "PAUSE", paid: false, requiresNote: true, page: "ISSUE", sortOrder: 66 },
-  { key: "TIME_OUT", name: "Time Out", icon: "⬅️", tone: "slate", kind: "OUT", paid: true, sortOrder: 99, locked: true },
+  { key: "HEAVY_RAIN", name: "Heavy Rain / Flood", icon: "rain", tone: "blue", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 61 },
+  { key: "EXTREME_HEAT", name: "Extreme Heat", icon: "heat", tone: "amber", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 62 },
+  { key: "TYPHOON", name: "Typhoon / Storm Signal", icon: "storm", tone: "indigo", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 63 },
+  { key: "EARTHQUAKE", name: "Earthquake", icon: "quake", tone: "red", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 64 },
+  { key: "POWER_OUTAGE", name: "Power Outage", icon: "power", tone: "slate", kind: "PAUSE", paid: false, page: "ISSUE", sortOrder: 65 },
+  { key: "CALAMITY", name: "Other Calamity", icon: "sos", tone: "red", kind: "PAUSE", paid: false, requiresNote: true, page: "ISSUE", sortOrder: 66 },
+  { key: "TIME_OUT", name: "Time Out", icon: "logout", tone: "slate", kind: "OUT", paid: true, sortOrder: 99, locked: true },
 ];
 
-export const STAMP_ICONS = ["☕", "🍽️", "🚻", "🩺", "⚠️", "📍", "🚗", "🧑‍🏫", "📞", "💻", "🛠️", "🎓", "🏥", "📦", "⏸️", "🙏", "🌧️", "🌡️", "🌀", "🫨", "⚡", "🆘"];
+// Icon names from components/Icon.tsx. Time stamp types store the name, never a picture character.
+export const STAMP_ICONS = ["coffee", "meal", "restroom", "clinic", "warning", "location", "car", "teach", "phone", "laptop", "tools", "learning", "hospital", "box", "pause", "prayer", "rain", "heat", "storm", "quake", "power", "sos"] as const satisfies readonly IconName[];
 export const STAMP_TONES = ["blue", "amber", "indigo", "slate", "teal", "red", "green", "violet", "pink"] as const;

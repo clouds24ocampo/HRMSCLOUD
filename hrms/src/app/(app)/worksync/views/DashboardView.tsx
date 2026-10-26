@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { Card, Stat } from "@/components/ui";
 import { addDays, dayKey, formatDay } from "@/lib/time";
@@ -12,7 +13,7 @@ function Attention({ title, tone, rows, ctx, hint }: { title: string; tone: stri
   return (
     <Card>
       <h3 className="flex items-center justify-between font-semibold"><span>{title}</span><span className="rounded-full px-2 py-0.5 text-xs font-bold text-white" style={{ backgroundColor: tone }}>{rows.length}</span></h3>
-      {rows.length === 0 ? <p className="mt-2 text-sm text-muted">Nothing here. 🎉</p> : (
+      {rows.length === 0 ? <p className="mt-2 text-sm text-muted">Nothing here. <Icon name="celebrate" className={ICON_INLINE} /></p> : (
         <ul className="mt-2 divide-y divide-line text-sm">
           {rows.slice(0, 6).map((c) => (
             <li key={c.id} className="flex items-center justify-between gap-2 py-1.5">

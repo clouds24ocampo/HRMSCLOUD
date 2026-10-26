@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import { DEFAULT_TIMEZONE } from "@/lib/locale";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -116,7 +117,7 @@ export default async function ContractDetailPage({
               <p className="text-[11px] text-gray-500">Address: {contract.employee.address || "On File"}</p>
               {contract.status === "SIGNED" && contract.signedAt && (
                 <div className="mt-2 inline-flex items-center gap-1.5 rounded bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-800">
-                  <span>✓ Digitally signed on</span> {formatDay(keyOfDbDate(contract.signedAt))} at {formatTime(contract.signedAt, DEFAULT_TIMEZONE)}
+                  <span><Icon name="ok" className={ICON_INLINE} /> Digitally signed on</span> {formatDay(keyOfDbDate(contract.signedAt))} at {formatTime(contract.signedAt, DEFAULT_TIMEZONE)}
                 </div>
               )}
             </div>

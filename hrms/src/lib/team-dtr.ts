@@ -79,7 +79,7 @@ export async function loadLive(organizationId: string, ids: string[], tz: string
     if (clock.pause) {
       const st = evs.find((e) => e.stampTypeId === clock.pause!.typeId)?.stampType;
       const mins = Math.floor((now.getTime() - clock.pause.since.getTime()) / 60000);
-      pause = { name: clock.pause.name, icon: st?.icon ?? "⏸️", page: st?.page ?? "PUNCH", since: clock.pause.since, overMinutes: st?.allowedMinutes != null ? Math.max(0, mins - st.allowedMinutes) : 0 };
+      pause = { name: clock.pause.name, icon: st?.icon ?? "pause", page: st?.page ?? "PUNCH", since: clock.pause.since, overMinutes: st?.allowedMinutes != null ? Math.max(0, mins - st.allowedMinutes) : 0 };
     }
     // The work day shown: from the latest Time In (an overnight shift keeps its start), else today's calendar day.
     const lastIn = [...evs].reverse().find((e) => e.type === "IN");
@@ -87,7 +87,7 @@ export async function loadLive(organizationId: string, ids: string[], tz: string
     const today: LiveEvent[] = evs
       .filter((e) => (from ? e.at >= from : dayKey(e.at, tz) === day))
       .map((e) => ({
-        id: e.id, at: e.at, type: e.type, name: e.stampType?.name ?? (e.type === "IN" ? "Time In" : e.type === "OUT" ? "Time Out" : "Break"), icon: e.stampType?.icon ?? "⏱️",
+        id: e.id, at: e.at, type: e.type, name: e.stampType?.name ?? (e.type === "IN" ? "Time In" : e.type === "OUT" ? "Time Out" : "Break"), icon: e.stampType?.icon ?? "clock",
         page: e.stampType?.page ?? null, source: e.source, note: e.note, lat: e.lat, lng: e.lng, accuracy: e.accuracy, gpsStatus: e.gpsStatus, locSource: e.locSource, device: e.device,
       }));
     return [id, { id, ...r, shift, firstIn: todays[0]?.at ?? null, pause, lastOut: r.state === "DONE" ? out?.at ?? null : null, systemOut: r.state === "DONE" && out?.source === "SYSTEM", today }];

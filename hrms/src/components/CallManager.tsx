@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/Icon";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { mediaErrorMessage } from "@/lib/media-error";
 import { answerCall, callState, endCall, pollIncoming, startCall, type IncomingCall } from "@/app/(app)/chat/actions";
@@ -183,7 +184,7 @@ export function CallManager() {
     <div role="dialog" aria-label="Call" className="fixed inset-x-4 bottom-24 z-50 mx-auto max-w-md rounded-3xl border border-line bg-surface p-4 shadow-2xl md:bottom-6">
       {phase.s === "incoming" ? (
         <div className="text-center">
-          <p className="text-3xl" aria-hidden>{phase.call.kind === "VIDEO" ? "📹" : "📞"}</p>
+          <Icon name={phase.call.kind === "VIDEO" ? "video" : "phone"} className="mx-auto h-9 w-9 text-brand" />
           <p className="mt-1 font-semibold">{phase.call.caller}</p>
           <p className="text-sm text-muted">is {phase.call.kind === "VIDEO" ? "video" : "voice"} calling you…</p>
           <div className="mt-4 flex justify-center gap-3">

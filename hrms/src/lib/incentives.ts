@@ -79,7 +79,7 @@ export async function awardIncentive(params: AwardIncentiveParams) {
       cardTitle: card.title,
       actorId: awardedById,
       type: "EDITED",
-      detail: `🎁 awarded ₱${(amountCents / 100).toLocaleString(DEFAULT_LOCALE, { minimumFractionDigits: 2 })} incentive to ${employee.firstName} ${employee.lastName}: ${title}`,
+      detail: `awarded ₱${(amountCents / 100).toLocaleString(DEFAULT_LOCALE, { minimumFractionDigits: 2 })} incentive to ${employee.firstName} ${employee.lastName}: ${title}`,
     });
   }
 
@@ -89,7 +89,7 @@ export async function awardIncentive(params: AwardIncentiveParams) {
       organizationId,
       [employee.userId],
       {
-        title: `🎁 Incentive Award: ₱${(amountCents / 100).toLocaleString(DEFAULT_LOCALE, { minimumFractionDigits: 2 })}`,
+        title: `Incentive Award: ₱${(amountCents / 100).toLocaleString(DEFAULT_LOCALE, { minimumFractionDigits: 2 })}`,
         body: `${awarder?.name ?? "Management"} awarded you an incentive for "${title}". Click to accept.`,
         href: "/incentives",
       },

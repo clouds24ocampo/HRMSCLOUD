@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon, StampIcon, ICON_INLINE } from "@/components/Icon";
 import { useEffect, useState, useSyncExternalStore, useTransition } from "react";
 import { PasswordInput } from "@/components/PasswordInput";
 import { useRouter } from "next/navigation";
@@ -281,7 +282,7 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
                     : "border-line bg-surface hover:border-line/80 shadow-xs"
                 }`}
               >
-                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border text-xl ${TONE[t.tone] ?? TONE.slate}`} aria-hidden>{t.icon}</span>
+                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${TONE[t.tone] ?? TONE.slate}`}><StampIcon value={t.icon} className="h-6 w-6" /></span>
                 <span className="min-w-0">
                   <span className="block truncate font-semibold text-ink">{buttonTitle}</span>
                   {blocked && !blocked.startsWith("Verify") && !blocked.startsWith("Time In") ? (
@@ -333,7 +334,7 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
 
       {phone.token && (
         <p role="status" className="mt-4 rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm font-medium text-success">
-          📱 Phone location received (±{Math.round(phone.accuracy ?? 0)} m). {retry ? `Press ${retry.name} again to record it.` : "It is used for your next time stamp."}
+          <Icon name="smartphone" className={ICON_INLINE} /> Phone location received (±{Math.round(phone.accuracy ?? 0)} m). {retry ? `Press ${retry.name} again to record it.` : "It is used for your next time stamp."}
         </p>
       )}
       {phone.open && !phone.token && (
@@ -348,7 +349,7 @@ export function ClockCard({ state, pause, types, requirePassword, timezone, last
       )}
       {desktop && !phone.open && !phone.token && (
         <button type="button" onClick={() => setPhone({ open: true })} className="mt-4 text-sm font-medium text-brand hover:underline">
-          💻 On a computer? Confirm your exact location with your phone first
+          <Icon name="laptop" className={ICON_INLINE} /> On a computer? Confirm your exact location with your phone first
         </button>
       )}
 

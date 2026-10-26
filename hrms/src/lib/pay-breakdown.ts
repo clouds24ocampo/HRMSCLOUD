@@ -122,7 +122,7 @@ export async function teamActivity(organizationId: string, ids: string[], from: 
         noLocation: stamps.filter((e) => e.lat == null && e.source !== "SYSTEM" && e.source !== "MANUAL").length,
         systemTimeout: stamps.some((e) => e.source === "SYSTEM"),
         stamps: stamps.map((e) => ({
-          id: e.id, at: e.at, type: e.type, name: e.stampType?.name ?? (e.type === "IN" ? "Time In" : e.type === "OUT" ? "Time Out" : "Break"), icon: e.stampType?.icon ?? "⏱️",
+          id: e.id, at: e.at, type: e.type, name: e.stampType?.name ?? (e.type === "IN" ? "Time In" : e.type === "OUT" ? "Time Out" : "Break"), icon: e.stampType?.icon ?? "clock",
           issue: e.stampType?.page === "ISSUE", source: e.source, note: e.note, lat: e.lat, lng: e.lng, accuracy: e.accuracy, gpsStatus: e.gpsStatus, device: e.device,
         })),
       };

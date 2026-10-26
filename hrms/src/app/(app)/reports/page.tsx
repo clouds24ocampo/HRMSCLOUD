@@ -1,3 +1,4 @@
+import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -20,10 +21,10 @@ import { AddedResolvedChart, BurnUpChart, CardsReport, PeopleTable, ReportTiles 
 import { Progress } from "../worksync/Progress";
 
 const TABS = [
-  { key: "attendance", label: "Overview & DTR", icon: "⏱️" },
-  { key: "documents", label: "Requirements & 201 Files", icon: "🗂️" },
-  { key: "payroll", label: "Payroll & Compensation", icon: "💰" },
-  { key: "worksync", label: "WorkSync Tasks", icon: "📋" },
+  { key: "attendance", label: "Overview & DTR", icon: "dtr" },
+  { key: "documents", label: "Requirements & 201 Files", icon: "documents" },
+  { key: "payroll", label: "Payroll & Compensation", icon: "payroll" },
+  { key: "worksync", label: "WorkSync Tasks", icon: "worksync" },
 ] as const;
 type TabKey = (typeof TABS)[number]["key"];
 
@@ -91,7 +92,7 @@ export default async function ReportsPage({
                 isActive ? "bg-brand text-brand-ink font-semibold" : "text-muted hover:bg-bg"
               }`}
             >
-              <span>{t.icon}</span>
+              <Icon name={t.icon} className="h-4 w-4" />
               <span>{t.label}</span>
             </Link>
           );

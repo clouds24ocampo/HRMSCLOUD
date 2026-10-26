@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { useOptimistic, useRef, useState, useTransition } from "react";
 import { useKeptForm } from "@/components/useKeptForm";
@@ -121,12 +122,12 @@ export function Board({ projectId, lists, canEdit, canManage, selected }: { proj
                 {c.labels.length > 0 && <div className="mb-1.5 flex flex-wrap gap-1">{c.labels.map((x) => <LabelChip key={x.name} label={x} compact />)}</div>}
                 <Link href={c.href} draggable={false} scroll={false} className="block text-sm font-medium leading-snug text-slate-900 hover:text-brand">{c.title}</Link>
                 <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
-                  {c.priority !== "NORMAL" && c.priority !== "LOW" && <span className="inline-flex items-center gap-1 font-semibold" style={{ color: PRIORITY_COLOR[c.priority] }}><span aria-hidden>⚑</span>{PRIORITY_LABEL[c.priority]}</span>}
+                  {c.priority !== "NORMAL" && c.priority !== "LOW" && <span className="inline-flex items-center gap-1 font-semibold" style={{ color: PRIORITY_COLOR[c.priority] }}><Icon name="flag" className="h-3.5 w-3.5" />{PRIORITY_LABEL[c.priority]}</span>}
                   {c.due && <DueBadge label={c.due.label} state={c.due.state} />}
                   {c.stuck && <span className="rounded-md bg-warning/15 px-1.5 py-0.5 text-[11px] font-semibold text-warning">Stuck</span>}
                   {c.hasDescription && <span title="Has a description" aria-label="Has a description">≡</span>}
-                  {c.checkTotal > 0 && <span className={`inline-flex items-center gap-1 ${c.checkDone === c.checkTotal ? "rounded-md bg-success/15 px-1.5 py-0.5 font-semibold text-success" : ""}`} title="Checklist"><span aria-hidden>☑</span>{c.checkDone}/{c.checkTotal}</span>}
-                  {c.comments > 0 && <span title="Comments"><span aria-hidden>💬</span> {c.comments}</span>}
+                  {c.checkTotal > 0 && <span className={`inline-flex items-center gap-1 ${c.checkDone === c.checkTotal ? "rounded-md bg-success/15 px-1.5 py-0.5 font-semibold text-success" : ""}`} title="Checklist"><Icon name="checked" className="h-3.5 w-3.5" />{c.checkDone}/{c.checkTotal}</span>}
+                  {c.comments > 0 && <span title="Comments"><Icon name="comment" className={ICON_INLINE} /> {c.comments}</span>}
                   <span className="ml-auto"><Facepile people={c.assignees} size={22} /></span>
                 </div>
                 {c.creator && <p className="mt-1.5 truncate text-[11px] text-slate-400" title={`Added by ${c.creator}`}>Added by {c.creator}</p>}

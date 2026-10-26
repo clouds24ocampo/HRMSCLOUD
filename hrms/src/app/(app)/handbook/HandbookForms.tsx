@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import { useState } from "react";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert } from "@/components/Fields";
@@ -14,7 +15,7 @@ export function AcknowledgeHandbookForm() {
     <form {...f.formProps} className="rounded-2xl border-2 border-brand/40 bg-linear-to-r from-brand/10 via-surface to-surface p-5 space-y-4">
       <div>
         <h3 className="font-bold text-lg text-ink flex items-center gap-2">
-          <span>📖</span> Handbook Receipt & Agreement
+          <Icon name="handbook" className={ICON_INLINE} /> Handbook Receipt & Agreement
         </h3>
         <p className="text-sm text-muted">
           All employees are required to acknowledge and adhere to company policies, disciplinary standards, and operational guidelines.
@@ -51,7 +52,7 @@ export function AcknowledgeHandbookForm() {
         disabled={!agreed || f.pending}
         className={`${buttonClass} disabled:opacity-50`}
       >
-        {f.pending ? "Submitting…" : "Acknowledge Handbook ✓"}
+        {f.pending ? "Submitting…" : "Acknowledge Handbook"}
       </button>
     </form>
   );

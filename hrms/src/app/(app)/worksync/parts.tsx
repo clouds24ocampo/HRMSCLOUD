@@ -1,3 +1,4 @@
+import { Icon } from "@/components/Icon";
 import { avatarColor, initials, labelColor, type DueState } from "@/lib/worksync";
 
 // Small pieces shared by every view. No state, so they work in server and client components alike.
@@ -40,7 +41,7 @@ const DUE_STYLE: Record<DueState, string> = {
   later: "bg-line/70 text-muted",
 };
 export function DueBadge({ label, state }: { label: string; state: DueState }) {
-  return <span className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-semibold ${DUE_STYLE[state]}`}><span aria-hidden>{state === "done" ? "✓" : "🕒"}</span>{label}{state === "overdue" && <span className="sr-only"> (overdue)</span>}</span>;
+  return <span className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-semibold ${DUE_STYLE[state]}`}><Icon name={state === "done" ? "ok" : "clock"} className="h-3.5 w-3.5" />{label}{state === "overdue" && <span className="sr-only"> (overdue)</span>}</span>;
 }
 
 // A colored pill, the way a status or priority sits in a table cell.

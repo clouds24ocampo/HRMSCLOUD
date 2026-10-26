@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { formatDay } from "@/lib/time";
 import { CATEGORY_COLOR, CATEGORY_LABEL, PRIORITY_COLOR, PRIORITY_LABEL, cardProgress } from "@/lib/worksync";
@@ -42,7 +43,7 @@ export function TableView({ ctx }: { ctx: ViewCtx }) {
                         <div className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-muted">
                           {ctx.names.get(c.createdById) && <span className="mr-1" title="Added by">by {ctx.names.get(c.createdById)}</span>}
                           {c.labels.map((x) => labelById.get(x.labelId)).filter((x): x is NonNullable<typeof x> => !!x).map((x) => <LabelChip key={x.id} label={x} compact />)}
-                          {c._count.comments > 0 && <span><span aria-hidden>💬</span> {c._count.comments}</span>}
+                          {c._count.comments > 0 && <span><Icon name="comment" className={ICON_INLINE} /> {c._count.comments}</span>}
                         </div>
                       )}
                     </div>

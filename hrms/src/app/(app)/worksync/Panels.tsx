@@ -1,3 +1,4 @@
+import type { IconName } from "@/components/Icon";
 import Link from "next/link";
 import { formatDay, formatTime, dayKey, keyOfDbDate } from "@/lib/time";
 import { Badge } from "@/components/ui";
@@ -8,11 +9,11 @@ import { Avatar, LabelChip } from "./parts";
 import type { ViewCtx } from "./views/types";
 
 export type PanelName = "people" | "labels" | "activity" | "settings";
-export const PANELS: { key: PanelName; label: string; icon: string }[] = [
-  { key: "people", label: "People", icon: "👥" },
-  { key: "labels", label: "Labels", icon: "🏷️" },
-  { key: "activity", label: "Activity", icon: "🕘" },
-  { key: "settings", label: "Settings", icon: "⚙️" },
+export const PANELS: { key: PanelName; label: string; icon: IconName }[] = [
+  { key: "people", label: "People", icon: "people" },
+  { key: "labels", label: "Labels", icon: "tag" },
+  { key: "activity", label: "Activity", icon: "history" },
+  { key: "settings", label: "Settings", icon: "settings" },
 ];
 
 const EVENT: Record<string, string> = {

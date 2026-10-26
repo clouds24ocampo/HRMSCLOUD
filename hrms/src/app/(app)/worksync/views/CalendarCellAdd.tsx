@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/Icon";
 import { useState } from "react";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert } from "@/components/Fields";
@@ -53,7 +54,7 @@ export function CalendarCellAdd({
             <div className="flex items-center justify-between pb-3 border-b border-line">
               <h3 className="font-semibold text-lg text-ink">Add card for {formatDay(day, { month: "short", day: "numeric", year: "numeric" })}</h3>
               <button type="button" onClick={() => setOpen(false)} className="rounded-lg p-1 text-muted hover:bg-bg hover:text-ink">
-                ✕
+                <Icon name="close" className="h-4 w-4" />
               </button>
             </div>
             <form {...f.formProps} className="mt-4 space-y-4 text-left">

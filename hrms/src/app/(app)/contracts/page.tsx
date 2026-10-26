@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import type { ContractStatus } from "@/generated/prisma/client";
 import { CONTRACT_STATUS_BADGE as STATUS_BADGE } from "@/lib/labels";
@@ -99,7 +100,7 @@ export default async function ContractsPage({
               href="/handbook"
               className="rounded-xl border border-line bg-surface px-4 py-2 text-sm font-semibold shadow-sm hover:border-brand hover:text-brand transition"
             >
-              📖 Company Handbook
+              <Icon name="handbook" className={ICON_INLINE} /> Company Handbook
             </Link>
           </div>
         }
@@ -109,7 +110,7 @@ export default async function ContractsPage({
       {pendingSigning.length > 0 && (
         <section aria-label="Contracts needing your signature" className="rounded-2xl border-2 border-brand/40 bg-linear-to-r from-brand/10 to-surface p-5 shadow-sm space-y-3">
           <div className="flex items-center gap-2">
-            <span className="text-xl">✍️</span>
+            <Icon name="sign" className="h-6 w-6 text-brand" />
             <h2 className="text-lg font-bold text-ink">
               You have {pendingSigning.length} contract agreement{pendingSigning.length > 1 ? "s" : ""} waiting for your signature
             </h2>

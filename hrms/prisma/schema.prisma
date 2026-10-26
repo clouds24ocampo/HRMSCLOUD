@@ -402,7 +402,7 @@ model TimeStampType {
   organization         Organization @relation(fields: [organizationId], references: [id])
   key                  String // stable machine key, e.g. TIME_IN, BREAK, MEAL
   name                 String
-  icon                 String       @default("⏱️")
+  icon                 String       @default("clock")
   tone                 String       @default("slate") // button color family
   kind                 StampKind
   paid                 Boolean      @default(true) // pauses: does the time still count as worked?

@@ -1,3 +1,4 @@
+import { StampIcon } from "@/components/Icon";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getOrgSettings } from "@/lib/settings";
@@ -39,7 +40,7 @@ export default async function SettingsPage() {
             {stamps.map((t) => (
               <li key={t.id} className={`flex items-center justify-between gap-2 rounded-xl border border-line px-3 py-2.5 ${t.archivedAt ? "opacity-50" : ""}`}>
                 <div className="min-w-0">
-                  <p className="truncate font-medium"><span aria-hidden>{t.icon}</span> {t.name}</p>
+                  <p className="truncate font-medium"><StampIcon value={t.icon} className="h-4 w-4 inline align-text-bottom" /> {t.name}</p>
                   <p className="mt-0.5 flex flex-wrap gap-1.5">
                     {t.locked && <Badge tone="brand">Required</Badge>}
                     {t.kind === "PAUSE" && <Badge tone={t.paid ? "success" : "neutral"}>{t.paid ? "Paid" : "Unpaid"}</Badge>}

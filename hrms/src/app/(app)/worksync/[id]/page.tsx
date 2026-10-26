@@ -1,3 +1,4 @@
+import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -25,12 +26,12 @@ import { TimelineView } from "../views/TimelineView";
 import type { ViewCtx } from "../views/types";
 
 const VIEWS = [
-  { key: "board", label: "Board", icon: "▦" },
-  { key: "table", label: "Table", icon: "☷" },
-  { key: "timeline", label: "Timeline", icon: "▤" },
-  { key: "calendar", label: "Calendar", icon: "▣" },
-  { key: "dashboard", label: "Dashboard", icon: "◔" },
-  { key: "reports", label: "Reports", icon: "▥" },
+  { key: "board", label: "Board", icon: "cards" },
+  { key: "table", label: "Table", icon: "table" },
+  { key: "timeline", label: "Timeline", icon: "timeline" },
+  { key: "calendar", label: "Calendar", icon: "schedule" },
+  { key: "dashboard", label: "Dashboard", icon: "dashboard" },
+  { key: "reports", label: "Reports", icon: "reports" },
 ] as const;
 type ViewKey = (typeof VIEWS)[number]["key"];
 
@@ -141,14 +142,14 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
             <Link href={href({ panel: "people", card: null })} scroll={false} aria-label={`${members.length} people on this project`} className="rounded-full p-0.5 hover:bg-white/20"><Facepile people={members} max={5} size={30} /></Link>
           </div>
           <nav aria-label="Project menu" className="flex flex-wrap justify-end gap-1">
-            {PANELS.map((p) => <Link key={p.key} href={href({ panel: p.key, card: null })} scroll={false} className="rounded-lg bg-white/15 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/30"><span aria-hidden>{p.icon}</span> {p.label}</Link>)}
+            {PANELS.map((p) => <Link key={p.key} href={href({ panel: p.key, card: null })} scroll={false} className="rounded-lg bg-white/15 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/30"><Icon name={p.icon} className="h-3.5 w-3.5 inline align-text-bottom" /> {p.label}</Link>)}
           </nav>
         </div>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav aria-label="Views" className="flex flex-wrap gap-1 rounded-xl bg-black/15 p-1">
-          {VIEWS.map((v) => <Link key={v.key} href={href({ view: v.key, card: null, panel: null })} scroll={false} aria-current={view === v.key ? "page" : undefined} className={tab(view === v.key)}><span aria-hidden>{v.icon}</span>{v.label}</Link>)}
+          {VIEWS.map((v) => <Link key={v.key} href={href({ view: v.key, card: null, panel: null })} scroll={false} aria-current={view === v.key ? "page" : undefined} className={tab(view === v.key)}><Icon name={v.icon} className="h-4 w-4" />{v.label}</Link>)}
         </nav>
         <Suspense fallback={null}><FilterBar people={members.filter((m) => m.role !== "VIEWER").map((m) => ({ id: m.employeeId, name: personName(m) }))} labels={project.labels.map((l) => ({ id: l.id, name: l.name }))} /></Suspense>
       </div>

@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import { Badge } from "@/components/ui";
 import { formatDay, formatTime, dayKey } from "@/lib/time";
 import { CommentForm } from "./CommentForm";
@@ -21,7 +22,7 @@ export function ReportComments({ reportId, comments, authors, meId, tz }: { repo
   return (
     <details className="mt-3 rounded-xl border border-line bg-bg/50" open={comments.length > 0}>
       <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm font-medium marker:hidden">
-        <span>💬 Comments</span>
+        <span><Icon name="comment" className={ICON_INLINE} /> Comments</span>
         <Badge tone={comments.length ? "brand" : "neutral"}>{comments.length}</Badge>
       </summary>
       <div className="space-y-3 border-t border-line p-3">

@@ -1,3 +1,4 @@
+import { Icon, StampIcon, ICON_INLINE } from "@/components/Icon";
 import { mapUrl } from "@/lib/locale";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -181,19 +182,19 @@ export default async function DtrPage({ searchParams }: { searchParams: Promise<
             href={q({ view: "day" })}
             className={`rounded-lg px-3 py-1.5 transition ${view === "day" ? "bg-brand text-white font-semibold shadow-sm" : "bg-surface text-muted hover:text-ink border border-line"}`}
           >
-            📅 Daily Breakdown ({data.rows.length} days)
+            <Icon name="schedule" className={ICON_INLINE} /> Daily Breakdown ({data.rows.length} days)
           </Link>
           <Link
             href={q({ view: "week" })}
             className={`rounded-lg px-3 py-1.5 transition ${view === "week" ? "bg-brand text-white font-semibold shadow-sm" : "bg-surface text-muted hover:text-ink border border-line"}`}
           >
-            📆 Weekly Rollup ({weeklyRollup.length} {weeklyRollup.length === 1 ? "week" : "weeks"})
+            <Icon name="week" className={ICON_INLINE} /> Weekly Rollup ({weeklyRollup.length} {weeklyRollup.length === 1 ? "week" : "weeks"})
           </Link>
           <Link
             href={q({ view: "month" })}
             className={`rounded-lg px-3 py-1.5 transition ${view === "month" ? "bg-brand text-white font-semibold shadow-sm" : "bg-surface text-muted hover:text-ink border border-line"}`}
           >
-            🗓️ Monthly Rollup ({monthlyRollup.length} {monthlyRollup.length === 1 ? "month" : "months"})
+            <Icon name="schedule" className={ICON_INLINE} /> Monthly Rollup ({monthlyRollup.length} {monthlyRollup.length === 1 ? "month" : "months"})
           </Link>
         </div>
         <p className="text-xs text-muted">
@@ -236,10 +237,10 @@ export default async function DtrPage({ searchParams }: { searchParams: Promise<
                         <span className="flex flex-1 flex-wrap items-center gap-1.5">
                           <Badge tone={st.tone}>{st.label}</Badge>
                           {showFlags && issSec > 0 && (
-                            <Badge tone="warning">⚠️ Issue {formatDurationPrecise(issSec)}</Badge>
+                            <Badge tone="warning"><Icon name="warning" className={ICON_INLINE} /> Issue {formatDurationPrecise(issSec)}</Badge>
                           )}
                           {showFlags && brkSec > 0 && (
-                            <Badge tone="neutral">☕ Break {formatDurationPrecise(brkSec)}</Badge>
+                            <Badge tone="neutral"><Icon name="coffee" className={ICON_INLINE} /> Break {formatDurationPrecise(brkSec)}</Badge>
                           )}
                           {showFlags && prodRate < 100 && prodRate > 0 && (
                             <Badge tone="brand">{prodRate}% Prod</Badge>
@@ -322,7 +323,7 @@ export default async function DtrPage({ searchParams }: { searchParams: Promise<
                                   <span className={`font-semibold tabular-nums ${p.voidedAt ? "line-through" : ""}`} title="100% recorded server timestamp with seconds">
                                     {formatTimePrecise(p.at, tz)}
                                   </span>
-                                  <span>{p.stampType ? `${p.stampType.icon} ` : ""}{punchLabel(p)}</span>
+                                  <span>{p.stampType && <><StampIcon value={p.stampType.icon} className="h-4 w-4 inline align-text-bottom" /> </>}{punchLabel(p)}</span>
                                   <Badge>{CONTEXT[p.workContext]}</Badge>
                                   {p.source === "MANUAL" && <Badge tone="warning">Manual entry</Badge>}
                                   {p.source === "SYSTEM" && <Badge tone="danger">System time-out (no log out)</Badge>}
@@ -340,9 +341,9 @@ export default async function DtrPage({ searchParams }: { searchParams: Promise<
                                   )}
                                   {p.gpsStatus === "LOW_ACCURACY" && <Badge tone="warning">Low accuracy</Badge>}
                                   {p.locSource && <Badge tone={p.locSource === "GPS" || p.locSource === "PHONE_LINK" ? "success" : "warning"}>{({ GPS: "Phone GPS", PHONE_LINK: "Confirmed by phone", WIFI: "Computer estimate", NONE: "No location" } as Record<string, string>)[p.locSource] ?? p.locSource}</Badge>}
-                                  {p.device && <span className="text-xs text-muted">{p.device === "DESKTOP" ? "💻 computer" : "📱 phone"}{p.ipAddress ? ` · IP ${p.ipAddress}` : ""}</span>}
+                                  {p.device && <span className="text-xs text-muted">{p.device === "DESKTOP" ? <><Icon name="laptop" className={ICON_INLINE} /> computer</> : <><Icon name="smartphone" className={ICON_INLINE} /> phone</>}{p.ipAddress ? ` · IP ${p.ipAddress}` : ""}</span>}
                                 </div>
-                                {p.tripFrom && <p className="mt-1">📍 <span className="font-medium">{p.tripFrom} → {p.tripTo}</span> <span className="text-muted">· {p.tripReason}</span></p>}
+                                {p.tripFrom && <p className="mt-1"><Icon name="location" className={ICON_INLINE} /> <span className="font-medium">{p.tripFrom} → {p.tripTo}</span> <span className="text-muted">· {p.tripReason}</span></p>}
                                 {p.note && <p className="mt-1 text-muted">“{p.note}”</p>}
                                 {p.voidedAt ? (
                                   <p className="mt-1 text-xs text-danger">Voided: {p.voidReason}</p>

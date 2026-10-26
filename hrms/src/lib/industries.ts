@@ -1,14 +1,15 @@
+import type { IconName } from "@/components/Icon";
 // Single source of truth for registration choices. Mirrors hrms-target-industries.md.
 // Stored on Organization as keys only, so renaming a label never touches data.
 
 export type Sector = "PRIVATE" | "GOVERNMENT" | "NONPROFIT";
 
 export type Segment = { key: string; name: string };
-export type Category = { key: string; name: string; icon: string; sector: Sector; segments: Segment[] };
+export type Category = { key: string; name: string; icon: IconName; sector: Sector; segments: Segment[] };
 
 export const CATEGORIES: Category[] = [
   {
-    key: "government", name: "Government & Public Sector", icon: "🏛️", sector: "GOVERNMENT",
+    key: "government", name: "Government & Public Sector", icon: "government", sector: "GOVERNMENT",
     segments: [
       { key: "lgu", name: "LGU (municipality, city, province)" },
       { key: "barangay", name: "Barangay" },
@@ -17,7 +18,7 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    key: "bpo-it", name: "BPO, IT & Services", icon: "💻", sector: "PRIVATE",
+    key: "bpo-it", name: "BPO, IT & Services", icon: "laptop", sector: "PRIVATE",
     segments: [
       { key: "bpo", name: "BPO / call center" },
       { key: "it-software", name: "IT or software company" },
@@ -26,7 +27,7 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    key: "retail-hospitality", name: "Retail, Hospitality & Food", icon: "🛍️", sector: "PRIVATE",
+    key: "retail-hospitality", name: "Retail, Hospitality & Food", icon: "shop", sector: "PRIVATE",
     segments: [
       { key: "retail", name: "Retail chain, mall or supermarket" },
       { key: "restaurant", name: "Restaurant or fast food" },
@@ -35,7 +36,7 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    key: "manufacturing", name: "Manufacturing & Industrial", icon: "🏭", sector: "PRIVATE",
+    key: "manufacturing", name: "Manufacturing & Industrial", icon: "factory", sector: "PRIVATE",
     segments: [
       { key: "factory", name: "Factory or plant" },
       { key: "construction", name: "Construction firm" },
@@ -44,7 +45,7 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    key: "healthcare", name: "Healthcare", icon: "🏥", sector: "PRIVATE",
+    key: "healthcare", name: "Healthcare", icon: "hospital", sector: "PRIVATE",
     segments: [
       { key: "hospital", name: "Hospital" },
       { key: "clinic", name: "Clinic or diagnostic center" },
@@ -52,14 +53,14 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    key: "education", name: "Education", icon: "🎓", sector: "PRIVATE",
+    key: "education", name: "Education", icon: "learning", sector: "PRIVATE",
     segments: [
       { key: "private-school", name: "Private school or university" },
       { key: "training-center", name: "Training or review center" },
     ],
   },
   {
-    key: "finance-professional", name: "Finance & Professional Services", icon: "💼", sector: "PRIVATE",
+    key: "finance-professional", name: "Finance & Professional Services", icon: "business", sector: "PRIVATE",
     segments: [
       { key: "bank-coop", name: "Bank, lending, microfinance or cooperative" },
       { key: "insurance", name: "Insurance or broker" },
@@ -68,7 +69,7 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    key: "logistics-security", name: "Logistics, Transport & Security", icon: "🚚", sector: "PRIVATE",
+    key: "logistics-security", name: "Logistics, Transport & Security", icon: "transport", sector: "PRIVATE",
     segments: [
       { key: "logistics", name: "Logistics or delivery" },
       { key: "transport", name: "Transport (bus, shipping, airline)" },
@@ -77,14 +78,14 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    key: "nonprofit", name: "Non-profit & Social Sector", icon: "🤝", sector: "NONPROFIT",
+    key: "nonprofit", name: "Non-profit & Social Sector", icon: "partners", sector: "NONPROFIT",
     segments: [
       { key: "ngo", name: "NGO or foundation" },
       { key: "community-org", name: "Religious or community organization" },
     ],
   },
   {
-    key: "small-business", name: "Small Business & Startups", icon: "🚀", sector: "PRIVATE",
+    key: "small-business", name: "Small Business & Startups", icon: "startup", sector: "PRIVATE",
     segments: [
       { key: "sme", name: "SME" },
       { key: "startup", name: "Startup" },

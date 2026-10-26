@@ -1,3 +1,4 @@
+import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
@@ -53,7 +54,7 @@ export default async function RulesPage() {
         <ul className="grid gap-1 text-sm sm:grid-cols-2">
           {NEEDED.map((n) => {
             const ok = inForce(n.code, n.sector);
-            return <li key={n.code} className={ok ? "text-muted" : "font-medium text-warning"}>{ok ? "✓" : "✗"} {n.label}</li>;
+            return <li key={n.code} className={ok ? "text-muted" : "font-medium text-warning"}><Icon name={ok ? "ok" : "noShow"} className="inline h-4 w-4" /> {n.label}</li>;
           })}
         </ul>
         <p className="text-sm text-muted">

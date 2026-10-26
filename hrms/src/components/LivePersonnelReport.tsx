@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon, StampIcon, ICON_INLINE } from "@/components/Icon";
 import { useState, useEffect, useMemo, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -268,7 +269,7 @@ export function LivePersonnelReport({
                     : "text-muted hover:text-ink"
                 }`}
               >
-                <span>🗂️</span> Big Cards
+                <Icon name="cards" className={ICON_INLINE} /> Big Cards
               </button>
               <button
                 type="button"
@@ -279,7 +280,7 @@ export function LivePersonnelReport({
                     : "text-muted hover:text-ink"
                 }`}
               >
-                <span>📋</span> Table View
+                <Icon name="table" className={ICON_INLINE} /> Table View
               </button>
             </div>
 
@@ -292,7 +293,7 @@ export function LivePersonnelReport({
               title="Refresh live data now"
               className="flex items-center gap-1.5 rounded-xl border border-line bg-surface px-3 py-2 text-xs font-semibold text-ink shadow-sm transition hover:border-brand hover:text-brand disabled:opacity-50"
             >
-              <span className={`inline-block ${isPending ? "animate-spin" : ""}`}>🔄</span>
+              <span className={`inline-block ${isPending ? "animate-spin" : ""}`}><Icon name="refresh" className="h-4 w-4" /></span>
               <span>{isPending ? "Syncing..." : "Refresh"}</span>
             </button>
 
@@ -320,7 +321,7 @@ export function LivePersonnelReport({
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-muted">Working Now</span>
-              <span className="text-sm">🟢</span>
+              <Icon name="working" className="h-4 w-4 text-success" />
             </div>
             <p className="mt-1 text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-400">
               {stats.working}
@@ -344,7 +345,7 @@ export function LivePersonnelReport({
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-muted">On System Issue</span>
-              <span className="text-sm">⚠️</span>
+              <Icon name="warning" className="h-4 w-4 text-danger" />
             </div>
             <p className={`mt-1 text-2xl font-black tracking-tight ${stats.issue > 0 ? "text-rose-600 dark:text-rose-400" : "text-muted"}`}>
               {stats.issue}
@@ -366,7 +367,7 @@ export function LivePersonnelReport({
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-muted">On Break</span>
-              <span className="text-sm">☕</span>
+              <Icon name="coffee" className="h-4 w-4 text-warning" />
             </div>
             <p className="mt-1 text-2xl font-black tracking-tight text-indigo-600 dark:text-indigo-400">
               {stats.breakCount}
@@ -388,7 +389,7 @@ export function LivePersonnelReport({
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-muted">Late / No-Show</span>
-              <span className="text-sm">⏰</span>
+              <Icon name="overtime" className="h-4 w-4 text-warning" />
             </div>
             <p className={`mt-1 text-2xl font-black tracking-tight ${stats.late > 0 ? "text-amber-600 dark:text-amber-400" : "text-muted"}`}>
               {stats.late}
@@ -410,7 +411,7 @@ export function LivePersonnelReport({
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-muted">On Leave / Off</span>
-              <span className="text-sm">🏖️</span>
+              <Icon name="leave" className="h-4 w-4 text-brand" />
             </div>
             <p className="mt-1 text-2xl font-black tracking-tight text-brand">
               {stats.onLeave}
@@ -432,7 +433,7 @@ export function LivePersonnelReport({
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-muted">Timed Out</span>
-              <span className="text-sm">✓</span>
+              <Icon name="ok" className="h-4 w-4" />
             </div>
             <p className="mt-1 text-2xl font-black tracking-tight text-ink">
               {stats.timedOut}
@@ -449,7 +450,7 @@ export function LivePersonnelReport({
         <div className="flex flex-wrap items-center justify-between gap-3">
           {/* Search Input */}
           <div className="relative min-w-0 flex-1 basis-64">
-            <span className="pointer-events-none absolute left-3 top-2.5 text-muted">🔍</span>
+            <span className="pointer-events-none absolute left-3 top-2.5 text-muted"><Icon name="search" className="h-4 w-4" /></span>
             <input
               type="text"
               value={search}
@@ -463,7 +464,7 @@ export function LivePersonnelReport({
                 onClick={() => setSearch("")}
                 className="absolute right-3 top-2.5 text-xs text-muted hover:text-ink"
               >
-                ✕
+                <Icon name="close" className="h-4 w-4" />
               </button>
             )}
           </div>
@@ -511,7 +512,7 @@ export function LivePersonnelReport({
                 : "border-line bg-surface text-muted hover:border-emerald-400 hover:text-emerald-600"
             }`}
           >
-            <span>🟢 Working</span>
+            <span><Icon name="working" className={ICON_INLINE} /> Working</span>
             <span className="rounded-full bg-black/10 px-1.5 py-0.2 text-[10px]">{stats.working}</span>
           </button>
 
@@ -526,7 +527,7 @@ export function LivePersonnelReport({
                 : "border-line bg-surface text-muted hover:border-rose-400 hover:text-rose-600"
             }`}
           >
-            <span>⚠️ On Issue</span>
+            <span><Icon name="warning" className={ICON_INLINE} /> On Issue</span>
             <span className="rounded-full bg-black/10 px-1.5 py-0.2 text-[10px]">{stats.issue}</span>
           </button>
 
@@ -539,7 +540,7 @@ export function LivePersonnelReport({
                 : "border-line bg-surface text-muted hover:border-indigo-400 hover:text-indigo-600"
             }`}
           >
-            <span>☕ On Break</span>
+            <span><Icon name="coffee" className={ICON_INLINE} /> On Break</span>
             <span className="rounded-full bg-black/10 px-1.5 py-0.2 text-[10px]">{stats.breakCount}</span>
           </button>
 
@@ -552,7 +553,7 @@ export function LivePersonnelReport({
                 : "border-line bg-surface text-muted hover:border-amber-400 hover:text-amber-600"
             }`}
           >
-            <span>⏰ Late / No Show</span>
+            <span><Icon name="overtime" className={ICON_INLINE} /> Late / No Show</span>
             <span className="rounded-full bg-black/10 px-1.5 py-0.2 text-[10px]">{stats.late}</span>
           </button>
 
@@ -565,7 +566,7 @@ export function LivePersonnelReport({
                 : "border-line bg-surface text-muted hover:border-brand/40 hover:text-brand"
             }`}
           >
-            <span>🏖️ On Leave</span>
+            <span><Icon name="leave" className={ICON_INLINE} /> On Leave</span>
             <span className="rounded-full bg-black/10 px-1.5 py-0.2 text-[10px]">{stats.onLeave}</span>
           </button>
 
@@ -578,7 +579,7 @@ export function LivePersonnelReport({
                 : "border-line bg-surface text-muted hover:border-muted hover:text-ink"
             }`}
           >
-            <span>✓ Timed Out</span>
+            <span><Icon name="ok" className={ICON_INLINE} /> Timed Out</span>
             <span className="rounded-full bg-black/10 px-1.5 py-0.2 text-[10px]">{stats.timedOut}</span>
           </button>
 
@@ -591,7 +592,7 @@ export function LivePersonnelReport({
                 : "border-line bg-surface text-muted hover:text-ink"
             }`}
           >
-            <span>⚪ Not In Yet</span>
+            <span><Icon name="notIn" className={ICON_INLINE} /> Not In Yet</span>
             <span className="rounded-full bg-black/10 px-1.5 py-0.2 text-[10px]">{stats.notIn}</span>
           </button>
 
@@ -615,7 +616,7 @@ export function LivePersonnelReport({
       <div className="p-6">
         {filtered.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-line bg-bg/50 p-12 text-center">
-            <p className="text-3xl">👥</p>
+            <Icon name="people" className="mx-auto h-9 w-9 text-muted" />
             <h3 className="mt-2 text-base font-bold text-ink">No personnel found</h3>
             <p className="mt-1 text-sm text-muted">
               No staff members match the selected status or search query.
@@ -695,13 +696,13 @@ export function LivePersonnelReport({
                       >
                         <div className="flex items-center gap-1.5 truncate">
                           <span className="text-base" aria-hidden>
-                            {item.statusIcon}
+                            <StampIcon value={item.statusIcon} className="h-4 w-4" />
                           </span>
                           <span className="truncate">{item.statusLabel}</span>
                         </div>
                         {liveTimerText && (
                           <span suppressHydrationWarning className="shrink-0 font-mono text-[11px] tabular-nums opacity-90">
-                            ⏱️ {liveTimerText}
+                            <Icon name="dtr" className={ICON_INLINE} /> {liveTimerText}
                           </span>
                         )}
                       </div>
@@ -751,7 +752,7 @@ export function LivePersonnelReport({
                             rel="noopener noreferrer"
                             className="flex items-center gap-1 font-medium text-brand hover:underline"
                           >
-                            <span>📍 Map</span>
+                            <span><Icon name="location" className={ICON_INLINE} /> Map</span>
                             <span className="text-[10px] text-muted">
                               (±{Math.round(item.location.accuracy ?? 0)}m)
                             </span>
@@ -805,7 +806,7 @@ export function LivePersonnelReport({
                                 />
                                 <div className="flex items-center justify-between gap-1">
                                   <span className="font-semibold text-ink">
-                                    {e.icon} {e.name}
+                                    <StampIcon value={e.icon} className="h-4 w-4 inline align-text-bottom" /> {e.name}
                                   </span>
                                   <span className="font-mono text-[11px] tabular-nums text-muted">
                                     {e.atTime}
@@ -826,7 +827,7 @@ export function LivePersonnelReport({
                                     rel="noopener noreferrer"
                                     className="block text-[11px] text-brand hover:underline"
                                   >
-                                    📍 ±{Math.round(e.accuracy ?? 0)}m
+                                    <Icon name="location" className={ICON_INLINE} /> ±{Math.round(e.accuracy ?? 0)}m
                                   </a>
                                 )}
                               </li>
@@ -883,7 +884,7 @@ export function LivePersonnelReport({
                         <span
                           className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${tone.badge}`}
                         >
-                          <span>{item.statusIcon}</span>
+                          <span><StampIcon value={item.statusIcon} className="h-4 w-4" /></span>
                           <span>{item.statusLabel}</span>
                         </span>
                       </td>
@@ -905,7 +906,7 @@ export function LivePersonnelReport({
                             rel="noopener noreferrer"
                             className="text-brand hover:underline"
                           >
-                            📍 ±{Math.round(item.location.accuracy ?? 0)}m
+                            <Icon name="location" className={ICON_INLINE} /> ±{Math.round(item.location.accuracy ?? 0)}m
                           </a>
                         ) : (
                           <span className="text-muted">—</span>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useKeptForm } from "@/components/useKeptForm";
@@ -114,7 +115,7 @@ export function GenerateContractForm({
               onClick={handlePopulate}
               className="rounded-lg bg-brand/10 px-2.5 py-1 text-xs font-semibold text-brand hover:bg-brand/20 transition"
             >
-              🔄 Import & Populate Template Text
+              <Icon name="refresh" className={ICON_INLINE} /> Import & Populate Template Text
             </button>
           </p>
           <div className="grid grid-cols-2 gap-2 text-muted sm:grid-cols-4">
@@ -166,7 +167,7 @@ export function GenerateContractForm({
           Regenerate Text
         </button>
         <button disabled={f.pending} className={buttonClass}>
-          {f.pending ? "Generating…" : autoIssue ? "Generate & Issue Contract 📝" : "Save as Draft 💾"}
+          {f.pending ? "Generating…" : autoIssue ? <>Generate & Issue Contract <Icon name="file" className={ICON_INLINE} /></> : <>Save as Draft <Icon name="save" className={ICON_INLINE} /></>}
         </button>
       </div>
     </form>
@@ -216,7 +217,7 @@ export function SignContractForm({ contractId, title }: { contractId: string; ti
         disabled={!agreed || f.pending}
         className="w-full sm:w-auto rounded-xl bg-emerald-600 px-6 py-2.5 font-bold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95 disabled:opacity-50"
       >
-        {f.pending ? "Signing…" : "Sign Contract Electronically ✍️"}
+        {f.pending ? "Signing…" : <>Sign Contract Electronically <Icon name="sign" className={ICON_INLINE} /></>}
       </button>
     </form>
   );
@@ -239,7 +240,7 @@ export function IssueContractButton({ contractId }: { contractId: string }) {
       disabled={pending}
       className="rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-brand-ink transition hover:bg-brand/90"
     >
-      {pending ? "Issuing…" : "Issue to Employee 📨"}
+      {pending ? "Issuing…" : <>Issue to Employee <Icon name="send" className={ICON_INLINE} /></>}
     </button>
   );
 }
@@ -266,7 +267,7 @@ export function VoidContractButton({ contractId }: { contractId: string }) {
         onClick={() => setOpen(true)}
         className="rounded-lg border border-danger/40 bg-danger/5 px-3 py-1.5 text-xs font-medium text-danger hover:bg-danger/10"
       >
-        Cancel Contract 🚫
+        Cancel Contract <Icon name="ban" className={ICON_INLINE} />
       </button>
     );
   }

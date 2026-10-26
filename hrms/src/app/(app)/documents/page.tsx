@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
@@ -48,7 +49,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <PageHeader title="Documents" action={<Link href="/policies" className={buttonClass}>📜 Company policies</Link>} subtitle={own ? "Your personal file: contracts, IDs and certificates. Only you and HR can open them." : `${person.firstName} ${person.lastName}'s file. Opening a file is recorded in the audit log.`} />
+      <PageHeader title="Documents" action={<Link href="/policies" className={buttonClass}><Icon name="policies" className={ICON_INLINE} /> Company policies</Link>} subtitle={own ? "Your personal file: contracts, IDs and certificates. Only you and HR can open them." : `${person.firstName} ${person.lastName}'s file. Opening a file is recorded in the audit log.`} />
 
       {hr && (
         <form className="flex flex-wrap items-end gap-2" role="search">

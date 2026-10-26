@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE, type IconName } from "@/components/Icon";
 import { mapUrl } from "@/lib/locale";
 import Link from "next/link";
 import type { BoardRow, StampPlace } from "@/lib/team-dtr";
@@ -6,7 +7,7 @@ import { Badge } from "@/components/ui";
 import { StatusTag, statusTag } from "@/components/LiveStatus";
 
 const SOURCE: Record<string, string> = { GPS: "phone GPS", WIFI: "browser (Wi-Fi)", PHONE_LINK: "confirmed by phone", NONE: "no location" };
-const DEVICE_ICON: Record<string, string> = { PHONE: "📱", TABLET: "📱", DESKTOP: "💻" };
+const DEVICE_ICON: Record<string, IconName> = { PHONE: "smartphone", TABLET: "smartphone", DESKTOP: "laptop" };
 
 
 // One stamp: the time, and where it was made (map link, accuracy, how the location was found).
@@ -16,11 +17,11 @@ export function Place({ p, tz }: { p: StampPlace | null; tz: string }) {
   return (
     <span className="block leading-tight">
       <span className="font-medium tabular-nums">{formatTime(p.at, tz)}</span>{" "}
-      {p.device && <span aria-label={p.device.toLowerCase()} title={p.device.toLowerCase()}>{DEVICE_ICON[p.device] ?? ""}</span>}
+      {p.device && <span aria-label={p.device.toLowerCase()} title={p.device.toLowerCase()}>{DEVICE_ICON[p.device] && <Icon name={DEVICE_ICON[p.device]} className="h-4 w-4" />}</span>}
       <span className="block text-xs">
         {p.lat != null && p.lng != null ? (
           <a href={mapUrl(p.lat, p.lng)} target="_blank" rel="noopener noreferrer" className={`hover:underline ${weak ? "text-warning" : "text-brand"}`}>
-            📍 ±{Math.round(p.accuracy ?? 0)} m{p.locSource ? ` · ${SOURCE[p.locSource] ?? p.locSource}` : ""}
+            <Icon name="location" className={ICON_INLINE} /> ±{Math.round(p.accuracy ?? 0)} m{p.locSource ? ` · ${SOURCE[p.locSource] ?? p.locSource}` : ""}
           </a>
         ) : (
           <span className="text-danger">No location{p.ipAddress ? ` · IP ${p.ipAddress}` : ""}</span>

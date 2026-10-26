@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
@@ -42,7 +43,7 @@ export default async function WorkSyncPage({ searchParams }: { searchParams: Pro
           </Link>
         ))}
         <Link href="/reports?tab=worksync" className="ml-auto whitespace-nowrap rounded-lg px-4 py-2 text-muted transition hover:bg-bg hover:text-ink">
-          📊 Reports & Analytics →
+          <Icon name="reports" className={ICON_INLINE} /> Reports & Analytics →
         </Link>
       </nav>
       {view === "projects" && <Projects scope={scope} today={today} />}

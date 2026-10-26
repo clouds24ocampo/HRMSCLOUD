@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
@@ -51,7 +52,7 @@ export default async function HandbookPage() {
           action={
             myAck ? (
               <Badge tone="success">
-                ✓ Acknowledged on {formatDay(keyOfDbDate(myAck.signedAt))}
+                <Icon name="ok" className={ICON_INLINE} /> Acknowledged on {formatDay(keyOfDbDate(myAck.signedAt))}
               </Badge>
             ) : (
               <Badge tone="warning">Acknowledgment Pending</Badge>
@@ -63,7 +64,7 @@ export default async function HandbookPage() {
             href="/contracts"
             className="rounded-xl border border-line bg-surface px-4 py-2 text-sm font-semibold shadow-sm hover:border-brand hover:text-brand transition"
           >
-            📝 Employment Contracts
+            <Icon name="contract" className={ICON_INLINE} /> Employment Contracts
           </Link>
           <PrintButton />
         </div>
@@ -100,7 +101,7 @@ export default async function HandbookPage() {
 
       {/* Table of Contents Header */}
       <Card className="print:hidden">
-        <h2 className="font-bold text-sm text-ink mb-2">📑 Table of Contents</h2>
+        <h2 className="font-bold text-sm text-ink mb-2"><Icon name="list" className={ICON_INLINE} /> Table of Contents</h2>
         <ul className="grid gap-2 sm:grid-cols-2 text-xs">
           {sections.map((s) => (
             <li key={s.id}>

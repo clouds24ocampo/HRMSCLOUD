@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
@@ -318,7 +319,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           </p>
         </div>
         <Link href="/dtr" className="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm font-semibold shadow-sm transition hover:border-brand hover:text-brand">
-          ⏱️ {clockText} <span className="text-brand">Open DTR</span>
+          <Icon name="dtr" className={ICON_INLINE} /> {clockText} <span className="text-brand">Open DTR</span>
         </Link>
       </div>
 
@@ -330,7 +331,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                <span>🎁</span> INCENTIVE RECOGNITION
+                <Icon name="incentive" className={ICON_INLINE} /> INCENTIVE RECOGNITION
               </div>
               <h2 className="mt-2 text-xl font-bold tracking-tight text-ink">
                 You have {pendingIncentives.length} incentive award{pendingIncentives.length > 1 ? "s" : ""} awaiting your acceptance!
@@ -385,7 +386,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <section aria-label="Announcements" className="space-y-2">
           {news.map((a) => (
             <article key={a.id} className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
-              <p className="font-semibold">{a.pinned && <span aria-label="pinned">📌 </span>}{a.title}</p>
+              <p className="font-semibold">{a.pinned && <span aria-label="pinned"><Icon name="pin" className={ICON_INLINE} /> </span>}{a.title}</p>
               <p className="mt-1 whitespace-pre-line text-sm text-muted">{a.body}</p>
             </article>
           ))}

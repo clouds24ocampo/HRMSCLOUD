@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/Icon";
 import { useActionState, useState, type ChangeEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
@@ -84,7 +85,7 @@ export function RegisterWizard() {
                         >
                           <span className="[transform:translateZ(46px)]">
                             <motion.span layoutId={`icon-${c.key}`} className="block text-4xl drop-shadow-[0_14px_12px_rgba(0,0,0,0.55)]" aria-hidden>
-                              {c.icon}
+                              <Icon name={c.icon} className="h-10 w-10" />
                             </motion.span>
                           </span>
                           <span className="text-sm leading-tight font-semibold [transform:translateZ(22px)]">{c.name}</span>
@@ -105,7 +106,7 @@ export function RegisterWizard() {
                     className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl shadow-[0_0_40px_-6px_rgba(143,162,255,0.8)] ${glass}`}
                   >
                     <motion.span layoutId={`icon-${category.key}`} className="block text-4xl" aria-hidden>
-                      {category.icon}
+                      <Icon name={category.icon} className="h-10 w-10" />
                     </motion.span>
                   </motion.div>
                   <div>

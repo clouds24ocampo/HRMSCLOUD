@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import { DEFAULT_LOCALE } from "@/lib/locale";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
@@ -82,7 +83,7 @@ export default async function IncentivesPage() {
       {myPending.length > 0 && (
         <section aria-label="Pending incentives" className="space-y-4">
           <h2 className="text-lg font-bold text-ink flex items-center gap-2">
-            <span>🎉</span> Action Required: Incentive Awards Waiting for Your Acceptance
+            <Icon name="celebrate" className={ICON_INLINE} /> Action Required: Incentive Awards Waiting for Your Acceptance
           </h2>
           <div className="grid gap-4">
             {myPending.map((inc) => (
@@ -93,7 +94,7 @@ export default async function IncentivesPage() {
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl" aria-hidden>🎁</span>
+                      <Icon name="incentive" className="h-7 w-7 text-brand" />
                       <h3 className="text-xl font-bold text-ink">{inc.title}</h3>
                       <Badge tone="warning">Pending Your Acceptance</Badge>
                     </div>
@@ -137,7 +138,7 @@ export default async function IncentivesPage() {
           <Card>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-base font-bold text-ink">Award an Incentive 🎁</h3>
+                <h3 className="text-base font-bold text-ink">Award an Incentive <Icon name="incentive" className={ICON_INLINE} /></h3>
                 <p className="text-xs text-muted">Grant a performance bonus or spot reward. The employee will be notified to accept it.</p>
               </div>
             </div>
@@ -198,7 +199,7 @@ export default async function IncentivesPage() {
                           <td className="px-5 py-3 text-xs text-muted">
                             {i.status === "ACCEPTED" && i.acceptedAt && (
                               <div>
-                                <span className="font-semibold text-success">✓ Accepted</span>
+                                <span className="font-semibold text-success"><Icon name="ok" className={ICON_INLINE} /> Accepted</span>
                                 <span className="block">{formatDay(keyOfDbDate(i.acceptedAt))} {formatTime(i.acceptedAt, tz)}</span>
                                 {i.employeeNote && <span className="italic">&ldquo;{i.employeeNote}&rdquo;</span>}
                               </div>

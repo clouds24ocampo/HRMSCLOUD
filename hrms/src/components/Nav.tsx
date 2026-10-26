@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
+import { Icon } from "@/components/Icon";
 import { Logo } from "@/components/Logo";
 import type { NavGroup, NavItem } from "@/lib/menu";
 
@@ -37,7 +38,7 @@ export function Nav({ groups, primary }: { groups: NavGroup[]; primary: string[]
                   {active && (
                     <motion.span layoutId="nav-pill" className="absolute inset-0 rounded-lg bg-brand/10" transition={{ type: "spring", stiffness: 400, damping: 32 }} />
                   )}
-                  <span className="relative text-base" aria-hidden>{i.icon}</span>
+                  <span className="relative"><Icon name={i.icon} /></span>
                   <span className="relative">{i.label}</span>
                 </Link>
               );
@@ -54,7 +55,7 @@ export function Nav({ groups, primary }: { groups: NavGroup[]; primary: string[]
             aria-current={isActive(path, i.href) ? "page" : undefined}
             className="flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium text-muted aria-[current=page]:text-brand"
           >
-            <span className="text-xl" aria-hidden>{i.icon}</span>
+            <Icon name={i.icon} className="h-6 w-6" />
             {i.label}
           </Link>
         ))}
@@ -64,7 +65,7 @@ export function Nav({ groups, primary }: { groups: NavGroup[]; primary: string[]
           aria-haspopup="dialog"
           className="flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium text-muted"
         >
-          <span className="text-xl" aria-hidden>☰</span>
+          <Icon name="menu" className="h-6 w-6" />
           More
         </button>
       </nav>
@@ -95,7 +96,7 @@ export function Nav({ groups, primary }: { groups: NavGroup[]; primary: string[]
                         aria-current={isActive(path, i.href) ? "page" : undefined}
                         className="flex flex-col items-center gap-1 rounded-xl border border-line p-3 text-center text-xs font-medium aria-[current=page]:border-brand aria-[current=page]:text-brand"
                       >
-                        <span className="text-xl" aria-hidden>{i.icon}</span>
+                        <Icon name={i.icon} className="h-6 w-6" />
                         {i.label}
                       </Link>
                     ))}

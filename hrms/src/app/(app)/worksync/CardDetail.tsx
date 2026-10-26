@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE, type IconName } from "@/components/Icon";
 import { formatDay, formatTime, keyOfDbDate } from "@/lib/time";
 import { dayKey } from "@/lib/time";
 import { Badge } from "@/components/ui";
@@ -31,16 +32,16 @@ type Detail = {
 
 const when = (d: Date, tz: string) => `${formatDay(dayKey(d, tz), { month: "short", day: "numeric" })} ${formatTime(d, tz)}`;
 
-const ICONS: Record<string, string> = {
-  CARD_CREATED: "➕",
-  EDITED: "✏️",
-  MOVED: "🔄",
-  DONE: "✅",
-  BLOCKED: "⚠️",
-  ASSIGNED: "👤",
-  CHECKED: "☑️",
-  COMMENTED: "💬",
-  ARCHIVED: "📦",
+const ICONS: Record<string, IconName> = {
+  CARD_CREATED: "add",
+  EDITED: "edit",
+  MOVED: "move",
+  DONE: "done",
+  BLOCKED: "warning",
+  ASSIGNED: "employee",
+  CHECKED: "checked",
+  COMMENTED: "comment",
+  ARCHIVED: "archive",
 };
 
 // The card, opened over the board: Trello's layout. Main column on the left (details, checklist, comments), actions on the right.
@@ -117,8 +118,8 @@ export function CardDetail({ ctx, card, who, activity, events }: { ctx: ViewCtx;
             {card.checklist.map((k) => (
               <li key={k.id} className="flex items-center justify-between gap-2 rounded-md px-1 py-1 text-sm hover:bg-bg">
                 {edit ? (
-                  <form action={toggleCheck.bind(null, k.id)} className="min-w-0 flex-1"><button aria-pressed={k.done} className="flex w-full items-center gap-2 text-left"><span aria-hidden>{k.done ? "☑" : "☐"}</span><span className={k.done ? "text-muted line-through" : ""}>{k.text}</span></button></form>
-                ) : <span className={k.done ? "text-muted line-through" : ""}>{k.done ? "☑" : "☐"} {k.text}</span>}
+                  <form action={toggleCheck.bind(null, k.id)} className="min-w-0 flex-1"><button aria-pressed={k.done} className="flex w-full items-center gap-2 text-left"><span aria-hidden><Icon name={k.done ? "checked" : "unchecked"} className="h-4 w-4" /></span><span className={k.done ? "text-muted line-through" : ""}>{k.text}</span></button></form>
+                ) : <span className={k.done ? "text-muted line-through" : ""}><Icon name={k.done ? "checked" : "unchecked"} className={ICON_INLINE} /> {k.text}</span>}
                 {edit && <form action={removeCheck.bind(null, k.id)}><button aria-label={`Remove step ${k.text}`} className="px-1 text-muted hover:text-danger">×</button></form>}
               </li>
             ))}
@@ -141,7 +142,7 @@ export function CardDetail({ ctx, card, who, activity, events }: { ctx: ViewCtx;
                 </li>
               ) : (
                 <li key={e.id} className="flex items-start gap-2.5 rounded-lg border border-line/60 bg-bg/40 px-3 py-2 text-xs text-muted">
-                  <span className="text-sm shrink-0" aria-hidden>{ICONS[e.a.type] ?? "📝"}</span>
+                  <Icon name={ICONS[e.a.type] ?? "file"} className="h-4 w-4 shrink-0" />
                   <div className="min-w-0 flex-1">
                     <p>
                       <span className="font-semibold text-ink">{who.get(e.a.actorId) ?? "Former user"}</span>{" "}
@@ -167,7 +168,7 @@ export function CardDetail({ ctx, card, who, activity, events }: { ctx: ViewCtx;
                   {edit ? (
                     <form action={toggleAssignee.bind(null, card.id, m.employeeId)}>
                       <button aria-pressed={on} className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition ${on ? "bg-brand/10 font-semibold text-brand" : "hover:bg-bg"}`}>
-                        <Facepile people={[m]} size={22} /><span className="min-w-0 flex-1 truncate">{fullName(m)}</span>{on && <span aria-hidden>✓</span>}
+                        <Facepile people={[m]} size={22} /><span className="min-w-0 flex-1 truncate">{fullName(m)}</span>{on && <Icon name="ok" className="h-4 w-4" />}
                       </button>
                     </form>
                   ) : on ? <Badge tone="brand">{fullName(m)}</Badge> : null}
@@ -185,7 +186,7 @@ export function CardDetail({ ctx, card, who, activity, events }: { ctx: ViewCtx;
               return (
                 <li key={l.id}>
                   {edit ? (
-                    <form action={toggleLabel.bind(null, card.id, l.id)}><button aria-pressed={on} className="flex w-full items-center gap-2 rounded-lg px-1 py-0.5 text-left hover:bg-bg"><span className="min-w-0 flex-1"><LabelChip label={l} /></span>{on && <span aria-hidden>✓</span>}</button></form>
+                    <form action={toggleLabel.bind(null, card.id, l.id)}><button aria-pressed={on} className="flex w-full items-center gap-2 rounded-lg px-1 py-0.5 text-left hover:bg-bg"><span className="min-w-0 flex-1"><LabelChip label={l} /></span>{on && <Icon name="ok" className="h-4 w-4" />}</button></form>
                   ) : on ? <LabelChip label={l} /> : null}
                 </li>
               );
@@ -210,7 +211,7 @@ export function CardDetail({ ctx, card, who, activity, events }: { ctx: ViewCtx;
 
         {edit && (
           <section className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3">
-            <h3 className="mb-1 text-xs font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400">Award Incentive 🎁</h3>
+            <h3 className="mb-1 text-xs font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400">Award Incentive <Icon name="incentive" className={ICON_INLINE} /></h3>
             <p className="mb-2 text-xs text-muted">Grant an incentive bonus for this task.</p>
             <details className="text-xs">
               <summary className="cursor-pointer font-semibold text-amber-600 dark:text-amber-400 hover:underline">Award bonus to member…</summary>

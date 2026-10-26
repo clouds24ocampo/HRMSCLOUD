@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { fetchMessages, sendAttachment, sendMessage, type ChatMessage } from "./actions";
 
@@ -13,8 +14,8 @@ export function CallButtons({ conversationId, name }: { conversationId: string; 
   const call = (kind: "VOICE" | "VIDEO") => window.dispatchEvent(new CustomEvent("hrms:call", { detail: { conversationId, kind, name } }));
   return (
     <div className="flex gap-2">
-      <button type="button" onClick={() => call("VOICE")} className="rounded-lg border border-line px-3 py-2 text-sm font-semibold transition hover:bg-bg" aria-label={`Voice call ${name}`}>📞 Voice</button>
-      <button type="button" onClick={() => call("VIDEO")} className="rounded-lg border border-line px-3 py-2 text-sm font-semibold transition hover:bg-bg" aria-label={`Video call ${name}`}>📹 Video</button>
+      <button type="button" onClick={() => call("VOICE")} className="rounded-lg border border-line px-3 py-2 text-sm font-semibold transition hover:bg-bg" aria-label={`Voice call ${name}`}><Icon name="phone" className={ICON_INLINE} /> Voice</button>
+      <button type="button" onClick={() => call("VIDEO")} className="rounded-lg border border-line px-3 py-2 text-sm font-semibold transition hover:bg-bg" aria-label={`Video call ${name}`}><Icon name="video" className={ICON_INLINE} /> Video</button>
     </div>
   );
 }
@@ -78,7 +79,7 @@ export function ChatThread({ conversationId, initial }: { conversationId: string
               {m.file && (m.file.image ? (
                 <a href={`/chat/file/${m.id}`} target="_blank" rel="noreferrer"><img src={`/chat/file/${m.id}`} alt={m.file.name} className="mb-1 max-h-64 rounded-lg object-contain" /></a>
               ) : (
-                <a href={`/chat/file/${m.id}`} download className="mb-1 flex items-center gap-2 rounded-lg bg-black/10 px-2.5 py-2 font-medium underline-offset-2 hover:underline"><span aria-hidden>📄</span><span className="min-w-0 truncate">{m.file.name}</span><span className="shrink-0 text-xs opacity-80">{size(m.file.size)}</span></a>
+                <a href={`/chat/file/${m.id}`} download className="mb-1 flex items-center gap-2 rounded-lg bg-black/10 px-2.5 py-2 font-medium underline-offset-2 hover:underline"><Icon name="file" className={ICON_INLINE} /><span className="min-w-0 truncate">{m.file.name}</span><span className="shrink-0 text-xs opacity-80">{size(m.file.size)}</span></a>
               ))}
               {m.body && <p className="whitespace-pre-wrap wrap-break-word">{m.body}</p>}
               <p className={`mt-0.5 text-[11px] ${m.mine ? "opacity-80" : "text-muted"}`}>{m.mine ? "" : `${m.sender} · `}{time(m.at)}</p>
@@ -89,14 +90,14 @@ export function ChatThread({ conversationId, initial }: { conversationId: string
       </div>
       {file && (
         <div className="mx-3 mb-1 flex items-center justify-between gap-2 rounded-lg bg-bg px-3 py-2 text-sm">
-          <span className="min-w-0 truncate">📎 {file.name} <span className="text-muted">({size(file.size)})</span></span>
+          <span className="min-w-0 truncate"><Icon name="attach" className={ICON_INLINE} /> {file.name} <span className="text-muted">({size(file.size)})</span></span>
           <button type="button" onClick={() => setFile(null)} aria-label="Remove attachment" className="px-1 text-muted hover:text-danger">×</button>
         </div>
       )}
       <form onSubmit={send} className="flex flex-wrap gap-2 border-t border-line p-3">
-        <label className={pick} title="Take a photo"><span aria-hidden>📷</span><span className="sr-only">Use camera</span><input type="file" accept="image/*" capture="environment" onChange={choose} className="sr-only" /></label>
-        <label className={pick} title="Attach a photo"><span aria-hidden>🖼️</span><span className="sr-only">Attach photo</span><input type="file" accept="image/png,image/jpeg" onChange={choose} className="sr-only" /></label>
-        <label className={pick} title="Attach a file"><span aria-hidden>📎</span><span className="sr-only">Attach file</span><input type="file" accept={FILE_ACCEPT} onChange={choose} className="sr-only" /></label>
+        <label className={pick} title="Take a photo"><Icon name="camera" className="h-5 w-5" /><span className="sr-only">Use camera</span><input type="file" accept="image/*" capture="environment" onChange={choose} className="sr-only" /></label>
+        <label className={pick} title="Attach a photo"><Icon name="image" className="h-5 w-5" /><span className="sr-only">Attach photo</span><input type="file" accept="image/png,image/jpeg" onChange={choose} className="sr-only" /></label>
+        <label className={pick} title="Attach a file"><Icon name="attach" className="h-5 w-5" /><span className="sr-only">Attach file</span><input type="file" accept={FILE_ACCEPT} onChange={choose} className="sr-only" /></label>
         <label htmlFor="chat-text" className="sr-only">Message</label>
         <textarea
           id="chat-text" value={text} onChange={(e) => setText(e.target.value)} rows={1} maxLength={4000} placeholder={file ? "Add a caption (optional)…" : "Write a message…"}

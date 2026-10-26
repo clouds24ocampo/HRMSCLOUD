@@ -1,3 +1,4 @@
+import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import {
   type DailyAdherence,
@@ -88,9 +89,7 @@ export function ScheduleAdherenceSection({
       {/* Break Policy Callout */}
       <div className="rounded-xl border border-line bg-surface-raised/40 p-3.5 text-xs text-ink/90 shadow-2xs">
         <div className="flex items-start gap-2.5">
-          <span className="text-base select-none" aria-hidden>
-            ⏱️
-          </span>
+          <Icon name="dtr" className="h-5 w-5" />
           <div className="space-y-1">
             <p className="font-semibold text-ink">
               Break &amp; Meal Adherence Policy:
@@ -144,7 +143,7 @@ export function ScheduleAdherenceSection({
           tone={summary.totalExcessBreakMinutes > 0 ? "warning" : "neutral"}
           hint={
             summary.totalExcessBreakMinutes > 0
-              ? `⚠️ +${formatDuration(summary.totalExcessBreakMinutes)} overbreak`
+              ? `+${formatDuration(summary.totalExcessBreakMinutes)} overbreak`
               : "Within 1h 30m limit"
           }
         />

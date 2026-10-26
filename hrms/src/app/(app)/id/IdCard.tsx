@@ -1,3 +1,4 @@
+import { Icon } from "@/components/Icon";
 /* eslint-disable @next/next/no-img-element -- private pictures behind a signed-in route; the image optimizer cannot fetch them */
 export type IdCardData = {
   org: string; title: string; accent: string; footer: string | null;
@@ -16,7 +17,7 @@ export function IdCard({ d }: { d: IdCardData }) {
       </header>
       <div className="flex flex-col items-center px-5 pt-5 text-center">
         <div className="h-32 w-32 overflow-hidden rounded-2xl border-4 bg-slate-100" style={{ borderColor: d.accent }}>
-          {d.photoUrl ? <img src={d.photoUrl} alt={`Photo of ${d.name}`} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-4xl" aria-label="No photo">👤</span>}
+          {d.photoUrl ? <img src={d.photoUrl} alt={`Photo of ${d.name}`} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-4xl" aria-label="No photo"><Icon name="employee" className="h-10 w-10 text-muted" /></span>}
         </div>
         <h2 className="mt-3 text-xl font-bold leading-tight">{d.name}</h2>
         {d.position && <p className="text-sm font-semibold" style={{ color: d.accent }}>{d.position}</p>}

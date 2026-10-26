@@ -1,3 +1,4 @@
+import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
@@ -174,7 +175,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
                             events: dayEvs.map((ev) => ({
                               type: ev.type,
                               name: ev.stampType?.name ?? (ev.type === "IN" ? "Time In" : ev.type === "OUT" ? "Time Out" : "Pause"),
-                              icon: ev.stampType?.icon ?? (ev.type === "IN" ? "▶️" : ev.type === "OUT" ? "⏹️" : "⏸️"),
+                              icon: ev.stampType?.icon ?? (ev.type === "IN" ? "play" : ev.type === "OUT" ? "stop" : "pause"),
                               time: formatTime(ev.at, tz),
                               note: ev.note,
                             })),
@@ -268,7 +269,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
                                   <span className="whitespace-nowrap">{r.shift.startTime}–{r.shift.endTime}</span>
                                   {isFinished && (
                                     <span className="text-[10px] font-medium text-emerald-700 tabular-nums">
-                                      ✓ {activity?.workedDuration}
+                                      <Icon name="ok" className="inline h-3.5 w-3.5" /> {activity?.workedDuration}
                                     </span>
                                   )}
                                 </span>
@@ -297,7 +298,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
             <span className="flex items-center gap-1.5"><Badge tone="warning">orange</Badge> Changed for that day</span>
             <span className="flex items-center gap-1.5"><Badge tone="neutral">purple</Badge> Approved leave</span>
             {canEdit ? (
-              <span className="ml-auto text-muted">Click any schedule to view all timestamps & activity · hover ✏️ to edit</span>
+              <span className="ml-auto text-muted">Click any schedule to view all timestamps & activity · hover the pencil to edit</span>
             ) : (
               <span className="ml-auto text-muted">Click any schedule to view all timestamps & activity</span>
             )}

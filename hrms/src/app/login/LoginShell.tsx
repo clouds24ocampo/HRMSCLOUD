@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import { useState, type ReactNode } from "react";
 import { LoginForm } from "./LoginForm";
 import { TimeStampPanel } from "./TimeStampPanel";
@@ -9,7 +10,7 @@ import { TimeStampPanel } from "./TimeStampPanel";
 // The card section lets pointer events through outside the card, so the sculpture still reacts to the cursor.
 export function LoginShell({ startOnStamp, top, bottom, hero }: { startOnStamp: boolean; top: ReactNode; bottom: ReactNode; hero: ReactNode }) {
   const [tab, setTab] = useState<"signin" | "stamp">(startOnStamp ? "stamp" : "signin");
-  const btn = (k: "signin" | "stamp", text: string) => (
+  const btn = (k: "signin" | "stamp", text: ReactNode) => (
     <button
       type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
       className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${tab === k ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}
@@ -25,7 +26,7 @@ export function LoginShell({ startOnStamp, top, bottom, hero }: { startOnStamp: 
           {top}
           <div role="tablist" aria-label="Sign in or time stamp" className="mb-6 flex gap-1 rounded-xl bg-line/50 p-1">
             {btn("signin", "Sign in")}
-            {btn("stamp", "⏱️ Time stamp")}
+            {btn("stamp", <><Icon name="dtr" className={ICON_INLINE} /> Time stamp</>)}
           </div>
           {tab === "signin" ? (
             <>

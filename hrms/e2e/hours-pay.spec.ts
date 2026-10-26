@@ -375,7 +375,7 @@ test("daily report comments: the supervisor comments, the employee replies, HR j
   const head = await browser.newPage();
   await signIn(head, "head");
   await head.goto("/daily-report");
-  await head.getByText("💬 Comments").first().click();
+  await head.getByText("Comments", { exact: true }).first().click();
   await head.getByPlaceholder("Add a comment").first().fill("Please attach the ticket numbers.");
   await head.getByRole("button", { name: "Send", exact: true }).first().click();
   await expect(head.getByText("Comment sent.")).toBeVisible();

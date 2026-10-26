@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import Image from "next/image";
 import Link from "next/link";
 import { SculptureHero } from "@/components/ui/liquid-sculpture-hero";
@@ -77,7 +78,7 @@ export default async function Landing() {
               key={c.key}
               className="flex items-center gap-2 rounded-full border border-white/10 bg-white/4 px-4 py-2 text-sm text-halo/85 backdrop-blur-xl"
             >
-              <span aria-hidden>{c.icon}</span> {c.name}
+              <Icon name={c.icon} className={ICON_INLINE} /> {c.name}
             </li>
           ))}
         </ul>

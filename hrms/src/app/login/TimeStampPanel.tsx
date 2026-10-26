@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon, StampIcon } from "@/components/Icon";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Field } from "@/components/Fields";
 import { inputClass } from "@/components/ui";
@@ -91,7 +92,7 @@ export function TimeStampPanel() {
     return (
       <div className="space-y-4" role="status">
         <div className="rounded-2xl border border-success/40 bg-success/10 p-5 text-center">
-          <p className="text-3xl" aria-hidden>✅</p>
+          <Icon name="done" className="h-10 w-10 text-success" />
           <p className="mt-1 font-semibold text-success">{info?.name}</p>
           <p className="mt-1 text-sm">{done}</p>
         </div>
@@ -148,7 +149,7 @@ export function TimeStampPanel() {
           return (
             <button key={t.id} type="button" disabled={!!why || busy !== ""} onClick={() => press(t)} title={why ?? undefined}
               className="flex items-center gap-2 rounded-xl border border-line p-2.5 text-left transition enabled:hover:bg-bg enabled:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40">
-              <span className="text-xl" aria-hidden>{t.icon}</span>
+              <StampIcon value={t.icon} className="h-6 w-6" />
               <span className="min-w-0 text-sm font-semibold leading-tight">
                 {label(t, clock)}
                 {why && t.kind === "PAUSE" && !why.startsWith("Time In") && <span className="block text-xs font-normal text-warning">{why}</span>}

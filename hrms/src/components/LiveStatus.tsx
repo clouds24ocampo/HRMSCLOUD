@@ -1,3 +1,4 @@
+import { Icon, StampIcon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import type { BoardRow, LiveEvent, LiveRow } from "@/lib/team-dtr";
 import { mapUrl } from "@/lib/locale";
@@ -17,30 +18,30 @@ const mins = (from: Date, now: Date) => Math.max(0, Math.floor((now.getTime() - 
 
 // One person's status right now, as a tag: what they are doing, since when, and whether it is a problem.
 export function statusTag(l: LiveRow | undefined, flex: boolean, lateToday: number, tz: string, now: Date): Tag {
-  if (!l) return { group: "Not in", icon: "○", label: "Not in", tone: "neutral" };
+  if (!l) return { group: "Not in", icon: "notIn", label: "Not in", tone: "neutral" };
   if (l.state === "ON_BREAK" && l.pause) {
     const since = `since ${formatTime(l.pause.since, tz)} · ${formatDuration(mins(l.pause.since, now)) || "0m"}`;
     if (l.pause.page === "ISSUE") return { group: "On an issue", icon: l.pause.icon, label: l.pause.name, detail: since, tone: "danger" };
     return { group: "On break", icon: l.pause.icon, label: l.pause.name, detail: l.pause.overMinutes ? `${since} · ${l.pause.overMinutes} min over` : since, tone: l.pause.overMinutes ? "danger" : "brand" };
   }
-  if (l.state === "WORKING") return { group: "Working", icon: "●", label: lateToday ? `Working · late ${formatDuration(lateToday)}` : "Working", detail: l.firstIn ? `in ${formatTime(l.firstIn, tz)}` : undefined, tone: lateToday ? "warning" : "success" };
+  if (l.state === "WORKING") return { group: "Working", icon: "working", label: lateToday ? `Working · late ${formatDuration(lateToday)}` : "Working", detail: l.firstIn ? `in ${formatTime(l.firstIn, tz)}` : undefined, tone: lateToday ? "warning" : "success" };
   if (l.state === "DONE") {
     return l.systemOut
-      ? { group: "Timed out", icon: "⏏", label: "System time-out", detail: "no log out", tone: "danger" }
-      : { group: "Timed out", icon: "✓", label: "Timed out", detail: l.lastOut ? formatTime(l.lastOut, tz) : undefined, tone: "neutral" };
+      ? { group: "Timed out", icon: "logout", label: "System time-out", detail: "no log out", tone: "danger" }
+      : { group: "Timed out", icon: "ok", label: "Timed out", detail: l.lastOut ? formatTime(l.lastOut, tz) : undefined, tone: "neutral" };
   }
-  if (l.state === "LATE") return { group: "Late, not in", icon: "!", label: "Late, not in", detail: l.detail, tone: "warning" };
-  if (l.state === "ABSENT_RISK") return { group: "No show", icon: "✕", label: "No show", detail: l.detail, tone: "danger" };
-  if (l.state === "NOT_YET") return { group: "Not in yet", icon: "○", label: "Not in yet", detail: l.detail ?? (l.shift ? `shift ${l.shift.startTime}` : undefined), tone: "neutral" };
-  if (l.state === "ON_LEAVE") return { group: "On leave", icon: "🏖️", label: "On leave", tone: "brand" };
-  if (l.state === "DAY_OFF") return { group: "Day off", icon: "–", label: "Day off", tone: "neutral" };
-  return flex ? { group: "Not in yet", icon: "○", label: "Flexible, not in", tone: "neutral" } : { group: "No schedule", icon: "?", label: "No schedule, not in", tone: "neutral" };
+  if (l.state === "LATE") return { group: "Late, not in", icon: "late", label: "Late, not in", detail: l.detail, tone: "warning" };
+  if (l.state === "ABSENT_RISK") return { group: "No show", icon: "noShow", label: "No show", detail: l.detail, tone: "danger" };
+  if (l.state === "NOT_YET") return { group: "Not in yet", icon: "notIn", label: "Not in yet", detail: l.detail ?? (l.shift ? `shift ${l.shift.startTime}` : undefined), tone: "neutral" };
+  if (l.state === "ON_LEAVE") return { group: "On leave", icon: "leave", label: "On leave", tone: "brand" };
+  if (l.state === "DAY_OFF") return { group: "Day off", icon: "pause", label: "Day off", tone: "neutral" };
+  return flex ? { group: "Not in yet", icon: "notIn", label: "Flexible, not in", tone: "neutral" } : { group: "No schedule", icon: "late", label: "No schedule, not in", tone: "neutral" };
 }
 
 export function StatusTag({ t }: { t: Tag }) {
   return (
     <span className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${TONE[t.tone]}`}>
-      <span aria-hidden>{t.icon}</span>
+      <StampIcon value={t.icon} className="h-3.5 w-3.5" />
       <span className="truncate">{t.label}</span>
       {t.detail && <span className="truncate font-normal opacity-80">· {t.detail}</span>}
     </span>
@@ -58,14 +59,14 @@ function Timeline({ events, tz }: { events: LiveEvent[]; tz: string }) {
         <li key={e.id} className="relative text-xs">
           <span className={`absolute -left-[17px] top-1 h-2 w-2 rounded-full ${e.page === "ISSUE" ? "bg-danger" : e.type === "IN" ? "bg-success" : e.type === "OUT" ? "bg-muted" : "bg-brand"}`} aria-hidden />
           <span className="font-semibold tabular-nums">{formatTime(e.at, tz)}</span>{" "}
-          <span aria-hidden>{e.icon}</span> {e.name} {VERB[e.type]}
+          <StampIcon value={e.icon} className="h-3.5 w-3.5 inline align-text-bottom" /> {e.name} {VERB[e.type]}
           {e.page === "ISSUE" && <span className="ml-1 text-danger">(issue)</span>}
           {e.source === "SYSTEM" && <span className="ml-1 font-semibold text-danger">system time-out</span>}
           {e.source === "MANUAL" && <span className="ml-1 text-warning">added by HR</span>}
           <span className="block text-muted">
             {e.lat != null && e.lng != null ? (
               <a href={mapUrl(e.lat, e.lng)} target="_blank" rel="noopener noreferrer" className={e.gpsStatus === "OK" ? "text-brand hover:underline" : "text-warning hover:underline"}>
-                📍 ±{Math.round(e.accuracy ?? 0)} m{e.device === "DESKTOP" ? " · computer" : e.device ? " · phone" : ""}
+                <Icon name="location" className={ICON_INLINE} /> ±{Math.round(e.accuracy ?? 0)} m{e.device === "DESKTOP" ? " · computer" : e.device ? " · phone" : ""}
               </a>
             ) : e.source === "SYSTEM" || e.source === "MANUAL" ? null : <span className="text-danger">no location</span>}
             {e.note && <span className="block italic">“{e.note}”</span>}

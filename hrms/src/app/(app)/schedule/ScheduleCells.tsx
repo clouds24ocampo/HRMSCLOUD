@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/Icon";
 import { useState, useTransition } from "react";
 import { useActionState } from "react";
 import Link from "next/link";
@@ -98,7 +99,7 @@ export function CellEditor({
             title={`Change schedule for ${day}`}
             className="flex h-5 w-5 items-center justify-center rounded-full border border-line bg-surface text-[10px] text-muted shadow-xs transition hover:border-brand/40 hover:bg-bg hover:text-ink opacity-0 group-hover/cell:opacity-100 max-sm:opacity-70 focus:opacity-100"
           >
-            ✏️
+            <Icon name="edit" className="h-3 w-3" />
           </button>
           {open && (
             <>
@@ -123,7 +124,7 @@ export function CellEditor({
                     onClick={() => setOpen(false)}
                     className="text-muted hover:text-ink text-xs font-medium"
                   >
-                    ✕
+                    <Icon name="close" className="h-4 w-4" />
                   </button>
                 </div>
 

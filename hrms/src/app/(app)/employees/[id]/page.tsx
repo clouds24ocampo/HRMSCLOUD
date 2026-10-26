@@ -1,3 +1,4 @@
+import { Icon, ICON_INLINE, type IconName } from "@/components/Icon";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -91,14 +92,15 @@ export default async function EmployeePage({ params, searchParams }: { params: P
   // Pay is personal: HR and the person themselves only.
   const breakdown = hr || own ? await payBreakdown(me, mine.id, e.id, today, settings) : null;
   const f201 = hr ? items201((await load201(me.organizationId, [e.id])).get(e.id)) : null;
-  const tabs = [
-    (hr || own) && { href: own ? "/payslips" : `/payslips?employee=${e.id}`, label: "Payslips", icon: "🧾" },
-    { href: `/schedule?employee=${e.id}`, label: "Schedule", icon: "📅" },
-    { href: `/dtr?employee=${e.id}`, label: "DTR", icon: "⏱️" },
-    (hr || own) && { href: own ? "/cash-advance" : `/cash-advance?employee=${e.id}`, label: "Cash advance", icon: "💵" },
-    { href: own ? "/daily-report" : `/daily-report?employee=${e.id}`, label: "Daily report", icon: "🗒️" },
-    (hr || own) && { href: own ? "/policies" : `/policies?employee=${e.id}`, label: "Policies", icon: "📜" },
-  ].filter((t): t is { href: string; label: string; icon: string } => !!t);
+  type Tab = { href: string; label: string; icon: IconName };
+  const tabs = ([
+    (hr || own) && { href: own ? "/payslips" : `/payslips?employee=${e.id}`, label: "Payslips", icon: "payslip" },
+    { href: `/schedule?employee=${e.id}`, label: "Schedule", icon: "schedule" },
+    { href: `/dtr?employee=${e.id}`, label: "DTR", icon: "dtr" },
+    (hr || own) && { href: own ? "/cash-advance" : `/cash-advance?employee=${e.id}`, label: "Cash advance", icon: "cashAdvance" },
+    { href: own ? "/daily-report" : `/daily-report?employee=${e.id}`, label: "Daily report", icon: "dailyReport" },
+    (hr || own) && { href: own ? "/policies" : `/policies?employee=${e.id}`, label: "Policies", icon: "policies" },
+  ] as (Tab | false)[]).filter((t): t is Tab => !!t);
   const shifts = canSchedule ? await prisma.shiftTemplate.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, orderBy: { startTime: "asc" } }) : [];
 
   const [departments, positions, managers] = hr
@@ -114,12 +116,12 @@ export default async function EmployeePage({ params, searchParams }: { params: P
       {me.role.key === ROLES.EMPLOYEE || me.role.key === ROLES.SUBCONTRACTOR ? <Link href="/dashboard" className="text-sm font-medium text-muted hover:text-ink">← Home</Link> : <Link href="/employees" className="text-sm font-medium text-muted hover:text-ink">← All employees</Link>}
       {via === "id" && (
         <p role="status" className="rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm font-medium text-success">
-          🪪 Opened from the QR code on {e.firstName}&apos;s digital ID. Status: {STATUS_LABEL[e.status]}.
+          <Icon name="id" className={ICON_INLINE} /> Opened from the QR code on {e.firstName}&apos;s digital ID. Status: {STATUS_LABEL[e.status]}.
         </p>
       )}
       <div className="flex items-center gap-4">
         {/* eslint-disable-next-line @next/next/no-img-element -- private picture behind a signed-in route */}
-        {e.photoKey ? <img src={`/employees/${e.id}/photo?v=${e.photoKey.slice(-8)}`} alt={`Photo of ${e.firstName}`} className="h-20 w-20 shrink-0 rounded-2xl object-cover" /> : <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-line/60 text-3xl" aria-hidden>👤</span>}
+        {e.photoKey ? <img src={`/employees/${e.id}/photo?v=${e.photoKey.slice(-8)}`} alt={`Photo of ${e.firstName}`} className="h-20 w-20 shrink-0 rounded-2xl object-cover" /> : <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-line/60 text-muted"><Icon name="employee" className="h-9 w-9" /></span>}
         <div className="min-w-0 flex-1">
       <PageHeader
         title={`${e.firstName} ${e.lastName}`}
@@ -132,7 +134,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
       <nav aria-label={`${e.firstName}'s records`} className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
         {tabs.map((t) => (
           <Link key={t.label} href={t.href} className="flex shrink-0 items-center gap-1.5 rounded-xl border border-line bg-surface px-3.5 py-2 text-sm font-semibold shadow-sm transition hover:border-brand hover:text-brand">
-            <span aria-hidden>{t.icon}</span>{t.label}
+            <Icon name={t.icon} className="h-4 w-4" />{t.label}
           </Link>
         ))}
       </nav>
@@ -159,7 +161,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
           <div className="mt-5 flex flex-wrap gap-2">
             <Link href={`/dtr?employee=${e.id}`} className={buttonClass}>View DTR</Link>
             <Link href={`/schedule?employee=${e.id}`} className="rounded-lg border border-line px-4 py-2.5 font-semibold transition hover:bg-bg">View schedule</Link>
-            {hr && <Link href={`/contracts?employee=${e.id}`} className="rounded-lg border border-line px-4 py-2.5 font-semibold transition hover:border-brand hover:text-brand">📝 Contract</Link>}
+            {hr && <Link href={`/contracts?employee=${e.id}`} className="rounded-lg border border-line px-4 py-2.5 font-semibold transition hover:border-brand hover:text-brand"><Icon name="contract" className={ICON_INLINE} /> Contract</Link>}
           </div>
         </Card>
 

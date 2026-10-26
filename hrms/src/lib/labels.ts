@@ -19,6 +19,6 @@ export const PAYROLL_KIND_LABEL = { REGULAR: "Regular payroll", THIRTEENTH_MONTH
 export const CONTRACT_STATUS_BADGE = {
   DRAFT: { label: "Draft", tone: "neutral" },
   ISSUED: { label: "Issued (Awaiting Signature)", tone: "warning" },
-  SIGNED: { label: "Signed ✓", tone: "success" },
+  SIGNED: { label: "Signed", tone: "success" },
   VOID: { label: "Cancelled", tone: "danger" },
 } as const;

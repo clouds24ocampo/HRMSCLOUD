@@ -1,0 +1,3 @@
+-- Time stamp types now store an icon name (see components/Icon.tsx) instead of an emoji character.
+ALTER TABLE "TimeStampType" ALTER COLUMN "icon" SET DEFAULT 'clock';
+UPDATE "TimeStampType" AS t SET "icon" = m.name FROM (VALUES ('➡️', 'login'), ('☕', 'coffee'), ('🍽️', 'meal'), ('🚻', 'restroom'), ('📍', 'location'), ('🩺', 'clinic'), ('⚠️', 'warning'), ('🌧️', 'rain'), ('🌡️', 'heat'), ('🌀', 'storm'), ('🫨', 'quake'), ('⚡', 'power'), ('🆘', 'sos'), ('⬅️', 'logout'), ('🚗', 'car'), ('🧑‍🏫', 'teach'), ('📞', 'phone'), ('💻', 'laptop'), ('🛠️', 'tools'), ('🎓', 'learning'), ('🏥', 'hospital'), ('📦', 'box'), ('⏸️', 'pause'), ('🙏', 'prayer'), ('⏱️', 'clock'), ('▶️', 'play'), ('⏹️', 'stop')) AS m(emoji, name) WHERE t."icon" = m.emoji;

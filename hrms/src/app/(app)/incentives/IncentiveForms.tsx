@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon, ICON_INLINE } from "@/components/Icon";
 import { useState } from "react";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert } from "@/components/Fields";
@@ -89,7 +90,7 @@ export function AwardIncentiveForm({
 
       <div className="flex justify-end gap-2 pt-2">
         <button disabled={f.pending} className={buttonClass}>
-          {f.pending ? "Awarding…" : "Award Incentive 🎁"}
+          {f.pending ? "Awarding…" : <>Award Incentive <Icon name="incentive" className={ICON_INLINE} /></>}
         </button>
       </div>
     </form>
@@ -108,7 +109,7 @@ export function AcceptIncentiveForm({ incentiveId, title, amount }: { incentiveI
           onClick={() => setOpen(true)}
           className="inline-flex items-center gap-2 rounded-xl bg-success px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-success/90 active:scale-95"
         >
-          <span>✓</span> Accept Incentive ({amount})
+          <Icon name="ok" className={ICON_INLINE} /> Accept Incentive ({amount})
         </button>
       ) : (
         <form {...f.formProps} className="rounded-xl border border-success/30 bg-success/5 p-4 space-y-3">
@@ -128,7 +129,7 @@ export function AcceptIncentiveForm({ incentiveId, title, amount }: { incentiveI
           {f.state?.ok && <Alert kind="success">{f.state.ok}</Alert>}
           <div className="flex items-center gap-2">
             <button disabled={f.pending} className="rounded-lg bg-success px-4 py-2 text-sm font-bold text-white transition hover:bg-success/90">
-              {f.pending ? "Confirming…" : "Confirm & Accept ✓"}
+              {f.pending ? "Confirming…" : "Confirm & Accept"}
             </button>
             <button type="button" onClick={() => setOpen(false)} className={ghostClass}>
               Cancel

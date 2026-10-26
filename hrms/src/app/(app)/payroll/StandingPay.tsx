@@ -1,3 +1,4 @@
+import { Icon, StampIcon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { regularMinutesOf, type Attendance } from "@/lib/payroll";
@@ -37,10 +38,10 @@ function Day({ d, tz }: { d: ActivityDay; tz: string }) {
           {d.stamps.map((e) => (
             <li key={e.id} className="flex flex-wrap items-baseline gap-x-2">
               <span className="w-16 shrink-0 font-semibold tabular-nums">{formatTime(e.at, tz)}</span>
-              <span><span aria-hidden>{e.icon}</span> {e.name} {VERB[e.type]}{e.issue && <span className="text-danger"> (issue)</span>}</span>
+              <span><StampIcon value={e.icon} className="h-4 w-4 inline align-text-bottom" /> {e.name} {VERB[e.type]}{e.issue && <span className="text-danger"> (issue)</span>}</span>
               {e.lat != null && e.lng != null ? (
                 <a href={mapUrl(e.lat, e.lng)} target="_blank" rel="noopener noreferrer" className={e.gpsStatus === "OK" ? "text-brand hover:underline" : "text-warning hover:underline"}>
-                  📍 ±{Math.round(e.accuracy ?? 0)} m{e.device === "DESKTOP" ? " · computer" : e.device ? " · phone" : ""}
+                  <Icon name="location" className={ICON_INLINE} /> ±{Math.round(e.accuracy ?? 0)} m{e.device === "DESKTOP" ? " · computer" : e.device ? " · phone" : ""}
                 </a>
               ) : e.source === "SYSTEM" ? <span className="font-semibold text-danger">by the system (no log out)</span>
                 : e.source === "MANUAL" ? <span className="text-warning">added by HR</span> : <span className="text-danger">no location</span>}
@@ -119,7 +120,7 @@ export async function StandingPay({ organizationId, today, pick, settings }: { o
                   </span>
                   <span className="flex items-center gap-2">
                     {flags > 0 && <Badge tone="warning">{flags} flag{flags === 1 ? "" : "s"}</Badge>}
-                    {out && <Badge tone={out.status === "CONFIRMED" ? "success" : out.status === "DISPUTED" ? "danger" : "warning"}>{out.status === "CONFIRMED" ? "Paid ✓" : out.status === "DISPUTED" ? "Problem" : "Paid, waiting"}</Badge>}
+                    {out && <Badge tone={out.status === "CONFIRMED" ? "success" : out.status === "DISPUTED" ? "danger" : "warning"}>{out.status === "CONFIRMED" ? "Paid" : out.status === "DISPUTED" ? "Problem" : "Paid, waiting"}</Badge>}
                     <span className={`text-right font-bold tabular-nums ${s && s.netCents < 0 ? "text-danger" : ""}`}>{s ? formatMoney(s.netCents) : "—"}</span>
                   </span>
                 </summary>
