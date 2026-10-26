@@ -58,13 +58,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         </header>
         {missing > 0 && (
-          <aside aria-label="201 file reminder" className="flex flex-wrap items-center justify-between gap-2 border-b border-danger/30 bg-danger/10 px-4 py-2.5 text-sm sm:px-8">
+          <aside aria-label="201 file reminder" className="print:hidden flex flex-wrap items-center justify-between gap-2 border-b border-danger/30 bg-danger/10 px-4 py-2.5 text-sm sm:px-8">
             <span><span className="font-semibold text-danger">Your 201 file is incomplete.</span> {missing} required document{missing === 1 ? " is" : "s are"} still missing.</span>
             <Link href="/documents#file201" className="rounded-lg bg-danger px-3 py-1.5 font-semibold text-white transition active:scale-95">Upload now</Link>
           </aside>
         )}
         {toSign > 0 && (
-          <aside aria-label="Policies reminder" className="flex flex-wrap items-center justify-between gap-2 border-b border-warning/30 bg-warning/10 px-4 py-2.5 text-sm sm:px-8">
+          <aside aria-label="Policies reminder" className="print:hidden flex flex-wrap items-center justify-between gap-2 border-b border-warning/30 bg-warning/10 px-4 py-2.5 text-sm sm:px-8">
             <span><span className="font-semibold text-warning">{toSign} {toSign === 1 ? "policy" : "policies"} to read and sign.</span> User agreement, terms and privacy policies.</span>
             <Link href="/policies" className="rounded-lg border border-warning/50 px-3 py-1.5 font-semibold text-warning transition hover:bg-warning/10">Open policies</Link>
           </aside>
