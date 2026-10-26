@@ -29,6 +29,8 @@ function gathered(pc: RTCPeerConnection) {
   });
 }
 
+const ERROR_TOAST_MS = 6000; // a call error is only a notice: it clears itself
+
 const mmss = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, "0")}`;
 
 export function CallManager() {
@@ -77,6 +79,12 @@ export function CallManager() {
     pc.current = p;
     return p;
   };
+
+  useEffect(() => {
+    if (!error) return;
+    const t = setTimeout(() => setError(undefined), ERROR_TOAST_MS);
+    return () => clearTimeout(t);
+  }, [error]);
 
   // Outgoing: started from a chat page.
   useEffect(() => {
