@@ -166,7 +166,7 @@ export function ScheduleAdherenceSection({
 
       {/* Daily Breakdown Table */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
           <h3 className="text-base font-semibold text-ink">
             Daily Breakdown ({daily.length} days)
           </h3>
@@ -176,7 +176,7 @@ export function ScheduleAdherenceSection({
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-line">
-          <table className="w-full text-left text-sm">
+          <table className="w-full whitespace-nowrap text-left text-sm">
             <thead className="border-b border-line bg-surface text-xs font-semibold text-muted">
               <tr>
                 <th className="px-3.5 py-3">Date</th>

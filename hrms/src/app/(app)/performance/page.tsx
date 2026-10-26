@@ -106,7 +106,7 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
             </Link>
           </div>
           <div className="overflow-x-auto rounded-xl border border-line">
-            <table className="w-full text-left text-sm">
+            <table className="w-full whitespace-nowrap text-left text-sm">
               <thead className="border-b border-line bg-surface text-xs font-semibold text-muted">
                 <tr>
                   <th className="px-3.5 py-2.5">Employee</th>
