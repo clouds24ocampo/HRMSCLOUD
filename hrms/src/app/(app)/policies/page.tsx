@@ -5,9 +5,9 @@ import { getMyEmployee } from "@/lib/employees";
 import { ensurePolicies, POLICY_KIND_LABEL } from "@/lib/policies";
 import { isHr } from "@/lib/scope";
 import { Badge, Card, EmptyState, PageHeader, buttonClass, inputClass } from "@/components/ui";
-import { ArchivePolicyButton, PublishPolicyForm } from "./PolicyForms";
+import { ArchivePolicyButton, PublishPolicyForm, RestorePolicyButton } from "./PolicyForms";
 
-export default async function PoliciesPage({ searchParams }: { searchParams: Promise<{ employee?: string }> }) {
+export default async function PoliciesPage({ searchParams }: { searchParams: Promise<{ employee?: string; view?: string }> }) {
   const me = await requireUser("/policies");
   const sp = await searchParams;
   await ensurePolicies(me.organizationId, me.organization.name);
@@ -15,11 +15,12 @@ export default async function PoliciesPage({ searchParams }: { searchParams: Pro
   const hr = isHr(me.role.key);
   // HR can look at anyone's signatures; everyone else sees their own.
   const employeeId = hr && sp.employee ? sp.employee : mine.id;
+  const archived = hr && sp.view === "archived";
   const [policies, person, headcount, people] = await Promise.all([
     prisma.policyDocument.findMany({
-      where: { organizationId: me.organizationId, archivedAt: null },
+      where: { organizationId: me.organizationId, archivedAt: archived ? { not: null } : null },
       include: { signatures: { where: { employeeId }, select: { id: true, createdAt: true } }, _count: { select: { signatures: true } } },
-      orderBy: [{ kind: "asc" }, { title: "asc" }],
+      orderBy: archived ? [{ archivedAt: "desc" }] : [{ kind: "asc" }, { title: "asc" }],
     }),
     prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, select: { firstName: true, lastName: true } }),
     hr ? prisma.employee.count({ where: { organizationId: me.organizationId, status: { in: ["ACTIVE", "ON_LEAVE"] } } }) : 0,
@@ -48,18 +49,28 @@ export default async function PoliciesPage({ searchParams }: { searchParams: Pro
         </form>
       )}
 
+      {hr && (
+        <nav aria-label="Policy list" className="flex gap-2 text-sm">
+          {[{ label: "Current", view: "" }, { label: "Archived", view: "archived" }].map((t) => (
+            <Link key={t.label} href={`/policies?${new URLSearchParams({ ...(t.view && { view: t.view }), ...(sp.employee && { employee: sp.employee }) })}`}
+              aria-current={(t.view === "archived") === archived ? "page" : undefined}
+              className={`rounded-lg px-3 py-1.5 font-medium ${(t.view === "archived") === archived ? "bg-brand text-brand-ink" : "border border-line text-muted hover:bg-bg"}`}>{t.label}</Link>
+          ))}
+        </nav>
+      )}
+
       <Card className="p-0">
-        {policies.length === 0 ? <div className="p-5"><EmptyState title="No policies yet" /></div> : (
+        {policies.length === 0 ? <div className="p-5"><EmptyState title={archived ? "No archived policies" : "No policies yet"} hint={archived ? "Archived policies and replaced versions appear here. Their signatures stay on record." : undefined} /></div> : (
           <ul className="divide-y divide-line">
             {policies.map((p) => (
-              <li key={p.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+              <li key={p.id} className={`flex flex-wrap items-center justify-between gap-3 px-5 py-4 ${archived ? "bg-bg/60 text-muted" : ""}`}>
                 <div className="min-w-0">
                   <Link href={`/policies/${p.id}${own ? "" : `?employee=${employeeId}`}`} className="font-semibold hover:underline">{p.title}</Link>
                   <p className="text-sm text-muted">{POLICY_KIND_LABEL[p.kind]} · version {p.version}{p.fileName ? " · PDF" : ""}{hr ? ` · signed by ${p._count.signatures} of ${headcount}` : ""}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {!p.requiresSignature ? <Badge>For reading</Badge> : p.signatures.length ? <Badge tone="success">Signed {p.signatures[0].createdAt.toISOString().slice(0, 10)}</Badge> : <Badge tone="danger">Not signed</Badge>}
-                  {hr && <ArchivePolicyButton id={p.id} />}
+                  {archived ? <Badge>Archived {p.archivedAt?.toISOString().slice(0, 10)}</Badge> : !p.requiresSignature ? <Badge>For reading</Badge> : p.signatures.length ? <Badge tone="success">Signed {p.signatures[0].createdAt.toISOString().slice(0, 10)}</Badge> : <Badge tone="danger">Not signed</Badge>}
+                  {hr && (archived ? <RestorePolicyButton id={p.id} /> : <ArchivePolicyButton id={p.id} />)}
                 </div>
               </li>
             ))}

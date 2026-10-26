@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui";
 import { CATEGORY_COLOR, CATEGORY_LABEL, cardProgress, personName as fullName } from "@/lib/worksync";
 import { cardContributors, type RCard } from "@/lib/worksync-report";
 import { archiveCard, removeCheck, toggleAssignee, toggleCheck, toggleLabel } from "./actions";
-import { CheckForm, CommentForm, EditCardForm, MoveForm, NewLabelForm } from "./CardForms";
+import { CheckForm, CommentForm, EditCardForm, MoveForm, NewLabelForm, QuickStatus } from "./CardForms";
 import { AwardIncentiveForm } from "@/app/(app)/incentives/IncentiveForms";
 import { Bar, Facepile, LabelChip } from "./parts";
 import type { ViewCtx } from "./views/types";
@@ -52,6 +52,7 @@ export function CardDetail({ ctx, card, who, activity, events }: { ctx: ViewCtx;
   const onCard = ctx.members.filter((m) => mine.has(m.employeeId));
   const cardLabels = ctx.labels.filter((l) => card.labels.some((x) => x.labelId === l.id));
   const edit = ctx.canEdit;
+  const closeHref = ctx.href({ card: null, panel: null });
   const assigneeKeys = card.assignees.map((a) => ctx.members.find((m) => m.employeeId === a.employeeId)?.userId ?? `e:${a.employeeId}`);
   const rcard: RCard = { id: card.id, projectId: ctx.projectId, title: card.title, listName: card.list.name, category: card.list.category, createdById: card.createdById, createdAt: card.createdAt, completedById: card.completedById, completedAt: card.completedAt, dueDay: card.dueDate ? keyOfDbDate(card.dueDate) : null, progress: pct, assigneeKeys };
   const contributors = cardContributors(rcard, events.map((e) => ({ ...e, cardId: card.id }))).filter((c) => c.actions > 0 || c.assigned);
@@ -104,7 +105,7 @@ export function CardDetail({ ctx, card, who, activity, events }: { ctx: ViewCtx;
         </section>
 
         {edit ? (
-          <EditCardForm cardId={card.id} card={{ title: card.title, description: card.description ?? "", priority: card.priority, startDay: card.startDate ? keyOfDbDate(card.startDate) : "", dueDay: card.dueDate ? keyOfDbDate(card.dueDate) : "" }} />
+          <EditCardForm cardId={card.id} closeHref={closeHref} card={{ title: card.title, description: card.description ?? "", priority: card.priority, startDay: card.startDate ? keyOfDbDate(card.startDate) : "", dueDay: card.dueDate ? keyOfDbDate(card.dueDate) : "" }} />
         ) : card.description ? <p className="whitespace-pre-line text-sm">{card.description}</p> : null}
 
         <section aria-label="Checklist">
@@ -195,8 +196,15 @@ export function CardDetail({ ctx, card, who, activity, events }: { ctx: ViewCtx;
 
         {edit && (
           <section>
+            <h3 className="mb-1.5 text-xs font-bold uppercase tracking-wide text-muted">Status</h3>
+            <QuickStatus cardId={card.id} current={card.list.category} closeHref={closeHref} />
+          </section>
+        )}
+
+        {edit && (
+          <section>
             <h3 className="mb-1.5 text-xs font-bold uppercase tracking-wide text-muted">Move</h3>
-            <MoveForm cardId={card.id} listId={card.listId} lists={ctx.lists.map((l) => ({ id: l.id, name: `${l.name} (${CATEGORY_LABEL[l.category]})` }))} />
+            <MoveForm cardId={card.id} listId={card.listId} closeHref={closeHref}lists={ctx.lists.map((l) => ({ id: l.id, name: `${l.name} (${CATEGORY_LABEL[l.category]})` }))} />
           </section>
         )}
 

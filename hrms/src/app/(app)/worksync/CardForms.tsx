@@ -1,15 +1,24 @@
 "use client";
 
+import { useEffect, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert } from "@/components/Fields";
 import { buttonClass, ghostClass, inputClass } from "@/components/ui";
 import { LABEL_COLORS, PRIORITY_LABEL, ROLE_LABEL, WS_THEMES, labelColor, themeGradient } from "@/lib/worksync";
-import { addCheck, addComment, addMember, createLabel, moveCardForm, updateCard, updateProject } from "./actions";
+import { addCheck, addComment, addMember, createLabel, moveCardForm, setCardStatus, updateCard, updateProject } from "./actions";
 
 const small = "rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-brand-ink transition active:scale-95 disabled:opacity-60";
 
-export function EditCardForm({ cardId, card }: { cardId: string; card: { title: string; description: string; priority: keyof typeof PRIORITY_LABEL; startDay: string; dueDay: string } }) {
+// Once an action succeeds the card is done with: close it so the board is visible again.
+function useCloseOnOk(ok: string | undefined, closeHref: string) {
+  const router = useRouter();
+  useEffect(() => { if (ok) router.push(closeHref, { scroll: false }); }, [ok, closeHref, router]);
+}
+
+export function EditCardForm({ cardId, closeHref, card }: { cardId: string; closeHref: string; card: { title: string; description: string; priority: keyof typeof PRIORITY_LABEL; startDay: string; dueDay: string } }) {
   const f = useKeptForm(updateCard.bind(null, cardId));
+  useCloseOnOk(f.state?.ok, closeHref);
   return (
     <form {...f.formProps} className="space-y-3">
       <label className="block text-sm font-medium">Title<input name="title" required maxLength={200} defaultValue={card.title} className={inputClass} /></label>
@@ -28,8 +37,32 @@ export function EditCardForm({ cardId, card }: { cardId: string; card: { title: 
   );
 }
 
-export function MoveForm({ cardId, listId, lists }: { cardId: string; listId: string; lists: { id: string; name: string }[] }) {
+const STATUS_BUTTONS = [
+  { category: "BLOCKED", label: "Mark blocked", className: "border-red-300 bg-red-50 text-red-700 hover:bg-red-100" },
+  { category: "DONE", label: "Mark done", className: "border-green-300 bg-green-50 text-green-700 hover:bg-green-100" },
+  { category: "TODO", label: "Reopen", className: "border-line text-ink hover:bg-bg" },
+] as const;
+
+export function QuickStatus({ cardId, current, closeHref }: { cardId: string; current: string; closeHref: string }) {
+  const [pending, start] = useTransition();
+  const [result, setResult] = useState<{ error?: string; ok?: string }>();
+  useCloseOnOk(result?.ok, closeHref);
+  const shown = STATUS_BUTTONS.filter((b) => (b.category === "TODO" ? current === "BLOCKED" || current === "DONE" : b.category !== current));
+  return (
+    <div className="space-y-1.5">
+      {shown.map((b) => (
+        <button key={b.category} type="button" disabled={pending} onClick={() => start(async () => setResult(await setCardStatus(cardId, b.category)))} className={`w-full rounded-lg border px-3 py-2 text-left text-sm font-semibold transition active:scale-95 disabled:opacity-60 ${b.className}`}>
+          {b.label}
+        </button>
+      ))}
+      {result?.error && <p role="alert" className="text-xs text-danger">{result.error}</p>}
+    </div>
+  );
+}
+
+export function MoveForm({ cardId, listId, closeHref, lists }: { cardId: string; listId: string; closeHref: string; lists: { id: string; name: string }[] }) {
   const f = useKeptForm(moveCardForm.bind(null, cardId));
+  useCloseOnOk(f.state?.ok, closeHref);
   return (
     <form {...f.formProps} className="flex flex-wrap items-end gap-2">
       <label className="min-w-0 flex-1 text-sm font-medium">Move to<select name="listId" defaultValue={listId} className={inputClass}>{lists.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}</select></label>

@@ -5,6 +5,8 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
+import { sniffChatFile } from "@/lib/chat-files";
+import { MAX_BYTES, safeName, saveFile } from "@/lib/documents";
 
 // Chat and calls stay inside one organization. Every action checks that the caller is a member of the conversation.
 type Me = Awaited<ReturnType<typeof requireUser>>;
@@ -28,7 +30,13 @@ export async function openDirect(userId: string) {
   redirect(`/chat/${c.id}`);
 }
 
-export type ChatMessage = { id: string; body: string; at: string; mine: boolean; sender: string };
+export type ChatMessage = { id: string; body: string; at: string; mine: boolean; sender: string; file?: { name: string; size: number; image: boolean } };
+
+type MessageRow = { id: string; body: string; createdAt: Date; senderId: string; attachmentName: string | null; attachmentMime: string | null; attachmentSize: number | null };
+const toChatMessage = (m: MessageRow, me: Me, sender: string): ChatMessage => ({
+  id: m.id, body: m.body, at: m.createdAt.toISOString(), mine: m.senderId === me.id, sender,
+  ...(m.attachmentName ? { file: { name: m.attachmentName, size: m.attachmentSize ?? 0, image: !!m.attachmentMime?.startsWith("image/") } } : {}),
+});
 
 export async function sendMessage(conversationId: string, body: string): Promise<{ error?: string; message?: ChatMessage }> {
   const me = await requireUser("/chat");
@@ -41,7 +49,31 @@ export async function sendMessage(conversationId: string, body: string): Promise
     await tx.conversationMember.updateMany({ where: { conversationId, userId: me.id }, data: { lastReadAt: msg.createdAt } });
     return msg;
   });
-  return { message: { id: m.id, body: m.body, at: m.createdAt.toISOString(), mine: true, sender: me.name } };
+  return { message: toChatMessage(m, me, me.name) };
+}
+
+// A photo (from the gallery or the camera) or a file, with an optional caption.
+export async function sendAttachment(conversationId: string, form: FormData): Promise<{ error?: string; message?: ChatMessage }> {
+  const me = await requireUser("/chat");
+  const file = form.get("file");
+  if (!(file instanceof File) || file.size === 0) return { error: "Choose a file to send." };
+  if (file.size > MAX_BYTES) return { error: `That file is too large. The limit is ${Math.round(MAX_BYTES / 1024 / 1024)} MB.` };
+  const caption = z.string().trim().max(4000).safeParse(form.get("caption") ?? "");
+  if (!caption.success) return { error: "The caption is too long (up to 4,000 characters)." };
+  if (!(await member(me, conversationId))) return { error: "You are not in this conversation." };
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const type = sniffChatFile(bytes, file.name);
+  if (!type) return { error: "That file type is not allowed. Send a photo, PDF, Word, Excel, PowerPoint, text or CSV file." };
+  const key = await saveFile(me.organizationId, bytes);
+  const m = await prisma.$transaction(async (tx) => {
+    const msg = await tx.message.create({
+      data: { conversationId, senderId: me.id, body: caption.data, attachmentKey: key, attachmentName: safeName(file.name), attachmentMime: type.mime, attachmentSize: file.size },
+    });
+    await tx.conversation.update({ where: { id: conversationId }, data: { lastMessageAt: msg.createdAt } });
+    await tx.conversationMember.updateMany({ where: { conversationId, userId: me.id }, data: { lastReadAt: msg.createdAt } });
+    return msg;
+  });
+  return { message: toChatMessage(m, me, me.name) };
 }
 
 // New messages since `after` (an ISO time), oldest first. Reading them marks the conversation read.
@@ -57,14 +89,14 @@ export async function fetchMessages(conversationId: string, after?: string): Pro
   });
   const list = since ? rows : rows.reverse();
   if (list.length) await prisma.conversationMember.updateMany({ where: { conversationId, userId: me.id }, data: { lastReadAt: new Date() } });
-  return list.map((m) => ({ id: m.id, body: m.body, at: m.createdAt.toISOString(), mine: m.senderId === me.id, sender: m.sender.name }));
+  return list.map((m) => toChatMessage(m, me, m.sender.name));
 }
 
 // ───────────── Calls (WebRTC signalling) ─────────────
 // The browsers gather their network candidates before sending, so one offer and one answer are all the server relays.
 
 const sdp = z.string().min(20).max(100_000);
-const RING_MS = 45_000;
+const RING_MS = 20_000; // an unanswered call stops ringing (and its pop-up goes away) after this long
 
 export async function startCall(conversationId: string, kind: "VOICE" | "VIDEO", offer: string): Promise<{ id?: string; error?: string }> {
   const me = await requireUser("/chat");

@@ -6,7 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { isHr } from "@/lib/scope";
-import { createContract, signContract, type ContractTemplateKey } from "@/lib/contracts";
+import { createContract, restoredStatus, signContract, type ContractTemplateKey } from "@/lib/contracts";
 import type { FormState } from "@/app/login/actions";
 import { audit } from "@/lib/audit";
 
@@ -68,13 +68,34 @@ export async function voidContractAction(contractId: string, reason: string): Pr
 
   await prisma.contract.update({
     where: { id: contractId },
-    data: { status: "VOID", signatureNote: `Voided by HR: ${reason.trim()}` },
+    data: { status: "VOID", voidReason: reason.trim(), voidedAt: new Date() },
   });
 
   await audit(me.id, "contract.voided", "Contract", contractId, { reason }, me.organizationId);
   revalidatePath("/contracts");
   revalidatePath(`/contracts/${contractId}`);
   return { ok: "Contract voided." };
+}
+
+export async function restoreContractAction(contractId: string): Promise<FormState> {
+  const me = await requireUser("/contracts");
+  if (!isHr(me.role.key)) return { error: "Only HR can restore a contract." };
+
+  const contract = await prisma.contract.findFirst({
+    where: { id: contractId, organizationId: me.organizationId, status: "VOID" },
+  });
+  if (!contract) return { error: "Contract not found or not voided." };
+
+  const status = restoredStatus(contract);
+  await prisma.contract.update({
+    where: { id: contractId },
+    data: { status, voidReason: null, voidedAt: null },
+  });
+
+  await audit(me.id, "contract.restored", "Contract", contractId, { status }, me.organizationId);
+  revalidatePath("/contracts");
+  revalidatePath(`/contracts/${contractId}`);
+  return { ok: "Contract restored." };
 }
 
 export async function issueContractAction(contractId: string): Promise<FormState> {

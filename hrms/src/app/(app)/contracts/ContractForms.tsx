@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert } from "@/components/Fields";
 import { buttonClass, ghostClass, inputClass } from "@/components/ui";
 import { CONTRACT_TEMPLATES, interpolateContract, type ContractTemplateKey, type EmployeeContractData } from "@/lib/contract-templates";
-import { createContractAction, issueContractAction, signContractAction, voidContractAction } from "./actions";
+import { createContractAction, issueContractAction, restoreContractAction, signContractAction, voidContractAction } from "./actions";
 export { PrintButton } from "@/components/PrintButton";
 
 export type EmployeeOption = {
@@ -298,3 +298,24 @@ export function VoidContractButton({ contractId }: { contractId: string }) {
 }
 
 
+
+export function RestoreContractButton({ contractId }: { contractId: string }) {
+  const [pending, start] = useTransition();
+  const router = useRouter();
+  return (
+    <button
+      type="button"
+      disabled={pending}
+      onClick={() => {
+        if (!window.confirm("Restore this contract to its previous status?")) return;
+        start(async () => {
+          await restoreContractAction(contractId);
+          router.refresh();
+        });
+      }}
+      className="rounded-lg border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-ink transition hover:border-brand hover:text-brand disabled:opacity-60"
+    >
+      {pending ? "Restoring…" : "Restore Contract ↩"}
+    </button>
+  );
+}

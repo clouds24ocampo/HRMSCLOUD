@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { interpolateContract, type EmployeeContractData } from "./contracts";
+import { interpolateContract, restoredStatus, type EmployeeContractData } from "./contracts";
 
 describe("Contract Variable Interpolation", () => {
   const sampleData: EmployeeContractData = {
@@ -56,5 +56,14 @@ Employee ID: {{employee_no}}`;
     const result = interpolateContract(raw, emptyData);
     expect(result).toContain("____________________");
     expect(result).toContain("Staff");
+  });
+});
+
+describe("restoredStatus", () => {
+  const d = new Date();
+  it("returns the furthest stage the contract reached", () => {
+    expect(restoredStatus({ signedAt: d, issuedAt: d })).toBe("SIGNED");
+    expect(restoredStatus({ signedAt: null, issuedAt: d })).toBe("ISSUED");
+    expect(restoredStatus({ signedAt: null, issuedAt: null })).toBe("DRAFT");
   });
 });

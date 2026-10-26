@@ -1,0 +1,2 @@
+ALTER TABLE "Contract" ADD COLUMN "voidReason" TEXT,
+ADD COLUMN "voidedAt" TIMESTAMP(3);

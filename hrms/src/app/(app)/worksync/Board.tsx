@@ -48,6 +48,14 @@ function applyMove(lists: BoardList[], m: Move): BoardList[] {
 
 // The Trello-style board. Drag a card to another list or into a new place; drag a list header to reorder lists (leads and HR).
 // The change shows at once and is saved on the server, which re-checks permission. On a phone, open the card and use "Move to".
+// A blocked card turns red and a finished one green, so the state reads without opening the card.
+const CARD_TONE: Record<Category, string> = {
+  TODO: "border-transparent bg-white",
+  DOING: "border-transparent bg-white",
+  BLOCKED: "border-red-500 bg-red-50",
+  DONE: "border-green-500 bg-green-50",
+};
+
 export function Board({ projectId, lists, canEdit, canManage, selected }: { projectId: string; lists: BoardList[]; canEdit: boolean; canManage: boolean; selected?: string }) {
   const [shown, move] = useOptimistic(lists, applyMove);
   const [, start] = useTransition();
@@ -108,7 +116,7 @@ export function Board({ projectId, lists, canEdit, canManage, selected }: { proj
                 onDragEnd={() => { drag.current = null; setOver(null); }}
                 onDragOver={(e) => { if (canEdit && drag.current?.kind === "card") e.preventDefault(); }}
                 onDrop={(e) => { if (drag.current?.kind !== "card") return; e.preventDefault(); e.stopPropagation(); dropCard(l.id, c.id); }}
-                className={`group rounded-xl bg-white p-2.5 shadow-sm ring-1 transition hover:shadow-md ${canEdit ? "cursor-grab active:cursor-grabbing" : ""} ${selected === c.id ? "ring-2 ring-brand" : "ring-black/5"}`}
+                className={`group rounded-xl border-l-4 p-2.5 shadow-sm ring-1 transition hover:shadow-md ${CARD_TONE[l.category]} ${canEdit ? "cursor-grab active:cursor-grabbing" : ""} ${selected === c.id ? "ring-2 ring-brand" : "ring-black/5"}`}
               >
                 {c.labels.length > 0 && <div className="mb-1.5 flex flex-wrap gap-1">{c.labels.map((x) => <LabelChip key={x.name} label={x} compact />)}</div>}
                 <Link href={c.href} draggable={false} scroll={false} className="block text-sm font-medium leading-snug text-slate-900 hover:text-brand">{c.title}</Link>

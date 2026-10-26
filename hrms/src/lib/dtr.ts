@@ -152,9 +152,12 @@ export function buildDtr(input: {
   graceMinutes: number;
   // Flexible schedule: own start time and days off. Never late; under this many minutes worked is undertime, above it is overtime.
   flexMinutes?: number;
+  // When given, a break still running is shown with its time so far (display only: pay and worked time wait for it to end).
+  now?: Date;
 }): DtrDay[] {
   const { days, schedule, leaveDays, today, tz, graceMinutes, flexMinutes } = input;
   const flex = flexMinutes != null;
+  const shownMs = (p: Pause) => (p.endAt || !input.now ? pauseMs(p) : Math.max(0, input.now.getTime() - p.startAt.getTime()));
   const byDay = new Map<string, Session[]>();
   for (const s of toSessions(input.punches)) {
     const k = dayKey(s.inAt, tz);
@@ -217,7 +220,7 @@ export function buildDtr(input: {
     const caps = new Map<string, number>();
     let overLimit = 0;
     for (const p of allPauses) {
-      const pMs = pauseMs(p);
+      const pMs = shownMs(p);
       const m = mins(pMs);
       const s = secs(pMs);
       const over = p.allowedMinutes != null && m > p.allowedMinutes ? m - p.allowedMinutes : 0;
@@ -250,8 +253,8 @@ export function buildDtr(input: {
     }
 
     // Issues & downtime (e.g. System Issue, Power Outage, Calamity, Clinic) vs Breaks (e.g. Meal, Bio Break, Rest breaks)
-    const issueMs = allPauses.filter((p) => p.category === "ISSUE").reduce((n, p) => n + pauseMs(p), 0);
-    const breakMs = allPauses.filter((p) => p.category === "BREAK").reduce((n, p) => n + pauseMs(p), 0);
+    const issueMs = allPauses.filter((p) => p.category === "ISSUE").reduce((n, p) => n + shownMs(p), 0);
+    const breakMs = allPauses.filter((p) => p.category === "BREAK").reduce((n, p) => n + shownMs(p), 0);
     // Productive work: pure active work time, strictly excluding both issues and breaks as they are not counted in productivity
     const productiveMs = Math.max(0, totalSessionMs - (issueMs + breakMs));
 

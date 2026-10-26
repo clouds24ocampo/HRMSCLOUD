@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getOrgSettings } from "@/lib/settings";
 import { Card, EmptyState, PageHeader, ghostClass } from "@/components/ui";
-import { markAllRead, markRead } from "./actions";
+import { markAllRead, markRead, openNotification } from "./actions";
 
 export default async function NotificationsPage() {
   const me = await requireUser("/notifications");
@@ -36,7 +35,7 @@ export default async function NotificationsPage() {
                   <p className="mt-0.5 text-xs text-muted">{when.format(n.createdAt)}</p>
                 </div>
                 <div className="flex shrink-0 gap-2">
-                  {n.href && <Link href={n.href} className={ghostClass}>Open</Link>}
+                  {n.href && <form action={openNotification.bind(null, n.id)}><button className={ghostClass}>Open</button></form>}
                   {!n.readAt && <form action={markRead.bind(null, n.id)}><button className={ghostClass}>Mark read</button></form>}
                 </div>
               </li>

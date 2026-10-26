@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { accessLevel, avatarColor, dueState, barSpan, cardProgress, donutGradient, matchesFilters, monthGrid, parseFilters, positionBetween, shiftMonth, summarize, TEMPLATES, timelineRange, type CardFacts } from "./worksync";
+import { accessLevel, avatarColor, dueState, barSpan, cardProgress, donutGradient, matchesFilters, monthGrid, parseFilters, listForCategory, positionBetween, shiftMonth, summarize, TEMPLATES, timelineRange, type CardFacts } from "./worksync";
 
 const now = Date.parse("2026-10-18T08:00:00Z");
 const card = (o: Partial<CardFacts>): CardFacts => ({ category: "TODO", dueDay: null, updatedAt: new Date(now), checkDone: 0, checkTotal: 0, ...o });
@@ -122,5 +122,13 @@ describe("display rules", () => {
   it("gives a person the same avatar color every time", () => {
     expect(avatarColor("Mark Ocampo")).toBe(avatarColor("Mark Ocampo"));
     expect(avatarColor("Mark Ocampo")).toMatch(/^#[0-9a-f]{6}$/);
+  });
+});
+
+describe("listForCategory", () => {
+  const lists = [{ id: "a", category: "TODO" as const }, { id: "b", category: "DONE" as const }, { id: "c", category: "DONE" as const }];
+  it("picks the first list of the category, or nothing", () => {
+    expect(listForCategory(lists, "DONE")?.id).toBe("b");
+    expect(listForCategory(lists, "BLOCKED")).toBeUndefined();
   });
 });

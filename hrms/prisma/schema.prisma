@@ -1445,6 +1445,10 @@ model Message {
   senderId       String
   sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
   body           String
+  attachmentKey  String?
+  attachmentName String?
+  attachmentMime String?
+  attachmentSize Int?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -1622,6 +1626,8 @@ model Contract {
   signedAt       DateTime?
   signatureIp    String?
   signatureNote  String?
+  voidReason     String?
+  voidedAt       DateTime?
   createdById    String
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt

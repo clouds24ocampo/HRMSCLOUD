@@ -78,6 +78,11 @@ export function accessLevel(isHr: boolean, memberRole: MemberRole | null, seesVi
 }
 
 // Fractional position for a card dropped between two neighbours (null = start or end of the list).
+// The list a one-click status change lands in: the first list (in board order) that counts as that category.
+export function listForCategory<T extends { category: Category }>(lists: T[], category: Category): T | undefined {
+  return lists.find((l) => l.category === category);
+}
+
 export function positionBetween(prev: number | null, next: number | null): number {
   if (prev == null && next == null) return 1000;
   if (prev == null) return next! - 1000;

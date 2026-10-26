@@ -12,7 +12,7 @@ import { employeeScope, isHr } from "@/lib/scope";
 import { ROLES } from "@/lib/roles";
 import { dbDate } from "@/lib/time";
 import { loadProject, logActivity, personName } from "@/lib/worksync-data";
-import { CATEGORY_LABEL, DEFAULT_LABELS, LABEL_COLORS, positionBetween, TEMPLATES, WS_THEMES, type Level } from "@/lib/worksync";
+import { CATEGORY_LABEL, DEFAULT_LABELS, LABEL_COLORS, listForCategory, positionBetween, TEMPLATES, WS_THEMES, type Level } from "@/lib/worksync";
 import type { FormState } from "@/app/login/actions";
 
 const PATH = "/worksync";
@@ -250,6 +250,17 @@ export async function moveCardForm(cardId: string, _: FormState, form: FormData)
   if (!target) return { error: "List not found." };
   await doMove(c, target.id, null);
   return { ok: `Moved to ${target.name} (${CATEGORY_LABEL[target.category].toLowerCase()}).` };
+}
+
+// One click to Blocked, Done or back to work: the card goes to the first list that counts as that category.
+export async function setCardStatus(cardId: string, category: "TODO" | "BLOCKED" | "DONE"): Promise<FormState> {
+  const c = await cardCtx(cardId, "EDIT");
+  if (!c.ok) return { error: c.error };
+  if (c.card.list.category === category) return { ok: "Already there." };
+  const target = listForCategory(c.project.lists, category);
+  if (!target) return { error: `This board has no ${CATEGORY_LABEL[category].toLowerCase()} list. Add one first.` };
+  await doMove(c, target.id, null);
+  return { ok: `Moved to ${target.name}.` };
 }
 
 export async function archiveCard(cardId: string) {

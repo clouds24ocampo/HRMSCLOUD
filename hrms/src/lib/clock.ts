@@ -1,4 +1,7 @@
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { SESSION_COOKIE } from "@/lib/auth";
+import { getPunchUnlock } from "@/lib/session";
 import { sweepAutoTimeouts } from "@/lib/auto-timeout";
 import { clockStatus } from "@/lib/dtr";
 import { getOrgSettings } from "@/lib/settings";
@@ -27,6 +30,9 @@ export async function getClockInfo(organizationId: string, employeeId: string, t
     getOrgSettings(organizationId),
     prisma.overtimeRequest.findFirst({ where: { organizationId, employeeId, status: "APPROVED", date: dbDate(dayKey(new Date(), tz)) }, select: { minutes: true } }),
   ]);
+  // The password unlock lives on the session, so a refresh must pick up what is left of it instead of asking again.
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  const until = token ? await getPunchUnlock(token) : null;
   const status = clockStatus(events.map(toPunch));
   const last = events[events.length - 1];
   const lastText = last
@@ -58,5 +64,6 @@ export async function getClockInfo(organizationId: string, employeeId: string, t
     types: clockTypes,
     requirePassword: settings.requirePunchPassword,
     unlockSeconds: settings.punchUnlockSeconds,
+    unlockedUntil: until && until.getTime() > Date.now() ? until.getTime() : null,
   };
 }

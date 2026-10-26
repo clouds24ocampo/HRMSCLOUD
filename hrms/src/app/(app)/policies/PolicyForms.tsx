@@ -4,7 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert, Field, SubmitButton } from "@/components/Fields";
 import { inputClass } from "@/components/ui";
-import { archivePolicy, publishPolicy, signPolicy } from "./actions";
+import { archivePolicy, publishPolicy, restorePolicy, signPolicy } from "./actions";
 
 export function PublishPolicyForm({ kinds }: { kinds: { value: string; label: string }[] }) {
   const f = useKeptForm(publishPolicy);
@@ -44,6 +44,19 @@ export function ArchivePolicyButton({ id }: { id: string }) {
     <button type="button" disabled={pending} onClick={() => window.confirm("Archive this policy? Signatures stay on record.") && start(() => archivePolicy(id))} className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium transition hover:bg-bg disabled:opacity-60">
       Archive
     </button>
+  );
+}
+
+export function RestorePolicyButton({ id }: { id: string }) {
+  const [pending, start] = useTransition();
+  const [error, setError] = useState("");
+  return (
+    <span className="flex flex-col items-end gap-1">
+      <button type="button" disabled={pending} onClick={() => start(async () => setError((await restorePolicy(id))?.error ?? ""))} className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium transition hover:bg-bg disabled:opacity-60">
+        Restore
+      </button>
+      {error && <span role="alert" className="text-xs text-danger">{error}</span>}
+    </span>
   );
 }
 

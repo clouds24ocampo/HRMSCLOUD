@@ -1,10 +1,11 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert, Field, SubmitButton } from "@/components/Fields";
 import { inputClass } from "@/components/ui";
 import type { FormState } from "@/app/login/actions";
+import { goalOutcome, type GoalStatus } from "@/lib/goals";
 import { acknowledgeReview, addGoal, closeCycle, createCycle, finalizeReview, submitManager, submitSelf, updateGoal } from "./actions";
 
 export const RATING_LABEL = ["", "Needs improvement", "Below expectations", "Meets expectations", "Exceeds expectations", "Outstanding"];
@@ -43,15 +44,18 @@ export function GoalForm({ people }: { people?: { id: string; label: string }[] 
 
 export function GoalProgress({ id, progress, status, locked }: { id: string; progress: number; status: string; locked?: boolean }) {
   const f = useKeptForm(updateGoal.bind(null, id));
+  const [value, setValue] = useState({ progress, status: status as GoalStatus });
+  // The same rule as the server: reaching 100% marks the goal achieved, and lowering it again reopens it.
+  const setProgress = (n: number) => setValue((v) => goalOutcome(n, v.status === "ACHIEVED" && n < 100 ? "ACTIVE" : v.status));
   return (
     <form {...f.formProps} className="mt-2 flex flex-wrap items-end gap-2">
       <label className="text-xs font-medium">
         Progress %
-        <input name="progress" type="number" min={0} max={100} defaultValue={progress} disabled={locked} aria-label="Progress percent" className="mt-1 block w-24 rounded-lg border border-line bg-surface px-2 py-1.5 text-sm" />
+        <input name="progress" type="number" min={0} max={100} value={value.progress} onChange={(e) => setProgress(Math.min(100, Math.max(0, Number(e.target.value) || 0)))} disabled={locked} aria-label="Progress percent" className="mt-1 block w-24 rounded-lg border border-line bg-surface px-2 py-1.5 text-sm" />
       </label>
       <label className="text-xs font-medium">
         Status
-        <select name="status" defaultValue={status} disabled={locked} aria-label="Goal status" className="mt-1 block rounded-lg border border-line bg-surface px-2 py-1.5 text-sm">
+        <select name="status" value={value.status} onChange={(e) => setValue((v) => goalOutcome(v.progress, e.target.value as GoalStatus))} disabled={locked} aria-label="Goal status" className="mt-1 block rounded-lg border border-line bg-surface px-2 py-1.5 text-sm">
           <option value="ACTIVE">In progress</option>
           <option value="ACHIEVED">Achieved</option>
           <option value="DROPPED">Dropped</option>

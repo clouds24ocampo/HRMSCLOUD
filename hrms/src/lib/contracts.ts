@@ -179,3 +179,8 @@ export async function signContract(contractId: string, employeeUserId: string, n
 
   return updated;
 }
+
+/** Status a voided contract returns to, derived from its own timestamps so no extra column is needed. */
+export function restoredStatus(c: { signedAt: Date | null; issuedAt: Date | null }): "SIGNED" | "ISSUED" | "DRAFT" {
+  return c.signedAt ? "SIGNED" : c.issuedAt ? "ISSUED" : "DRAFT";
+}

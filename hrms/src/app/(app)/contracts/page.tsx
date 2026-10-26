@@ -223,7 +223,7 @@ export default async function ContractsPage({
                   <th className="px-4 py-3">Position</th>
                   <th className="px-4 py-3">Address</th>
                   <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="w-px whitespace-nowrap px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -254,10 +254,10 @@ export default async function ContractsPage({
                       <td className="px-4 py-3">
                         <Badge tone={b.tone}>{b.label}</Badge>
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="w-px whitespace-nowrap px-4 py-3 text-right">
                         <Link
                           href={`/contracts/${c.id}`}
-                          className="rounded-lg border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-ink hover:border-brand hover:text-brand transition shadow-sm"
+                          className="inline-block whitespace-nowrap rounded-lg border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-ink hover:border-brand hover:text-brand transition shadow-sm"
                         >
                           View Document →
                         </Link>

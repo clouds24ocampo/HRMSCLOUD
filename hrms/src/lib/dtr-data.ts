@@ -45,7 +45,7 @@ export async function loadDtr(actor: Actor, myEmployeeId: string, employeeId: st
   const schedule = new Map<string, ShiftTimes | null>([...resolved].map(([d, r]) => [d, r.shift]));
   const leaveDays = new Set(leave.flatMap((l) => daysBetween(keyOfDbDate(l.startDate), keyOfDbDate(l.endDate))));
   const valid = events.filter((e) => !e.voidedAt);
-  const rows = buildDtr({ days, punches: valid.map(toPunch), schedule, leaveDays, today: dayKey(new Date(), tz), tz, graceMinutes, flexMinutes: employee.flexible ? FLEX_MIN_MINUTES : undefined });
+  const rows = buildDtr({ days, punches: valid.map(toPunch), schedule, leaveDays, today: dayKey(new Date(), tz), tz, graceMinutes, flexMinutes: employee.flexible ? FLEX_MIN_MINUTES : undefined, now: new Date() });
 
   const punchesByDay = new Map<string, typeof events>();
   for (const e of events) {

@@ -7,7 +7,7 @@ import { getMyEmployee } from "@/lib/employees";
 import { isHr } from "@/lib/scope";
 import { formatDay, formatTime, keyOfDbDate } from "@/lib/time";
 import { Badge, Card } from "@/components/ui";
-import { IssueContractButton, PrintButton, SignContractForm, VoidContractButton } from "../ContractForms";
+import { IssueContractButton, PrintButton, RestoreContractButton, SignContractForm, VoidContractButton } from "../ContractForms";
 
 const STATUS_BADGE: Record<string, { label: string; tone: "warning" | "success" | "neutral" | "danger" }> = {
   DRAFT: { label: "Draft", tone: "neutral" },
@@ -67,6 +67,9 @@ export default async function ContractDetailPage({
           )}
           {hr && contract.status !== "VOID" && (
             <VoidContractButton contractId={contract.id} />
+          )}
+          {hr && contract.status === "VOID" && (
+            <RestoreContractButton contractId={contract.id} />
           )}
         </div>
       </div>

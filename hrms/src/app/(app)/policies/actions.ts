@@ -63,6 +63,21 @@ export async function archivePolicy(id: string) {
   done();
 }
 
+// Brings an archived policy back, unless a current policy already carries its title (two active versions would split the signatures).
+export async function restorePolicy(id: string): Promise<FormState> {
+  const me = await requireUser("/policies");
+  if (!isHr(me.role.key)) return { error: "Only HR can restore policies." };
+  const p = await prisma.policyDocument.findFirst({ where: { id, organizationId: me.organizationId, archivedAt: { not: null } } });
+  if (!p) return { error: "Policy not found." };
+  if (await prisma.policyDocument.findFirst({ where: { organizationId: me.organizationId, title: p.title, archivedAt: null } })) {
+    return { error: "A current version with this title is already published." };
+  }
+  await prisma.policyDocument.update({ where: { id }, data: { archivedAt: null } });
+  await audit(me.id, "policy.restored", "PolicyDocument", id, undefined, me.organizationId);
+  done();
+  return { ok: "Policy restored." };
+}
+
 // The employee signs for themselves: typed full name, a drawn signature, and "I have read and agree".
 // What was signed is pinned by the policy's content hash, so a later edit can never change what this signature covers.
 export async function signPolicy(policyId: string, _: FormState, form: FormData): Promise<FormState> {

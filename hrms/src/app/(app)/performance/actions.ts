@@ -5,6 +5,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
+import { goalOutcome } from "@/lib/goals";
 import { getMyEmployee } from "@/lib/employees";
 import { notify, userIdOfEmployee } from "@/lib/notify";
 import { ROLES } from "@/lib/roles";
@@ -52,9 +53,9 @@ export async function updateGoal(id: string, _: FormState, form: FormData): Prom
   const g = await prisma.goal.findFirst({ where: { id, organizationId: me.organizationId } });
   if (!g) return { error: "Goal not found." };
   if (g.employeeId !== mine.id && !(isHr(me.role.key) || (me.role.key === ROLES.MANAGER && (await canViewEmployee(me, mine.id, g.employeeId))))) return { error: "This goal is not yours to update." };
-  const progress = parsed.data.status === "ACHIEVED" ? 100 : parsed.data.progress;
-  await prisma.goal.update({ where: { id }, data: { progress, status: parsed.data.status } });
-  await audit(me.id, "goal.updated", "Goal", id, { progress, status: parsed.data.status }, me.organizationId);
+  const { progress, status } = goalOutcome(parsed.data.progress, parsed.data.status);
+  await prisma.goal.update({ where: { id }, data: { progress, status } });
+  await audit(me.id, "goal.updated", "Goal", id, { progress, status }, me.organizationId);
   done();
   return { ok: "Saved." };
 }

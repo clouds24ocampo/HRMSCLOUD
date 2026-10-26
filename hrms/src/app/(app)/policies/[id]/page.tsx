@@ -32,7 +32,7 @@ export default async function PolicyPage({ params, searchParams }: { params: Pro
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <Link href="/policies" className="text-sm font-medium text-muted hover:text-ink">← Policies</Link>
+      <Link href="/policies" className="text-sm font-medium text-muted hover:text-ink print:hidden">← Policies</Link>
       <PageHeader
         title={p.title}
         subtitle={`${POLICY_KIND_LABEL[p.kind]} · version ${p.version}${p.archivedAt ? " · replaced by a newer version" : ""}`}
@@ -42,7 +42,7 @@ export default async function PolicyPage({ params, searchParams }: { params: Pro
         {p.storageKey ? (
           <div className="space-y-2">
             <iframe src={`/policies/${p.id}/file`} title={p.title} className="h-[70vh] w-full rounded-xl border border-line bg-white" />
-            <a href={`/policies/${p.id}/file`} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand hover:underline">Open the PDF in a new tab</a>
+            <a href={`/policies/${p.id}/file`} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand hover:underline print:hidden">Open the PDF in a new tab</a>
           </div>
         ) : (
           <div className="whitespace-pre-line text-sm leading-relaxed">{p.body}</div>
