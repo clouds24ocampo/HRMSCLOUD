@@ -51,7 +51,8 @@ const nextConfig: NextConfig = {
             ].join("; "),
           },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self)" },
+          // Calls and chat photos need the camera and microphone on this site only; no embedded third party gets them.
+          { key: "Permissions-Policy", value: "camera=(self), microphone=(self), geolocation=(self)" },
         ],
       },
     ];

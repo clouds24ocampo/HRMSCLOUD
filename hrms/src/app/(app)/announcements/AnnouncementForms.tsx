@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert, Field, SubmitButton } from "@/components/Fields";
 import { inputClass } from "@/components/ui";
-import { archiveAnnouncement, postAnnouncement } from "./actions";
+import { archiveAnnouncement, restoreAnnouncement, postAnnouncement } from "./actions";
 
 export function AnnouncementForm() {
   const f = useKeptForm(postAnnouncement);
@@ -28,6 +28,15 @@ export function ArchiveAnnouncementButton({ id, title }: { id: string; title: st
   return (
     <button disabled={pending} aria-label={`Archive ${title}`} onClick={() => start(() => archiveAnnouncement(id))} className="rounded-lg border border-line px-2.5 py-1 text-xs font-medium transition hover:bg-bg active:scale-95 disabled:opacity-60">
       Archive
+    </button>
+  );
+}
+
+export function RestoreAnnouncementButton({ id, title }: { id: string; title: string }) {
+  const [pending, start] = useTransition();
+  return (
+    <button disabled={pending} aria-label={`Restore ${title}`} onClick={() => start(() => restoreAnnouncement(id))} className="rounded-lg border border-line px-2.5 py-1 text-xs font-medium transition hover:bg-bg active:scale-95 disabled:opacity-60">
+      Restore
     </button>
   );
 }

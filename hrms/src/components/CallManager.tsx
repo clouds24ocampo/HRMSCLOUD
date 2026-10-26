@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { mediaErrorMessage } from "@/lib/media-error";
 import { answerCall, callState, endCall, pollIncoming, startCall, type IncomingCall } from "@/app/(app)/chat/actions";
 
 // One-to-one voice and video calls (WebRTC). Mounted once in the app layout, so a call rings on whatever page you are on.
@@ -92,7 +93,7 @@ export function CallManager() {
         if (!r.id) throw new Error(r.error ?? "The call could not be started.");
         setPhase({ s: "calling", id: r.id, name, kind });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Camera or microphone is blocked. Allow them for this site and try again.");
+        setError(mediaErrorMessage(err, kind === "VIDEO"));
         cleanup();
       }
     };
@@ -142,7 +143,7 @@ export function CallManager() {
       if (r.error) throw new Error(r.error);
       setPhase({ s: "active", id: call.id, name: call.caller, kind: call.kind, since: Date.now() });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Camera or microphone is blocked.");
+      setError(mediaErrorMessage(err, call.kind === "VIDEO"));
       await endCall(call.id);
       cleanup();
     }

@@ -33,3 +33,11 @@ export async function archiveAnnouncement(id: string) {
   await audit(me.id, "announcement.archived", "Announcement", id, { title: a.title }, me.organizationId);
   done();
 }
+
+// Brings an archived announcement back to the list and the Home page. It does not notify everyone a second time.
+export async function restoreAnnouncement(id: string) {
+  const me = await requireUser("/announcements");
+  const n = await prisma.announcement.updateMany({ where: { id, organizationId: me.organizationId, archivedAt: { not: null } }, data: { archivedAt: null } });
+  if (n.count) await audit(me.id, "announcement.restored", "Announcement", id, undefined, me.organizationId);
+  done();
+}
