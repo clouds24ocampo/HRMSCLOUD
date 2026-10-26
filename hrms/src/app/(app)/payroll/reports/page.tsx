@@ -29,8 +29,8 @@ export default async function PayrollReportsPage({ searchParams }: { searchParam
       </div>
 
       <form className="flex flex-wrap items-end gap-2" role="search">
-        <label className="block text-sm font-medium">Month<input type="month" name="month" defaultValue={month} className={inputClass} /></label>
-        <label className="block text-sm font-medium">Year<input type="number" name="year" min={2020} max={2100} defaultValue={year} className={inputClass} /></label>
+        <label className="block min-w-0 flex-1 basis-40 text-sm font-medium">Month<input type="month" name="month" defaultValue={month} className={inputClass} /></label>
+        <label className="block min-w-0 flex-1 basis-28 text-sm font-medium">Year<input type="number" name="year" min={2020} max={2100} defaultValue={year} className={inputClass} /></label>
         <button className={buttonClass}>Show</button>
       </form>
 

@@ -132,8 +132,8 @@ export default async function DtrPage({ searchParams }: { searchParams: Promise<
         )}
         {people.length <= 1 && <input type="hidden" name="employee" value={employeeId} />}
         <input type="hidden" name="view" value={view} />
-        <label className="block text-sm font-medium">From<input type="date" name="from" defaultValue={from} className={inputClass} /></label>
-        <label className="block text-sm font-medium">To<input type="date" name="to" defaultValue={to} className={inputClass} /></label>
+        <label className="block min-w-0 flex-1 basis-36 text-sm font-medium">From<input type="date" name="from" defaultValue={from} className={inputClass} /></label>
+        <label className="block min-w-0 flex-1 basis-36 text-sm font-medium">To<input type="date" name="to" defaultValue={to} className={inputClass} /></label>
         <button className={buttonClass}>Show</button>
       </form>
       <div className="flex flex-wrap gap-2 text-sm">

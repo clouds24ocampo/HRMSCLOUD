@@ -21,7 +21,7 @@ export function LoginShell({ startOnStamp, top, bottom, hero }: { startOnStamp: 
   return (
     <main className="relative min-h-dvh overflow-hidden bg-[#111110]">
       <div className="absolute inset-0">{hero}</div>
-      <section className="pointer-events-none relative z-10 flex min-h-dvh items-center justify-center px-4 py-10 lg:justify-end lg:pr-[8vw]">
+      <section className="pointer-events-none relative z-10 flex min-h-dvh items-center justify-center px-4 pt-24 pb-10 lg:justify-end lg:py-10 lg:pr-[8vw]">
         <div className="pointer-events-auto w-full max-w-sm rounded-3xl bg-surface/95 p-7 shadow-2xl ring-1 ring-white/10 backdrop-blur-md sm:p-8">
           {top}
           <div role="tablist" aria-label="Sign in or time stamp" className="mb-6 flex gap-1 rounded-xl bg-line/50 p-1">

@@ -40,9 +40,9 @@ export default async function PeriodPage({ params }: { params: Promise<{ id: str
       <Link href="/payroll" className="text-sm font-medium text-muted hover:text-ink">← All pay periods</Link>
       <PageHeader title={p.name} subtitle={`${fmtDay(p.startDate)} – ${fmtDay(p.endDate)} · pay day ${fmtDay(p.payDate)}`} action={<div className="flex flex-wrap gap-2">{p.kind !== "REGULAR" && <Badge tone="brand">{PAYROLL_KIND_LABEL[p.kind]}</Badge>}{p.yearEnd && <Badge tone="warning">Year-end tax adjustment</Badge>}<Badge tone={status.tone}>{status.label}</Badge></div>} />
 
-      <ol className="grid grid-cols-4 gap-2" aria-label="Progress">
+      <ol className="grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Progress">
         {STEPS.map((s, i) => (
-          <li key={s} aria-current={i === idx ? "step" : undefined} className={`rounded-xl border px-3 py-2 text-sm ${i <= idx ? "border-brand bg-brand/10 font-semibold text-brand" : "border-line text-muted"}`}>
+          <li key={s} aria-current={i === idx ? "step" : undefined} className={`min-w-0 break-words rounded-xl border px-3 py-2 text-sm ${i <= idx ? "border-brand bg-brand/10 font-semibold text-brand" : "border-line text-muted"}`}>
             {PAYROLL_STATUS[s].label}
             <span className="block text-xs font-normal text-muted">{s === "CALCULATED" && p.calculatedAt ? (p.calculatedById ? who(p.calculatedById) : "Automatic, live") : s === "APPROVED" && p.approvedAt ? who(p.approvedById) : s === "FINALIZED" && p.finalizedAt ? who(p.finalizedById) : " "}</span>
           </li>

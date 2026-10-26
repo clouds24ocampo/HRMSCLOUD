@@ -209,7 +209,35 @@ export default async function ContractsPage({
             hint={hr ? "Use the form above to generate your first contract." : "No contract records have been issued to your account yet."}
           />
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* Phones: one card per contract, so the action is never scrolled off to the right of the table. */}
+          <ul className="divide-y divide-line md:hidden">
+            {contracts.map((c) => {
+              const b = STATUS_BADGE[c.status] ?? STATUS_BADGE.DRAFT;
+              return (
+                <li key={c.id} className="space-y-2 py-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-ink break-words">{c.title}</p>
+                      <p className="text-[11px] text-muted">Created {formatDay(keyOfDbDate(c.createdAt))}</p>
+                    </div>
+                    <Badge tone={b.tone}>{b.label}</Badge>
+                  </div>
+                  <p className="text-sm text-ink">
+                    {c.employee.firstName} {c.employee.lastName}{" "}
+                    <span className="text-xs text-muted">· {c.employee.employeeNo} · {c.employee.position?.title ?? "Staff"}</span>
+                  </p>
+                  <Link
+                    href={`/contracts/${c.id}`}
+                    className="block rounded-lg border border-line bg-surface px-3 py-2 text-center text-sm font-semibold text-ink shadow-sm transition hover:border-brand hover:text-brand"
+                  >
+                    View Document →
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-left text-sm">
               <thead className="border-b border-line bg-bg/50 text-xs font-semibold uppercase text-muted">
                 <tr>
@@ -263,6 +291,7 @@ export default async function ContractsPage({
               </tbody>
             </table>
           </div>
+          </>
         )}
       </Card>
     </div>
