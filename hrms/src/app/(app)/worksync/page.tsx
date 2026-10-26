@@ -174,8 +174,13 @@ async function DailyActivity({ scope, meId, lead, tz, today, date }: { scope: Aw
       <Card>
         <form className="flex flex-wrap items-end gap-3" action="/worksync">
           <input type="hidden" name="view" value="today" />
-          <label className="text-sm font-medium">Day<input type="date" name="date" defaultValue={date} max={today} className="mt-1 block rounded-lg border border-line bg-surface px-3 py-2" /></label>
-          <button className={ghostClass}>Show</button>
+          <div className="text-sm font-medium">
+            <label htmlFor="ws-day">Day</label>
+            <div className="mt-1 flex items-stretch gap-2">
+              <input id="ws-day" type="date" name="date" defaultValue={date} max={today} className="block rounded-lg border border-line bg-surface px-3 py-2" />
+              <button className={ghostClass}>Show</button>
+            </div>
+          </div>
           <p className="ml-auto max-w-md text-xs text-muted">Shows what people did on the boards: cards added, moved, finished, blocked, commented. Nothing is tracked in the background, and this is not a score.</p>
         </form>
       </Card>

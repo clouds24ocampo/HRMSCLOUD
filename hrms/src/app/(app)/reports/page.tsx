@@ -79,7 +79,7 @@ export default async function ReportsPage({
       />
 
       {/* Primary Tab Navigation */}
-      <nav aria-label="Reports tabs" className="flex gap-1 overflow-x-auto rounded-xl border border-line bg-surface p-1 text-sm font-medium">
+      <nav aria-label="Reports tabs" className="flex flex-wrap gap-1 rounded-xl border border-line bg-surface p-1 text-sm font-medium">
         {TABS.map((t) => {
           const isActive = activeTab === t.key;
           const href = `/reports?tab=${t.key}${sp.from ? `&from=${sp.from}` : ""}${sp.to ? `&to=${sp.to}` : ""}`;
@@ -103,8 +103,8 @@ export default async function ReportsPage({
       {activeTab !== "worksync" && (
         <form className="flex flex-wrap items-end gap-2" role="search">
           <input type="hidden" name="tab" value={activeTab} />
-          <label className="block text-sm font-medium">From<input type="date" name="from" defaultValue={from} className={inputClass} /></label>
-          <label className="block text-sm font-medium">To<input type="date" name="to" defaultValue={to} className={inputClass} /></label>
+          <label className="block min-w-0 flex-1 basis-36 text-sm font-medium">From<input type="date" name="from" defaultValue={from} className={inputClass} /></label>
+          <label className="block min-w-0 flex-1 basis-36 text-sm font-medium">To<input type="date" name="to" defaultValue={to} className={inputClass} /></label>
           <button className={buttonClass}>Show</button>
           <Link href={`/reports?tab=${activeTab}`} className="self-center text-sm font-medium text-muted hover:text-ink">This month</Link>
           <span className="ml-auto self-center text-xs text-muted">Showing {fmt(from)} to {fmt(to)}</span>
