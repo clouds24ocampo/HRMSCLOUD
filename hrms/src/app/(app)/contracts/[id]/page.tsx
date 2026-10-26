@@ -1,6 +1,7 @@
 import { DEFAULT_TIMEZONE } from "@/lib/locale";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CONTRACT_STATUS_BADGE as STATUS_BADGE } from "@/lib/labels";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
@@ -8,13 +9,6 @@ import { isHr } from "@/lib/scope";
 import { formatDay, formatTime, keyOfDbDate } from "@/lib/time";
 import { Badge, Card } from "@/components/ui";
 import { IssueContractButton, PrintButton, RestoreContractButton, SignContractForm, VoidContractButton } from "../ContractForms";
-
-const STATUS_BADGE: Record<string, { label: string; tone: "warning" | "success" | "neutral" | "danger" }> = {
-  DRAFT: { label: "Draft", tone: "neutral" },
-  ISSUED: { label: "Issued (Awaiting Signature)", tone: "warning" },
-  SIGNED: { label: "Signed ✓", tone: "success" },
-  VOID: { label: "Voided", tone: "danger" },
-};
 
 export default async function ContractDetailPage({
   params,

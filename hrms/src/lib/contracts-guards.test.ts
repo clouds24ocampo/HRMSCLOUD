@@ -24,7 +24,7 @@ describe("contract guards", () => {
     expect(vi.mocked(prisma.employee.findFirst).mock.calls[0][0]).toMatchObject({ where: { id: "emp-of-another-company", organizationId: "org-1" } });
   });
 
-  it.each([["DRAFT", "not available for signing"], ["SIGNED", "already been signed"], ["VOID", "voided"]])("refuses to sign a %s contract", async (status, message) => {
+  it.each([["DRAFT", "not available for signing"], ["SIGNED", "already been signed"], ["VOID", "cancelled"]])("refuses to sign a %s contract", async (status, message) => {
     vi.mocked(prisma.contract.findUnique).mockResolvedValueOnce({ id: "c1", status, employee: { userId: "usr-1" } } as never);
     await expect(signContract("c1", "usr-1")).rejects.toThrow(message);
     expect(prisma.contract.update).not.toHaveBeenCalled();

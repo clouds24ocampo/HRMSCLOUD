@@ -266,19 +266,19 @@ export function VoidContractButton({ contractId }: { contractId: string }) {
         onClick={() => setOpen(true)}
         className="rounded-lg border border-danger/40 bg-danger/5 px-3 py-1.5 text-xs font-medium text-danger hover:bg-danger/10"
       >
-        Void Contract 🚫
+        Cancel Contract 🚫
       </button>
     );
   }
 
   return (
     <div className="rounded-xl border border-danger/30 bg-surface p-3 space-y-2 text-xs">
-      <p className="font-bold text-danger">Void this contract?</p>
+      <p className="font-bold text-danger">Cancel this contract?</p>
       <input
         required
         value={reason}
         onChange={(e) => setReason(e.target.value)}
-        placeholder="Reason for voiding (e.g. Terms revised, duplicate draft)"
+        placeholder="Reason for cancelling (e.g. Terms revised, duplicate draft)"
         className={inputClass}
       />
       <div className="flex gap-2">
@@ -287,7 +287,7 @@ export function VoidContractButton({ contractId }: { contractId: string }) {
           disabled={pending || !reason.trim()}
           className="rounded-lg bg-danger px-3 py-1 font-bold text-white disabled:opacity-50"
         >
-          {pending ? "Voiding…" : "Confirm Void"}
+          {pending ? "Cancelling…" : "Yes, Cancel Contract"}
         </button>
         <button type="button" onClick={() => setOpen(false)} className={ghostClass}>
           Cancel
@@ -301,21 +301,27 @@ export function VoidContractButton({ contractId }: { contractId: string }) {
 
 export function RestoreContractButton({ contractId }: { contractId: string }) {
   const [pending, start] = useTransition();
+  const [error, setError] = useState<string>();
   const router = useRouter();
   return (
-    <button
-      type="button"
-      disabled={pending}
-      onClick={() => {
-        if (!window.confirm("Restore this contract to its previous status?")) return;
-        start(async () => {
-          await restoreContractAction(contractId);
-          router.refresh();
-        });
-      }}
-      className="rounded-lg border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-ink transition hover:border-brand hover:text-brand disabled:opacity-60"
-    >
-      {pending ? "Restoring…" : "Restore Contract ↩"}
-    </button>
+    <span className="flex flex-col items-end gap-1">
+      <button
+        type="button"
+        disabled={pending}
+        onClick={() => {
+          if (!window.confirm("Make this contract active again? It goes back to the status it had before it was cancelled.")) return;
+          setError(undefined);
+          start(async () => {
+            const r = await restoreContractAction(contractId);
+            if (r?.error) setError(r.error);
+            else router.refresh();
+          });
+        }}
+        className="rounded-lg border border-success/40 bg-success/5 px-3 py-1.5 text-xs font-semibold text-success transition hover:bg-success/10 disabled:opacity-60"
+      >
+        {pending ? "Reactivating…" : "Make Active Again ↩"}
+      </button>
+      {error && <span role="alert" className="text-xs text-danger">{error}</span>}
+    </span>
   );
 }

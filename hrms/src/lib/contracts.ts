@@ -134,7 +134,7 @@ export async function signContract(contractId: string, employeeUserId: string, n
     throw new Error("This contract has already been signed.");
   }
   if (contract.status === "VOID") {
-    throw new Error("This contract has been voided.");
+    throw new Error("This contract has been cancelled.");
   }
   // Only a contract HR has issued can be signed: a draft is not open to the employee yet.
   if (contract.status !== "ISSUED") {

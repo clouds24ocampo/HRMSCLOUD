@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ContractStatus } from "@/generated/prisma/client";
+import { CONTRACT_STATUS_BADGE as STATUS_BADGE } from "@/lib/labels";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
@@ -9,13 +10,6 @@ import { formatDay, keyOfDbDate } from "@/lib/time";
 import { formatMoney } from "@/lib/money";
 import { Badge, Card, EmptyState, PageHeader, Stat } from "@/components/ui";
 import { GenerateContractForm, type EmployeeOption } from "./ContractForms";
-
-const STATUS_BADGE: Record<string, { label: string; tone: "warning" | "success" | "neutral" | "danger" }> = {
-  DRAFT: { label: "Draft", tone: "neutral" },
-  ISSUED: { label: "Issued (Awaiting Signature)", tone: "warning" },
-  SIGNED: { label: "Signed ✓", tone: "success" },
-  VOID: { label: "Voided", tone: "danger" },
-};
 
 export default async function ContractsPage({
   searchParams,

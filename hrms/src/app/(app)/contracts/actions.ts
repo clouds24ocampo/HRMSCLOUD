@@ -59,7 +59,7 @@ export async function signContractAction(contractId: string, _: FormState, form:
 
 export async function voidContractAction(contractId: string, reason: string): Promise<FormState> {
   const me = await requireUser("/contracts");
-  if (!isHr(me.role.key)) return { error: "Only HR can void a contract." };
+  if (!isHr(me.role.key)) return { error: "Only HR can cancel a contract." };
 
   const contract = await prisma.contract.findFirst({
     where: { id: contractId, organizationId: me.organizationId },
@@ -74,7 +74,7 @@ export async function voidContractAction(contractId: string, reason: string): Pr
   await audit(me.id, "contract.voided", "Contract", contractId, { reason }, me.organizationId);
   revalidatePath("/contracts");
   revalidatePath(`/contracts/${contractId}`);
-  return { ok: "Contract voided." };
+  return { ok: "Contract cancelled." };
 }
 
 export async function restoreContractAction(contractId: string): Promise<FormState> {
@@ -84,7 +84,7 @@ export async function restoreContractAction(contractId: string): Promise<FormSta
   const contract = await prisma.contract.findFirst({
     where: { id: contractId, organizationId: me.organizationId, status: "VOID" },
   });
-  if (!contract) return { error: "Contract not found or not voided." };
+  if (!contract) return { error: "Contract not found or not cancelled." };
 
   const status = restoredStatus(contract);
   await prisma.contract.update({
@@ -95,7 +95,7 @@ export async function restoreContractAction(contractId: string): Promise<FormSta
   await audit(me.id, "contract.restored", "Contract", contractId, { status }, me.organizationId);
   revalidatePath("/contracts");
   revalidatePath(`/contracts/${contractId}`);
-  return { ok: "Contract restored." };
+  return { ok: "Contract is active again." };
 }
 
 export async function issueContractAction(contractId: string): Promise<FormState> {
