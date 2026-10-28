@@ -50,7 +50,7 @@ export function AddPositionForm({ departments, levels }: { departments: Opt[]; l
   return (
     <form {...formProps} className="space-y-3">
       <Field label="Position title" id="title" required value={title} onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)} />
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="space-y-3">
         <label htmlFor="level" className="block text-sm font-medium">
           Level in the chain
           <select id="level" name="level" className={inputClass} value={level} onChange={(e) => setLevel(e.target.value)}>

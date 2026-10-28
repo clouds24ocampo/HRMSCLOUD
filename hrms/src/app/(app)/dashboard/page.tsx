@@ -496,9 +496,9 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
               <>
                 <p className="text-xs font-medium uppercase tracking-wide text-muted">Earned so far</p>
                 <div className="grid grid-cols-3 gap-3 text-sm">
-                  <div><p className="text-muted">Gross</p><p className="text-lg font-bold tabular-nums">{formatMoney(hrData.sum.gross)}</p></div>
-                  <div><p className="text-muted">Deductions</p><p className="text-lg font-bold tabular-nums">{formatMoney(hrData.sum.ded)}</p></div>
-                  <div><p className="text-muted">Net to pay</p><p className="text-lg font-bold tabular-nums">{formatMoney(hrData.sum.net)}</p></div>
+                  <div><p className="text-muted">Gross</p><p className="whitespace-nowrap font-bold tabular-nums sm:text-lg">{formatMoney(hrData.sum.gross)}</p></div>
+                  <div><p className="text-muted">Deductions</p><p className="whitespace-nowrap font-bold tabular-nums sm:text-lg">{formatMoney(hrData.sum.ded)}</p></div>
+                  <div><p className="text-muted">Net to pay</p><p className="whitespace-nowrap font-bold tabular-nums sm:text-lg">{formatMoney(hrData.sum.net)}</p></div>
                 </div>
                 <div className="rounded-xl border border-brand/30 bg-brand/5 p-3">
                   <p className="text-xs font-medium uppercase tracking-wide text-muted">Projected by {formatDay(cut.end, short)} (gross)</p>

@@ -96,9 +96,9 @@ export async function StandingPay({ organizationId, today, pick, settings }: { o
       </div>
 
       <div className="grid grid-cols-3 gap-2 text-sm">
-        <div><p className="text-muted">Gross</p><p className="font-bold tabular-nums sm:text-lg">{formatMoney(sum.gross)}</p></div>
-        <div><p className="text-muted">Deductions</p><p className="font-bold tabular-nums sm:text-lg">{formatMoney(sum.ded)}</p></div>
-        <div><p className="text-muted">Net to pay</p><p className="font-bold tabular-nums sm:text-lg">{formatMoney(sum.net)}</p></div>
+        <div><p className="text-muted">Gross</p><p className="whitespace-nowrap font-bold tabular-nums sm:text-lg">{formatMoney(sum.gross)}</p></div>
+        <div><p className="text-muted">Deductions</p><p className="whitespace-nowrap font-bold tabular-nums sm:text-lg">{formatMoney(sum.ded)}</p></div>
+        <div><p className="text-muted">Net to pay</p><p className="whitespace-nowrap font-bold tabular-nums sm:text-lg">{formatMoney(sum.net)}</p></div>
       </div>
 
       <ul className="space-y-2" aria-label="Employees">

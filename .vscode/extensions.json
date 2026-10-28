@@ -1,0 +1,4 @@
+{
+  // Colors each column of docs/CHANGELOG.csv so the change log reads like a spreadsheet.
+  "recommendations": ["mechatroner.rainbow-csv"]
+}
