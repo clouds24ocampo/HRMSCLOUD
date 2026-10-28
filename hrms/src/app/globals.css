@@ -78,9 +78,13 @@ body {
 
 /* Printing a payslip: only the page itself. */
 @media print {
-  nav[aria-label="Main"], header { display: none !important; }
+  /* App chrome only: a <header> inside an article (the ID card) is content and must print. */
+  nav[aria-label="Main"], header:not(article header) { display: none !important; }
   body { background: #fff; }
 }
+
+/* iOS Safari gives date/time inputs a wide built-in minimum width, so in a narrow row they overflow their box. */
+input[type="date"], input[type="time"], input[type="month"], input[type="datetime-local"] { min-width: 0; max-width: 100%; }
 
 /* Hide native browser password reveal eye (e.g. Edge, IE) so only custom eye is shown */
 input[type="password"]::-ms-reveal,

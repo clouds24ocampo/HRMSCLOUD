@@ -12,6 +12,8 @@ export type Team = { id: string; label: string; members: string[] }; // a leader
 
 function PeoplePicker({ people, picked, setPicked, teams = [] }: { people: Person[]; picked: string[]; setPicked: (v: string[]) => void; teams?: Team[] }) {
   const toggle = (id: string) => setPicked(picked.includes(id) ? picked.filter((x) => x !== id) : [...picked, id]);
+  // The dropdown names the team whose people are exactly the ones ticked, so the choice stays visible after picking.
+  const team = teams.find((t) => t.members.length === picked.length && t.members.every((m) => picked.includes(m)))?.id ?? "";
   return (
     <fieldset>
       <div className="mb-2 flex items-center justify-between">
@@ -23,7 +25,7 @@ function PeoplePicker({ people, picked, setPicked, teams = [] }: { people: Perso
       {teams.length > 0 && (
         <label className="mb-2 block text-sm font-medium">
           Pick a whole team in one click
-          <select value="" onChange={(e) => { const t = teams.find((x) => x.id === e.target.value); if (t) setPicked(t.members); }} className={inputClass}>
+          <select value={team} onChange={(e) => { const t = teams.find((x) => x.id === e.target.value); if (t) setPicked(t.members); }} className={inputClass}>
             <option value="">Choose a leader…</option>
             {teams.map((t) => (
               <option key={t.id} value={t.id}>{t.label} ({t.members.length})</option>

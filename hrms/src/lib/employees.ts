@@ -74,9 +74,11 @@ export async function getMyEmployee(actor: { id: string; organizationId: string;
   if (found) return found;
   const [firstName, ...rest] = actor.name.trim().split(/\s+/);
   const hireDate = dbDate(dayKey(new Date(), tz));
-  const isSuperAdmin = actor.role?.key === "SUPER_ADMIN";
-  const defaultNo = isSuperAdmin ? "superadmin001" : undefined;
-  return prisma.$transaction((tx) =>
-    createEmployee(tx, actor.organizationId, actor.id, { firstName, lastName: rest.join(" ") || "-", employeeNo: defaultNo, hireDate, userId: actor.id }, { checklist: false }),
-  );
+  return prisma.$transaction(async (tx) => {
+    // The first super admin gets the friendly "superadmin001"; any later one takes the next normal number,
+    // since employee numbers are unique per organization.
+    const taken = !!(await tx.employee.findUnique({ where: { organizationId_employeeNo: { organizationId: actor.organizationId, employeeNo: "superadmin001" } } }));
+    const defaultNo = actor.role?.key === "SUPER_ADMIN" && !taken ? "superadmin001" : undefined;
+    return createEmployee(tx, actor.organizationId, actor.id, { firstName, lastName: rest.join(" ") || "-", employeeNo: defaultNo, hireDate, userId: actor.id }, { checklist: false });
+  });
 }

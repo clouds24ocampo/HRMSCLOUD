@@ -136,7 +136,7 @@ export default async function DtrPage({ searchParams }: { searchParams: Promise<
         <label className="block min-w-0 flex-1 basis-36 text-sm font-medium">To<input type="date" name="to" defaultValue={to} className={inputClass} /></label>
         <button className={buttonClass}>Show</button>
       </form>
-      <div className="flex flex-wrap gap-2 text-sm">
+      <div className="grid grid-cols-3 gap-2 text-center text-sm sm:flex sm:flex-wrap">
         <Link href={q({ from: prevWs, to: addDays(prevWs, 6) })} className={ghostClass}>← Previous week</Link>
         <Link href={q({ from: ws, to: addDays(ws, 6) })} className={ghostClass}>This week</Link>
         <Link href={q({ from: nextWs, to: addDays(nextWs, 6) })} className={ghostClass}>Next week →</Link>
