@@ -8,22 +8,18 @@ type Db = Prisma.TransactionClient;
 
 export async function nextEmployeeNo(db: Db, organizationId: string, at: Date = new Date(), tz = DEFAULT_TIMEZONE): Promise<string> {
   const prefix = dayKey(at, tz).replace(/-/g, ""); // "YYYYMMDD"
-  const existing = await db.employee.findMany({
-    where: { organizationId, employeeNo: { startsWith: `${prefix}-` } },
-    select: { employeeNo: true },
-  });
-  let maxSeq = 0;
-  for (const e of existing) {
-    const parts = e.employeeNo.split("-");
-    const num = Number(parts[1]);
-    if (Number.isInteger(num) && num > maxSeq) maxSeq = num;
+  // Applicant numbers are reserved too: an applicant keeps the same number when hired, so nobody else may take it.
+  const [emps, apps] = await Promise.all([
+    db.employee.findMany({ where: { organizationId, employeeNo: { startsWith: `${prefix}-` } }, select: { employeeNo: true } }),
+    db.applicantProfile.findMany({ where: { organizationId, applicantNo: { startsWith: `${prefix}-` } }, select: { applicantNo: true } }),
+  ]);
+  const taken = new Set([...emps.map((e) => e.employeeNo), ...apps.map((a) => a.applicantNo)]);
+  let seq = 1;
+  for (const n of taken) {
+    const num = Number(n.split("-")[1]);
+    if (Number.isInteger(num) && num >= seq) seq = num + 1;
   }
-  let seq = maxSeq + 1;
-  for (;;) {
-    const employeeNo = `${prefix}-${String(seq).padStart(4, "0")}`;
-    if (!(await db.employee.findUnique({ where: { organizationId_employeeNo: { organizationId, employeeNo } } }))) return employeeNo;
-    seq++;
-  }
+  return `${prefix}-${String(seq).padStart(4, "0")}`;
 }
 
 // Names are copied into history rows so they stay readable after renames or archiving.

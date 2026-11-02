@@ -1,11 +1,12 @@
 "use client";
 
 import { Icon, ICON_INLINE } from "@/components/Icon";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert } from "@/components/Fields";
 import { buttonClass, ghostClass, inputClass } from "@/components/ui";
-import { acknowledgeHandbookAction, createHandbookSectionAction, updateHandbookSectionAction } from "./actions";
+import { acknowledgeHandbookAction, createHandbookSectionAction, installItHandbookAction, updateHandbookSectionAction } from "./actions";
+import type { FormState } from "@/app/login/actions";
 
 export function AcknowledgeHandbookForm() {
   const [agreed, setAgreed] = useState(false);
@@ -173,5 +174,24 @@ export function AddHandbookSectionForm({ onDone }: { onDone?: () => void } = {})
         </button>
       </div>
     </form>
+  );
+}
+
+// HR: replaces the generic starter chapters with the full IT company handbook (software, hardware, cloud, network, security, Wi-Fi).
+export function InstallItHandbookButton({ installed }: { installed: boolean }) {
+  const [pending, start] = useTransition();
+  const [msg, setMsg] = useState<FormState>();
+  return (
+    <div className="space-y-2">
+      <button
+        disabled={pending}
+        onClick={() => { if (confirm(installed ? "Update the IT company handbook chapters to the latest text? Chapters you edited by hand are kept." : "Replace the generic starter chapters with the full IT company handbook? Chapters you edited by hand are kept.")) start(async () => setMsg(await installItHandbookAction())); }}
+        className="rounded-lg border border-brand bg-brand/10 px-4 py-2 text-sm font-semibold text-brand transition hover:bg-brand/20 active:scale-95 disabled:opacity-60"
+      >
+        {pending ? "Installing…" : installed ? "Update the IT company handbook" : "Install the IT company handbook"}
+      </button>
+      {msg?.error && <p className="text-sm text-danger">{msg.error}</p>}
+      {msg?.ok && <p className="text-sm text-success">{msg.ok}</p>}
+    </div>
   );
 }

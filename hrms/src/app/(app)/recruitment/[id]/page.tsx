@@ -4,6 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getOrgSettings } from "@/lib/settings";
 import { dayKey } from "@/lib/time";
+import { passed, KIND_LABEL } from "@/lib/exams";
+import { examsForJob } from "@/lib/applicants";
+import { buildChecklist } from "@/lib/requirements";
+import { RoleInfo } from "@/components/RoleInfo";
 import { LEVEL_LABEL } from "@/lib/defaults";
 import { Badge, Card, PageHeader } from "@/components/ui";
 import { AddApplicantForm, ApplicantCard, JobStatusButton } from "../RecruitmentForms";
@@ -12,6 +16,7 @@ const STAGES = [
   ["APPLIED", "Applied"],
   ["SCREENING", "Screening"],
   ["INTERVIEW", "Interview"],
+  ["REQUIREMENTS", "For requirements"],
   ["OFFER", "Offer"],
   ["HIRED", "Hired"],
   ["REJECTED", "Rejected"],
@@ -25,11 +30,14 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
     where: { id, organizationId: me.organizationId },
     include: {
       department: { select: { name: true } },
-      applicants: { orderBy: { createdAt: "asc" }, include: { notes: { orderBy: { createdAt: "desc" }, take: 6 } } },
+      applicants: { orderBy: { createdAt: "asc" }, include: { notes: { orderBy: { createdAt: "desc" }, take: 6 }, profile: { include: { documents: { where: { archivedAt: null }, orderBy: { createdAt: "desc" } }, policySignatures: { select: { policyId: true } } } }, attempts: { include: { exam: { select: { title: true, kind: true, passingPct: true } } }, orderBy: { startedAt: "asc" } } } },
     },
   });
   if (!job) notFound();
 
+  const required = await examsForJob(me.organizationId, job.id);
+  const activePolicies = new Set((await prisma.policyDocument.findMany({ where: { organizationId: me.organizationId, archivedAt: null, requiresSignature: true }, select: { id: true } })).map((p) => p.id));
+  const localInput = (d: Date) => new Intl.DateTimeFormat("sv-SE", { timeZone: settings.timezone, dateStyle: "short", timeStyle: "short" }).format(d).replace(" ", "T");
   const [departments, positions, managers, shifts] = await Promise.all([
     prisma.department.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
     prisma.position.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, select: { id: true, title: true, level: true }, orderBy: { title: "asc" } }),
@@ -48,7 +56,12 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
         subtitle={`${job.department?.name ?? "Any department"} · ${hired} of ${job.openings} filled`}
         action={<div className="flex items-center gap-2"><Badge tone={job.status === "OPEN" ? "success" : "neutral"}>{job.status === "OPEN" ? "Open" : "Closed"}</Badge><JobStatusButton id={job.id} open={job.status === "OPEN"} /></div>}
       />
-      {job.description && <p className="text-muted">{job.description}</p>}
+      {(job.description || job.duties) && <Card><RoleInfo description={job.description} descriptionTl={job.descriptionTl} duties={job.duties} dutiesTl={job.dutiesTl} /></Card>}
+      {required.length === 0 && (
+        <p className="rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm">
+          No exam is set for this position, so applicants go straight to uploading their documents. <Link href="/recruitment/exams" className="font-semibold text-brand hover:underline">Create an exam</Link> and choose this position.
+        </p>
+      )}
 
       <Card>
         <h2 className="mb-3 text-lg font-semibold">Add an applicant</h2>
@@ -73,6 +86,26 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
                         id: a.id, name: a.name, email: a.email, phone: a.phone, source: a.source, stage: a.stage,
                         interviewAt: a.interviewAt ? when.format(a.interviewAt) : null,
                         notes: a.notes.map((n) => ({ id: n.id, text: n.text, at: when.format(n.createdAt) })),
+                        portal: a.profile ? {
+                          applicantNo: a.profile.applicantNo, hasResume: !!a.profile.resumeKey, hasId: !!a.profile.idKey,
+                          // Every exam this job needs, so HR also sees the ones not started yet.
+                          exams: required.map((e) => {
+                            const t = a.attempts.find((x) => x.examId === e.id);
+                            const pct = t?.maxScore ? Math.round(((t.score ?? 0) / t.maxScore) * 100) : 0;
+                            const bd = (t?.breakdown ?? {}) as Record<string, { score: number; max: number }>;
+                            return {
+                              title: `${e.title} (${KIND_LABEL[e.kind]})`, kind: e.kind, attemptId: t?.submittedAt ? t.id : null,
+                              status: !t ? "Not started" : t.submittedAt ? `${t.score}/${t.maxScore} (${pct}%)` : "In progress",
+                              passed: t?.submittedAt && t.exam.passingPct != null ? passed(pct, t.exam.passingPct) : null,
+                              traits: Object.entries(bd).map(([k, v]) => `${k} ${v.max ? Math.round((v.score / v.max) * 100) : 0}%`).join(" · "),
+                            };
+                          }),
+                          orientation: { at: a.orientationAt ? when.format(a.orientationAt) : null, input: a.orientationAt ? localInput(a.orientationAt) : "", signed: a.profile.policySignatures.filter((x) => activePolicies.has(x.policyId)).length, total: activePolicies.size },
+                          requirements: ["REQUIREMENTS", "OFFER", "HIRED"].includes(a.stage) ? (() => {
+                            const c = buildChecklist(a.profile!.documents, !!a.profile!.resumeKey);
+                            return { done: c.done, total: c.total, items: c.items.map((i) => ({ title: i.title, required: i.required, docId: i.doc?.id ?? null, auto: i.auto })) };
+                          })() : undefined,
+                        } : undefined,
                       }}
                       today={today}
                       defaultDepartment={job.departmentId ?? ""}

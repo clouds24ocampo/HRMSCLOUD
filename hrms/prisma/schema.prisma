@@ -54,6 +54,9 @@ model Organization {
   jobs           JobPosting[]
   applicants     Applicant[]
   applicantNotes ApplicantNote[]
+  applicantProfiles ApplicantProfile[]
+  applicantDocuments ApplicantDocument[]
+  exams          Exam[]
   cycles         ReviewCycle[]
   reviews        Review[]
   goals          Goal[]
@@ -104,6 +107,7 @@ model User {
   memberships        ConversationMember[]
   messages           Message[]
   locationLinks      LocationLink[]
+  applicantProfile   ApplicantProfile?
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 
@@ -287,6 +291,13 @@ model Employee {
   handbookAcks   HandbookAcknowledgment[]
   signatures     PolicySignature[]
   address        String?
+  // Government numbers shown on the back of the digital ID. Kept in step with the tax profile's numbers (see saveTaxProfile).
+  sssNo          String?
+  philhealthNo   String?
+  tinNo          String?
+  pagibigNo      String?
+  idIssuedOn     DateTime?            @db.Date // when the ID card was issued; it expires after the design's validity
+  birthDate      DateTime?            @db.Date
   createdAt      DateTime             @default(now())
   updatedAt      DateTime             @updatedAt
 
@@ -860,9 +871,13 @@ model JobPosting {
   position       Position?    @relation(fields: [positionId], references: [id])
   openings       Int          @default(1)
   description    String?
+  descriptionTl  String? // Tagalog summary
+  duties         String? // what the person will do, one per line
+  dutiesTl       String? // the same in Tagalog
   status         JobStatus    @default(OPEN)
   createdById    String?
   applicants     Applicant[]
+  exams          Exam[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -873,6 +888,7 @@ enum ApplicantStage {
   APPLIED
   SCREENING
   INTERVIEW
+  REQUIREMENTS // passed the interview: the applicant uploads the 201 file documents
   OFFER
   HIRED
   REJECTED
@@ -890,14 +906,141 @@ model Applicant {
   source         String?
   stage          ApplicantStage  @default(APPLIED)
   interviewAt    DateTime?
+  orientationAt  DateTime? // orientation day: the applicant reads and signs the company policies
   employeeId     String?         @unique // set when hired: the applicant became this employee
   employee       Employee?       @relation(fields: [employeeId], references: [id])
+  profileId      String? // set when the person applied through the careers page (own account)
+  profile        ApplicantProfile? @relation(fields: [profileId], references: [id])
   notes          ApplicantNote[]
+  attempts       ExamAttempt[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
+  @@unique([jobId, profileId])
   @@index([jobId, stage])
   @@index([organizationId])
+}
+
+// An applicant's own account details. One per person, shared by every job they apply to.
+// applicantNo is reserved here and becomes the employee number when they are hired.
+model ApplicantProfile {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  userId         String       @unique
+  user           User         @relation(fields: [userId], references: [id])
+  applicantNo    String
+  phone          String?
+  resumeKey      String? // stored like documents (storage/<org>/<uuid>)
+  resumeName     String?
+  resumeMime     String?
+  idKey          String?
+  idName         String?
+  idMime         String?
+  applications   Applicant[]
+  documents      ApplicantDocument[]
+  policySignatures ApplicantPolicySignature[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, applicantNo])
+  @@index([organizationId])
+}
+
+// A policy signed by an applicant on orientation day. On hire it is copied to a PolicySignature for the new employee.
+model ApplicantPolicySignature {
+  id          String           @id @default(cuid())
+  profileId   String
+  profile     ApplicantProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  policyId    String
+  policy      PolicyDocument   @relation(fields: [policyId], references: [id])
+  signedName  String
+  signatureKey String
+  contentHash String
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime         @default(now())
+
+  @@unique([policyId, profileId])
+  @@index([profileId])
+}
+
+// 201 file documents an applicant uploads once they are "For requirements". On hire they are copied to the employee's 201 file.
+model ApplicantDocument {
+  id             String           @id @default(cuid())
+  organizationId String
+  organization   Organization     @relation(fields: [organizationId], references: [id])
+  profileId      String
+  profile        ApplicantProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  title          String // a requirement title from the 201 checklist
+  fileName       String
+  mimeType       String
+  sizeBytes      Int
+  storageKey     String
+  version        Int              @default(1)
+  archivedAt     DateTime? // replaced by a newer upload of the same requirement
+  createdAt      DateTime         @default(now())
+
+  @@index([profileId, title])
+  @@index([organizationId])
+}
+
+enum ExamKind {
+  KNOWLEDGE // right and wrong answers, scored against the position
+  PSYCHOLOGICAL // no wrong answers: each choice carries points toward fit
+}
+
+// jobId null = taken by applicants of every job.
+model Exam {
+  id             String         @id @default(cuid())
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  jobId          String?
+  job            JobPosting?    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  kind           ExamKind
+  title          String
+  instructions   String?
+  timeLimitMin   Int            @default(60)
+  passingPct     Int? // knowledge exams only
+  active         Boolean        @default(true)
+  questions      ExamQuestion[]
+  attempts       ExamAttempt[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([organizationId, jobId])
+}
+
+model ExamQuestion {
+  id        String   @id @default(cuid())
+  examId    String
+  exam      Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  text      String
+  textTl    String? // Tagalog version; the English text shows when empty
+  trait     String? // psychological exams: the trait this question measures
+  options   Json // [{ "text": string, "textTl"?: string, "points": number }]; knowledge: 1 for the right answer, 0 for the rest
+  sort      Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([examId, sort])
+}
+
+model ExamAttempt {
+  id          String    @id @default(cuid())
+  applicantId String
+  applicant   Applicant @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  examId      String
+  exam        Exam      @relation(fields: [examId], references: [id], onDelete: Cascade)
+  lang        String    @default("en") // "en" | "tl": chosen by the applicant when starting
+  startedAt   DateTime  @default(now())
+  submittedAt DateTime?
+  answers     Json? // { questionId: optionIndex }
+  score       Int?
+  maxScore    Int?
+  breakdown   Json? // psychological: { trait: { score, max } }
+  createdAt   DateTime  @default(now())
+
+  @@unique([applicantId, examId])
 }
 
 model ApplicantNote {
@@ -1337,6 +1480,7 @@ model PolicyDocument {
   archivedAt        DateTime?
   createdById       String?
   signatures        PolicySignature[]
+  applicantSignatures ApplicantPolicySignature[]
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
@@ -1381,6 +1525,9 @@ model IdCardSettings {
   signatoryTitle String?
   signatureKey   String? // the signatory's signature image
   logoKey        String? // the company logo shown on every card
+  address        String? // company address on the front
+  terms          String? // terms and conditions on the back, one point per line
+  validYears     Int          @default(2) // how long an ID is valid from its issue date
   footer         String?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt

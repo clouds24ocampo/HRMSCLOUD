@@ -1403,7 +1403,7 @@ export default function SculptureHero(props: SculptureHeroProps) {
     intro = true,
     height = "100svh",
     backdropText = "",
-    showCredit = true,
+    showCredit = false, // the on-page credit link is off; the source file header keeps the author note
     className,
     style,
   } = props

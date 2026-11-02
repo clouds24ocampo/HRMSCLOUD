@@ -43,7 +43,7 @@ export function File201({ employeeId, items, mandatory }: { employeeId: string; 
       <ul className="divide-y divide-line rounded-xl border border-line">
         {items.map((i) => <Row key={i.title} employeeId={employeeId} item={i} required={i.required} />)}
       </ul>
-      <p className="text-xs text-muted">PDF, PNG or JPEG, up to 5 MB each. Replacing a file keeps the older version.</p>
+      <p className="text-xs text-muted">PDF, PNG or JPEG, up to 10 MB each. Replacing a file keeps the older version.</p>
     </div>
   );
 }

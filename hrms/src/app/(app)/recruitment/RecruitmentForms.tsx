@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert, Field, SubmitButton } from "@/components/Fields";
 import { inputClass } from "@/components/ui";
 import type { FormState } from "@/app/login/actions";
-import { addApplicant, addApplicantNote, addJob, hireApplicant, moveApplicant, setInterview, setJobStatus } from "./actions";
+import { addStarterPositions } from "./exam-actions";
+import { addApplicant, addApplicantNote, addJob, deleteApplication, deleteApplicantPerson, setOrientation, hireApplicant, moveApplicant, setInterview, setJobStatus } from "./actions";
 
 type Opt = { id: string; label: string };
 const Msg = ({ s }: { s: FormState }) => (
@@ -38,12 +40,29 @@ export function AddJobForm({ departments, positions }: { departments: Opt[]; pos
       </div>
       <Field label="Openings" id="openings" type="number" min={1} defaultValue={1} required />
       <label className="block text-sm font-medium">
-        Description (optional)
-        <textarea name="description" rows={3} className={inputClass} />
+        About the role (optional)
+        <textarea name="description" rows={2} placeholder="One or two sentences about the job" className={inputClass} />
       </label>
+      <label className="block text-sm font-medium">
+        What the person will do (optional, one per line)
+        <textarea name="duties" rows={4} placeholder={"Answer customer calls\nPrepare daily reports"} className={inputClass} />
+      </label>
+      <p className="text-xs text-muted">Write in English. Applicants who choose Tagalog get an automatic translation.</p>
       <Msg s={f.state} />
       <SubmitButton pending={f.pending}>Open the job</SubmitButton>
     </form>
+  );
+}
+
+// Adds the standard positions (software engineers, safety, office, field crews…). Titles that exist are skipped.
+export function StarterPositionsButton() {
+  const [pending, start] = useTransition();
+  const [msg, setMsg] = useState<FormState>();
+  return (
+    <div className="space-y-2">
+      <button disabled={pending} onClick={() => start(async () => setMsg(await addStarterPositions()))} className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium transition hover:bg-bg active:scale-95 disabled:opacity-60">Add the starter positions</button>
+      <Msg s={msg} />
+    </div>
   );
 }
 
@@ -72,15 +91,20 @@ export function AddApplicantForm({ jobId }: { jobId: string }) {
   );
 }
 
-const MOVES = [
+// The path an applicant walks. Hired is only reached through the Hire form.
+const PATH = [
+  ["APPLIED", "Applied"],
   ["SCREENING", "Screening"],
   ["INTERVIEW", "Interview"],
+  ["REQUIREMENTS", "Requirements"],
   ["OFFER", "Offer"],
 ] as const;
 
 type Applicant = {
   id: string; name: string; email: string | null; phone: string | null; source: string | null; stage: string; interviewAt: string | null;
   notes: { id: string; text: string; at: string }[];
+  // Present when the person applied through the careers page.
+  portal?: { applicantNo: string; hasResume: boolean; hasId: boolean; exams: { title: string; kind: string; status: string; passed: boolean | null; traits: string; attemptId: string | null }[]; orientation?: { at: string | null; input: string; signed: number; total: number }; requirements?: { done: number; total: number; items: { title: string; required: boolean; docId: string | null; auto: boolean }[] } };
 };
 
 export function ApplicantCard(p: {
@@ -92,15 +116,56 @@ export function ApplicantCard(p: {
   const [pending, start] = useTransition();
   const note = useKeptForm(addApplicantNote.bind(null, a.id));
   const interview = useKeptForm(setInterview.bind(null, a.id));
+  const orientation = useKeptForm(setOrientation.bind(null, a.id));
   const hire = useKeptForm(hireApplicant.bind(null, a.id));
   const [login, setLogin] = useState(false);
-  const move = (stage: (typeof MOVES)[number][0] | "REJECTED" | "APPLIED") => start(async () => setMsg(await moveApplicant(a.id, stage)));
+  const move = (stage: (typeof PATH)[number][0] | "REJECTED") => start(async () => setMsg(await moveApplicant(a.id, stage)));
   const closed = a.stage === "HIRED" || a.stage === "REJECTED";
+  const at = PATH.findIndex(([s]) => s === a.stage);
+  const prev = at > 0 ? PATH[at - 1] : null;
+  const next = at >= 0 && at < PATH.length - 1 ? PATH[at + 1] : null;
 
   return (
     <li className="rounded-xl border border-line p-4">
-      <p className="font-medium">{a.name}</p>
+      <p className="font-medium"><Link href={`/recruitment/applicants/${a.id}`} className="hover:text-brand hover:underline" title="Open the full profile">{a.name}</Link></p>
+      {at >= 0 && (
+        <ol aria-label="Stage" className="mt-1 flex flex-wrap items-center gap-1 text-xs text-muted">
+          {PATH.map(([s, l], i) => (
+            <li key={s} className={`flex items-center gap-1 ${i === at ? "font-bold text-brand" : i < at ? "text-ink" : ""}`}>{i > 0 && <span aria-hidden>›</span>}{l}</li>
+          ))}
+        </ol>
+      )}
       <p className="text-sm text-muted">{[a.email, a.phone, a.source && `via ${a.source}`].filter(Boolean).join(" · ") || "No contact details"}</p>
+      {a.portal && (
+        <div className="mt-2 space-y-1 rounded-lg bg-bg p-3 text-sm">
+          <p>Applicant no. <span className="font-mono font-semibold">{a.portal.applicantNo}</span></p>
+          <p className="flex flex-wrap gap-x-4">
+            {a.portal.hasResume ? <a href={`/recruitment/applicant/${a.id}/resume`} target="_blank" className="font-semibold text-brand hover:underline">Open resume</a> : <span className="text-muted">No resume yet</span>}
+            {a.portal.hasId ? <a href={`/recruitment/applicant/${a.id}/id`} target="_blank" className="font-semibold text-brand hover:underline">Open valid ID</a> : <span className="text-muted">No valid ID yet</span>}
+          </p>
+          {a.portal.exams.map((e) => (
+            <p key={e.title}>
+              <span className="font-medium">{e.title}:</span> {e.status}
+              {e.passed !== null && <span className={e.passed ? " font-semibold text-success" : " font-semibold text-danger"}>{e.passed ? " · Passed" : " · Below passing"}</span>}
+              {e.traits && <span className="block text-xs text-muted">{e.traits}</span>}
+              {e.attemptId && <Link href={`/recruitment/results/${e.attemptId}`} className="block text-xs font-semibold text-brand hover:underline">Review every answer →</Link>}
+            </p>
+          ))}
+          {a.portal.requirements && (
+            <details className="pt-1">
+              <summary className="cursor-pointer font-semibold text-brand">201 file: {a.portal.requirements.done} of {a.portal.requirements.total} required in</summary>
+              <ul className="mt-2 space-y-1">
+                {a.portal.requirements.items.map((i) => (
+                  <li key={i.title} className="flex flex-wrap items-center justify-between gap-2">
+                    <span className={i.docId || i.auto ? "" : i.required ? "text-warning" : "text-muted"}>{i.title}{!i.required && <span className="text-xs text-muted"> (if it applies)</span>}</span>
+                    {i.docId ? <a href={`/recruitment/applicant/${a.id}/doc/${i.docId}`} target="_blank" className="font-semibold text-brand hover:underline">Open</a> : i.auto ? <a href={`/recruitment/applicant/${a.id}/resume`} target="_blank" className="font-semibold text-brand hover:underline">Open resume</a> : <span className="text-xs text-muted">{i.required ? "Missing" : "–"}</span>}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </div>
+      )}
       {a.interviewAt && <p className="mt-1 text-sm">Interview: <span className="font-medium">{a.interviewAt}</span></p>}
 
       {a.stage !== "HIRED" && (
@@ -109,15 +174,42 @@ export function ApplicantCard(p: {
             <button disabled={pending} onClick={() => move("APPLIED")} className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium transition hover:bg-bg active:scale-95">Reopen</button>
           ) : (
             <>
-              {MOVES.filter(([s]) => s !== a.stage).map(([s, l]) => (
-                <button key={s} disabled={pending} onClick={() => move(s)} className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium transition hover:bg-bg active:scale-95 disabled:opacity-60">Move to {l}</button>
-              ))}
-              <button disabled={pending} onClick={() => move("REJECTED")} className="rounded-lg border border-danger px-3 py-1.5 text-sm font-medium text-danger transition hover:bg-danger/10 active:scale-95 disabled:opacity-60">Reject</button>
+              {prev && <button disabled={pending} onClick={() => move(prev[0])} className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium transition hover:bg-bg active:scale-95 disabled:opacity-60">← Back to {prev[1]}</button>}
+              {next && <button disabled={pending} onClick={() => { if (confirm(`Move ${a.name} to ${next[1]}?`)) move(next[0]); }} className="rounded-lg border border-brand bg-brand/10 px-3 py-1.5 text-sm font-semibold text-brand transition hover:bg-brand/20 active:scale-95 disabled:opacity-60">Move to {next[1]} →</button>}
+              <button disabled={pending} onClick={() => { if (confirm(`Reject ${a.name}?`)) move("REJECTED"); }} className="rounded-lg border border-danger px-3 py-1.5 text-sm font-medium text-danger transition hover:bg-danger/10 active:scale-95 disabled:opacity-60">Reject</button>
             </>
           )}
         </div>
       )}
       {msg?.error && <div className="mt-2"><Alert kind="error">{msg.error}</Alert></div>}
+      {a.stage !== "HIRED" && (
+        <button
+          disabled={pending}
+          onClick={() => { if (confirm(`Remove ${a.name} from this position? Their exam results for it are deleted.`)) start(async () => setMsg(await deleteApplication(a.id))); }}
+          className="mt-2 text-xs font-medium text-danger hover:underline disabled:opacity-60"
+        >
+          Remove from this position
+        </button>
+      )}
+
+      {a.portal && ["REQUIREMENTS", "OFFER"].includes(a.stage) && a.portal.orientation && (
+        <details className="mt-3" open={!!a.portal.orientation.at}>
+          <summary className="cursor-pointer text-sm font-semibold text-brand">
+            Orientation day{a.portal.orientation.at ? `: ${a.portal.orientation.at} · ${a.portal.orientation.signed} of ${a.portal.orientation.total} policies signed` : ""}
+          </summary>
+          <div className="mt-3 space-y-2">
+            <p className="text-xs text-muted">On this day the applicant reads and signs the company policies and the privacy policy. They are hired after that. Clear the date to cancel.</p>
+            <form {...orientation.formProps} className="flex flex-wrap items-end gap-2">
+              <label className="block min-w-0 flex-1 basis-48 text-sm font-medium">
+                Date and time
+                <input type="datetime-local" name="orientationAt" defaultValue={a.portal.orientation.input} className={inputClass} />
+              </label>
+              <button disabled={orientation.pending} className="rounded-lg border border-line px-4 py-2.5 text-sm font-semibold transition hover:bg-bg active:scale-95">Save</button>
+            </form>
+            <Msg s={orientation.state} />
+          </div>
+        </details>
+      )}
 
       {!closed && (
         <details className="mt-3">
@@ -205,5 +297,23 @@ export function ApplicantCard(p: {
         </ul>
       )}
     </li>
+  );
+}
+
+// Whole-person delete, used on the All applicants list.
+export function DeleteApplicantButton({ id, name }: { id: string; name: string }) {
+  const [pending, start] = useTransition();
+  const [msg, setMsg] = useState<FormState>();
+  return (
+    <span className="inline-flex flex-col items-end gap-1">
+      <button
+        disabled={pending}
+        onClick={() => { if (confirm(`Delete ${name} completely? Their applications, exam results, uploaded files and applicant account are removed. This cannot be undone.`)) start(async () => setMsg(await deleteApplicantPerson(id))); }}
+        className="rounded-lg border border-danger px-3 py-1.5 text-sm font-medium text-danger transition hover:bg-danger/10 active:scale-95 disabled:opacity-60"
+      >
+        {pending ? "Deleting…" : "Delete applicant"}
+      </button>
+      {msg?.error && <span className="max-w-60 text-right text-xs text-danger">{msg.error}</span>}
+    </span>
   );
 }

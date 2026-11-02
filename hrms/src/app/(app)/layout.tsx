@@ -36,7 +36,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div className="flex min-w-0 flex-1 flex-col pb-20 md:pb-0">
         <header className="flex items-center justify-between border-b border-line bg-surface px-4 py-3 sm:px-8">
           <div className="min-w-0">
-            <p className="truncate font-semibold">{user.name}</p>
+            <Link href="/profile" className="block truncate font-semibold hover:text-brand hover:underline" title="My profile">{user.name}</Link>
             <p className="truncate text-xs text-muted">{user.organization.name} · {user.role.name}</p>
           </div>
           <div className="flex items-center gap-2">

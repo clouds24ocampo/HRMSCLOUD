@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { ROLES } from "@/lib/roles";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
@@ -19,7 +20,7 @@ export async function postAnnouncement(_: FormState, form: FormData): Promise<Fo
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const a = await prisma.announcement.create({ data: { organizationId: me.organizationId, ...parsed.data, pinned: form.get("pinned") === "on", createdById: me.id } });
   await audit(me.id, "announcement.posted", "Announcement", a.id, { title: a.title }, me.organizationId);
-  const everyone = await prisma.user.findMany({ where: { organizationId: me.organizationId, active: true }, select: { id: true } });
+  const everyone = await prisma.user.findMany({ where: { organizationId: me.organizationId, active: true, role: { key: { not: ROLES.APPLICANT } } }, select: { id: true } });
   await notify(me.organizationId, everyone.map((u) => u.id), { title: `Announcement: ${a.title}`, href: "/dashboard" }, me.id);
   done();
   return { ok: "Posted. Everyone was notified and it shows on their Home page." };

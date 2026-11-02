@@ -18,8 +18,9 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["pdfkit"],
   // The dev-only "N" badge sits on top of the phone bottom bar and blocks taps.
   devIndicators: false,
-  // Document uploads are posted through server actions: allow a little over the file limit (see DOCUMENT_MAX_MB).
-  experimental: { serverActions: { bodySizeLimit: "8mb" } },
+  // Uploads are posted through server actions. The applicant form sends two files at once (resume and valid ID),
+  // each up to DOCUMENT_MAX_MB (10 by default), so allow room for both.
+  experimental: { serverActions: { bodySizeLimit: "24mb" } },
   // Lets the dev server accept requests through the phone tunnel (npm run tunnel) and from phones on the LAN.
   allowedDevOrigins: ["*.trycloudflare.com", ...lanHosts],
   // Enterprise production security headers

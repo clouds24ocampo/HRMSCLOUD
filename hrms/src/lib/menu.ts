@@ -5,7 +5,7 @@ export type NavGroup = { title?: string; items: NavItem[] };
 
 // Every item still passes canAccess() per role before it is shown. Hiding is cosmetic; pages enforce access themselves.
 export const MENU: NavGroup[] = [
-  { items: [{ href: "/dashboard", label: "Home", icon: "home" }] },
+  { items: [{ href: "/dashboard", label: "Home", icon: "home" }, { href: "/profile", label: "My profile", icon: "employee" }] },
   {
     title: "People",
     items: [
@@ -13,7 +13,7 @@ export const MENU: NavGroup[] = [
       { href: "/contracts", label: "Contracts", icon: "contract" },
       { href: "/handbook", label: "Company Handbook", icon: "handbook" },
       { href: "/organization", label: "Organization", icon: "organization" },
-      { href: "/recruitment", label: "Recruitment", icon: "recruitment" },
+      { href: "/recruitment/dashboard", label: "Recruitment", icon: "recruitment" },
       { href: "/documents", label: "Documents", icon: "documents" },
       { href: "/policies", label: "Policies", icon: "policies" },
       { href: "/id", label: "Digital ID", icon: "id" },

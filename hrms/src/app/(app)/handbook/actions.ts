@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { isHr } from "@/lib/scope";
 import { getMyEmployee } from "@/lib/employees";
-import { acknowledgeHandbook } from "@/lib/handbook";
+import { acknowledgeHandbook, installItHandbook } from "@/lib/handbook";
 import type { FormState } from "@/app/login/actions";
 import { audit } from "@/lib/audit";
 
@@ -99,4 +99,14 @@ export async function createHandbookSectionAction(_: FormState, form: FormData):
   await audit(me.id, "handbook.section_created", "HandbookSection", sec.id, { title: sec.title }, me.organizationId);
   revalidatePath("/handbook");
   return { ok: "New chapter added to the handbook." };
+}
+
+// HR loads the ready-made IT company handbook. Chapters that HR already edited by hand are kept as they are.
+export async function installItHandbookAction(): Promise<FormState> {
+  const me = await requireUser("/handbook");
+  if (!isHr(me.role.key)) return { error: "Only HR or Administrator can install the handbook." };
+  const r = await installItHandbook(me.organizationId, me.organization.name, me.id);
+  revalidatePath("/handbook");
+  const kept = r.keptEdited.length ? ` Kept as you edited them: ${r.keptEdited.join(", ")}.` : "";
+  return { ok: `IT company handbook ready: ${r.added} chapters added, ${r.updated} updated, ${r.unchanged} already current, ${r.removed} old starter chapters replaced.${kept}` };
 }

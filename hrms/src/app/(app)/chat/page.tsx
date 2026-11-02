@@ -11,7 +11,7 @@ export default async function ChatPage({ searchParams }: { searchParams: Promise
   const [chats, people] = await Promise.all([
     myConversations(me.id, me.organizationId),
     prisma.user.findMany({
-      where: { organizationId: me.organizationId, active: true, id: { not: me.id }, ...(q ? { name: { contains: q, mode: "insensitive" } } : {}) },
+      where: { organizationId: me.organizationId, active: true, id: { not: me.id }, role: { key: { not: "APPLICANT" } }, ...(q ? { name: { contains: q, mode: "insensitive" } } : {}) },
       select: { id: true, name: true, role: { select: { name: true } }, employee: { select: { position: { select: { title: true } }, department: { select: { name: true } } } } },
       orderBy: { name: "asc" },
       take: 50,

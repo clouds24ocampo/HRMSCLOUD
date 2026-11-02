@@ -19,5 +19,7 @@ export function useKeptForm(fn: (prev: FormState, fd: FormData) => Promise<FormS
     const fd = new FormData(e.currentTarget);
     start(() => dispatch(fd));
   };
-  return { state, pending, formProps: { ref, onSubmit } };
+  // For forms that prepare their data first (for example shrinking photos) and then send it.
+  const submit = (fd: FormData) => start(() => dispatch(fd));
+  return { state, pending, submit, formProps: { ref, onSubmit } };
 }

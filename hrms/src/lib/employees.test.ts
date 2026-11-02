@@ -11,6 +11,7 @@ describe("nextEmployeeNo", () => {
         findMany: async () => [],
         findUnique: async () => null,
       },
+      applicantProfile: { findMany: async () => [] },
     } as unknown as Parameters<typeof nextEmployeeNo>[0];
 
     const no = await nextEmployeeNo(mockDb, orgId, testDate, "Asia/Manila");
@@ -26,9 +27,18 @@ describe("nextEmployeeNo", () => {
         findMany: async () => [{ employeeNo: "20261017-0001" }, { employeeNo: "20261017-0002" }],
         findUnique: async () => null,
       },
+      applicantProfile: { findMany: async () => [] },
     } as unknown as Parameters<typeof nextEmployeeNo>[0];
 
     const no = await nextEmployeeNo(mockDb, orgId, testDate, "Asia/Manila");
     expect(no).toBe("20261017-0003");
+  });
+
+  it("skips numbers already reserved by an applicant", async () => {
+    const mockDb = {
+      employee: { findMany: async () => [{ employeeNo: "20261017-0001" }] },
+      applicantProfile: { findMany: async () => [{ applicantNo: "20261017-0002" }, { applicantNo: "20261017-0003" }] },
+    } as unknown as Parameters<typeof nextEmployeeNo>[0];
+    expect(await nextEmployeeNo(mockDb, "org_1", new Date("2026-10-17T08:00:00Z"), "Asia/Manila")).toBe("20261017-0004");
   });
 });

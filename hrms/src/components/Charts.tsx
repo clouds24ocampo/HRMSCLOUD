@@ -22,3 +22,17 @@ export function Meter({ value, tone }: { value: number | null; tone: "success" |
     </div>
   );
 }
+
+// Column bars where every column opens the list behind it. Plain HTML so each column is a real link.
+export function LinkBars({ data, unit = "" }: { data: { label: string; value: number; href: string }[]; unit?: string }) {
+  const max = Math.max(1, ...data.map((d) => d.value));
+  return (
+    <div className="flex h-36 items-end gap-px" role="list">
+      {data.map((d) => (
+        <a key={d.label} href={d.href} role="listitem" title={`${d.label}: ${d.value}${unit}. Click to see who.`} aria-label={`${d.label}: ${d.value}${unit}`} className="group flex h-full min-w-0 flex-1 flex-col justify-end">
+          <span className="block w-full rounded-t-sm bg-brand transition group-hover:bg-brand/70" style={{ height: d.value ? `${Math.max(4, (d.value / max) * 100)}%` : "2px", opacity: d.value ? 0.9 : 0.2 }} />
+        </a>
+      ))}
+    </div>
+  );
+}
