@@ -41,6 +41,8 @@ export async function saveTaxProfile(employeeId: string, _: FormState, form: For
   const row = same
     ? await prisma.employeeTaxProfile.update({ where: { id: same.id }, data })
     : await prisma.employeeTaxProfile.create({ data: { organizationId: me.organizationId, employeeId, effectiveFrom: dbDate(d.effectiveFrom), createdById: me.id, ...data } });
+  // The same numbers are shown on the back of the digital ID, so they are kept on the employee as well.
+  await prisma.employee.update({ where: { id: employeeId }, data: { sssNo: d.sssNo || null, philhealthNo: d.philhealthNo || null, tinNo: d.tin || null, pagibigNo: d.pagibigNo || null } });
   await audit(me.id, "employee.tax_profile_saved", "EmployeeTaxProfile", row.id, { employeeId, sector: d.sector, mwe: data.mwe, from: d.effectiveFrom }, me.organizationId);
   revalidatePath(`/employees/${employeeId}`);
   return { ok: `Tax profile of ${e.firstName} ${e.lastName} saved from ${d.effectiveFrom}.` };

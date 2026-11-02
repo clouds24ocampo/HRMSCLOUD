@@ -2,6 +2,7 @@ import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
+import { NOT_PORTAL } from "@/lib/audit";
 import { getMyEmployee } from "@/lib/employees";
 import { getOrgSettings } from "@/lib/settings";
 import { employeeScope, isHr } from "@/lib/scope";
@@ -101,11 +102,9 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   let board: BoardRow[] = [];
   let boardNames = new Map<string, { name: string; dept: string | null }>();
   let team: { total: Summary; daily: { label: string; late: number; absent: number }[]; attention: { id: string; s: Summary }[] } | null = null;
-  const liveScope = approver
-    ? await employeeScope(me, emp.id)
-    : emp.departmentId
-    ? { organizationId: me.organizationId, departmentId: emp.departmentId }
-    : { organizationId: me.organizationId };
+  // Other people's time stamps are private to their supervisor chain (and HR). Everyone else sees only themselves here:
+  // never their department or their colleagues. employeeScope gives a supervisor their downline, HR the whole organization.
+  const liveScope = approver ? await employeeScope(me, emp.id) : { organizationId: me.organizationId, id: emp.id };
 
   const livePeople = await prisma.employee.findMany({
     where: { ...liveScope, status: { not: "SEPARATED" } },
@@ -158,7 +157,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       prisma.dailyReport.findMany({ where: { organizationId: me.organizationId, date: dbDate(today), employeeId: { in: ids.filter((i) => i !== emp.id) } }, distinct: ["employeeId"], select: { employeeId: true } }).then((r) => r.length),
       // Activity: everything the people in my reach did (HR: the whole organization).
       prisma.auditLog.findMany({
-        where: { organizationId: me.organizationId, ...(hr ? {} : { actorId: { in: livePeople.map((p) => p.userId).filter((u): u is string => !!u) } }) },
+        where: { organizationId: me.organizationId, ...NOT_PORTAL, ...(hr ? {} : { actorId: { in: livePeople.map((p) => p.userId).filter((u): u is string => !!u) } }) },
         orderBy: { createdAt: "desc" },
         take: 20,
       }),

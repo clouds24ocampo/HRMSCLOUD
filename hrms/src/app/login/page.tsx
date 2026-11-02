@@ -24,6 +24,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       bottom={
         <>
           <p className="mt-4 text-center text-xs text-muted">Employees: use the email and temporary password from your administrator.</p>
+          <p className="mt-2 text-center text-xs text-muted">Looking for a job? <Link href="/careers" className="font-semibold text-brand hover:underline">See open positions</Link></p>
           {open && (
             <p className="mt-6 text-center text-sm text-muted">
               New here?{" "}

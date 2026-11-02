@@ -26,7 +26,9 @@ export const config = {
   get multiOrg() { return process.env.ALLOW_MULTIPLE_ORGS === "true"; },
   get sessionTtlHours() { return num(process.env.SESSION_TTL_HOURS, 8); },
   get registerLimitPerHour() { return num(process.env.REGISTER_LIMIT_PER_HOUR, 10); },
-  get documentMaxMb() { return num(process.env.DOCUMENT_MAX_MB, 5); },
+  /** Job applicants signing up on the careers page, per address per hour. Higher than company registration: many can share one office network. */
+  get applicantLimitPerHour() { return num(process.env.APPLICANT_LIMIT_PER_HOUR, 30); },
+  get documentMaxMb() { return num(process.env.DOCUMENT_MAX_MB, 10); },
   /** Folder for uploaded files, relative to the working directory unless absolute. */
   get storageDir() { return process.env.STORAGE_DIR ?? "storage"; },
 };

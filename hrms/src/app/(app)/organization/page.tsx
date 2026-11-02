@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { departmentSuggestionsFor, LEVEL_LABEL, positionSuggestionsFor } from "@/lib/defaults";
 import { Badge, Card, EmptyState, PageHeader, ghostClass } from "@/components/ui";
-import { AddDepartmentForm, AddPositionForm, SuggestionButton } from "./OrgForms";
+import { AddDepartmentForm, AddPositionForm, InstallItOrgButton, SuggestionButton } from "./OrgForms";
+import { missingItOrg } from "@/lib/it-org-data";
 import { setDepartmentArchived, setPositionArchived } from "./actions";
 import { descendantIds } from "@/lib/scope";
 
@@ -44,13 +45,23 @@ export default async function OrganizationPage() {
   ]);
   const active = depts.filter((d) => !d.archivedAt);
   const archived = depts.filter((d) => d.archivedAt);
-  const suggestedDepts = departmentSuggestionsFor(org.categoryKey).filter((n) => !depts.some((d) => d.name === n));
-  const posSuggest = positionSuggestionsFor(org.categoryKey).filter((s) => !positions.some((p) => p.title === s.title));
+  const suggestedDepts = departmentSuggestionsFor(org.categoryKey, org.industryKey).filter((n) => !depts.some((d) => d.name === n));
+  const posSuggest = positionSuggestionsFor(org.categoryKey, org.industryKey).filter((s) => !positions.some((p) => p.title === s.title));
   const levels = Object.entries(LEVEL_LABEL).map(([value, label]) => ({ value, label }));
 
   return (
     <div className="mx-auto max-w-5xl">
       <PageHeader title="Organization" subtitle="Departments and positions. Employees are placed in these." />
+      {org.industryKey === "it-software" && (() => {
+        const m = missingItOrg(depts.map((d) => d.name), positions.map((p) => p.title));
+        return (
+          <Card className="mb-6 space-y-2">
+            <h2 className="text-lg font-semibold">IT corporation structure</h2>
+            <p className="text-sm text-muted">Departments for technology, cloud, network and Wi-Fi, cybersecurity, data, product, quality, support, field operations, sales, marketing, HR, finance, legal and administration, with a position for every level in each. Your open jobs are linked to them. Nothing you already have is changed or removed.</p>
+            <InstallItOrgButton missingDepartments={m.departments} missingPositions={m.positions} />
+          </Card>
+        );
+      })()}
       <Card className="mb-6 space-y-3">
         <div>
           <h2 className="text-lg font-semibold">Department heads</h2>

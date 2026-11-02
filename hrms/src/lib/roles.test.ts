@@ -3,7 +3,13 @@ import { ROLES, canAccess } from "./roles";
 
 describe("canAccess", () => {
   it("lets every role open the dashboard", () => {
-    for (const r of Object.values(ROLES)) expect(canAccess(r, "/dashboard")).toBe(true);
+    for (const r of Object.values(ROLES).filter((x) => x !== ROLES.APPLICANT)) expect(canAccess(r, "/dashboard")).toBe(true);
+  });
+  it("keeps applicants inside the careers portal, and everyone else out of it", () => {
+    expect(canAccess(ROLES.APPLICANT, "/apply")).toBe(true);
+    expect(canAccess(ROLES.APPLICANT, "/apply/exam/1")).toBe(true);
+    for (const p of ["/dashboard", "/employees", "/recruitment", "/chat", "/dtr", "/payslips", "/admin/users"]) expect(canAccess(ROLES.APPLICANT, p)).toBe(false);
+    for (const r of Object.values(ROLES).filter((x) => x !== ROLES.APPLICANT)) expect(canAccess(r, "/apply")).toBe(false);
   });
   it("lets only Super Admin open user management", () => {
     expect(canAccess(ROLES.SUPER_ADMIN, "/admin/users")).toBe(true);
@@ -40,5 +46,14 @@ describe("canAccess", () => {
     expect(canAccess(ROLES.SUPER_ADMIN, "/secret")).toBe(false);
     expect(canAccess("HACKER", "/dashboard")).toBe(false);
     expect(canAccess(ROLES.SUPER_ADMIN, "/admin/usersX")).toBe(false);
+  });
+  it("gives every staff role a profile page, keeps the ID page to HR and supervisors, and gives applicants neither", () => {
+    for (const r of Object.values(ROLES).filter((x) => x !== ROLES.APPLICANT)) {
+      expect(canAccess(r, "/profile")).toBe(true);
+    }
+    expect(canAccess(ROLES.APPLICANT, "/profile")).toBe(false);
+    expect(canAccess(ROLES.APPLICANT, "/id")).toBe(false);
+    for (const r of [ROLES.EMPLOYEE, ROLES.SUBCONTRACTOR]) expect(canAccess(r, "/id")).toBe(false);
+    for (const r of [ROLES.EMPLOYEE, ROLES.SUBCONTRACTOR, ROLES.MANAGER]) expect(canAccess(r, "/id/design")).toBe(false);
   });
 });

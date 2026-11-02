@@ -6,6 +6,7 @@ export const ROLES = {
   MANAGER: "MANAGER",
   EMPLOYEE: "EMPLOYEE",
   SUBCONTRACTOR: "SUBCONTRACTOR",
+  APPLICANT: "APPLICANT", // job applicant: sees only the careers portal (/apply), never the workspace
 } as const;
 
 export type RoleKey = (typeof ROLES)[keyof typeof ROLES];
@@ -16,9 +17,10 @@ export const ROLE_SEED: { key: RoleKey; name: string }[] = [
   { key: ROLES.MANAGER, name: "Manager" },
   { key: ROLES.EMPLOYEE, name: "Employee" },
   { key: ROLES.SUBCONTRACTOR, name: "Sub Contractor" },
+  { key: ROLES.APPLICANT, name: "Applicant" },
 ];
 
-const ALL: RoleKey[] = Object.values(ROLES);
+const ALL: RoleKey[] = Object.values(ROLES).filter((r) => r !== ROLES.APPLICANT);
 const INTERNAL: RoleKey[] = [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER, ROLES.EMPLOYEE];
 
 // Longest matching prefix wins. Unlisted paths are denied.
@@ -45,7 +47,8 @@ export const PAGE_ACCESS: Record<string, RoleKey[]> = {
   "/documents": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
   "/requests": INTERNAL, // own requests; HR answers all
   "/locate": ALL, // phone confirms the location of a desktop time stamp
-  "/id": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // supervisors and HR can open their people's
+  "/id": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // supervisors and HR can open their people's; HR prints the cards
+  "/profile": ALL, // your own account: picture, contact details and government numbers
   "/id/design": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
   "/chat": ALL, // messages and calls inside the organization
   "/policies": ALL, // read and e-sign; HR uploads
@@ -58,7 +61,11 @@ export const PAGE_ACCESS: Record<string, RoleKey[]> = {
   "/reports": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
   "/analytics": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN], // all activity in the system
   "/admin/users": [ROLES.SUPER_ADMIN],
+  "/apply": [ROLES.APPLICANT], // the applicant portal: own application, exams and documents
 };
+
+// Where a person lands after signing in, and where a denied page sends them.
+export const homeFor = (role: string) => (role === ROLES.APPLICANT ? "/apply" : "/dashboard");
 
 export function canAccess(role: string, path: string): boolean {
   const match = Object.keys(PAGE_ACCESS)

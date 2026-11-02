@@ -9,6 +9,7 @@ import { audit } from "@/lib/audit";
 import { createSession, deleteSession } from "@/lib/session";
 import { isCookieSecure, SESSION_COOKIE } from "@/lib/auth";
 import { clearAttempts, tooManyAttempts } from "@/lib/rate-limit";
+import { homeFor } from "@/lib/roles";
 import { DB_DOWN_MESSAGE, isDbDown } from "@/lib/db-health";
 
 export type FormState = { error?: string; ok?: string } | undefined;
@@ -44,6 +45,10 @@ async function loginInner(_: FormState, form: FormData): Promise<FormState> {
     return { error: "Wrong email, username or password." };
   }
 
+  // Applicants have their own sign-in on the careers page. Checked after the password, so this never reveals who has an account.
+  const kind = await prisma.role.findUnique({ where: { id: user.roleId }, select: { key: true } });
+  if (kind?.key === "APPLICANT") return { error: "This sign-in is for staff. Applicants sign in on the careers page." };
+
   clearAttempts(email);
   const { token, expiresAt } = await createSession(user.id);
   (await cookies()).set(SESSION_COOKIE, token, {
@@ -54,7 +59,8 @@ async function loginInner(_: FormState, form: FormData): Promise<FormState> {
     expires: expiresAt,
   });
   await audit(user.id, "login.success", "User", user.id, undefined, user.organizationId);
-  redirect(user.mustChangePassword ? "/change-password" : "/dashboard");
+  const role = await prisma.role.findUnique({ where: { id: user.roleId }, select: { key: true } });
+  redirect(user.mustChangePassword ? "/change-password" : homeFor(role?.key ?? ""));
 }
 
 export async function logout() {

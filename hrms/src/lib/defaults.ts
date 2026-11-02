@@ -40,7 +40,10 @@ export const DEPARTMENT_SUGGESTIONS: Record<string, string[]> = {
   "small-business": ["Operations", "Sales", "Finance", "Administration"],
 };
 
-export const departmentSuggestionsFor = (categoryKey: string) => [...(DEPARTMENT_SUGGESTIONS[categoryKey] ?? []), "Field"];
+import { IT_DEPARTMENTS, IT_POSITIONS } from "@/lib/it-org-data";
+
+export const departmentSuggestionsFor = (categoryKey: string, industryKey?: string) =>
+  industryKey === "it-software" ? IT_DEPARTMENTS.map((d) => d.name) : [...(DEPARTMENT_SUGGESTIONS[categoryKey] ?? []), "Field"];
 
 type PositionSuggestion = { title: string; level: keyof typeof LEVEL_LABEL; department?: string };
 // Department heads and assistant heads are not suggested on their own: they always need a department, so they are added
@@ -67,7 +70,8 @@ const GENERIC_POSITIONS: PositionSuggestion[] = [
   { title: "Staff", level: "ENTRY" }, { title: "Team Leader", level: "TEAM_LEAD" },
   { title: "Manager", level: "MANAGER" }, { title: "Executive", level: "EXECUTIVE" },
 ];
-export const positionSuggestionsFor = (categoryKey: string): PositionSuggestion[] => [...(POSITION_SUGGESTIONS[categoryKey] ?? GENERIC_POSITIONS), ...FIELD_POSITIONS];
+export const positionSuggestionsFor = (categoryKey: string, industryKey?: string): PositionSuggestion[] =>
+  industryKey === "it-software" ? IT_POSITIONS : [...(POSITION_SUGGESTIONS[categoryKey] ?? GENERIC_POSITIONS), ...FIELD_POSITIONS];
 
 export const LEVEL_LABEL = { ENTRY: "Entry level", TEAM_LEAD: "Team leader", MANAGER: "Manager", ASSISTANT_HEAD: "Assistant department head", DEPT_HEAD: "Department head", EXECUTIVE: "Executive" } as const;
 // These levels always belong to one department: the form asks which.

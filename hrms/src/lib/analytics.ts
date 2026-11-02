@@ -1,6 +1,7 @@
 // System activity analytics for HR: everything the audit log, the time clock and the chat recorded in a date range.
 // Read-only aggregate queries; days are counted in the organization's timezone.
 import { prisma } from "@/lib/prisma";
+import { NOT_PORTAL } from "@/lib/audit";
 import { addDays, daysBetween, zonedTimeToUtc } from "@/lib/time";
 
 const MODULE_LABEL: Record<string, string> = {
@@ -26,8 +27,8 @@ export async function activityAnalytics(organizationId: string, from: string, to
       `SELECT ${day('m."createdAt"')} d, count(*) n FROM "Message" m JOIN "Conversation" c ON c."id" = m."conversationId" WHERE c."organizationId" = $1 AND m."createdAt" >= $3 AND m."createdAt" < $4 GROUP BY 1`,
       organizationId, tz, start, end,
     ),
-    prisma.auditLog.groupBy({ by: ["action"], where: { organizationId, createdAt: range }, _count: { _all: true } }),
-    prisma.auditLog.groupBy({ by: ["actorId"], where: { organizationId, createdAt: range, actorId: { not: null } }, _count: { _all: true }, orderBy: { _count: { actorId: "desc" } }, take: 10 }),
+    prisma.auditLog.groupBy({ by: ["action"], where: { organizationId, createdAt: range, ...NOT_PORTAL }, _count: { _all: true } }),
+    prisma.auditLog.groupBy({ by: ["actorId"], where: { organizationId, createdAt: range, actorId: { not: null }, ...NOT_PORTAL }, _count: { _all: true }, orderBy: { _count: { actorId: "desc" } }, take: 10 }),
     prisma.$queryRawUnsafe<{ h: number; n: bigint }[]>(
       `SELECT extract(hour FROM ("at" AT TIME ZONE 'UTC' AT TIME ZONE $2))::int h, count(*) n FROM "TimeEvent" WHERE "organizationId" = $1 AND "at" >= $3 AND "at" < $4 AND "voidedAt" IS NULL AND "type" IN ('IN', 'OUT') GROUP BY 1`,
       organizationId, tz, start, end,
@@ -41,7 +42,7 @@ export async function activityAnalytics(organizationId: string, from: string, to
     prisma.dailyReport.count({ where: { organizationId, createdAt: range } }),
     prisma.policySignature.count({ where: { organizationId, createdAt: range } }),
     prisma.employeeDocument.count({ where: { organizationId, createdAt: range } }),
-    prisma.auditLog.findMany({ where: { organizationId, createdAt: range }, orderBy: { createdAt: "desc" }, take: 40 }),
+    prisma.auditLog.findMany({ where: { organizationId, createdAt: range, ...NOT_PORTAL }, orderBy: { createdAt: "desc" }, take: 40 }),
   ]);
 
   const series = (rows: DayCount[]) => {
@@ -57,7 +58,7 @@ export async function activityAnalytics(organizationId: string, from: string, to
 
   return {
     totals: {
-      actions: byAction.reduce((n, a) => n + a._count._all, 0), activeUsers: (await prisma.auditLog.findMany({ where: { organizationId, createdAt: range, actorId: { not: null } }, distinct: ["actorId"], select: { actorId: true } })).length,
+      actions: byAction.reduce((n, a) => n + a._count._all, 0), activeUsers: (await prisma.auditLog.findMany({ where: { organizationId, createdAt: range, actorId: { not: null }, ...NOT_PORTAL }, distinct: ["actorId"], select: { actorId: true } })).length,
       logins, failed, messages, reports, signatures, uploads,
       stamps: stampDays.reduce((n, r) => n + Number(r.n), 0),
       voiceCalls: calls.find((c) => c.kind === "VOICE")?._count._all ?? 0, videoCalls: calls.find((c) => c.kind === "VIDEO")?._count._all ?? 0,

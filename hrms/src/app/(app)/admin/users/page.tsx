@@ -9,7 +9,7 @@ export default async function UsersPage() {
   const me = await requireUser("/admin/users");
   const [users, roles] = await Promise.all([
     listOrgUsers(me.organizationId),
-    prisma.role.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
+    prisma.role.findMany({ where: { key: { not: "APPLICANT" } }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
   ]);
 
   return (

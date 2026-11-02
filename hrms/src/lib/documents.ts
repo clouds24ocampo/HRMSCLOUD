@@ -1,7 +1,7 @@
 // Employee documents. Bytes live on disk (never in the database), under a folder per organization, with a random name.
 // Nothing the user types ever becomes part of a path.
 import { randomUUID } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { prisma } from "@/lib/prisma";
 import { config } from "@/lib/config";
@@ -36,6 +36,12 @@ export async function readStored(storageKey: string, organizationId: string): Pr
   } catch {
     return null;
   }
+}
+
+// Removes a stored file. Same key checks as readStored; a missing file is not an error.
+export async function deleteStored(storageKey: string | null | undefined, organizationId: string) {
+  if (!storageKey || !/^[a-z0-9]+\/[0-9a-f-]{36}$/.test(storageKey) || !storageKey.startsWith(`${organizationId}/`)) return;
+  await unlink(/*turbopackIgnore: true*/ path.join(/*turbopackIgnore: true*/ root(), storageKey)).catch(() => undefined);
 }
 
 // A name safe to show and to send in a header.

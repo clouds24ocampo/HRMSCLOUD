@@ -5,7 +5,7 @@ import { useKeptForm } from "@/components/useKeptForm";
 import { Alert, Field, SubmitButton } from "@/components/Fields";
 import { inputClass } from "@/components/ui";
 import type { FormState } from "@/app/login/actions";
-import { addDepartment, addPosition, addSuggestedDepartments, addSuggestedPositions } from "./actions";
+import { addDepartment, addPosition, addSuggestedDepartments, addSuggestedPositions, installItOrgAction } from "./actions";
 
 type Opt = { id: string; name: string };
 
@@ -98,6 +98,26 @@ export function SuggestionButton({ kind, departments, positions }: { kind: "depa
       </button>
       {msg?.ok && <p role="status" className="mt-2 text-sm text-success">{msg.ok}</p>}
       {msg?.error && <p role="alert" className="mt-2 text-sm text-danger">{msg.error}</p>}
+    </div>
+  );
+}
+
+// One click: the whole IT corporation structure (departments with hierarchy, positions by level, job openings linked).
+export function InstallItOrgButton({ missingDepartments, missingPositions }: { missingDepartments: number; missingPositions: number }) {
+  const [pending, start] = useTransition();
+  const [msg, setMsg] = useState<FormState>();
+  const upToDate = missingDepartments + missingPositions === 0;
+  return (
+    <div className="space-y-2">
+      <button
+        disabled={pending}
+        onClick={() => start(async () => setMsg(await installItOrgAction()))}
+        className="rounded-lg border border-brand bg-brand/10 px-4 py-2 text-sm font-semibold text-brand transition hover:bg-brand/20 active:scale-95 disabled:opacity-60"
+      >
+        {pending ? "Setting up…" : upToDate ? "Check the IT structure again" : `Set up the IT corporation structure (${missingDepartments} departments, ${missingPositions} positions)`}
+      </button>
+      {msg?.error && <Alert kind="error">{msg.error}</Alert>}
+      {msg?.ok && <Alert kind="success">{msg.ok}</Alert>}
     </div>
   );
 }

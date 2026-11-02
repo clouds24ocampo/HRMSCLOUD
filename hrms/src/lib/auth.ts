@@ -2,7 +2,7 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { findSession } from "@/lib/session";
-import { canAccess } from "@/lib/roles";
+import { canAccess, homeFor } from "@/lib/roles";
 import { isDbDown } from "@/lib/db-health";
 import { config } from "@/lib/config";
 
@@ -28,15 +28,16 @@ export const getUser = cache(async () => {
 
 // Public pages (landing, login, register): send real signed-in users to the dashboard.
 export async function redirectIfSignedIn() {
-  if (await getUser()) redirect("/dashboard");
+  const u = await getUser();
+  if (u) redirect(homeFor(u.role.key));
 }
 
 // Call at the top of every protected page/action. Server-side check; proxy.ts is only a shortcut.
 export async function requireUser(path: string) {
   const user = await getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect(path === "/apply" || path.startsWith("/apply/") ? "/careers/login" : "/login");
   // Temporary password: nothing else is reachable until the user picks their own.
   if (user.mustChangePassword && path !== "/change-password") redirect("/change-password");
-  if (!canAccess(user.role.key, path)) redirect("/dashboard?denied=1");
+  if (!canAccess(user.role.key, path)) redirect(user.role.key === "APPLICANT" ? "/apply" : "/dashboard?denied=1"); // /apply must not bounce back to itself
   return user;
 }

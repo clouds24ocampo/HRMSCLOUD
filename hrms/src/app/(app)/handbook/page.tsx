@@ -9,7 +9,7 @@ import { ensureHandbook } from "@/lib/handbook";
 import { formatDay, keyOfDbDate } from "@/lib/time";
 import { Badge, Card, PageHeader } from "@/components/ui";
 import { PrintButton } from "@/components/PrintButton";
-import { AcknowledgeHandbookForm, AddHandbookSectionForm } from "./HandbookForms";
+import { AcknowledgeHandbookForm, AddHandbookSectionForm, InstallItHandbookButton } from "./HandbookForms";
 
 export default async function HandbookPage() {
   const me = await requireUser("/handbook");
@@ -140,6 +140,7 @@ export default async function HandbookPage() {
       {/* HR Add Chapter */}
       {hr && (
         <div className="print:hidden">
+          <div className="mb-4"><InstallItHandbookButton installed={sections.some((s) => s.slug === "welcome-and-purpose")} /></div>
           <AddHandbookSectionForm />
         </div>
       )}

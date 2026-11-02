@@ -8,6 +8,8 @@ import { requireUser } from "@/lib/auth";
 import { saveImage } from "@/lib/documents";
 import { getMyEmployee } from "@/lib/employees";
 import { isHr } from "@/lib/scope";
+import { readGovNumbers, saveGovNumbers } from "@/lib/employee-ids";
+import { dbDate } from "@/lib/time";
 import type { FormState } from "@/app/login/actions";
 
 // Profile picture: your own, or anyone's for HR.
@@ -33,8 +35,8 @@ export async function saveIdDesign(_: FormState, form: FormData): Promise<FormSt
   const parsed = z
     .object({
       title: z.string().trim().min(2, "Give the card a title.").max(40),
-      accent: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Pick a color."),
-      signatoryName: text(80), signatoryTitle: text(80), footer: text(160),
+            signatoryName: text(80), signatoryTitle: text(80), footer: text(160), address: text(200), terms: text(1500),
+      validYears: z.coerce.number().int().min(1, "Validity is 1 to 10 years.").max(10, "Validity is 1 to 10 years."),
     })
     .safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
@@ -59,4 +61,20 @@ export async function saveIdDesign(_: FormState, form: FormData): Promise<FormSt
   await audit(me.id, "id_card.design_saved", "IdCardSettings", undefined, { ...parsed.data, ...flags, signature: !!signatureKey, logo: logoKey === undefined ? "kept" : logoKey ? "changed" : "removed" }, me.organizationId);
   revalidatePath("/id", "layout");
   return { ok: "Saved. Every employee's ID now uses this design." };
+}
+
+// The numbers on the back of the ID, and the date it was issued. HR only here (the employee has their own form on My profile).
+export async function saveIdDetails(employeeId: string, _: FormState, form: FormData): Promise<FormState> {
+  const me = await requireUser("/id/design"); // HR and Super Admin
+  const e = await prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, select: { id: true, firstName: true, lastName: true } });
+  if (!e) return { error: "Employee not found." };
+  const r = readGovNumbers(form);
+  if (!r.ok) return { error: r.error };
+  const issued = String(form.get("idIssuedOn") ?? "").trim();
+  if (issued && !/^\d{4}-\d{2}-\d{2}$/.test(issued)) return { error: "Choose the date the ID was issued." };
+  const set = await saveGovNumbers(me.organizationId, employeeId, r.nums, { idIssuedOn: issued ? dbDate(issued) : null });
+  // The audit trail says that numbers changed, never what they are.
+  await audit(me.id, "employee.id_details_saved", "Employee", employeeId, { numbers: set, issued: issued || null }, me.organizationId);
+  revalidatePath("/id");
+  return { ok: `Saved for ${e.firstName} ${e.lastName}.` };
 }

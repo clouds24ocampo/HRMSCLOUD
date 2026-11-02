@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { NOT_PORTAL } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
 import { getOrgSettings } from "@/lib/settings";
 import { Card, EmptyState, PageHeader, buttonClass, inputClass } from "@/components/ui";
@@ -13,7 +14,7 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
   const { q } = await searchParams;
   const settings = await getOrgSettings(me.organizationId);
   const logs = await prisma.auditLog.findMany({
-    where: { organizationId: me.organizationId, ...(q?.trim() ? { action: { contains: q.trim(), mode: "insensitive" } } : {}) },
+    where: { organizationId: me.organizationId, ...NOT_PORTAL, ...(q?.trim() ? { action: { contains: q.trim(), mode: "insensitive" } } : {}) },
     orderBy: { createdAt: "desc" },
     take: 100,
   });

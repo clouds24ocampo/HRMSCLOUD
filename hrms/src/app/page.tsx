@@ -1,5 +1,4 @@
 import { Icon, ICON_INLINE } from "@/components/Icon";
-import Image from "next/image";
 import Link from "next/link";
 import { SculptureHero } from "@/components/ui/liquid-sculpture-hero";
 import { Spotlight } from "@/components/Spotlight";
@@ -11,14 +10,6 @@ const STEPS = [
   { t: "Choose your industry", d: "Ten categories, from local governments to call centers." },
   { t: "Set your size", d: "From under 20 people to over 1,000." },
   { t: "Create your account", d: "You become the Super Admin of your organization." },
-];
-
-// Logos from svgl.app.
-const BUILT_WITH = [
-  { src: "/logos/nextjs_icon_dark.svg", name: "Next.js" },
-  { src: "/logos/react_dark.svg", name: "React" },
-  { src: "/logos/typescript.svg", name: "TypeScript" },
-  { src: "/logos/postgresql.svg", name: "PostgreSQL" },
 ];
 
 export default async function Landing() {
@@ -39,6 +30,7 @@ export default async function Landing() {
           { label: "Time stamp", href: "/login?stamp=1" },
           { label: "How it works", href: open ? "#how" : "#industries" },
           { label: "Industries", href: "#industries" },
+          { label: "Careers", href: "/careers" },
         ]}
         navCta={{ label: "Sign in", href: "/login" }}
         eyebrow="Attendance · Payroll · Projects"
@@ -86,12 +78,7 @@ export default async function Landing() {
 
       <footer className="border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-6 py-10 sm:flex-row sm:items-center">
-          <div className="flex items-center gap-5">
-            <span className="text-sm text-halo/60">Built with</span>
-            {BUILT_WITH.map((l) => (
-              <Image key={l.name} src={l.src} alt={l.name} width={28} height={28} unoptimized className="h-7 w-7 object-contain opacity-80" />
-            ))}
-          </div>
+          <p className="text-sm text-halo/60">&copy; {new Date().getFullYear()} HRMS</p>
           <Link href={open ? "/register" : "/login"} className="text-sm font-medium text-photon hover:underline">
             {open ? "Register your organization" : "Sign in"}
           </Link>

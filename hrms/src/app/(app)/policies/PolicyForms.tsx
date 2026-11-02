@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import type { FormState } from "@/app/login/actions";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert, Field, SubmitButton } from "@/components/Fields";
 import { inputClass } from "@/components/ui";
@@ -61,12 +62,12 @@ export function RestorePolicyButton({ id }: { id: string }) {
 }
 
 // A drawn signature: mouse, pen or finger. Sent as a PNG with the typed name.
-export function SignPolicyForm({ policyId, defaultName }: { policyId: string; defaultName: string }) {
+export function SignPolicyForm({ policyId, defaultName, action = signPolicy }: { policyId: string; defaultName: string; action?: (policyId: string, prev: FormState, form: FormData) => Promise<FormState> }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
   const [drawn, setDrawn] = useState(false);
   const [sig, setSig] = useState("");
-  const f = useKeptForm(signPolicy.bind(null, policyId));
+  const f = useKeptForm(action.bind(null, policyId));
 
   const point = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const c = canvas.current!;

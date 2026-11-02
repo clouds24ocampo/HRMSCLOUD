@@ -32,7 +32,10 @@ services:
       COOKIE_SECURE: "true"
       SESSION_TTL_HOURS: ${SESSION_TTL_HOURS:-8}
       REGISTER_LIMIT_PER_HOUR: ${REGISTER_LIMIT_PER_HOUR:-10}
-      DOCUMENT_MAX_MB: ${DOCUMENT_MAX_MB:-5}
+      APPLICANT_LIMIT_PER_HOUR: ${APPLICANT_LIMIT_PER_HOUR:-30}
+      # Optional: better Tagalog exam translation (Claude). Without it the free Google Translate endpoint is used.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      DOCUMENT_MAX_MB: ${DOCUMENT_MAX_MB:-10}
       STORAGE_DIR: /data/storage
     # Reachable only from this machine: put a reverse proxy in front (the server's nginx, or the optional Caddy below).
     ports:

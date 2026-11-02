@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
 import { DEPT_BOUND_LEVELS } from "@/lib/defaults";
+import { installItOrganization } from "@/lib/it-org";
 import type { FormState } from "@/app/login/actions";
 
 const LEVELS = ["ENTRY", "TEAM_LEAD", "MANAGER", "ASSISTANT_HEAD", "DEPT_HEAD", "EXECUTIVE"] as const;
@@ -32,7 +33,7 @@ export async function addDepartment(_: FormState, form: FormData): Promise<FormS
 
 export async function addSuggestedDepartments(names: string[]): Promise<FormState> {
   const me = await requireUser("/organization");
-  const list = z.array(name).max(20).safeParse(names);
+  const list = z.array(name).max(100).safeParse(names);
   if (!list.success) return { error: "Invalid suggestion." };
   const res = await prisma.department.createMany({
     data: list.data.map((n) => ({ organizationId: me.organizationId, name: n })),
@@ -71,7 +72,7 @@ export async function addPosition(_: FormState, form: FormData): Promise<FormSta
 
 export async function addSuggestedPositions(items: { title: string; level: string; department?: string }[]): Promise<FormState> {
   const me = await requireUser("/organization");
-  const list = z.array(z.object({ title: name, level: z.enum(LEVELS), department: name.optional() })).max(20).safeParse(items);
+  const list = z.array(z.object({ title: name, level: z.enum(LEVELS), department: name.optional() })).max(150).safeParse(items);
   if (!list.success) return { error: "Invalid suggestion." };
   if (list.data.some((p) => headOf(p.level) && !p.department)) return { error: "A head position needs its department. Add it with the form." };
   const existing = new Set((await prisma.position.findMany({ where: { organizationId: me.organizationId }, select: { title: true } })).map((p) => p.title));
@@ -95,4 +96,15 @@ export async function setPositionArchived(id: string, archived: boolean) {
   await prisma.position.update({ where: { id }, data: { archivedAt: archived ? new Date() : null } });
   await audit(me.id, archived ? "position.archived" : "position.restored", "Position", id, { title: p.title }, me.organizationId);
   done();
+}
+
+// Loads the IT corporation structure: departments with their hierarchy, positions by level, and links the job openings to them.
+export async function installItOrgAction(): Promise<FormState> {
+  const me = await requireUser("/organization");
+  const r = await installItOrganization(me.organizationId, me.id);
+  done();
+  revalidatePath("/recruitment");
+  revalidatePath("/careers");
+  const bits = [`${r.departments} departments`, `${r.positions} positions`, `${r.jobsLinked} job openings linked`].join(", ");
+  return { ok: r.departments + r.positions + r.jobsLinked + r.parented === 0 ? "The IT structure is already in place." : `Added ${bits}.${r.archived ? ` ${r.archived} unused generic positions archived.` : ""}` };
 }

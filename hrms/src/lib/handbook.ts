@@ -178,3 +178,44 @@ export async function acknowledgeHandbook(employeeId: string, organizationId: st
 
   return ack;
 }
+
+/**
+ * Installs the IT company handbook. Safe to run again.
+ * - The eight generic starter chapters are replaced, but only if nobody edited them.
+ * - A chapter that HR edited by hand (a newer version, or an editor recorded) is never overwritten.
+ * - Chapters from this handbook are updated when their text changed.
+ */
+export async function installItHandbook(organizationId: string, companyName: string, actorId: string | null) {
+  const { IT_HANDBOOK, fill } = await import("@/lib/handbook-it");
+  const result = { added: 0, updated: 0, unchanged: 0, removed: 0, keptEdited: [] as string[] };
+
+  const starter = new Map(DEFAULT_HANDBOOK_SECTIONS.map((d) => [d.slug, d.content]));
+  const existing = await prisma.handbookSection.findMany({ where: { organizationId } });
+  const newSlugs = new Set(IT_HANDBOOK.map((c) => c.slug));
+
+  for (const e of existing) {
+    const original = starter.get(e.slug);
+    if (original === undefined || newSlugs.has(e.slug)) continue; // not a starter chapter, or it is replaced in place below
+    const untouched = e.version === 1 && !e.updatedById;
+    if (untouched) { await prisma.handbookSection.delete({ where: { id: e.id } }); result.removed++; }
+    else result.keptEdited.push(e.title);
+  }
+
+  for (const c of IT_HANDBOOK) {
+    const content = fill(c.content, companyName);
+    const have = await prisma.handbookSection.findUnique({ where: { organizationId_slug: { organizationId, slug: c.slug } } });
+    if (!have) {
+      await prisma.handbookSection.create({ data: { organizationId, slug: c.slug, title: c.title, content, sortOrder: c.sortOrder, version: 1, updatedById: actorId } });
+      result.added++;
+      continue;
+    }
+    const starterText = starter.get(c.slug);
+    const editedByHr = starterText !== undefined && (have.version > 1 || !!have.updatedById) && have.content !== fill(c.content, companyName);
+    if (editedByHr) { result.keptEdited.push(have.title); continue; }
+    if (have.content === content && have.title === c.title && have.sortOrder === c.sortOrder) { result.unchanged++; continue; }
+    await prisma.handbookSection.update({ where: { id: have.id }, data: { title: c.title, content, sortOrder: c.sortOrder, version: have.version + 1, updatedById: actorId } });
+    result.updated++;
+  }
+  await audit(actorId, "handbook.installed", "HandbookSection", undefined, { ...result, kind: "IT company handbook" }, organizationId);
+  return result;
+}
