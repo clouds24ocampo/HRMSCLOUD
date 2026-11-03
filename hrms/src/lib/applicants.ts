@@ -32,14 +32,23 @@ export async function shareGlobalAttempts(profileId: string) {
   const done = new Map<string, (typeof apps)[number]["attempts"][number]>();
   for (const a of apps) for (const t of a.attempts) if (t.submittedAt && t.exam.jobId === null) done.set(t.examId, t);
   const rows = [];
+  const closing = [];
   for (const a of apps) {
     const have = new Set(a.attempts.map((t) => t.examId));
     for (const [examId, t] of done) {
+      const open = a.attempts.find((x) => x.examId === examId && !x.submittedAt);
+      if (open) { closing.push({ applicantId: a.id, examId, t }); continue; } // started here too, but finished elsewhere: it counts as done
       if (have.has(examId)) continue;
       rows.push({ applicantId: a.id, examId, lang: t.lang, startedAt: t.startedAt, submittedAt: t.submittedAt, answers: t.answers ?? undefined, score: t.score, maxScore: t.maxScore, breakdown: t.breakdown ?? undefined, oathAt: t.oathAt, leaves: t.leaves });
     }
   }
   if (rows.length) await prisma.examAttempt.createMany({ data: rows, skipDuplicates: true });
+  for (const { applicantId, examId, t } of closing) {
+    await prisma.examAttempt.updateMany({
+      where: { applicantId, examId, submittedAt: null },
+      data: { lang: t.lang, submittedAt: t.submittedAt, answers: t.answers ?? undefined, score: t.score, maxScore: t.maxScore, breakdown: t.breakdown ?? undefined, oathAt: t.oathAt, runToken: null },
+    });
+  }
 }
 
 // Closes an attempt exactly once (a second call changes nothing) and stores the score.

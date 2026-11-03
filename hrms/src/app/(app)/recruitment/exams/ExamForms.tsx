@@ -97,5 +97,5 @@ export function ExamControls({ id, active }: { id: string; active: boolean }) {
 
 export function DeleteQuestionButton({ id }: { id: string }) {
   const [pending, start] = useTransition();
-  return <button disabled={pending} onClick={() => start(() => deleteQuestion(id))} className="text-sm font-medium text-danger hover:underline disabled:opacity-60">Remove</button>;
+  return <button disabled={pending} onClick={() => start(async () => { const r = await deleteQuestion(id); if (r?.error) alert(r.error); })} className="text-sm font-medium text-danger hover:underline disabled:opacity-60">Remove</button>;
 }

@@ -14,7 +14,6 @@ import { notify } from "@/lib/notify";
 import { ROLES } from "@/lib/roles";
 import { requestEvidence } from "@/lib/device";
 import { getOrgSettings } from "@/lib/settings";
-import { dayKey } from "@/lib/time";
 import { orientationOpen, requiredPolicies } from "@/lib/orientation";
 import { advanceIfComplete, closeRun, examsForJob, finalizeAttempt, shareGlobalAttempts } from "@/lib/applicants";
 import { asLang, secondsLeft, timeIsUp } from "@/lib/exams";
@@ -78,7 +77,10 @@ export async function startExam(applicantId: string, examId: string, lang: strin
   if (c.exam.kind === "COMMITMENT" && !c.attempt && oath !== true) return { error: "Tick the oath box before you start this exam." };
   let attempt = c.attempt;
   if (!attempt) {
-    await ensureTagalog(examId); // older questions without a translation get one now, before the timer starts
+    // Questions without a Tagalog version get one now. A person who chose English never waits for it; a person who chose Tagalog waits
+    // at most 15 seconds, and any question that is not ready yet shows in English.
+    const translating = ensureTagalog(examId);
+    if (asLang(lang) === "tl") await Promise.race([translating, new Promise((r) => setTimeout(r, 15_000))]);
     // The unique (applicant, exam) pair means a double click cannot start two attempts.
     attempt = await prisma.examAttempt.create({ data: { applicantId, examId, lang: asLang(lang), oathAt: c.exam.kind === "COMMITMENT" ? new Date() : null } }).catch(() => null)
       ?? await prisma.examAttempt.findUnique({ where: { applicantId_examId: { applicantId, examId } } });

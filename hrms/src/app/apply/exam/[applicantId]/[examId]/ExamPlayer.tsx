@@ -59,7 +59,7 @@ export function ExamPlayer({ info }: { info: PlayerInfo }) {
     setError(undefined);
     const r = await startExam(info.applicantId, info.examId, lang, !info.resumed && info.commitment && sworn);
     if ("run" in r) setRun(r.run);
-    else if ("done" in r) location.assign("/apply");
+    else if ("done" in r) location.href = "/apply";
     else setError(r.error);
   });
 

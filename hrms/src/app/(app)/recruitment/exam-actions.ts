@@ -19,6 +19,9 @@ const done = (examId?: string) => {
 };
 
 const examOf = async (id: string, organizationId: string) => prisma.exam.findFirst({ where: { id, organizationId } });
+// Once an applicant has sent in answers, changing the questions would make their saved score and answers wrong.
+const TAKEN = "Applicants have already taken this exam, so its questions cannot change. Turn it off and create a new exam instead.";
+const wasTaken = async (examId: string) => (await prisma.examAttempt.count({ where: { examId, submittedAt: { not: null } } })) > 0;
 
 export async function createExam(_: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/recruitment");
@@ -69,6 +72,7 @@ export async function addQuestion(examId: string, _: FormState, form: FormData):
   const me = await requireUser("/recruitment");
   const exam = await examOf(examId, me.organizationId);
   if (!exam) return { error: "Exam not found." };
+  if (await wasTaken(examId)) return { error: TAKEN };
   const text = z.string().trim().min(3, "Write the question.").max(1000).safeParse(form.get("text"));
   if (!text.success) return { error: text.error.issues[0].message };
   const trait = String(form.get("trait") ?? "").trim().slice(0, 40) || null;
@@ -94,13 +98,15 @@ export async function addQuestion(examId: string, _: FormState, form: FormData):
   return { ok: "Question added." };
 }
 
-export async function deleteQuestion(id: string) {
+export async function deleteQuestion(id: string): Promise<FormState> {
   const me = await requireUser("/recruitment");
   const q = await prisma.examQuestion.findFirst({ where: { id, exam: { organizationId: me.organizationId } } });
-  if (!q) return;
+  if (!q) return { error: "Question not found." };
+  if (await wasTaken(q.examId)) return { error: TAKEN };
   await prisma.examQuestion.delete({ where: { id } });
   await audit(me.id, "exam.question_deleted", "Exam", q.examId, undefined, me.organizationId);
   done(q.examId);
+  return { ok: "Removed." };
 }
 
 // Adds the standard positions the company hires for. A title that already exists is skipped, so it is safe to press twice.

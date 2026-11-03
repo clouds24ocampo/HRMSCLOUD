@@ -59,7 +59,17 @@ export async function translateToTagalog(texts: string[]): Promise<string[] | nu
 }
 
 // Translates every question of an exam that has no Tagalog yet. Safe to call any time; already translated ones are skipped.
-export async function ensureTagalog(examId: string) {
+// Two applicants starting the same exam at once share one run instead of each sending the whole exam to the translation service.
+const running = new Map<string, Promise<void>>();
+export function ensureTagalog(examId: string): Promise<void> {
+  const live = running.get(examId);
+  if (live) return live;
+  const p = translateExam(examId).catch(() => undefined).finally(() => running.delete(examId));
+  running.set(examId, p);
+  return p;
+}
+
+async function translateExam(examId: string) {
   const todo = await prisma.examQuestion.findMany({ where: { examId, textTl: null }, select: { id: true, text: true, options: true } });
   for (let i = 0; i < todo.length; i += 4) {
     await Promise.all(
