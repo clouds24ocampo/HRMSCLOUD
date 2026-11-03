@@ -17,7 +17,7 @@ import { getOrgSettings } from "@/lib/settings";
 import { orientationOpen, requiredPolicies } from "@/lib/orientation";
 import { advanceIfComplete, closeRun, examsForJob, finalizeAttempt, shareGlobalAttempts } from "@/lib/applicants";
 import { asLang, secondsLeft, timeIsUp } from "@/lib/exams";
-import { questionsFor, runSeed, type RunResult } from "@/lib/exam-run";
+import { questionsFor, type RunResult } from "@/lib/exam-run";
 import { ensureTagalog } from "@/lib/translate";
 import type { FormState } from "@/app/login/actions";
 
@@ -97,7 +97,7 @@ export async function startExam(applicantId: string, examId: string, lang: strin
   const token = randomUUID();
   await prisma.examAttempt.update({ where: { id: attempt.id }, data: { runToken: token, round, ...(attempt.runToken ? { leaves: { increment: 1 } } : {}) } });
   const rows = await prisma.examQuestion.findMany({ where: { examId }, orderBy: [{ sort: "asc" }, { createdAt: "asc" }], select: { id: true, text: true, textTl: true, options: true } });
-  return { run: { token, lang: asLang(attempt.lang), secondsLeft: Math.max(0, secondsLeft(attempt.startedAt, c.exam.timeLimitMin)), questions: questionsFor(rows, runSeed(attempt.id, round)) } };
+  return { run: { token, lang: asLang(attempt.lang), secondsLeft: Math.max(0, secondsLeft(attempt.startedAt, c.exam.timeLimitMin)), questions: questionsFor(rows, token) } }; // a fresh random token per Start is the seed: every Start is a new order
 }
 
 // The person left the exam screen (hid the tab, minimized, switched window). The run ends; the next start is a new random order.

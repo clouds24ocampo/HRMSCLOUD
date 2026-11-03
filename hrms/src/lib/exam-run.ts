@@ -1,13 +1,12 @@
 // What the browser gets while an exam is open. Pure, so it can be tested.
-// The questions are mixed with a seed made of the attempt and its round. Every time the person leaves the exam screen the
-// round goes up, so the next start shows a new order of questions and of answer choices. Points never leave the server.
+// The questions and the answer choices are mixed with a seed. The seed is the random token made at every Start, so every Start
+// (the first one, a start after leaving the screen, a start after a reload) gives a new order that nobody can predict or repeat.
+// Points never leave the server.
 import { parseOptions, shuffleSeeded } from "@/lib/exams";
 
 export type RunQuestion = { id: string; text: string; textTl: string | null; options: { i: number; text: string; textTl: string | null }[] };
 export type ExamRun = { token: string; secondsLeft: number; lang: "en" | "tl"; questions: RunQuestion[] };
 export type RunResult = { error: string } | { done: true } | { run: ExamRun };
-
-export const runSeed = (attemptId: string, round: number) => `${attemptId}:${round}`;
 
 export function questionsFor(rows: { id: string; text: string; textTl: string | null; options: unknown }[], seed: string): RunQuestion[] {
   return shuffleSeeded(rows, seed).map((q) => ({

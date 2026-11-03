@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Alert } from "@/components/Fields";
 import { Card, buttonClass } from "@/components/ui";
@@ -21,6 +22,7 @@ export type PlayerInfo = {
 // window's memory. Leaving the screen (hiding the tab, minimizing, switching window) or reloading ends the run: the page
 // comes back to this start screen, and the next start shows the questions in a new random order. The clock does not reset.
 export function ExamPlayer({ info }: { info: PlayerInfo }) {
+  const router = useRouter();
   const [run, setRun] = useState<ExamRun | null>(null);
   const [left, setLeft] = useState(false); // the person left: nothing is shown while the page reloads
   const [lang, setLang] = useState<"en" | "tl">(info.resumed?.lang ?? "en");
@@ -59,7 +61,7 @@ export function ExamPlayer({ info }: { info: PlayerInfo }) {
     setError(undefined);
     const r = await startExam(info.applicantId, info.examId, lang, !info.resumed && info.commitment && sworn);
     if ("run" in r) setRun(r.run);
-    else if ("done" in r) location.href = "/apply";
+    else if ("done" in r) router.replace("/apply");
     else setError(r.error);
   });
 
