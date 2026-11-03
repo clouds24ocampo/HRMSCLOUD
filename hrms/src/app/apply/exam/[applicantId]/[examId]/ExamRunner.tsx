@@ -4,17 +4,17 @@ import { useEffect, useState } from "react";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert, SubmitButton } from "@/components/Fields";
 import { LANGS, UI, pick, type Lang } from "@/lib/exams";
+import type { ExamRun } from "@/lib/exam-run";
 import { submitExam } from "../../../actions";
-
-type Q = { id: string; text: string; textTl: string | null; options: { i: number; text: string; textTl: string | null }[] };
 
 const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
-export function ExamRunner({ applicantId, examId, title, questions, secondsLeft, lang: startLang }: { applicantId: string; examId: string; title: string; questions: Q[]; secondsLeft: number; lang: Lang }) {
-  const f = useKeptForm(submitExam.bind(null, applicantId, examId));
+export function ExamRunner({ applicantId, examId, title, run, onSending }: { applicantId: string; examId: string; title: string; run: ExamRun; onSending: () => void }) {
+  const { questions, secondsLeft, lang: startLang } = run;
+  const f = useKeptForm(submitExam.bind(null, applicantId, examId, run.token));
   const [left, setLeft] = useState(secondsLeft);
   const [answered, setAnswered] = useState(0);
-  const [lang, setLang] = useState<Lang>(startLang); // can be switched while answering; answers do not change
+  const [lang, setLang] = useState<Lang>(startLang as Lang); // can be switched while answering; answers do not change
   const t = UI[lang];
 
   // Count down from the server's remaining time. At zero the exam is sent as it stands.
@@ -33,7 +33,7 @@ export function ExamRunner({ applicantId, examId, title, questions, secondsLeft,
   }, [secondsLeft, submit]);
 
   return (
-    <form {...f.formProps} onChange={(e) => setAnswered(new Set(Array.from(new FormData(e.currentTarget).keys())).size)} className="space-y-4">
+    <form {...f.formProps} onSubmit={(e) => { onSending(); f.formProps.onSubmit(e); }} onChange={(e) => setAnswered(new Set(Array.from(new FormData(e.currentTarget).keys())).size)} className="space-y-4">
       <div className="sticky top-0 z-10 -mx-4 flex items-center justify-between gap-3 border-b border-line bg-surface/95 px-4 py-3 backdrop-blur">
         <h1 className="truncate font-semibold">{title}</h1>
         <p className="shrink-0 text-sm" aria-live="off">

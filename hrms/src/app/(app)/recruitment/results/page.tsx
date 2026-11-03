@@ -59,7 +59,7 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
                     <tr key={t.id} className="align-top transition hover:bg-bg">
                       <td className="px-5 py-3"><Link href={`/recruitment/applicants/${t.applicant.id}`} className="font-medium hover:text-brand hover:underline">{t.applicant.name}</Link>{t.applicant.profile && <p className="font-mono text-xs text-muted">{t.applicant.profile.applicantNo}</p>}</td>
                       <td className="px-2 py-3"><Link href={`/recruitment/${t.applicant.jobId}`} className="hover:text-brand hover:underline">{t.applicant.job.title}</Link></td>
-                      <td className="px-2 py-3"><span className="font-medium">{t.exam.title}</span><p className="text-xs text-muted">{KIND_LABEL[t.exam.kind]}</p></td>
+                      <td className="px-2 py-3"><span className="font-medium">{t.exam.title}</span><p className="text-xs text-muted">{KIND_LABEL[t.exam.kind]}</p>{t.leaves > 0 && <p className="mt-1"><Badge tone="warning">Left the screen {t.leaves}×</Badge></p>}</td>
                       <td className="px-2 py-3 text-right font-semibold"><Link href={`/recruitment/results/${t.id}`} className="hover:text-brand hover:underline" title="Review every answer">{t.score}/{t.maxScore} <span className="font-normal text-muted">({pct}%)</span></Link></td>
                       <td className="px-2 py-3">{ok === null ? <Badge>Mindset score</Badge> : ok ? <Badge tone="success">Passed</Badge> : <Badge tone="danger">Below passing</Badge>}</td>
                       <td className="px-2 py-3 text-right text-muted">{durationMin(t.startedAt, t.submittedAt)} min</td>

@@ -1,5 +1,6 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { redirect } from "next/navigation";
@@ -15,8 +16,9 @@ import { requestEvidence } from "@/lib/device";
 import { getOrgSettings } from "@/lib/settings";
 import { dayKey } from "@/lib/time";
 import { orientationOpen, requiredPolicies } from "@/lib/orientation";
-import { advanceIfComplete, examsForJob, finalizeAttempt, shareGlobalAttempts } from "@/lib/applicants";
-import { asLang, timeIsUp } from "@/lib/exams";
+import { advanceIfComplete, closeRun, examsForJob, finalizeAttempt, shareGlobalAttempts } from "@/lib/applicants";
+import { asLang, secondsLeft, timeIsUp } from "@/lib/exams";
+import { questionsFor, runSeed, type RunResult } from "@/lib/exam-run";
 import { ensureTagalog } from "@/lib/translate";
 import type { FormState } from "@/app/login/actions";
 
@@ -62,29 +64,57 @@ async function examContext(applicantId: string, examId: string) {
   return { me, profile, app, exam: exams[i], unlocked, attempt: app.attempts.find((t) => t.examId === examId) ?? null };
 }
 
-export async function startExam(applicantId: string, examId: string, lang: string, oath = false): Promise<FormState> {
+// Starts (or restarts) the exam and hands the questions to this browser window. The questions are sent only here, never
+// inside the page itself, so reloading the page can never show them again. Every start gets a new random order.
+// The clock keeps running from the very first start: leaving and coming back does not give more time.
+export async function startExam(applicantId: string, examId: string, lang: string, oath = false): Promise<RunResult> {
   const c = await examContext(applicantId, examId);
   if (!c) return { error: "Exam not found." };
   if (!c.profile.resumeKey || !c.profile.idKey) return { error: "Upload your resume and valid ID first." };
   if (!c.unlocked) return { error: "Take the earlier exam first." };
   if (c.app.stage === "HIRED" || c.app.stage === "REJECTED") return { error: "This application is closed." };
+  if (c.attempt?.submittedAt) return { done: true };
   // The commitment exam cannot start until the applicant has taken the oath. The server checks it, not only the page.
   if (c.exam.kind === "COMMITMENT" && !c.attempt && oath !== true) return { error: "Tick the oath box before you start this exam." };
-  if (!c.attempt) {
+  let attempt = c.attempt;
+  if (!attempt) {
     await ensureTagalog(examId); // older questions without a translation get one now, before the timer starts
     // The unique (applicant, exam) pair means a double click cannot start two attempts.
-    await prisma.examAttempt.create({ data: { applicantId, examId, lang: asLang(lang), oathAt: c.exam.kind === "COMMITMENT" ? new Date() : null } }).catch(() => null);
+    attempt = await prisma.examAttempt.create({ data: { applicantId, examId, lang: asLang(lang), oathAt: c.exam.kind === "COMMITMENT" ? new Date() : null } }).catch(() => null)
+      ?? await prisma.examAttempt.findUnique({ where: { applicantId_examId: { applicantId, examId } } });
+    if (!attempt) return { error: "Could not start the exam. Try again." };
     await audit(c.me.id, "portal.exam_started", "Exam", examId, { applicantId, ...(c.exam.kind === "COMMITMENT" ? { oath: true } : {}) }, c.me.organizationId);
   }
-  revalidatePath(`/apply/exam/${applicantId}/${examId}`);
-  return { ok: "Started." };
+  if (timeIsUp(attempt.startedAt, c.exam.timeLimitMin)) {
+    await finalizeAttempt(attempt.id, examId, {});
+    await shareGlobalAttempts(c.profile.id);
+    return { done: true };
+  }
+  // A run that is still open (a second window, a double click) counts as a leave: this window gets a new order and the old one is cut off.
+  const round = attempt.runToken ? attempt.round + 1 : attempt.round;
+  const token = randomUUID();
+  await prisma.examAttempt.update({ where: { id: attempt.id }, data: { runToken: token, round, ...(attempt.runToken ? { leaves: { increment: 1 } } : {}) } });
+  const rows = await prisma.examQuestion.findMany({ where: { examId }, orderBy: [{ sort: "asc" }, { createdAt: "asc" }], select: { id: true, text: true, textTl: true, options: true } });
+  return { run: { token, lang: asLang(attempt.lang), secondsLeft: Math.max(0, secondsLeft(attempt.startedAt, c.exam.timeLimitMin)), questions: questionsFor(rows, runSeed(attempt.id, round)) } };
+}
+
+// The person left the exam screen (hid the tab, minimized, switched window). The run ends; the next start is a new random order.
+export async function leaveExam(applicantId: string, examId: string, token: string, reason: string): Promise<FormState> {
+  const c = await examContext(applicantId, examId);
+  if (!c?.attempt || c.attempt.submittedAt) return {};
+  if (await closeRun(c.attempt.id, token)) {
+    await audit(c.me.id, "portal.exam_left", "Exam", examId, { applicantId, reason: String(reason).slice(0, 20) }, c.me.organizationId);
+  }
+  return { ok: "Reset." };
 }
 
 // Answers arrive as q_<questionId> = option index. Time is checked on the server: past the limit plus a short grace, the answers are discarded.
-export async function submitExam(applicantId: string, examId: string, _: FormState, form: FormData): Promise<FormState> {
+// Only the window that holds the current run can send answers; after a reset the old window's answers are refused.
+export async function submitExam(applicantId: string, examId: string, token: string, _: FormState, form: FormData): Promise<FormState> {
   const c = await examContext(applicantId, examId);
   if (!c?.attempt) return { error: "Start the exam first." };
   if (c.attempt.submittedAt) redirect("/apply");
+  if (!c.attempt.runToken || c.attempt.runToken !== token) return { error: "This exam window was reset because the exam screen was left. Reload the page and start again." };
   const answers: Record<string, number> = {};
   for (const [k, v] of form.entries()) {
     const n = Number(v);
@@ -93,7 +123,7 @@ export async function submitExam(applicantId: string, examId: string, _: FormSta
   const late = timeIsUp(c.attempt.startedAt, c.exam.timeLimitMin);
   await finalizeAttempt(c.attempt.id, examId, late ? {} : answers);
   await shareGlobalAttempts(c.profile.id);
-  await audit(c.me.id, "portal.exam_submitted", "Exam", examId, { applicantId, late }, c.me.organizationId);
+  await audit(c.me.id, "portal.exam_submitted", "Exam", examId, { applicantId, late, leaves: c.attempt.leaves }, c.me.organizationId);
   await advanceIfComplete(c.profile.id);
   done();
   redirect("/apply");

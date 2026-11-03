@@ -27,7 +27,7 @@ export async function examsForJob(organizationId: string, jobId: string) {
 export async function shareGlobalAttempts(profileId: string) {
   const apps = await prisma.applicant.findMany({
     where: { profileId },
-    select: { id: true, attempts: { select: { examId: true, startedAt: true, submittedAt: true, lang: true, answers: true, score: true, maxScore: true, breakdown: true, oathAt: true, exam: { select: { jobId: true } } } } },
+    select: { id: true, attempts: { select: { examId: true, startedAt: true, submittedAt: true, lang: true, answers: true, score: true, maxScore: true, breakdown: true, oathAt: true, leaves: true, exam: { select: { jobId: true } } } } },
   });
   const done = new Map<string, (typeof apps)[number]["attempts"][number]>();
   for (const a of apps) for (const t of a.attempts) if (t.submittedAt && t.exam.jobId === null) done.set(t.examId, t);
@@ -36,7 +36,7 @@ export async function shareGlobalAttempts(profileId: string) {
     const have = new Set(a.attempts.map((t) => t.examId));
     for (const [examId, t] of done) {
       if (have.has(examId)) continue;
-      rows.push({ applicantId: a.id, examId, lang: t.lang, startedAt: t.startedAt, submittedAt: t.submittedAt, answers: t.answers ?? undefined, score: t.score, maxScore: t.maxScore, breakdown: t.breakdown ?? undefined, oathAt: t.oathAt });
+      rows.push({ applicantId: a.id, examId, lang: t.lang, startedAt: t.startedAt, submittedAt: t.submittedAt, answers: t.answers ?? undefined, score: t.score, maxScore: t.maxScore, breakdown: t.breakdown ?? undefined, oathAt: t.oathAt, leaves: t.leaves });
     }
   }
   if (rows.length) await prisma.examAttempt.createMany({ data: rows, skipDuplicates: true });
@@ -48,9 +48,19 @@ export async function finalizeAttempt(attemptId: string, examId: string, answers
   const r = scoreExam(qs.map((q) => ({ id: q.id, trait: q.trait, options: parseOptions(q.options) })), answers);
   const res = await prisma.examAttempt.updateMany({
     where: { id: attemptId, submittedAt: null },
-    data: { submittedAt: new Date(), answers, score: r.score, maxScore: r.max, breakdown: r.breakdown },
+    data: { submittedAt: new Date(), answers, score: r.score, maxScore: r.max, breakdown: r.breakdown, runToken: null },
   });
   return res.count === 1;
+}
+
+// Ends the open run of an attempt because the person left the exam screen (or the page was reloaded). The next start shows the
+// questions in a new random order. Only counts when a run was open, so calling it twice counts once. With `token`, only that run.
+export async function closeRun(attemptId: string, token?: string) {
+  const r = await prisma.examAttempt.updateMany({
+    where: { id: attemptId, submittedAt: null, runToken: token ?? { not: null } },
+    data: { runToken: null, round: { increment: 1 }, leaves: { increment: 1 } },
+  });
+  return r.count === 1;
 }
 
 // When a person has taken every exam and uploaded the resume and ID, their application moves to Screening
