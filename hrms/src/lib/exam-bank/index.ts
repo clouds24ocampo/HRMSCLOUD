@@ -37,6 +37,7 @@ export const KNOWLEDGE_BANK: Record<string, Q[]> = {
 };
 
 export { ROLE_INFO, roleFields } from "./roles";
+export { COMMITMENT, COMMITMENT_TITLE, COMMITMENT_INSTRUCTIONS } from "./commitment";
 
 type Choice = { text: string; points: number };
 

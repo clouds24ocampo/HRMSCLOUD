@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { STARTER_POSITIONS } from "../exams";
-import { KNOWLEDGE_BANK, PSYCH, ROLE_INFO, knowledgeOptions, psychOptions, roleFields } from "./index";
+import { EXAM_ORDER, OATH, STARTER_POSITIONS } from "../exams";
+import { COMMITMENT, KNOWLEDGE_BANK, PSYCH, ROLE_INFO, knowledgeOptions, psychOptions, roleFields } from "./index";
 
 describe("knowledge bank", () => {
   it("covers every starter position with exactly 30 questions", () => {
@@ -70,5 +70,38 @@ describe("role descriptions", () => {
       expect(f.duties.split(NL)).toHaveLength(f.dutiesTl.split(NL).length);
     }
     expect(roleFields("Unknown job")).toBeNull();
+  });
+});
+
+describe("commitment exam", () => {
+  it("has 30 questions: 10 traits x 3, each with 4 distinct choices", () => {
+    expect(COMMITMENT).toHaveLength(30);
+    const byTrait = new Map<string, number>();
+    const texts = new Set<string>();
+    for (const q of COMMITMENT) {
+      byTrait.set(q[0], (byTrait.get(q[0]) ?? 0) + 1);
+      expect(q).toHaveLength(6);
+      expect(q.every((t) => t.trim().length > 0), q[1]).toBe(true);
+      expect(new Set(q.slice(2)).size, q[1]).toBe(4);
+      expect(texts.has(q[1]), `duplicate ${q[1]}`).toBe(false);
+      texts.add(q[1]);
+    }
+    expect(byTrait.size).toBe(10);
+    for (const [t, n] of byTrait) expect([t, n]).toEqual([t, 3]);
+  });
+  it("scores 4 3 1 0 and mixes where the best choice sits", () => {
+    const slots = [0, 0, 0, 0];
+    COMMITMENT.forEach((q, i) => {
+      const o = psychOptions(q, i);
+      expect(o.map((c) => c.points).sort()).toEqual([0, 1, 3, 4]);
+      expect(o.find((c) => c.points === 4)!.text).toBe(q[2]);
+      slots[o.findIndex((c) => c.points === 4)]++;
+    });
+    for (const n of slots) expect(n).toBeGreaterThanOrEqual(5);
+  });
+  it("is taken last, after the psychological and knowledge exams, and has an oath in both languages", () => {
+    expect(EXAM_ORDER.PSYCHOLOGICAL).toBeLessThan(EXAM_ORDER.KNOWLEDGE);
+    expect(EXAM_ORDER.KNOWLEDGE).toBeLessThan(EXAM_ORDER.COMMITMENT);
+    for (const l of ["en", "tl"] as const) for (const k of ["title", "text", "check", "need"] as const) expect(OATH[l][k].length).toBeGreaterThan(10);
   });
 });

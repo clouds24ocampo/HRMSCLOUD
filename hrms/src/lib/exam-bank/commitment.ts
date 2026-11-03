@@ -1,0 +1,52 @@
+import type { PsychQ } from "./psych";
+
+// Third exam, for every position: commitment to the corporation. Same shape and scoring as the psychological exam:
+// [trait, scenario, choice, choice, choice, choice], best choice first, points 4, 3, 1, 0 in that order, shown in a mixed order.
+// 10 traits x 3 questions = 30 questions, 120 points. The best choice always protects the corporation AND stays honest and lawful:
+// no question rewards hiding a wrong, breaking a law or giving up a worker's legal rights.
+export const COMMITMENT_TITLE = "Corporate Commitment & Loyalty Exam";
+export const COMMITMENT_INSTRUCTIONS =
+  "This exam shows how you would protect the corporation and help it grow. Answer as you would really act. Your answers are your commitment and oath to the corporation.";
+
+export const COMMITMENT: PsychQ[] = [
+  // Loyalty to the corporation
+  ["Loyalty to the corporation", "A competitor offers you extra pay to share how our company prices its projects. What would you most likely do?", "Refuse and report the offer to my supervisor or management", "Refuse and keep it to myself", "Think about it first because the pay is good", "Accept and share only a small part"],
+  ["Loyalty to the corporation", "A shortcut would finish a task faster, but it could hurt the company's reputation later. What would you most likely do?", "Follow the proper process even if it takes longer", "Use the shortcut and tell my supervisor about it", "Use the shortcut and fix problems only if they appear", "Use the shortcut and say nothing"],
+  ["Loyalty to the corporation", "The team needs help with an urgent deadline on your rest day, and the work would be paid at the overtime rate. What would you most likely do?", "Help if I am able, and record the hours properly", "Help only if asked a second time", "Decline without asking why it is urgent", "Say yes, but not show up"],
+  // Confidentiality and data privacy
+  ["Confidentiality and data privacy", "A friend asks you for a client's contact list that you can access, to help a friend's business. What would you most likely do?", "Refuse, because client data is confidential and used only for work", "Refuse, but tell my friend where to find public information", "Share only the names", "Share it because a friend asked"],
+  ["Confidentiality and data privacy", "You receive an email that looks like it is from the company and asks for your password. What would you most likely do?", "Not reply and report it to IT security as a suspected phishing attempt", "Delete it quietly", "Reply to ask if it is real", "Send the password to be helpful"],
+  ["Confidentiality and data privacy", "You want to finish a confidential file at home. What would you most likely do?", "Ask for an approved way first, such as a company laptop or VPN", "Send it to my personal email and delete it afterwards", "Copy it to a USB drive and bring it back tomorrow", "Upload it to my personal cloud storage"],
+  // Protecting company assets
+  ["Protecting company assets", "You find a co-worker's company laptop left alone in a public place. What would you most likely do?", "Secure it and tell the owner and my supervisor right away", "Tell the owner later in the day", "Leave it because it is not my job", "Walk away and say nothing"],
+  ["Protecting company assets", "A project is finished and some company materials are left over. What would you most likely do?", "Return all of it and record what was left", "Return it without recording it", "Keep it in case I need it later", "Take it home for personal use"],
+  ["Protecting company assets", "You notice a co-worker often uses company supplies for a personal business. What would you most likely do?", "Report it to my supervisor or HR through the proper channel", "Remind the co-worker privately and report it if it continues", "Say nothing because it is not my business", "Do the same"],
+  // Honesty and integrity
+  ["Honesty and integrity", "A client gives you an expensive gift after you closed a deal. What would you most likely do?", "Decline it, or declare it to management as the company policy requires", "Accept it and declare it later", "Accept it and keep quiet because it was freely given", "Hint that I would like more"],
+  ["Honesty and integrity", "You find a mistake in your report that makes the company's results look better than they are. What would you most likely do?", "Correct it right away and tell my supervisor", "Correct it quietly", "Wait to see if anyone notices", "Leave it because it helps the company"],
+  ["Honesty and integrity", "A co-worker asks you to sign off on work you have not checked. What would you most likely do?", "Decline until I have checked it", "Check only part of it, then sign", "Sign because they are trusted", "Sign without reading it"],
+  // Protecting the company's good name
+  ["Protecting the company's good name", "A customer posts an online complaint about the company, and you know it is partly true. What would you most likely do?", "Tell my supervisor so the company can respond properly, and not reply on my own", "Reply politely with facts", "Ignore it", "Argue with the customer online"],
+  ["Protecting the company's good name", "At a gathering, friends ask you about problems at your company. What would you most likely do?", "Speak honestly and positively in general terms, share no confidential details, and raise issues inside the company", "Change the subject", "Share a few small complaints", "Share all the office gossip"],
+  ["Protecting the company's good name", "You want to post about your job on social media. What would you most likely do?", "Check the social media policy first and never post confidential or client details", "Post only photos of my own desk", "Post anything but hide the company name", "Post screenshots of my work"],
+  // Helping the corporation grow
+  ["Helping the corporation grow", "You have an idea that could save the company money, but it needs extra work from you. What would you most likely do?", "Write it up, present it to my supervisor, and offer to help carry it out", "Mention it casually", "Keep it until someone asks", "Keep it to use in my own business"],
+  ["Helping the corporation grow", "The company offers training in a skill it needs. What would you most likely do?", "Join and share what I learn with my team", "Join but keep what I learn to myself", "Join only if I am required to", "Skip it"],
+  ["Helping the corporation grow", "The company announces cost cutting after a hard quarter. What would you most likely do?", "Look for ways to save cost in my own work while keeping quality up", "Continue as usual", "Complain about it", "Slack off and start looking for another job"],
+  // Accountability and reporting
+  ["Accountability and reporting", "You learn that a co-worker is falsifying receipts to get reimbursed. What would you most likely do?", "Report it to management or HR through the proper channel right away", "Tell the co-worker to stop", "Wait for more proof", "Say nothing"],
+  ["Accountability and reporting", "You notice a safety or security gap, such as a broken door lock or a software bug that exposes data. What would you most likely do?", "Report it immediately and follow up until it is fixed", "Tell a colleague about it", "Wait for the next scheduled review", "Ignore it"],
+  ["Accountability and reporting", "You made a mistake that cost the company money. What would you most likely do?", "Report it at once, explain, and help limit the loss", "Fix it first and report it afterwards", "Hope it goes unnoticed", "Blame a co-worker"],
+  // Following policy and the law
+  ["Following policy and the law", "Company policy requires approval before installing software, and you need a tool quickly. What would you most likely do?", "Ask for approval and use an approved alternative meanwhile", "Install it, then ask for approval", "Install it because nobody checks", "Install a pirated copy"],
+  ["Following policy and the law", "A client asks for a discount bigger than your authority allows. What would you most likely do?", "Say I will check with the manager and promise nothing", "Offer a little less than the client asked", "Grant it to close the deal", "Grant it and hide it from the company"],
+  ["Following policy and the law", "A new company rule is announced and you disagree with it. What would you most likely do?", "Follow it and share my concerns through the proper channel", "Follow it but complain to co-workers", "Follow it only when someone is watching", "Ignore it"],
+  // Long-term commitment
+  ["Long-term commitment", "You get a job offer elsewhere while handling an important project. What would you most likely do?", "Finish my commitments, give proper notice, and document a handover", "Give proper notice only", "Leave without notice if the new pay is higher", "Take company files for the new job"],
+  ["Long-term commitment", "A senior colleague is leaving and you are asked to learn their tasks. What would you most likely do?", "Learn carefully, ask questions, and write down the knowledge", "Learn the basics", "Say it is not in my job description", "Refuse"],
+  ["Long-term commitment", "Where do you see yourself in relation to the company in five years? What would you most likely say?", "Growing with the company and taking bigger responsibility", "Learning here for a while, then deciding", "Using the company for experience only", "Not sure I will still be here"],
+  // Putting the corporation's interest before personal gain
+  ["Putting the corporation's interest first", "You are offered a side job by a company that competes with ours. What would you most likely do?", "Decline it, or tell management and ask for written permission first", "Do it only on my days off", "Do it quietly", "Take it and share company information"],
+  ["Putting the corporation's interest first", "A relative owns a company that wants to supply our company. What would you most likely do?", "Declare the relationship and step out of the decision", "Declare it but help them get the deal", "Recommend them without declaring it", "Take a commission from them"],
+  ["Putting the corporation's interest first", "You could use working hours for a personal project that earns money. What would you most likely do?", "Keep working hours for company work and do the project on my own time", "Do it only when work is slow", "Do it during breaks using the company internet", "Do it during working hours"],
+];

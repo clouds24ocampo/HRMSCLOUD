@@ -3,10 +3,11 @@
 import { addDays, dayKey } from "@/lib/time";
 
 import { STAGES, type Stage } from "@/lib/stages";
+import type { ExamKindKey } from "@/lib/exams";
 export { STAGES, type Stage };
 
 export type AttemptRow = {
-  examId: string; kind: "KNOWLEDGE" | "PSYCHOLOGICAL"; examTitle: string; passingPct: number | null;
+  examId: string; kind: ExamKindKey; examTitle: string; passingPct: number | null;
   startedAt: Date; submittedAt: Date | null; score: number | null; maxScore: number | null; lang: string;
   breakdown: Record<string, { score: number; max: number }> | null;
 };

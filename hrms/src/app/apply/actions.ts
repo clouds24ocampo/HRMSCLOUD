@@ -62,17 +62,19 @@ async function examContext(applicantId: string, examId: string) {
   return { me, profile, app, exam: exams[i], unlocked, attempt: app.attempts.find((t) => t.examId === examId) ?? null };
 }
 
-export async function startExam(applicantId: string, examId: string, lang: string): Promise<FormState> {
+export async function startExam(applicantId: string, examId: string, lang: string, oath = false): Promise<FormState> {
   const c = await examContext(applicantId, examId);
   if (!c) return { error: "Exam not found." };
   if (!c.profile.resumeKey || !c.profile.idKey) return { error: "Upload your resume and valid ID first." };
   if (!c.unlocked) return { error: "Take the earlier exam first." };
   if (c.app.stage === "HIRED" || c.app.stage === "REJECTED") return { error: "This application is closed." };
+  // The commitment exam cannot start until the applicant has taken the oath. The server checks it, not only the page.
+  if (c.exam.kind === "COMMITMENT" && !c.attempt && oath !== true) return { error: "Tick the oath box before you start this exam." };
   if (!c.attempt) {
     await ensureTagalog(examId); // older questions without a translation get one now, before the timer starts
     // The unique (applicant, exam) pair means a double click cannot start two attempts.
-    await prisma.examAttempt.create({ data: { applicantId, examId, lang: asLang(lang) } }).catch(() => null);
-    await audit(c.me.id, "portal.exam_started", "Exam", examId, { applicantId }, c.me.organizationId);
+    await prisma.examAttempt.create({ data: { applicantId, examId, lang: asLang(lang), oathAt: c.exam.kind === "COMMITMENT" ? new Date() : null } }).catch(() => null);
+    await audit(c.me.id, "portal.exam_started", "Exam", examId, { applicantId, ...(c.exam.kind === "COMMITMENT" ? { oath: true } : {}) }, c.me.organizationId);
   }
   revalidatePath(`/apply/exam/${applicantId}/${examId}`);
   return { ok: "Started." };

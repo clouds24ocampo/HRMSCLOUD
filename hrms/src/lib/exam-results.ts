@@ -1,5 +1,5 @@
 // Question-by-question review of one submitted exam attempt, for HR and admin. Pure, so it can be tested.
-import { parseOptions, type Answers } from "@/lib/exams";
+import { parseOptions, type Answers, type ExamKindKey } from "@/lib/exams";
 
 export type ReviewQuestion = { id: string; text: string; trait: string | null; options: unknown; sort: number };
 export type ReviewRow = {
@@ -8,7 +8,7 @@ export type ReviewRow = {
   points: number; max: number; right: boolean | null; // right is null for psychological exams
 };
 
-export function reviewAttempt(kind: "KNOWLEDGE" | "PSYCHOLOGICAL", questions: ReviewQuestion[], answers: Answers | null): ReviewRow[] {
+export function reviewAttempt(kind: ExamKindKey, questions: ReviewQuestion[], answers: Answers | null): ReviewRow[] {
   return [...questions].sort((a, b) => a.sort - b.sort).map((q, i) => {
     const opts = parseOptions(q.options);
     const pick = answers?.[q.id];

@@ -8,6 +8,7 @@ import { Badge, buttonClass } from "@/components/ui";
 import type { FormState } from "@/app/login/actions";
 import { applyToJobs, startExam, uploadDocuments, uploadRequirement } from "./actions";
 import { RoleInfo } from "@/components/RoleInfo";
+import { OATH } from "@/lib/exams";
 import { RoleArt } from "@/components/RoleArt";
 
 // One button that runs a server action and shows its error, if any.
@@ -52,8 +53,10 @@ export function ApplyPicker({ jobs }: { jobs: { id: string; title: string; meta:
   );
 }
 // Language is chosen here, before the timer starts. Tagalog is translated automatically from the English questions.
-export function StartExam({ applicantId, examId }: { applicantId: string; examId: string }) {
+export function StartExam({ applicantId, examId, commitment = false }: { applicantId: string; examId: string; commitment?: boolean }) {
   const [lang, setLang] = useState("en");
+  const [sworn, setSworn] = useState(false);
+  const oath = OATH[lang === "tl" ? "tl" : "en"];
   return (
     <div className="space-y-4">
       {(
@@ -69,7 +72,18 @@ export function StartExam({ applicantId, examId }: { applicantId: string; examId
           </div>
         </fieldset>
       )}
-      <ActionButton run={() => startExam(applicantId, examId, lang)}>{lang === "tl" ? "Simulan ang exam" : "Start the exam"}</ActionButton>
+      {commitment && (
+        <fieldset className="rounded-xl border-2 border-brand/40 bg-brand/5 p-4">
+          <legend className="px-2 text-sm font-bold text-brand">{oath.title}</legend>
+          <p className="text-sm leading-relaxed">{oath.text}</p>
+          <label className="mt-3 flex cursor-pointer items-start gap-3 text-sm font-semibold">
+            <input type="checkbox" checked={sworn} onChange={(e) => setSworn(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--brand)]" />
+            <span>{oath.check}</span>
+          </label>
+          {!sworn && <p className="mt-2 text-xs text-muted">{oath.need}</p>}
+        </fieldset>
+      )}
+      {(!commitment || sworn) && <ActionButton run={() => startExam(applicantId, examId, lang, commitment && sworn)}>{lang === "tl" ? "Simulan ang exam" : "Start the exam"}</ActionButton>}
     </div>
   );
 }

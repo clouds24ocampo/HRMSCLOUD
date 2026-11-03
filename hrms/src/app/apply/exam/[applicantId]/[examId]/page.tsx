@@ -50,9 +50,10 @@ export default async function ExamPage({ params }: { params: Promise<{ applicant
             <li>You have {exam.timeLimitMin} minutes. The timer starts when you press Start and cannot be paused.</li>
             <li>You can take this exam only once. It is sent when you press Submit, or when time is up.</li>
             {exam.kind === "PSYCHOLOGICAL" && <li>There are no right or wrong answers. Answer honestly.</li>}
+            {exam.kind === "COMMITMENT" && <li>This exam is bonded to the corporation. Before you start you take an oath that your answers are your commitment to it.</li>}
           </ul>
           {exam.instructions && <p className="mt-4 whitespace-pre-line text-sm text-muted">{exam.instructions}</p>}
-          <div className="mt-6"><StartExam applicantId={app.id} examId={exam.id} /></div>
+          <div className="mt-6"><StartExam applicantId={app.id} examId={exam.id} commitment={exam.kind === "COMMITMENT"} /></div>
         </Card>
       </>
     );

@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { notify } from "@/lib/notify";
 import { ROLES } from "@/lib/roles";
-import { parseOptions, scoreExam, type Answers } from "@/lib/exams";
+import { EXAM_ORDER, parseOptions, scoreExam, type Answers } from "@/lib/exams";
 
 // One company per install, so the careers page belongs to the first organization.
 // ponytail: with ALLOW_MULTIPLE_ORGS (tests only) this is still the first one; add an org slug to the URL if that ever matters.
@@ -12,20 +12,22 @@ export const careersOrg = () => prisma.organization.findFirst({ orderBy: { creat
 export const openJobs = (organizationId: string) =>
   prisma.jobPosting.findMany({ where: { organizationId, status: "OPEN" }, orderBy: { title: "asc" }, select: { id: true, title: true, description: true, descriptionTl: true, duties: true, dutiesTl: true, openings: true, department: { select: { name: true } } } });
 
-// Exams an applicant of this job must take, in order: psychological first, then position knowledge. Empty exams are skipped.
-export const examsForJob = (organizationId: string, jobId: string) =>
-  prisma.exam.findMany({
+// Exams an applicant of this job must take, in order: psychological, position knowledge, then commitment. Empty exams are skipped.
+export async function examsForJob(organizationId: string, jobId: string) {
+  const exams = await prisma.exam.findMany({
     where: { organizationId, active: true, OR: [{ jobId }, { jobId: null }], questions: { some: {} } },
-    orderBy: [{ kind: "desc" }, { createdAt: "asc" }], // enum order is KNOWLEDGE, PSYCHOLOGICAL: descending puts psychological first
+    orderBy: { createdAt: "asc" },
     select: { id: true, kind: true, title: true, instructions: true, timeLimitMin: true, _count: { select: { questions: true } } },
   });
+  return exams.sort((a, b) => EXAM_ORDER[a.kind] - EXAM_ORDER[b.kind]); // stable: same kind keeps oldest first
+}
 
 // An exam that is not tied to one position (jobId null, e.g. the psychological exam) is taken once per person.
 // Their result is copied onto every one of their applications, so applying for more positions never repeats it.
 export async function shareGlobalAttempts(profileId: string) {
   const apps = await prisma.applicant.findMany({
     where: { profileId },
-    select: { id: true, attempts: { select: { examId: true, startedAt: true, submittedAt: true, lang: true, answers: true, score: true, maxScore: true, breakdown: true, exam: { select: { jobId: true } } } } },
+    select: { id: true, attempts: { select: { examId: true, startedAt: true, submittedAt: true, lang: true, answers: true, score: true, maxScore: true, breakdown: true, oathAt: true, exam: { select: { jobId: true } } } } },
   });
   const done = new Map<string, (typeof apps)[number]["attempts"][number]>();
   for (const a of apps) for (const t of a.attempts) if (t.submittedAt && t.exam.jobId === null) done.set(t.examId, t);
@@ -34,7 +36,7 @@ export async function shareGlobalAttempts(profileId: string) {
     const have = new Set(a.attempts.map((t) => t.examId));
     for (const [examId, t] of done) {
       if (have.has(examId)) continue;
-      rows.push({ applicantId: a.id, examId, lang: t.lang, startedAt: t.startedAt, submittedAt: t.submittedAt, answers: t.answers ?? undefined, score: t.score, maxScore: t.maxScore, breakdown: t.breakdown ?? undefined });
+      rows.push({ applicantId: a.id, examId, lang: t.lang, startedAt: t.startedAt, submittedAt: t.submittedAt, answers: t.answers ?? undefined, score: t.score, maxScore: t.maxScore, breakdown: t.breakdown ?? undefined, oathAt: t.oathAt });
     }
   }
   if (rows.length) await prisma.examAttempt.createMany({ data: rows, skipDuplicates: true });

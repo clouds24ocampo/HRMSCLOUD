@@ -16,6 +16,7 @@
     "exams:seed": "tsx prisma/seed-exams.ts",
     "handbook:seed": "tsx prisma/seed-handbook.ts",
     "org:seed": "tsx prisma/seed-org.ts",
+    "commitment:seed": "tsx prisma/seed-commitment.ts",
     "exams:translate": "tsx prisma/translate-exams.ts",
     "demo:seed": "tsx prisma/demo.ts",
     "demo:remove": "tsx prisma/demo.ts remove",

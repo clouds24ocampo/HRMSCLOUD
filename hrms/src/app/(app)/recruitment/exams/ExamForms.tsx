@@ -5,6 +5,7 @@ import { useKeptForm } from "@/components/useKeptForm";
 import { Alert, Field, SubmitButton } from "@/components/Fields";
 import { inputClass } from "@/components/ui";
 import type { FormState } from "@/app/login/actions";
+import type { ExamKindKey } from "@/lib/exams";
 import { addQuestion, createExam, deleteExam, deleteQuestion, setExamActive } from "../exam-actions";
 
 const Msg = ({ s }: { s: FormState }) => (
@@ -25,6 +26,7 @@ export function CreateExamForm({ jobs }: { jobs: { id: string; label: string }[]
         <select name="kind" value={kind} onChange={(e) => setKind(e.target.value)} className={inputClass}>
           <option value="KNOWLEDGE">Position knowledge (right and wrong answers)</option>
           <option value="PSYCHOLOGICAL">Psychological (no wrong answers)</option>
+          <option value="COMMITMENT">Commitment to the corporation (oath before starting)</option>
         </select>
       </label>
       <label className="block text-sm font-medium">
@@ -48,7 +50,7 @@ export function CreateExamForm({ jobs }: { jobs: { id: string; label: string }[]
   );
 }
 
-export function QuestionForm({ examId, kind }: { examId: string; kind: "KNOWLEDGE" | "PSYCHOLOGICAL" }) {
+export function QuestionForm({ examId, kind }: { examId: string; kind: ExamKindKey }) {
   const f = useKeptForm(addQuestion.bind(null, examId));
   const knowledge = kind === "KNOWLEDGE";
   return (

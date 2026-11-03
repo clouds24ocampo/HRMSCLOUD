@@ -50,7 +50,7 @@ export default async function ResultDetail({ params }: { params: Promise<{ id: s
           <div><p className="text-sm text-muted">Time taken</p><p className="text-xl font-semibold">{durationMin(t.startedAt, t.submittedAt)} min</p><p className="text-sm text-muted">of {t.exam.timeLimitMin} allowed</p></div>
           <div><p className="text-sm text-muted">Language</p><p className="text-xl font-semibold">{t.lang === "tl" ? "Tagalog" : "English"}</p><p className="mt-1"><Badge tone={STAGE_TONE[a.stage]}>{STAGE_LABEL[a.stage]}</Badge></p></div>
         </div>
-        <p className="mt-4 text-sm text-muted">Submitted {t.submittedAt && formatDay(dayKey(t.submittedAt, settings.timezone), { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.{t.exam.kind === "KNOWLEDGE" ? ` ${right} right, ${rows.length - right - blank} wrong, ${blank} not answered.` : blank ? ` ${blank} not answered.` : ""}</p>
+        <p className="mt-4 text-sm text-muted">Submitted {t.submittedAt && formatDay(dayKey(t.submittedAt, settings.timezone), { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.{t.oathAt && <> Oath to the corporation taken {formatDay(dayKey(t.oathAt, settings.timezone), { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.</>}{t.exam.kind === "KNOWLEDGE" ? ` ${right} right, ${rows.length - right - blank} wrong, ${blank} not answered.` : blank ? ` ${blank} not answered.` : ""}</p>
       </Card>
 
       {traits.length > 0 && (

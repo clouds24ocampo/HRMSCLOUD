@@ -20,7 +20,7 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
         submittedAt: { not: null },
         applicant: { organizationId: me.organizationId, ...(q ? { name: { contains: q, mode: "insensitive" } } : {}) },
         ...(exam ? { examId: exam } : {}),
-        ...(kind === "KNOWLEDGE" || kind === "PSYCHOLOGICAL" ? { exam: { kind } } : {}),
+        ...(kind === "KNOWLEDGE" || kind === "PSYCHOLOGICAL" || kind === "COMMITMENT" ? { exam: { kind } } : {}),
       },
       orderBy: { submittedAt: "desc" },
       take: 300,
@@ -40,7 +40,7 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
         </label>
         <label className="block min-w-0 flex-1 basis-40 text-sm font-medium">
           Type
-          <select name="kind" defaultValue={kind} className={inputClass}><option value="">Both</option><option value="KNOWLEDGE">Position knowledge</option><option value="PSYCHOLOGICAL">Psychological</option></select>
+          <select name="kind" defaultValue={kind} className={inputClass}><option value="">All</option><option value="KNOWLEDGE">Position knowledge</option><option value="PSYCHOLOGICAL">Psychological</option><option value="COMMITMENT">Commitment to the corporation</option></select>
         </label>
         <button className={buttonClass}>Filter</button>
       </form>

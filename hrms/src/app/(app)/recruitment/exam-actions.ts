@@ -25,7 +25,7 @@ export async function createExam(_: FormState, form: FormData): Promise<FormStat
   const parsed = z
     .object({
       title: z.string().trim().min(3, "Give the exam a title.").max(100),
-      kind: z.enum(["KNOWLEDGE", "PSYCHOLOGICAL"], { error: "Choose the exam type." }),
+      kind: z.enum(["KNOWLEDGE", "PSYCHOLOGICAL", "COMMITMENT"], { error: "Choose the exam type." }),
       jobId: opt, instructions: opt,
       timeLimitMin: z.coerce.number().int().min(1, "At least 1 minute.").max(300, "At most 300 minutes."),
       passingPct: z.union([z.literal(""), z.coerce.number().int().min(1).max(100)]).optional(),
@@ -87,7 +87,7 @@ export async function addQuestion(examId: string, _: FormState, form: FormData):
   if (options.length < 2) return { error: "Give at least two answer choices." };
   if (exam.kind === "KNOWLEDGE" && !options.some((o) => o.points === 1)) return { error: "Mark which choice is correct." };
   const last = await prisma.examQuestion.findFirst({ where: { examId }, orderBy: { sort: "desc" }, select: { sort: true } });
-  await prisma.examQuestion.create({ data: { examId, text: text.data, trait: exam.kind === "PSYCHOLOGICAL" ? trait : null, options, sort: (last?.sort ?? 0) + 1 } });
+  await prisma.examQuestion.create({ data: { examId, text: text.data, trait: exam.kind !== "KNOWLEDGE" ? trait : null, options, sort: (last?.sort ?? 0) + 1 } });
   await ensureTagalog(examId); // the system writes the Tagalog version; HR types English only
   await audit(me.id, "exam.question_added", "Exam", examId, undefined, me.organizationId);
   done(examId);
