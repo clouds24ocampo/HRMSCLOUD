@@ -12,7 +12,7 @@ export const careersOrg = () => prisma.organization.findFirst({ orderBy: { creat
 export const openJobs = (organizationId: string) =>
   prisma.jobPosting.findMany({ where: { organizationId, status: "OPEN" }, orderBy: { title: "asc" }, select: { id: true, title: true, description: true, descriptionTl: true, duties: true, dutiesTl: true, openings: true, department: { select: { name: true } } } });
 
-// Exams an applicant of this job must take, in order: psychological, position knowledge, then commitment. Empty exams are skipped.
+// Exams an applicant of this job must take, in order: corporate commitment, psychological, then position knowledge. Empty exams are skipped.
 export async function examsForJob(organizationId: string, jobId: string) {
   const exams = await prisma.exam.findMany({
     where: { organizationId, active: true, OR: [{ jobId }, { jobId: null }], questions: { some: {} } },

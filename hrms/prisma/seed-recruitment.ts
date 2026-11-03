@@ -16,7 +16,7 @@ async function main() {
     run("prisma/seed-exams.ts", "--no-translate"); // opens the positions, adds role descriptions and exams
     run("prisma/seed-org.ts"); // IT departments and positions, links the jobs to them
   }
-  run("prisma/seed-commitment.ts"); // the third exam; added to an install that already had the first two
+  run("prisma/seed-commitment.ts"); // the commitment exam, taken first; added to an install that already had the other two
   console.log("recruitment seed: done");
 }
 

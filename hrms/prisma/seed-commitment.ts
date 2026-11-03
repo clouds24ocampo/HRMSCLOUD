@@ -1,4 +1,4 @@
-// Adds the third exam, "Corporate Commitment & Loyalty", for every position. Safe to run again: if the organization
+// Adds the first exam, "Corporate Commitment", for every position. Safe to run again: if the organization
 // already has a commitment exam (even an edited one), nothing is added. Tagalog is translated when an applicant first starts it.
 //   npm run commitment:seed
 //   npm run commitment:seed -- --refresh   replace the questions of the existing exam with the ones in the code; refused once anyone has taken it

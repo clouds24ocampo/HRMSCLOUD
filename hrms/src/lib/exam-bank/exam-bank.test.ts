@@ -99,9 +99,9 @@ describe("commitment exam", () => {
     });
     for (const n of slots) expect(n).toBeGreaterThanOrEqual(5);
   });
-  it("is taken last, after the psychological and knowledge exams, and has an oath in both languages", () => {
+  it("is taken first, before the psychological and knowledge exams, and has an oath in both languages", () => {
+    expect(EXAM_ORDER.COMMITMENT).toBeLessThan(EXAM_ORDER.PSYCHOLOGICAL);
     expect(EXAM_ORDER.PSYCHOLOGICAL).toBeLessThan(EXAM_ORDER.KNOWLEDGE);
-    expect(EXAM_ORDER.KNOWLEDGE).toBeLessThan(EXAM_ORDER.COMMITMENT);
     for (const l of ["en", "tl"] as const) for (const k of ["title", "text", "check", "need"] as const) expect(OATH[l][k].length).toBeGreaterThan(10);
   });
 });

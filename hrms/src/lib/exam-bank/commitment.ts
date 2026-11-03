@@ -1,13 +1,13 @@
 import type { PsychQ } from "./psych";
 
-// Third exam, for every position: commitment to the corporation. Same shape and scoring as the psychological exam:
+// First exam, for every position: commitment to the corporation. Same shape and scoring as the psychological exam:
 // [trait, scenario, choice, choice, choice, choice], best choice first, points 4, 3, 1, 0 in that order, shown in a mixed order.
 // 10 traits x 3 questions = 30 questions, 120 points. Every question is a dilemma that sets the applicant's own gain, comfort or
 // friendships against the corporation's interest, and every choice sounds reasonable, so the answer shows what the person puts first.
 // The best choice favors the corporation AND stays honest and lawful: no question rewards hiding a wrong, breaking a law, unpaid
 // work or giving up a worker's legal rights (overtime, training and transfers in the questions are paid, and raising a concern
 // through the proper channel is always allowed).
-export const COMMITMENT_TITLE = "Corporate Commitment & Loyalty Exam";
+export const COMMITMENT_TITLE = "Corporate Commitment Exam";
 export const COMMITMENT_INSTRUCTIONS =
   "This exam shows how you would protect the corporation and help it grow. Many situations are hard: your own interest and the corporation's interest pull in different directions. Choose what you would really do, not what sounds best. Your answers are your commitment and oath to the corporation.";
 

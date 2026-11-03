@@ -34,8 +34,8 @@ export function shuffleSeeded<T>(items: readonly T[], seed: string): T[] {
 
 export const KIND_LABEL = { KNOWLEDGE: "Position knowledge", PSYCHOLOGICAL: "Psychological", COMMITMENT: "Commitment to the corporation" } as const;
 export type ExamKindKey = keyof typeof KIND_LABEL;
-// The order an applicant takes the exams: psychological, then position knowledge, then commitment.
-export const EXAM_ORDER: Record<ExamKindKey, number> = { PSYCHOLOGICAL: 0, KNOWLEDGE: 1, COMMITMENT: 2 };
+// The order an applicant takes the exams: corporate commitment first, then psychological, then position knowledge.
+export const EXAM_ORDER: Record<ExamKindKey, number> = { COMMITMENT: 0, PSYCHOLOGICAL: 1, KNOWLEDGE: 2 };
 
 // Shown before the commitment exam. The applicant must tick the box; the time of the tick is saved with the attempt.
 export const OATH = {
