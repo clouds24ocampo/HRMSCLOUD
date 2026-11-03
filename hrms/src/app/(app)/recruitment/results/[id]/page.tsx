@@ -10,6 +10,7 @@ import { STAGE_LABEL, STAGE_TONE } from "@/lib/stages";
 import { Badge, Card, PageHeader, ghostClass } from "@/components/ui";
 import { PrintButton } from "@/components/PrintButton";
 import { Meter } from "@/components/Charts";
+import { commitmentBand } from "@/lib/commitment-result";
 import { dayKey, formatDay } from "@/lib/time";
 
 // One handed-in exam, answer by answer. For knowledge exams: what the applicant chose against the right answer.
@@ -46,7 +47,7 @@ export default async function ResultDetail({ params }: { params: Promise<{ id: s
       <Card>
         <div className="grid gap-4 sm:grid-cols-4">
           <div><p className="text-sm text-muted">Score</p><p className="text-3xl font-bold">{pct}%</p><p className="text-sm text-muted">{t.score} of {t.maxScore} points</p></div>
-          <div><p className="text-sm text-muted">Result</p><p className="mt-1">{ok === null ? <Badge>Mindset score</Badge> : ok ? <Badge tone="success">Passed (needs {t.exam.passingPct}%)</Badge> : <Badge tone="danger">Below passing ({t.exam.passingPct}%)</Badge>}</p><p className="mt-1 text-sm text-muted">{KIND_LABEL[t.exam.kind]}</p>{t.leaves > 0 && <p className="mt-1"><Badge tone="warning">Left the exam screen {t.leaves}×</Badge></p>}</div>
+          <div><p className="text-sm text-muted">Result</p><p className="mt-1">{ok === null ? (t.exam.kind === "COMMITMENT" ? <Badge tone={commitmentBand(pct).tone}>{commitmentBand(pct).label}</Badge> : <Badge>Mindset score</Badge>) : ok ? <Badge tone="success">Passed (needs {t.exam.passingPct}%)</Badge> : <Badge tone="danger">Below passing ({t.exam.passingPct}%)</Badge>}</p><p className="mt-1 text-sm text-muted">{KIND_LABEL[t.exam.kind]}</p>{t.leaves > 0 && <p className="mt-1"><Badge tone="warning">Left the exam screen {t.leaves}×</Badge></p>}</div>
           <div><p className="text-sm text-muted">Time taken</p><p className="text-xl font-semibold">{durationMin(t.startedAt, t.submittedAt)} min</p><p className="text-sm text-muted">of {t.exam.timeLimitMin} allowed</p></div>
           <div><p className="text-sm text-muted">Language</p><p className="text-xl font-semibold">{t.lang === "tl" ? "Tagalog" : "English"}</p><p className="mt-1"><Badge tone={STAGE_TONE[a.stage]}>{STAGE_LABEL[a.stage]}</Badge></p></div>
         </div>
@@ -55,7 +56,7 @@ export default async function ResultDetail({ params }: { params: Promise<{ id: s
 
       {traits.length > 0 && (
         <Card>
-          <h2 className="mb-3 text-lg font-semibold">Mindset by trait</h2>
+          <h2 className="mb-3 text-lg font-semibold">{t.exam.kind === "COMMITMENT" ? "Corporate commitment by area" : "Mindset by trait"}</h2>
           <ul className="space-y-3">{traits.map((x) => (
             <li key={x.name}><div className="flex justify-between text-sm"><span>{x.name}</span><span className="font-semibold">{x.pct}%</span></div><div className="mt-1"><Meter value={x.pct} tone={x.pct >= 70 ? "success" : x.pct >= 50 ? "warning" : "danger"} /></div></li>
           ))}</ul>

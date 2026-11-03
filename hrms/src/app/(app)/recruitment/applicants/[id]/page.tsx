@@ -8,6 +8,7 @@ import { dayKey, formatDay } from "@/lib/time";
 import { durationMin } from "@/lib/exam-results";
 import { KIND_LABEL, passed } from "@/lib/exams";
 import { buildChecklist } from "@/lib/requirements";
+import { commitmentBand } from "@/lib/commitment-result";
 import { STAGE_LABEL, STAGE_TONE } from "@/lib/stages";
 import { Meter } from "@/components/Charts";
 import { Badge, Card, PageHeader, ghostClass } from "@/components/ui";
@@ -49,6 +50,11 @@ export default async function ApplicantProfile({ params }: { params: Promise<{ i
   const psych = apps.flatMap((a) => a.attempts).find((t) => t.exam.kind === "PSYCHOLOGICAL");
   const traits = Object.entries((psych?.breakdown ?? {}) as Record<string, { score: number; max: number }>).map(([name, v]) => ({ name, pct: v.max ? Math.round((v.score / v.max) * 100) : 0 })).sort((a, b) => b.pct - a.pct);
   const knowledge = apps.flatMap((a) => a.attempts.filter((t) => t.exam.kind === "KNOWLEDGE").map((t) => ({ a, t })));
+  // The Corporate Commitment result: the newest one if the person took more than one version of the exam.
+  const pledge = apps.flatMap((a) => a.attempts).filter((t) => t.exam.kind === "COMMITMENT").sort((x, y) => (y.submittedAt?.getTime() ?? 0) - (x.submittedAt?.getTime() ?? 0))[0];
+  const pledgePct = pledge ? pctOf(pledge.score, pledge.maxScore) : null;
+  const pledgeBand = pledgePct === null ? null : commitmentBand(pledgePct);
+  const pledgeAreas = Object.entries((pledge?.breakdown ?? {}) as Record<string, { score: number; max: number }>).map(([name, v]) => ({ name, pct: v.max ? Math.round((v.score / v.max) * 100) : 0 })).sort((a, b) => b.pct - a.pct);
   const best = apps.map((a) => {
     const k = a.attempts.find((t) => t.exam.kind === "KNOWLEDGE"), p = a.attempts.find((t) => t.exam.kind === "PSYCHOLOGICAL");
     return k && p ? Math.round((pctOf(k.score, k.maxScore) + pctOf(p.score, p.maxScore)) / 2) : null;
@@ -73,6 +79,7 @@ export default async function ApplicantProfile({ params }: { params: Promise<{ i
           <div><p className="text-sm text-muted">First applied</p><p className="font-medium">{day(lead.createdAt)}</p></div>
           <div><p className="text-sm text-muted">Source</p><p className="font-medium">{lead.source ?? "Added by HR"}</p></div>
           {profile && <div><p className="text-sm text-muted">Applicant account</p><p className="mt-0.5">{profile.user.active ? <Badge tone="success">Active</Badge> : <Badge tone="danger">Deactivated</Badge>} <span className="text-sm text-muted">since {day(profile.user.createdAt)}</span></p></div>}
+          <div><p className="text-sm text-muted">Corporate commitment</p><p className="font-medium">{pledgePct === null ? "Not taken" : <>{pledgePct}% <span className="text-sm font-normal text-muted">({pledge!.score}/{pledge!.maxScore})</span></>}</p>{pledgeBand && <p className="mt-0.5"><Badge tone={pledgeBand.tone}>{pledgeBand.label}</Badge></p>}</div>
           <div><p className="text-sm text-muted">Psychological exam</p><p className="font-medium">{psych ? `${pctOf(psych.score, psych.maxScore)}%` : "Not taken"}</p></div>
           <div><p className="text-sm text-muted">Knowledge exams</p><p className="font-medium">{knowledge.length ? knowledge.map(({ t }) => `${pctOf(t.score, t.maxScore)}%`).join(", ") : "Not taken"}</p></div>
           <div><p className="text-sm text-muted">Best combined score</p><p className="text-xl font-bold">{best === null ? "–" : `${best}%`}</p></div>
@@ -106,7 +113,7 @@ export default async function ApplicantProfile({ params }: { params: Promise<{ i
                   <li key={t.id} className="rounded-xl border border-line p-3">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div><p className="font-medium">{t.exam.title}</p><p className="text-xs text-muted">{KIND_LABEL[t.exam.kind]} · {durationMin(t.startedAt, t.submittedAt)} of {t.exam.timeLimitMin} min · {t.lang === "tl" ? "Tagalog" : "English"} · {t.submittedAt && day(t.submittedAt)}</p></div>
-                      <div className="text-right"><p className="text-2xl font-bold">{pct}%</p>{ok === null ? <Badge>Mindset score</Badge> : ok ? <Badge tone="success">Passed</Badge> : <Badge tone="danger">Below passing</Badge>}</div>
+                      <div className="text-right"><p className="text-2xl font-bold">{pct}%</p>{ok === null ? (t.exam.kind === "COMMITMENT" ? <Badge tone={commitmentBand(pct).tone}>{commitmentBand(pct).label}</Badge> : <Badge>Mindset score</Badge>) : ok ? <Badge tone="success">Passed</Badge> : <Badge tone="danger">Below passing</Badge>}</div>
                     </div>
                     <Link href={`/recruitment/results/${t.id}`} className="mt-2 inline-block text-sm font-semibold text-brand hover:underline print:hidden">Review every answer →</Link>
                   </li>
@@ -122,6 +129,31 @@ export default async function ApplicantProfile({ params }: { params: Promise<{ i
           )}
         </Card>
       </div>
+
+      <Card>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold">Corporate commitment by area</h2>
+            <p className="text-sm text-muted">How strongly this person puts the corporation first, area by area. A guide for the interview, not a pass mark.</p>
+          </div>
+          {pledge && pledgeBand && (
+            <div className="text-right">
+              <p className="text-3xl font-bold">{pledgePct}%</p>
+              <p className="text-sm text-muted">{pledge.score} of {pledge.maxScore} points</p>
+              <p className="mt-1"><Badge tone={pledgeBand.tone}>{pledgeBand.label}</Badge></p>
+            </div>
+          )}
+        </div>
+        {!pledge ? <p className="mt-3 text-sm text-muted">Appears after the applicant submits the Corporate Commitment Exam.</p> : (
+          <>
+            <ul className="mt-4 space-y-3">{pledgeAreas.map((x) => <li key={x.name}><div className="flex justify-between text-sm"><span>{x.name}</span><span className="font-semibold">{x.pct}%</span></div><div className="mt-1"><Meter value={x.pct} tone={x.pct >= 70 ? "success" : x.pct >= 50 ? "warning" : "danger"} /></div></li>)}</ul>
+            <p className="mt-4 text-sm text-muted">
+              {pledge.oathAt ? `Oath taken ${when.format(pledge.oathAt)}. ` : ""}{pledge.leaves > 0 ? `Left the exam screen ${pledge.leaves} ${pledge.leaves === 1 ? "time" : "times"}. ` : "Never left the exam screen. "}
+              <Link href={`/recruitment/results/${pledge.id}`} className="font-semibold text-brand hover:underline print:hidden">Read every answer →</Link>
+            </p>
+          </>
+        )}
+      </Card>
 
       <Card>
         <h2 className="mb-3 text-lg font-semibold">Documents</h2>

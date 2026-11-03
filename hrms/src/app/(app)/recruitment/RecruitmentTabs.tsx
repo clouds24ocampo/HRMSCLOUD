@@ -20,7 +20,7 @@ export function RecruitmentTabs() {
   const others = TABS.filter(([h]) => h !== "/recruitment");
   const active = (href: string) => (href === "/recruitment" ? !others.some(([h]) => under(h)) : under(href));
   return (
-    <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+    <div className="mb-6 flex flex-col gap-3 2xl:flex-row 2xl:items-center 2xl:justify-between">
       <nav aria-label="Recruitment" className="flex min-w-0 gap-1 overflow-x-auto rounded-xl bg-line/50 p-1">
         {TABS.map(([href, label]) => (
           <Link
