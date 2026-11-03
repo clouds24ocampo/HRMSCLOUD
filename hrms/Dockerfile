@@ -19,5 +19,6 @@ USER node
 EXPOSE 3300
 # Healthy once the app answers and can reach the database (see src/app/api/health).
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 CMD wget -qO- http://127.0.0.1:3300/api/health >/dev/null || exit 1
-# Apply migrations and seed the roles (idempotent) on every start, then serve.
-CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && npx next start -H 0.0.0.0 -p 3300"]
+# Apply migrations and seed the roles (idempotent) on every start, load the recruitment starter set once (a failure there
+# never blocks the app), then serve.
+CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && (npx tsx prisma/seed-recruitment.ts || true) && npx next start -H 0.0.0.0 -p 3300"]
