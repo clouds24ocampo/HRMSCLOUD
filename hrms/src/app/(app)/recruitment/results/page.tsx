@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { getOrgSettings } from "@/lib/settings";
 import { dayKey, formatDay } from "@/lib/time";
 import { durationMin } from "@/lib/exam-results";
+import { applicantMatch } from "@/lib/applicant-search";
 import { KIND_LABEL, passed } from "@/lib/exams";
 import { Badge, Card, EmptyState, PageHeader, buttonClass, inputClass } from "@/components/ui";
 import { RecruitmentTabs } from "../RecruitmentTabs";
@@ -18,7 +19,7 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
     prisma.examAttempt.findMany({
       where: {
         submittedAt: { not: null },
-        applicant: { organizationId: me.organizationId, ...(q ? { name: { contains: q, mode: "insensitive" } } : {}) },
+        applicant: { organizationId: me.organizationId, ...applicantMatch(q) },
         ...(exam ? { examId: exam } : {}),
         ...(kind === "KNOWLEDGE" || kind === "PSYCHOLOGICAL" || kind === "COMMITMENT" ? { exam: { kind } } : {}),
       },

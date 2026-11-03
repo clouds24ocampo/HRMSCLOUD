@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { passed } from "@/lib/exams";
+import { applicantMatch } from "@/lib/applicant-search";
 import { DeleteApplicantButton } from "../RecruitmentForms";
 import { RecruitmentTabs } from "../RecruitmentTabs";
 import { STAGES, STAGE_LABEL, STAGE_TONE } from "@/lib/stages";
@@ -21,7 +22,7 @@ export default async function ApplicantsPage({ searchParams }: { searchParams: P
   const [jobs, rows] = await Promise.all([
     prisma.jobPosting.findMany({ where: { organizationId: me.organizationId }, select: { id: true, title: true }, orderBy: { title: "asc" } }),
     prisma.applicant.findMany({
-      where: { organizationId: me.organizationId, ...(gone.profileIds.length || gone.ids.length ? { NOT: [{ profileId: { in: gone.profileIds } }, { id: { in: gone.ids } }] } : {}), ...(job ? { jobId: job } : {}), ...(q ? { name: { contains: q, mode: "insensitive" } } : {}) },
+      where: { organizationId: me.organizationId, ...(gone.profileIds.length || gone.ids.length ? { NOT: [{ profileId: { in: gone.profileIds } }, { id: { in: gone.ids } }] } : {}), ...(job ? { jobId: job } : {}), ...applicantMatch(q) },
       orderBy: { createdAt: "desc" },
       include: { job: { select: { id: true, title: true } }, profile: true, attempts: { where: { submittedAt: { not: null } }, include: { exam: { select: { id: true, title: true, kind: true, passingPct: true } } } } },
     }),
@@ -46,7 +47,7 @@ export default async function ApplicantsPage({ searchParams }: { searchParams: P
       <PageHeader title="Recruitment" subtitle={`${list.length} ${list.length === 1 ? "person" : "people"}. Each shows the positions they applied for and their exam results. Hired people are now employees and are not listed.`} />
       <RecruitmentTabs />
       <form className="flex flex-wrap items-end gap-3">
-        <label className="block min-w-0 flex-1 basis-48 text-sm font-medium">Search by name<input name="q" defaultValue={q} className={inputClass} /></label>
+        <label className="block min-w-0 flex-1 basis-48 text-sm font-medium">Search by name, email or applicant no.<input name="q" defaultValue={q} className={inputClass} /></label>
         <label className="block min-w-0 flex-1 basis-48 text-sm font-medium">
           Position
           <select name="job" defaultValue={job} className={inputClass}>
