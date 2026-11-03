@@ -988,6 +988,7 @@ model ApplicantDocument {
 enum ExamKind {
   KNOWLEDGE // right and wrong answers, scored against the position
   PSYCHOLOGICAL // no wrong answers: each choice carries points toward fit
+  COMMITMENT // commitment and oath to the corporation: scored like a psychological exam, taken after an oath
 }
 
 // jobId null = taken by applicants of every job.
@@ -1038,6 +1039,10 @@ model ExamAttempt {
   score       Int?
   maxScore    Int?
   breakdown   Json? // psychological: { trait: { score, max } }
+  runToken    String? // set while the exam is open in one browser window; cleared when the person leaves the screen
+  round       Int       @default(0) // bumped on every leave: a new round means a new random order
+  leaves      Int       @default(0) // times the person left the exam screen (switched tab, minimized, refreshed)
+  oathAt      DateTime? // commitment exam: when the applicant ticked the oath before starting
   createdAt   DateTime  @default(now())
 
   @@unique([applicantId, examId])

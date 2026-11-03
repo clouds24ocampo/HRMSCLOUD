@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { notify } from "@/lib/notify";
 import { ROLES } from "@/lib/roles";
-import { parseOptions, scoreExam, type Answers } from "@/lib/exams";
+import { EXAM_ORDER, parseOptions, scoreExam, type Answers } from "@/lib/exams";
 
 // One company per install, so the careers page belongs to the first organization.
 // ponytail: with ALLOW_MULTIPLE_ORGS (tests only) this is still the first one; add an org slug to the URL if that ever matters.
@@ -12,32 +12,43 @@ export const careersOrg = () => prisma.organization.findFirst({ orderBy: { creat
 export const openJobs = (organizationId: string) =>
   prisma.jobPosting.findMany({ where: { organizationId, status: "OPEN" }, orderBy: { title: "asc" }, select: { id: true, title: true, description: true, descriptionTl: true, duties: true, dutiesTl: true, openings: true, department: { select: { name: true } } } });
 
-// Exams an applicant of this job must take, in order: psychological first, then position knowledge. Empty exams are skipped.
-export const examsForJob = (organizationId: string, jobId: string) =>
-  prisma.exam.findMany({
+// Exams an applicant of this job must take, in order: corporate commitment, psychological, then position knowledge. Empty exams are skipped.
+export async function examsForJob(organizationId: string, jobId: string) {
+  const exams = await prisma.exam.findMany({
     where: { organizationId, active: true, OR: [{ jobId }, { jobId: null }], questions: { some: {} } },
-    orderBy: [{ kind: "desc" }, { createdAt: "asc" }], // enum order is KNOWLEDGE, PSYCHOLOGICAL: descending puts psychological first
+    orderBy: { createdAt: "asc" },
     select: { id: true, kind: true, title: true, instructions: true, timeLimitMin: true, _count: { select: { questions: true } } },
   });
+  return exams.sort((a, b) => EXAM_ORDER[a.kind] - EXAM_ORDER[b.kind]); // stable: same kind keeps oldest first
+}
 
 // An exam that is not tied to one position (jobId null, e.g. the psychological exam) is taken once per person.
 // Their result is copied onto every one of their applications, so applying for more positions never repeats it.
 export async function shareGlobalAttempts(profileId: string) {
   const apps = await prisma.applicant.findMany({
     where: { profileId },
-    select: { id: true, attempts: { select: { examId: true, startedAt: true, submittedAt: true, lang: true, answers: true, score: true, maxScore: true, breakdown: true, exam: { select: { jobId: true } } } } },
+    select: { id: true, attempts: { select: { examId: true, startedAt: true, submittedAt: true, lang: true, answers: true, score: true, maxScore: true, breakdown: true, oathAt: true, leaves: true, exam: { select: { jobId: true } } } } },
   });
   const done = new Map<string, (typeof apps)[number]["attempts"][number]>();
   for (const a of apps) for (const t of a.attempts) if (t.submittedAt && t.exam.jobId === null) done.set(t.examId, t);
   const rows = [];
+  const closing = [];
   for (const a of apps) {
     const have = new Set(a.attempts.map((t) => t.examId));
     for (const [examId, t] of done) {
+      const open = a.attempts.find((x) => x.examId === examId && !x.submittedAt);
+      if (open) { closing.push({ applicantId: a.id, examId, t }); continue; } // started here too, but finished elsewhere: it counts as done
       if (have.has(examId)) continue;
-      rows.push({ applicantId: a.id, examId, lang: t.lang, startedAt: t.startedAt, submittedAt: t.submittedAt, answers: t.answers ?? undefined, score: t.score, maxScore: t.maxScore, breakdown: t.breakdown ?? undefined });
+      rows.push({ applicantId: a.id, examId, lang: t.lang, startedAt: t.startedAt, submittedAt: t.submittedAt, answers: t.answers ?? undefined, score: t.score, maxScore: t.maxScore, breakdown: t.breakdown ?? undefined, oathAt: t.oathAt, leaves: t.leaves });
     }
   }
   if (rows.length) await prisma.examAttempt.createMany({ data: rows, skipDuplicates: true });
+  for (const { applicantId, examId, t } of closing) {
+    await prisma.examAttempt.updateMany({
+      where: { applicantId, examId, submittedAt: null },
+      data: { lang: t.lang, submittedAt: t.submittedAt, answers: t.answers ?? undefined, score: t.score, maxScore: t.maxScore, breakdown: t.breakdown ?? undefined, oathAt: t.oathAt, runToken: null },
+    });
+  }
 }
 
 // Closes an attempt exactly once (a second call changes nothing) and stores the score.
@@ -46,9 +57,19 @@ export async function finalizeAttempt(attemptId: string, examId: string, answers
   const r = scoreExam(qs.map((q) => ({ id: q.id, trait: q.trait, options: parseOptions(q.options) })), answers);
   const res = await prisma.examAttempt.updateMany({
     where: { id: attemptId, submittedAt: null },
-    data: { submittedAt: new Date(), answers, score: r.score, maxScore: r.max, breakdown: r.breakdown },
+    data: { submittedAt: new Date(), answers, score: r.score, maxScore: r.max, breakdown: r.breakdown, runToken: null },
   });
   return res.count === 1;
+}
+
+// Ends the open run of an attempt because the person left the exam screen (or the page was reloaded). The next start shows the
+// questions in a new random order. Only counts when a run was open, so calling it twice counts once. With `token`, only that run.
+export async function closeRun(attemptId: string, token?: string) {
+  const r = await prisma.examAttempt.updateMany({
+    where: { id: attemptId, submittedAt: null, runToken: token ?? { not: null } },
+    data: { runToken: null, round: { increment: 1 }, leaves: { increment: 1 } },
+  });
+  return r.count === 1;
 }
 
 // When a person has taken every exam and uploaded the resume and ID, their application moves to Screening

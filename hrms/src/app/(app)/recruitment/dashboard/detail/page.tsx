@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { getOrgSettings } from "@/lib/settings";
-import { scoresOf, type Stage } from "@/lib/recruitment-stats";
+import { scoresOf } from "@/lib/recruitment-stats";
 import { drillApps, drillQuery, drillTitle, groupByPerson, parseDrill } from "@/lib/recruitment-drill";
 import { loadRecruitment, rangeLabel, rangeOf } from "@/lib/recruitment-data";
 import { formatDay, dayKey } from "@/lib/time";

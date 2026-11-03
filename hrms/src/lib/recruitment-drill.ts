@@ -52,7 +52,7 @@ export function drillApps(apps: AppRow[], d: Drill, tz: string, now = new Date()
       break;
     case "day": out = rows(apps.filter((a) => dayKey(a.createdAt, tz) === v)); break;
     case "source": out = rows(apps.filter((a) => (a.source ?? "Added by HR") === v)); break;
-    case "lang": out = rows(apps.filter((a) => a.attempts.some((t) => t.submittedAt && (t.lang === "tl" ? "tl" : "en") === v)), (a) => (v === "tl" ? "Tagalog" : "English")); break;
+    case "lang": out = rows(apps.filter((a) => a.attempts.some((t) => t.submittedAt && (t.lang === "tl" ? "tl" : "en") === v)), () => (v === "tl" ? "Tagalog" : "English")); break;
     default: out = rows(apps);
   }
   const num = (r: DrillRow) => (r.note && /^\d+%$/.test(r.note) ? parseInt(r.note) : null);

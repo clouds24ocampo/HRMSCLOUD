@@ -6,7 +6,7 @@ import { useKeptForm } from "@/components/useKeptForm";
 import { Alert, SubmitButton } from "@/components/Fields";
 import { Badge, buttonClass } from "@/components/ui";
 import type { FormState } from "@/app/login/actions";
-import { applyToJobs, startExam, uploadDocuments, uploadRequirement } from "./actions";
+import { applyToJobs, uploadDocuments, uploadRequirement } from "./actions";
 import { RoleInfo } from "@/components/RoleInfo";
 import { RoleArt } from "@/components/RoleArt";
 
@@ -51,29 +51,6 @@ export function ApplyPicker({ jobs }: { jobs: { id: string; title: string; meta:
     </div>
   );
 }
-// Language is chosen here, before the timer starts. Tagalog is translated automatically from the English questions.
-export function StartExam({ applicantId, examId }: { applicantId: string; examId: string }) {
-  const [lang, setLang] = useState("en");
-  return (
-    <div className="space-y-4">
-      {(
-        <fieldset>
-          <legend className="text-sm font-medium">Language / Wika</legend>
-          <div className="mt-2 flex gap-2">
-            {[["en", "English"], ["tl", "Tagalog"]].map(([k, l]) => (
-              <label key={k} className="cursor-pointer">
-                <input type="radio" name="lang" value={k} checked={lang === k} onChange={() => setLang(k)} className="peer sr-only" />
-                <span className="inline-block rounded-lg border border-line px-4 py-2 text-sm font-semibold peer-checked:border-brand peer-checked:bg-brand/10 peer-checked:text-brand peer-focus-visible:outline-2">{l}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
-      )}
-      <ActionButton run={() => startExam(applicantId, examId, lang)}>{lang === "tl" ? "Simulan ang exam" : "Start the exam"}</ActionButton>
-    </div>
-  );
-}
-
 export function UploadForm({ hasResume, hasId, maxMb }: { hasResume: boolean; hasId: boolean; maxMb: number }) {
   const { state, pending, submit, formProps } = useKeptForm(uploadDocuments);
   const [localError, setLocalError] = useState<string>();

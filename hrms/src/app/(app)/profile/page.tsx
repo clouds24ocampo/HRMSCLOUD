@@ -3,8 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
 import { getOrgSettings } from "@/lib/settings";
-import { formatDay, keyOfDbDate } from "@/lib/time";
+import { dayKey, formatDay, keyOfDbDate } from "@/lib/time";
 import { Badge, Card, PageHeader, buttonClass, ghostClass } from "@/components/ui";
+import { commitmentRecord } from "@/lib/exam-results";
+import { OATH, asLang, type Answers } from "@/lib/exams";
 import { canAccess } from "@/lib/roles";
 import { ContactForm, MyPhotoForm, NumbersForm } from "./ProfileForms";
 
@@ -21,6 +23,14 @@ export default async function ProfilePage() {
       manager: { select: { firstName: true, lastName: true } },
     },
   });
+  // The commitment exam they took as an applicant stays on their account while they work here: the oath and their own answers.
+  const pledge = await prisma.examAttempt.findFirst({
+    where: { submittedAt: { not: null }, exam: { kind: "COMMITMENT" }, applicant: { organizationId: me.organizationId, profile: { userId: me.id } } },
+    orderBy: { submittedAt: "desc" },
+    select: { lang: true, oathAt: true, submittedAt: true, answers: true, exam: { select: { title: true, questions: { select: { id: true, text: true, textTl: true, trait: true, options: true, sort: true } } } } },
+  });
+  const pledgeLang = asLang(pledge?.lang);
+  const pledgeRows = pledge ? commitmentRecord(pledge.exam.questions, (pledge.answers ?? {}) as Answers, pledgeLang) : [];
   const missing = [!e.sssNo && "SSS", !e.philhealthNo && "PhilHealth", !e.tinNo && "TIN", !e.pagibigNo && "Pag-IBIG"].filter(Boolean) as string[];
 
   return (
@@ -60,6 +70,31 @@ export default async function ProfilePage() {
           <ContactForm v={{ phone: e.phone ?? "", address: e.address ?? "", birthDate: e.birthDate ? keyOfDbDate(e.birthDate) : "" }} />
         </Card>
       </div>
+
+      {pledge && (
+        <Card className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-lg font-semibold">My commitment to the corporation</h2>
+            <Badge tone="brand">{pledge.oathAt ? `Oath taken ${formatDay(dayKey(pledge.oathAt, settings.timezone), { month: "long", day: "numeric", year: "numeric" })}` : "Submitted"}</Badge>
+          </div>
+          <p className="text-sm text-muted">You took the {pledge.exam.title} before you were hired. These are your own answers, and the oath you made with them. They stay on your account as a reminder of what you promised while you work here.</p>
+          <blockquote className="rounded-xl border-l-4 border-brand bg-brand/5 p-4 text-sm leading-relaxed">
+            <p className="font-semibold text-brand">{OATH[pledgeLang].title}</p>
+            <p className="mt-1">{OATH[pledgeLang].text}</p>
+          </blockquote>
+          <details className="rounded-xl border border-line p-3">
+            <summary className="cursor-pointer text-sm font-semibold">My {pledgeRows.length} answers</summary>
+            <ol className="mt-3 space-y-3 text-sm">
+              {pledgeRows.map((r) => (
+                <li key={r.n}>
+                  <p className="font-medium">{r.n}. {r.question}</p>
+                  <p className="mt-0.5 text-muted">{r.chosen ?? "Not answered"}</p>
+                </li>
+              ))}
+            </ol>
+          </details>
+        </Card>
+      )}
 
       <Card className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">

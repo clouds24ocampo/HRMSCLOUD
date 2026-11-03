@@ -32,7 +32,26 @@ export function shuffleSeeded<T>(items: readonly T[], seed: string): T[] {
   return out;
 }
 
-export const KIND_LABEL = { KNOWLEDGE: "Position knowledge", PSYCHOLOGICAL: "Psychological" } as const;
+export const KIND_LABEL = { KNOWLEDGE: "Position knowledge", PSYCHOLOGICAL: "Psychological", COMMITMENT: "Commitment to the corporation" } as const;
+export type ExamKindKey = keyof typeof KIND_LABEL;
+// The order an applicant takes the exams: corporate commitment first, then psychological, then position knowledge.
+export const EXAM_ORDER: Record<ExamKindKey, number> = { COMMITMENT: 0, PSYCHOLOGICAL: 1, KNOWLEDGE: 2 };
+
+// Shown before the commitment exam. The applicant must tick the box; the time of the tick is saved with the attempt.
+export const OATH = {
+  en: {
+    title: "My commitment and oath to the corporation",
+    text: "I declare that every answer I give in this examination is true and given in good faith. I make these answers as my commitment and oath to the corporation: to protect its interests, property, confidential information and good name, and to help it grow. I understand that an answer found to be false or dishonest may disqualify my application or, if I am hired, lead to action under company policy and the law.",
+    check: "I have read this and I swear that all my answers in this examination are my commitment and oath to the corporation.",
+    need: "Tick the box to take the oath before you start.",
+  },
+  tl: {
+    title: "Ang aking pangako at panunumpa sa korporasyon",
+    text: "Ipinapahayag ko na ang bawat sagot ko sa pagsusulit na ito ay totoo at ibinibigay ko nang may mabuting loob. Ibinibigay ko ang mga sagot na ito bilang aking pangako at panunumpa sa korporasyon: ang pangalagaan ang interes, ari-arian, kumpidensyal na impormasyon at magandang pangalan nito, at tumulong sa paglago nito. Nauunawaan ko na ang sagot na mapatunayang hindi totoo o hindi tapat ay maaaring magdiskuwalipika sa aking aplikasyon o, kung ako ay matanggap, magresulta sa aksyon ayon sa patakaran ng kumpanya at ng batas.",
+    check: "Nabasa ko ito at sumusumpa ako na ang lahat ng sagot ko sa pagsusulit na ito ay aking pangako at panunumpa sa korporasyon.",
+    need: "Lagyan ng tsek ang kahon para manumpa bago magsimula.",
+  },
+} as const;
 
 export const parseOptions = (raw: unknown): ExamOption[] => {
   const r = OptionsSchema.safeParse(raw);

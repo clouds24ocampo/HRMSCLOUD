@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { getOrgSettings } from "@/lib/settings";
 import { dayKey, formatDay } from "@/lib/time";
 import { durationMin } from "@/lib/exam-results";
+import { applicantMatch } from "@/lib/applicant-search";
 import { KIND_LABEL, passed } from "@/lib/exams";
 import { Badge, Card, EmptyState, PageHeader, buttonClass, inputClass } from "@/components/ui";
 import { RecruitmentTabs } from "../RecruitmentTabs";
@@ -18,9 +19,9 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
     prisma.examAttempt.findMany({
       where: {
         submittedAt: { not: null },
-        applicant: { organizationId: me.organizationId, ...(q ? { name: { contains: q, mode: "insensitive" } } : {}) },
+        applicant: { organizationId: me.organizationId, ...applicantMatch(q) },
         ...(exam ? { examId: exam } : {}),
-        ...(kind === "KNOWLEDGE" || kind === "PSYCHOLOGICAL" ? { exam: { kind } } : {}),
+        ...(kind === "KNOWLEDGE" || kind === "PSYCHOLOGICAL" || kind === "COMMITMENT" ? { exam: { kind } } : {}),
       },
       orderBy: { submittedAt: "desc" },
       take: 300,
@@ -40,7 +41,7 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
         </label>
         <label className="block min-w-0 flex-1 basis-40 text-sm font-medium">
           Type
-          <select name="kind" defaultValue={kind} className={inputClass}><option value="">Both</option><option value="KNOWLEDGE">Position knowledge</option><option value="PSYCHOLOGICAL">Psychological</option></select>
+          <select name="kind" defaultValue={kind} className={inputClass}><option value="">All</option><option value="KNOWLEDGE">Position knowledge</option><option value="PSYCHOLOGICAL">Psychological</option><option value="COMMITMENT">Commitment to the corporation</option></select>
         </label>
         <button className={buttonClass}>Filter</button>
       </form>
@@ -59,7 +60,7 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
                     <tr key={t.id} className="align-top transition hover:bg-bg">
                       <td className="px-5 py-3"><Link href={`/recruitment/applicants/${t.applicant.id}`} className="font-medium hover:text-brand hover:underline">{t.applicant.name}</Link>{t.applicant.profile && <p className="font-mono text-xs text-muted">{t.applicant.profile.applicantNo}</p>}</td>
                       <td className="px-2 py-3"><Link href={`/recruitment/${t.applicant.jobId}`} className="hover:text-brand hover:underline">{t.applicant.job.title}</Link></td>
-                      <td className="px-2 py-3"><span className="font-medium">{t.exam.title}</span><p className="text-xs text-muted">{KIND_LABEL[t.exam.kind]}</p></td>
+                      <td className="px-2 py-3"><span className="font-medium">{t.exam.title}</span><p className="text-xs text-muted">{KIND_LABEL[t.exam.kind]}</p>{t.leaves > 0 && <p className="mt-1"><Badge tone="warning">Left the screen {t.leaves}×</Badge></p>}</td>
                       <td className="px-2 py-3 text-right font-semibold"><Link href={`/recruitment/results/${t.id}`} className="hover:text-brand hover:underline" title="Review every answer">{t.score}/{t.maxScore} <span className="font-normal text-muted">({pct}%)</span></Link></td>
                       <td className="px-2 py-3">{ok === null ? <Badge>Mindset score</Badge> : ok ? <Badge tone="success">Passed</Badge> : <Badge tone="danger">Below passing</Badge>}</td>
                       <td className="px-2 py-3 text-right text-muted">{durationMin(t.startedAt, t.submittedAt)} min</td>

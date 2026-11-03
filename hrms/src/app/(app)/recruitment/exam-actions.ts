@@ -19,13 +19,16 @@ const done = (examId?: string) => {
 };
 
 const examOf = async (id: string, organizationId: string) => prisma.exam.findFirst({ where: { id, organizationId } });
+// Once an applicant has sent in answers, changing the questions would make their saved score and answers wrong.
+const TAKEN = "Applicants have already taken this exam, so its questions cannot change. Turn it off and create a new exam instead.";
+const wasTaken = async (examId: string) => (await prisma.examAttempt.count({ where: { examId, submittedAt: { not: null } } })) > 0;
 
 export async function createExam(_: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/recruitment");
   const parsed = z
     .object({
       title: z.string().trim().min(3, "Give the exam a title.").max(100),
-      kind: z.enum(["KNOWLEDGE", "PSYCHOLOGICAL"], { error: "Choose the exam type." }),
+      kind: z.enum(["KNOWLEDGE", "PSYCHOLOGICAL", "COMMITMENT"], { error: "Choose the exam type." }),
       jobId: opt, instructions: opt,
       timeLimitMin: z.coerce.number().int().min(1, "At least 1 minute.").max(300, "At most 300 minutes."),
       passingPct: z.union([z.literal(""), z.coerce.number().int().min(1).max(100)]).optional(),
@@ -69,6 +72,7 @@ export async function addQuestion(examId: string, _: FormState, form: FormData):
   const me = await requireUser("/recruitment");
   const exam = await examOf(examId, me.organizationId);
   if (!exam) return { error: "Exam not found." };
+  if (await wasTaken(examId)) return { error: TAKEN };
   const text = z.string().trim().min(3, "Write the question.").max(1000).safeParse(form.get("text"));
   if (!text.success) return { error: text.error.issues[0].message };
   const trait = String(form.get("trait") ?? "").trim().slice(0, 40) || null;
@@ -87,20 +91,22 @@ export async function addQuestion(examId: string, _: FormState, form: FormData):
   if (options.length < 2) return { error: "Give at least two answer choices." };
   if (exam.kind === "KNOWLEDGE" && !options.some((o) => o.points === 1)) return { error: "Mark which choice is correct." };
   const last = await prisma.examQuestion.findFirst({ where: { examId }, orderBy: { sort: "desc" }, select: { sort: true } });
-  await prisma.examQuestion.create({ data: { examId, text: text.data, trait: exam.kind === "PSYCHOLOGICAL" ? trait : null, options, sort: (last?.sort ?? 0) + 1 } });
+  await prisma.examQuestion.create({ data: { examId, text: text.data, trait: exam.kind !== "KNOWLEDGE" ? trait : null, options, sort: (last?.sort ?? 0) + 1 } });
   await ensureTagalog(examId); // the system writes the Tagalog version; HR types English only
   await audit(me.id, "exam.question_added", "Exam", examId, undefined, me.organizationId);
   done(examId);
   return { ok: "Question added." };
 }
 
-export async function deleteQuestion(id: string) {
+export async function deleteQuestion(id: string): Promise<FormState> {
   const me = await requireUser("/recruitment");
   const q = await prisma.examQuestion.findFirst({ where: { id, exam: { organizationId: me.organizationId } } });
-  if (!q) return;
+  if (!q) return { error: "Question not found." };
+  if (await wasTaken(q.examId)) return { error: TAKEN };
   await prisma.examQuestion.delete({ where: { id } });
   await audit(me.id, "exam.question_deleted", "Exam", q.examId, undefined, me.organizationId);
   done(q.examId);
+  return { ok: "Removed." };
 }
 
 // Adds the standard positions the company hires for. A title that already exists is skipped, so it is safe to press twice.
