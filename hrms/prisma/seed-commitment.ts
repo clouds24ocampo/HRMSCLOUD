@@ -1,6 +1,7 @@
 // Adds the first exam, "Corporate Commitment", for every position. Safe to run again: if the organization
 // already has a commitment exam (even an edited one), nothing is added. Tagalog is translated when an applicant first starts it.
 //   npm run commitment:seed
+//   npm run commitment:seed -- --new-version   keep every old exam and its results, turn the old ones off, and add a new exam with the questions in the code
 //   npm run commitment:seed -- --refresh   replace the questions of the existing exam with the ones in the code. Refused once anyone has SUBMITTED it;
 //                                          attempts that were started but not submitted are removed, those people simply start again
 import { db } from "../src/lib/db-client";
@@ -9,6 +10,14 @@ import { COMMITMENT, COMMITMENT_INSTRUCTIONS, COMMITMENT_TITLE, psychOptions } f
 async function main() {
   const org = await db.organization.findFirst({ orderBy: { createdAt: "asc" } });
   if (!org) throw new Error("No organization yet. Register one first.");
+  if (process.argv.includes("--new-version")) {
+    const old = await db.exam.findMany({ where: { organizationId: org.id, kind: "COMMITMENT", active: true }, select: { id: true, title: true } });
+    const stamp = new Date().toISOString().slice(0, 10);
+    for (const e of old) await db.exam.update({ where: { id: e.id }, data: { active: false, title: `${e.title} (retired ${stamp})` } });
+    const exam = await db.exam.create({ data: { organizationId: org.id, jobId: null, kind: "COMMITMENT", title: COMMITMENT_TITLE, instructions: COMMITMENT_INSTRUCTIONS, timeLimitMin: 60, passingPct: null } });
+    await db.examQuestion.createMany({ data: COMMITMENT.map((q, i) => ({ examId: exam.id, text: q[1], trait: q[0], options: psychOptions(q, i), sort: i + 1 })) });
+    return console.log(`new version: ${old.length} old exam(s) turned off, results kept; added ${COMMITMENT.length} questions`);
+  }
   const have = await db.exam.findFirst({ where: { organizationId: org.id, kind: "COMMITMENT" }, include: { attempts: { select: { id: true, submittedAt: true, applicant: { select: { name: true } } } } } });
   if (have && !process.argv.includes("--refresh")) return console.log("keep   commitment exam: already exists");
   if (have?.attempts.some((a) => a.submittedAt)) throw new Error("Refused: applicants already submitted the commitment exam. Their answers would no longer match the questions.");
