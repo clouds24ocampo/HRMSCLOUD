@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   // Uploads are posted through server actions. The applicant form sends two files at once (resume and valid ID),
   // each up to DOCUMENT_MAX_MB (10 by default), so allow room for both.
-  experimental: { serverActions: { bodySizeLimit: "24mb" } },
+  experimental: { serverActions: { bodySizeLimit: "24mb" }, agentUpgrade: "security" },
   // Lets the dev server accept requests through the phone tunnel (npm run tunnel) and from phones on the LAN.
   allowedDevOrigins: ["*.trycloudflare.com", ...lanHosts],
   // Enterprise production security headers
