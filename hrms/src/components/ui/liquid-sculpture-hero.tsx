@@ -1044,7 +1044,7 @@ export interface SculptureHeroProps {
   /** Only for images without transparency: the flat background colour inside the image. */
   imageBackground?: string
 
-  brand?: string
+  brand?: React.ReactNode
   /** Where the brand name links to. */
   brandHref?: string
   navLinks?: SculptureHeroLink[]
@@ -1213,7 +1213,7 @@ const CSS = `
   font-family:var(--sh-head);font-weight:600;letter-spacing:-.06em;line-height:.8;color:color-mix(in srgb,var(--sh-fg) 5%,transparent)}
 .sh-nav{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:24px;
   padding:26px clamp(20px,3.2cqw,48px) 0}
-.sh-brand{font-family:var(--sh-head);font-weight:600;font-size:17px;letter-spacing:-.02em;color:inherit;text-decoration:none}
+.sh-brand{font-family:var(--sh-head);font-weight:600;font-size:17px;letter-spacing:-.02em;color:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
 .sh-links{display:flex;align-items:center;gap:clamp(18px,2.4cqw,36px);list-style:none;margin:0;padding:0}
 .sh-link{color:inherit;text-decoration:none;font-size:13.5px;letter-spacing:-.005em;opacity:.72;transition:opacity .2s}
 .sh-link:hover{opacity:1}

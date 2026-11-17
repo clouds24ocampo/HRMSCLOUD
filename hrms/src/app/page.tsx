@@ -2,6 +2,7 @@ import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { SculptureHero } from "@/components/ui/liquid-sculpture-hero";
 import { Spotlight } from "@/components/Spotlight";
+import { Logo } from "@/components/Logo";
 import { CATEGORIES } from "@/lib/industries";
 import { redirectIfSignedIn } from "@/lib/auth";
 import { registrationOpen } from "@/lib/registration";
@@ -25,7 +26,7 @@ export default async function Landing() {
         mobileSrc="/hero/sculpture-light-mobile.webp"
         mobileDarkSrc="/hero/sculpture-dark-mobile.webp"
         imageAlt="Abstract sculpture of interwoven metallic filaments and particles"
-        brand="HRMS"
+        brand={<span className="inline-flex items-center gap-2"><Logo className="h-6 w-6" /> HRMS</span>}
         navLinks={[
           { label: "Time stamp", href: "/login?stamp=1" },
           { label: "How it works", href: open ? "#how" : "#industries" },
