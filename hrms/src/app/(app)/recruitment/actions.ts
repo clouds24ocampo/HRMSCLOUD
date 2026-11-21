@@ -1,6 +1,7 @@
 "use server";
 
 import { DEFAULT_TIMEZONE } from "@/lib/locale";
+import { randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -8,13 +9,16 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
-import { createEmployee } from "@/lib/employees";
-import { ROLES } from "@/lib/roles";
+import { createEmployee, nextEmployeeNo } from "@/lib/employees";
+import { ROLES, ROLE_SEED } from "@/lib/roles";
 import { dbDate } from "@/lib/time";
 import { deleteStored } from "@/lib/documents";
 import { notify } from "@/lib/notify";
 import { copyToEmployee201, moveSignaturesToEmployee } from "@/lib/requirements";
-import { requiredPolicies } from "@/lib/orientation";
+import { hiringState } from "@/lib/hiring";
+import { ENGAGEMENT_LABEL, isEngagement, TEMPLATES_FOR, type Engagement } from "@/lib/hiring-pipeline";
+import { issueApplicantContract, voidApplicantContract } from "@/lib/applicant-contract";
+import type { ContractTemplateKey } from "@/lib/contract-templates";
 import { translateToTagalog } from "@/lib/translate";
 import type { FormState } from "@/app/login/actions";
 
@@ -162,6 +166,7 @@ export async function hireApplicant(id: string, _: FormState, form: FormData): P
       hireDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose the hire date."),
       departmentId: opt, positionId: opt, managerId: opt, shiftId: opt,
       createLogin: z.string().optional(), password: z.string().optional(),
+      engagement: opt, override: z.string().optional(), overrideReason: opt,
     })
     .safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
@@ -173,11 +178,17 @@ export async function hireApplicant(id: string, _: FormState, form: FormData): P
   if (a.stage === "REJECTED") return { error: "Move this applicant out of Rejected first." };
 
   const orgId = me.organizationId;
-  // When an orientation day was set, the policies must be signed first (cancel the orientation day to hire without it).
-  if (a.orientationAt && a.profile) {
-    const left = (await requiredPolicies(orgId, a.profile.id)).filter((p) => !p.signed);
-    if (left.length) return { error: `Orientation is not complete: ${left.length} ${left.length === 1 ? "policy is" : "policies are"} not signed yet (${left.map((p) => p.title).join(", ")}).` };
+  // The whole road must be walked: account, exams, interview, requirements, orientation, signed contract. HR or Administrator may hire
+  // before that only on purpose: they tick "Hire anyway" and write why. The reason is saved on the applicant and in the audit log.
+  const st = await hiringState(orgId, id);
+  const override = d.override === "on";
+  if (st && !st.pipeline.ready) {
+    if (!override) return { error: `Not ready to hire yet. Still missing: ${st.pipeline.missing.join(", ")}. Finish these steps, or tick "Hire anyway" and write the reason.` };
+    if ((d.overrideReason ?? "").length < 5) return { error: "Write the reason for hiring before every step is done (at least 5 letters)." };
   }
+  // The signed contract decides the account type. Without one (hired anyway), HR chooses.
+  const engagement: Engagement = st?.engagement ?? (isEngagement(d.engagement) ? d.engagement : "EMPLOYEE");
+  const signedContract = st?.contract?.status === "SIGNED" ? st.contract : null;
   if (d.departmentId && !(await prisma.department.findFirst({ where: { id: d.departmentId, organizationId: orgId, archivedAt: null } }))) return { error: "Choose a department from the list." };
   if (d.positionId && !(await prisma.position.findFirst({ where: { id: d.positionId, organizationId: orgId, archivedAt: null } }))) return { error: "Choose a position from the list." };
   if (d.managerId && !(await prisma.employee.findFirst({ where: { id: d.managerId, organizationId: orgId, status: { not: "SEPARATED" } } }))) return { error: "Choose a supervisor from the list." };
@@ -191,7 +202,7 @@ export async function hireApplicant(id: string, _: FormState, form: FormData): P
     if (!a.email) return { error: "A sign-in needs the applicant's email. Add it to the applicant first." };
     if ((d.password ?? "").length < 10) return { error: "Temporary password needs at least 10 characters." };
     if (await prisma.user.findUnique({ where: { email: a.email.toLowerCase() } })) return { error: "This email already has a sign-in." };
-    const role = await prisma.role.findUnique({ where: { key: ROLES.EMPLOYEE } });
+    const role = await prisma.role.findUnique({ where: { key: engagement === "SUBCONTRACTOR" ? ROLES.SUBCONTRACTOR : ROLES.EMPLOYEE } });
     if (!role) return { error: "System is not set up yet. Run the database seed." };
     login = { email: a.email.toLowerCase(), passwordHash: await bcrypt.hash(d.password!, 12), roleId: role.id };
   }
@@ -200,9 +211,9 @@ export async function hireApplicant(id: string, _: FormState, form: FormData): P
   const emp = await prisma.$transaction(async (tx) => {
     let user = login ? await tx.user.create({ data: { organizationId: orgId, name: a.name, email: login.email, passwordHash: login.passwordHash, roleId: login.roleId, mustChangePassword: true } }) : null;
     if (a.profile) {
-      const role = await tx.role.findUnique({ where: { key: ROLES.EMPLOYEE } });
-      if (!role) throw new Error("Employee role is missing. Run the database seed.");
-      user = await tx.user.update({ where: { id: a.profile.userId }, data: { roleId: role.id } }); // applicant account -> employee account
+      const role = await tx.role.findUnique({ where: { key: engagement === "SUBCONTRACTOR" ? ROLES.SUBCONTRACTOR : ROLES.EMPLOYEE } });
+      if (!role) throw new Error(`${ENGAGEMENT_LABEL[engagement]} role is missing. Run the database seed.`);
+      user = await tx.user.update({ where: { id: a.profile.userId }, data: { roleId: role.id } }); // applicant account -> employee or subcontractor account
     }
     const created = await createEmployee(tx, orgId, me.id, {
       firstName: first, lastName: rest.join(" ") || "-", email: a.email, phone: a.phone,
@@ -222,16 +233,25 @@ export async function hireApplicant(id: string, _: FormState, form: FormData): P
         await tx.applicantNote.createMany({ data: others.map((o) => ({ organizationId: orgId, applicantId: o.id, stage: "REJECTED" as const, text: `Closed: hired for ${a.job.title}`, createdById: me.id })) });
       }
     }
-    await tx.applicantNote.create({ data: { organizationId: orgId, applicantId: id, stage: "HIRED", text: `Hired as ${created.employeeNo}`, createdById: me.id } });
+    if (signedContract) {
+      await tx.contract.create({
+        data: {
+          organizationId: orgId, employeeId: created.id, templateKey: signedContract.templateKey, title: signedContract.title, body: signedContract.body, status: "SIGNED",
+          issuedAt: signedContract.issuedAt, issuedById: signedContract.issuedById, signedAt: signedContract.signedAt, signatureIp: signedContract.signatureIp,
+          signatureNote: `Signed before hiring by ${signedContract.signedName ?? a.name}, with a drawn signature on file (applicant ${a.profile?.applicantNo ?? "no."}).`, createdById: me.id,
+        },
+      });
+    }
+    await tx.applicantNote.create({ data: { organizationId: orgId, applicantId: id, stage: "HIRED", text: `Hired as ${ENGAGEMENT_LABEL[engagement]} ${created.employeeNo}${st && !st.pipeline.ready ? `. Hired before every step was done (${st.pipeline.missing.join(", ")}): ${d.overrideReason}` : ""}`, createdById: me.id } });
     // Close the job once every opening is filled.
     const hired = await tx.applicant.count({ where: { jobId: a.jobId, stage: "HIRED" } });
     if (hired >= a.job.openings) await tx.jobPosting.update({ where: { id: a.jobId }, data: { status: "CLOSED" } });
     return created;
   });
-  await audit(me.id, "applicant.hired", "Applicant", id, { employeeId: emp.id, employeeNo: emp.employeeNo }, orgId);
+  await audit(me.id, "applicant.hired", "Applicant", id, { employeeId: emp.id, employeeNo: emp.employeeNo, engagement, contractSigned: !!signedContract, ...(st && !st.pipeline.ready ? { overrode: st.pipeline.missing, reason: d.overrideReason } : {}) }, orgId);
   done(a.jobId);
   revalidatePath("/employees");
-  return { ok: `${a.name} is now ${emp.employeeNo}. Their onboarding checklist is ready.` };
+  return { ok: `${a.name} is now ${ENGAGEMENT_LABEL[engagement].toLowerCase()} ${emp.employeeNo}. Their onboarding checklist is ready.` };
 }
 
 // Takes one application away (the person stays, with their other applications). A hired applicant is kept: the employee record points back to it.
@@ -240,7 +260,9 @@ export async function deleteApplication(id: string): Promise<FormState> {
   const a = await prisma.applicant.findFirst({ where: { id, organizationId: me.organizationId }, include: { job: { select: { title: true } } } });
   if (!a) return { error: "Applicant not found." };
   if (a.stage === "HIRED") return { error: "This applicant was hired and is now an employee. Their record cannot be deleted here." };
-  await prisma.applicant.delete({ where: { id } }); // notes and exam results go with it
+  const sigs = await prisma.applicantContract.findMany({ where: { applicantId: id }, select: { signatureKey: true } });
+  await prisma.applicant.delete({ where: { id } }); // notes, exam results and contracts go with it
+  for (const c of sigs) await deleteStored(c.signatureKey, me.organizationId);
   await audit(me.id, "applicant.application_deleted", "Applicant", id, { name: a.name, job: a.job.title }, me.organizationId);
   done(a.jobId);
   revalidatePath("/recruitment/applicants");
@@ -257,6 +279,7 @@ export async function deleteApplicantPerson(id: string): Promise<FormState> {
   if (await prisma.applicant.count({ where: { organizationId: me.organizationId, ...scope, stage: "HIRED" } })) return { error: "This person was hired and is now an employee. Their record cannot be deleted here." };
   const p = a.profile;
   const files = p ? await prisma.applicantDocument.findMany({ where: { profileId: p.id }, select: { storageKey: true } }) : [];
+  const sigs = await prisma.applicantContract.findMany({ where: { organizationId: me.organizationId, applicant: scope }, select: { signatureKey: true } });
   await prisma.$transaction(async (tx) => {
     await tx.applicant.deleteMany({ where: { organizationId: me.organizationId, ...scope } });
     if (p) {
@@ -265,8 +288,83 @@ export async function deleteApplicantPerson(id: string): Promise<FormState> {
     }
   });
   if (p) { await deleteStored(p.resumeKey, me.organizationId); await deleteStored(p.idKey, me.organizationId); for (const f of files) await deleteStored(f.storageKey, me.organizationId); }
+  for (const c of sigs) await deleteStored(c.signatureKey, me.organizationId);
   await audit(me.id, "applicant.deleted", "Applicant", id, { name: a.name, applicantNo: p?.applicantNo }, me.organizationId);
   done(a.jobId);
   revalidatePath("/recruitment/applicants");
   return { ok: "Deleted." };
+}
+
+// Makes a sign-in for an applicant HR added by hand, so they can take the exams, upload their documents, attend orientation and sign.
+// The temporary password is shown once, to HR; the applicant must choose their own at the first sign-in.
+const TEMP_ALPHABET = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const tempPassword = () => Array.from(randomBytes(12), (b) => TEMP_ALPHABET[b % TEMP_ALPHABET.length]).join("");
+
+export async function createApplicantAccount(id: string): Promise<FormState & { email?: string; password?: string }> {
+  const me = await requireUser("/recruitment");
+  const a = await prisma.applicant.findFirst({ where: { id, organizationId: me.organizationId } });
+  if (!a) return { error: "Applicant not found." };
+  if (a.profileId) return { error: "This applicant already has an account." };
+  if (a.stage === "HIRED" || a.stage === "REJECTED") return { error: "Reopen this applicant before creating an account." };
+  const email = a.email?.trim().toLowerCase();
+  if (!email || !z.email().safeParse(email).success) return { error: "Add the applicant's email address first. It is their sign-in." };
+  if (await prisma.user.findUnique({ where: { email } })) return { error: "This email already has an account in the system." };
+  const seed = ROLE_SEED.find((r) => r.key === ROLES.APPLICANT)!;
+  const role = await prisma.role.upsert({ where: { key: seed.key }, update: {}, create: seed });
+  const password = tempPassword();
+  const passwordHash = await bcrypt.hash(password, 12);
+  await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(7302)`; // the same lock as sign-up: two people must not draw the same applicant number
+    const u = await tx.user.create({ data: { organizationId: me.organizationId, name: a.name, email, passwordHash, roleId: role.id, mustChangePassword: true } });
+    const profile = await tx.applicantProfile.create({ data: { organizationId: me.organizationId, userId: u.id, applicantNo: await nextEmployeeNo(tx, me.organizationId), phone: a.phone } });
+    // Every application this person has under the same email joins the account.
+    await tx.applicant.updateMany({ where: { organizationId: me.organizationId, profileId: null, email: { equals: email, mode: "insensitive" } }, data: { profileId: profile.id } });
+  });
+  await audit(me.id, "applicant.account_created", "Applicant", id, { email }, me.organizationId);
+  done(a.jobId);
+  revalidatePath("/recruitment/applicants");
+  return { ok: "Account created. Give the applicant these sign-in details. They choose their own password the first time.", email, password };
+}
+
+// Sends the contract to the applicant: the account type they are hired into (employee or subcontractor) is decided here.
+export async function issueContract(id: string, _: FormState, form: FormData): Promise<FormState> {
+  const me = await requireUser("/recruitment");
+  const parsed = z
+    .object({
+      engagement: z.enum(["EMPLOYEE", "SUBCONTRACTOR"], { error: "Choose Employee or Subcontractor." }),
+      templateKey: z.enum(["REGULAR", "PROBATIONARY", "PROJECT_BASED", "CONSULTANT"], { error: "Choose the contract type." }),
+      startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose the start date."),
+      address: opt, pay: z.string().trim().max(120).optional().transform((v) => v || undefined), customBody: opt,
+    })
+    .safeParse(Object.fromEntries(form));
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  const d = parsed.data;
+  if (!(TEMPLATES_FOR[d.engagement] as string[]).includes(d.templateKey)) return { error: "That contract type does not match. Choose one from the list." };
+  const a = await prisma.applicant.findFirst({ where: { id, organizationId: me.organizationId }, select: { jobId: true } });
+  if (!a) return { error: "Applicant not found." };
+  try {
+    await issueApplicantContract({
+      organizationId: me.organizationId, applicantId: id, engagement: d.engagement, templateKey: d.templateKey as ContractTemplateKey,
+      startDate: dbDate(d.startDate), address: d.address, pay: d.pay, customBody: d.customBody, issuedById: me.id,
+    });
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Could not issue the contract." };
+  }
+  done(a.jobId);
+  return { ok: "Contract sent. The applicant can read and sign it in their portal." };
+}
+
+export async function cancelContract(contractId: string, _: FormState, form: FormData): Promise<FormState> {
+  const me = await requireUser("/recruitment");
+  const reason = z.string().trim().min(3, "Write why the contract is cancelled.").max(300).safeParse(form.get("reason"));
+  if (!reason.success) return { error: reason.error.issues[0].message };
+  const c = await prisma.applicantContract.findFirst({ where: { id: contractId, organizationId: me.organizationId }, select: { applicant: { select: { jobId: true } } } });
+  if (!c) return { error: "Contract not found." };
+  try {
+    await voidApplicantContract({ organizationId: me.organizationId, contractId, reason: reason.data, byId: me.id });
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Could not cancel the contract." };
+  }
+  done(c.applicant.jobId);
+  return { ok: "Contract cancelled. You can issue a new one." };
 }

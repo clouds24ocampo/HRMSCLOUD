@@ -11,13 +11,16 @@ import { RoleInfo } from "@/components/RoleInfo";
 import { LEVEL_LABEL } from "@/lib/defaults";
 import { Badge, Card, PageHeader } from "@/components/ui";
 import { AddApplicantForm, ApplicantCard, JobStatusButton } from "../RecruitmentForms";
+import type { HiringInfo } from "../HiringPanel";
+import { hiringState } from "@/lib/hiring";
+import { isEngagement } from "@/lib/hiring-pipeline";
 
 const STAGES = [
   ["APPLIED", "Applied"],
   ["SCREENING", "Screening"],
   ["INTERVIEW", "Interview"],
   ["REQUIREMENTS", "For requirements"],
-  ["OFFER", "Offer"],
+  ["OFFER", "Orientation & contract"],
   ["HIRED", "Hired"],
   ["REJECTED", "Rejected"],
 ] as const;
@@ -47,6 +50,18 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
   const when = new Intl.DateTimeFormat("en-US", { timeZone: settings.timezone, dateStyle: "medium", timeStyle: "short" });
   const today = dayKey(new Date(), settings.timezone);
   const hired = job.applicants.filter((a) => a.stage === "HIRED").length;
+  // The road to being hired for everyone still in the process: what is done, what is missing, the account and the contract.
+  const dateOnly = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", dateStyle: "medium" });
+  const hiringByApp = new Map(await Promise.all(job.applicants.filter((a) => a.stage !== "HIRED" && a.stage !== "REJECTED").map(async (a) => [a.id, await hiringState(me.organizationId, a.id)] as const)));
+  const hiringOf = (appId: string): HiringInfo => {
+    const st = hiringByApp.get(appId);
+    if (!st) return { steps: [], current: "account", ready: false, missing: [], hasAccount: false, contract: null };
+    const c = st.contract;
+    return {
+      steps: st.pipeline.steps, current: st.pipeline.current, ready: st.pipeline.ready, missing: st.pipeline.missing, hasAccount: !!st.applicant.profile,
+      contract: c ? { id: c.id, status: c.status === "SIGNED" ? "SIGNED" : "ISSUED", engagement: isEngagement(c.engagement) ? c.engagement : null, title: c.title, issuedAt: c.issuedAt ? when.format(c.issuedAt) : null, signedAt: c.signedAt ? when.format(c.signedAt) : null, signedName: c.signedName, startDate: c.startDate ? dateOnly.format(c.startDate) : null } : null,
+    };
+  };
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -86,6 +101,7 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
                         id: a.id, name: a.name, email: a.email, phone: a.phone, source: a.source, stage: a.stage,
                         interviewAt: a.interviewAt ? when.format(a.interviewAt) : null,
                         notes: a.notes.map((n) => ({ id: n.id, text: n.text, at: when.format(n.createdAt) })),
+                        hiring: hiringOf(a.id),
                         portal: a.profile ? {
                           applicantNo: a.profile.applicantNo, hasResume: !!a.profile.resumeKey, hasId: !!a.profile.idKey,
                           // Every exam this job needs, so HR also sees the ones not started yet.

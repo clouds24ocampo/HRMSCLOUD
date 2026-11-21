@@ -10,13 +10,18 @@ import { canUploadRequirements } from "@/lib/stages";
 import { requirementChecklist } from "@/lib/requirements";
 import { orientationOpen, requiredPolicies } from "@/lib/orientation";
 import { getOrgSettings } from "@/lib/settings";
+import { hiringState } from "@/lib/hiring";
+import { ENGAGEMENT_LABEL, isEngagement } from "@/lib/hiring-pipeline";
+import { HiringJourney } from "@/components/HiringJourney";
+import { SignPolicyForm } from "@/app/(app)/policies/PolicyForms";
+import { signApplicantContract } from "./actions";
 
 const STAGE: Record<string, [string, "neutral" | "brand" | "success" | "warning" | "danger"]> = {
   APPLIED: ["Application started", "neutral"],
   SCREENING: ["With HR for review", "brand"],
   INTERVIEW: ["Interview stage", "brand"],
   REQUIREMENTS: ["Submit your requirements", "warning"],
-  OFFER: ["Job offer", "success"],
+  OFFER: ["Orientation and contract", "success"],
   HIRED: ["Hired", "success"],
   REJECTED: ["Not selected", "danger"],
 };
@@ -40,6 +45,12 @@ export default async function ApplyPage() {
   const policies = scheduled.length ? await requiredPolicies(me.organizationId, profile.id) : [];
   const signingOpen = orientationOpen(scheduled, new Date(), tz);
   const when = new Intl.DateTimeFormat("en-US", { timeZone: tz, dateStyle: "full", timeStyle: "short" });
+  // The road to being hired, for the application that is furthest along; and the contract(s) HR sent.
+  const RANK = ["APPLIED", "SCREENING", "INTERVIEW", "REQUIREMENTS", "OFFER"];
+  const lead = [...apps].filter((a) => RANK.includes(a.stage)).sort((x, y) => RANK.indexOf(y.stage) - RANK.indexOf(x.stage))[0];
+  const journey = lead ? await hiringState(me.organizationId, lead.id) : null;
+  const contracts = await prisma.applicantContract.findMany({ where: { organizationId: me.organizationId, applicant: { profileId: profile.id }, status: { not: "VOID" } }, orderBy: { createdAt: "desc" }, include: { applicant: { select: { job: { select: { title: true } } } } } });
+  const contractStage = apps.some((a) => ["REQUIREMENTS", "OFFER"].includes(a.stage));
 
   return (
     <>
@@ -49,6 +60,17 @@ export default async function ApplyPage() {
         <p className="font-mono text-2xl font-bold tracking-wider">{profile.applicantNo}</p>
         <p className="mt-1 text-sm text-muted">Keep it. If you are hired, it becomes your employee number.</p>
       </section>
+
+      {journey && lead && (
+        <Card>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-lg font-semibold">Your hiring journey</h2>
+            <span className="text-sm text-muted">{lead.job.title}</span>
+          </div>
+          <p className="mt-1 mb-3 text-sm text-muted">From your exams to your first day. We update each step as it is done.{journey.engagement && ` You will join as ${ENGAGEMENT_LABEL[journey.engagement].toLowerCase() === "employee" ? "an employee" : "a subcontractor"}.`}</p>
+          <HiringJourney steps={journey.pipeline.steps} current={journey.pipeline.current} />
+        </Card>
+      )}
 
       {withExams.length > 0 && (
         <Card className={docsDone ? "" : "border-brand"}>
@@ -146,6 +168,37 @@ export default async function ApplyPage() {
               </ul>
             </>
           )}
+        </Card>
+      )}
+
+      {live && (contracts.length > 0 || contractStage) && (
+        <Card className={contracts.some((c) => c.status === "ISSUED") ? "border-brand" : ""}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-lg font-semibold">Step 5: Your contract</h2>
+            {contracts.length === 0 ? <Badge>Not sent yet</Badge> : contracts.some((c) => c.status === "ISSUED") ? <Badge tone="warning">Waiting for your signature</Badge> : <Badge tone="success">Signed</Badge>}
+          </div>
+          {contracts.length === 0 && <p className="mt-1 text-sm text-muted">After orientation, HR sends your contract here. You read it and sign it with your signature. Then HR completes your hiring.</p>}
+          {contracts.map((c) => (
+            <div key={c.id} className="mt-4 space-y-3 rounded-xl border border-line p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="font-semibold">{c.title}</p>
+                <Badge tone={c.status === "SIGNED" ? "success" : "warning"}>{c.status === "SIGNED" ? "Signed" : "Please sign"}</Badge>
+              </div>
+              <p className="text-sm text-muted">{c.applicant.job.title} · you join as {isEngagement(c.engagement) ? (c.engagement === "EMPLOYEE" ? "an employee" : "a subcontractor") : "a team member"}{c.startDate ? ` · starts ${new Intl.DateTimeFormat("en-US", { timeZone: "UTC", dateStyle: "long" }).format(c.startDate)}` : ""}</p>
+              {c.status === "SIGNED" ? (
+                <>
+                  <p className="text-sm">You signed this contract on <span className="font-semibold">{c.signedAt && when.format(c.signedAt)}</span> as {c.signedName}.</p>
+                  <details><summary className="cursor-pointer text-sm font-semibold text-brand">Read the contract</summary><pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap rounded-lg bg-bg p-4 font-sans text-sm leading-relaxed">{c.body}</pre></details>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-muted">Read the whole contract, then sign below.</p>
+                  <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-lg bg-bg p-4 font-sans text-sm leading-relaxed" tabIndex={0} aria-label="Contract text">{c.body}</pre>
+                  <SignPolicyForm policyId={c.id} defaultName={me.name} action={signApplicantContract} />
+                </>
+              )}
+            </div>
+          ))}
         </Card>
       )}
 

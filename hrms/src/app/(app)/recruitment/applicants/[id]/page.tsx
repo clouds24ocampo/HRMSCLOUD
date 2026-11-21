@@ -9,6 +9,9 @@ import { durationMin } from "@/lib/exam-results";
 import { KIND_LABEL, passed } from "@/lib/exams";
 import { buildChecklist } from "@/lib/requirements";
 import { commitmentBand } from "@/lib/commitment-result";
+import { hiringState } from "@/lib/hiring";
+import { ENGAGEMENT_LABEL } from "@/lib/hiring-pipeline";
+import { HiringJourney } from "@/components/HiringJourney";
 import { STAGE_LABEL, STAGE_TONE } from "@/lib/stages";
 import { Meter } from "@/components/Charts";
 import { Badge, Card, PageHeader, ghostClass } from "@/components/ui";
@@ -45,6 +48,10 @@ export default async function ApplicantProfile({ params }: { params: Promise<{ i
   const day = (d: Date) => formatDay(dayKey(d, settings.timezone), { month: "short", day: "numeric", year: "numeric" });
   const when = new Intl.DateTimeFormat("en-US", { timeZone: settings.timezone, dateStyle: "medium", timeStyle: "short" });
   const employeeId = apps.find((a) => a.employeeId)?.employeeId ?? null;
+  // The road to being hired, for the application that is furthest along (or the hired one).
+  const RANK = ["APPLIED", "SCREENING", "INTERVIEW", "REQUIREMENTS", "OFFER", "HIRED"];
+  const furthest = [...apps].filter((a) => RANK.includes(a.stage)).sort((x, y) => RANK.indexOf(y.stage) - RANK.indexOf(x.stage))[0];
+  const journey = furthest ? await hiringState(me.organizationId, furthest.id) : null;
 
   // One psychological result per person (copied to each application); every knowledge result.
   const psych = apps.flatMap((a) => a.attempts).find((t) => t.exam.kind === "PSYCHOLOGICAL");
@@ -85,6 +92,16 @@ export default async function ApplicantProfile({ params }: { params: Promise<{ i
           <div><p className="text-sm text-muted">Best combined score</p><p className="text-xl font-bold">{best === null ? "–" : `${best}%`}</p></div>
         </div>
       </Card>
+
+      {journey && furthest && (
+        <Card>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-lg font-semibold">Hiring journey</h2>
+            <Link href={`/recruitment/${furthest.job.id}`} className="text-sm font-semibold text-brand hover:underline print:hidden">{furthest.job.title}: manage →</Link>
+          </div>
+          <HiringJourney steps={journey.pipeline.steps} current={journey.pipeline.current} finalLabel={journey.engagement && furthest.stage === "HIRED" ? `Hired as ${ENGAGEMENT_LABEL[journey.engagement].toLowerCase()}` : undefined} />
+        </Card>
+      )}
 
       <Card>
         <h2 className="mb-3 text-lg font-semibold">Positions and stages</h2>

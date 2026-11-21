@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
-import { MAX_BYTES, safeName, saveFile, sniffType } from "@/lib/documents";
+import { MAX_BYTES, deleteStored, safeName, saveFile, sniffType } from "@/lib/documents";
 import { canUploadRequirements } from "@/lib/stages";
 import { isApplicantRequirement, requirementChecklist } from "@/lib/requirements";
 import { notify } from "@/lib/notify";
@@ -223,4 +223,37 @@ export async function signApplicantPolicy(policyId: string, _: FormState, form: 
   done();
   revalidatePath(`/apply/policies/${policyId}`);
   return { ok: left === 0 ? "Signed. You have signed every policy. Thank you!" : `Signed. ${left} more to sign.` };
+}
+
+// The applicant reads the contract HR sent and signs it with a drawn signature, the same way as the company policies.
+// Only the account the contract was issued to can sign it, and only while it is open (not cancelled, not already signed).
+export async function signApplicantContract(contractId: string, _: FormState, form: FormData): Promise<FormState> {
+  const { me, profile } = await myProfile();
+  const parsed = z
+    .object({
+      signedName: z.string().trim().min(3, "Type your full name.").max(120),
+      signature: z.string().regex(/^data:image\/png;base64,[A-Za-z0-9+/=]+$/, "Draw your signature in the box.").max(700_000, "The signature is too large. Clear it and sign again."),
+      agree: z.literal("on", { error: "Tick the box to confirm you have read and agree." }),
+    })
+    .safeParse(Object.fromEntries(form));
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  const c = await prisma.applicantContract.findFirst({ where: { id: contractId, organizationId: me.organizationId, applicant: { profileId: profile.id } }, include: { applicant: { select: { jobId: true } } } });
+  if (!c) return { error: "Contract not found." };
+  if (c.status === "SIGNED") return { error: "You already signed this contract." };
+  if (c.status !== "ISSUED") return { error: "This contract was cancelled. HR will send you a new one." };
+  const bytes = new Uint8Array(Buffer.from(parsed.data.signature.split(",")[1], "base64"));
+  if (sniffType(bytes)?.mime !== "image/png" || bytes.length < 200) return { error: "Draw your signature in the box." };
+  const ev = await requestEvidence();
+  const key = await saveFile(me.organizationId, bytes);
+  // Signing closes the contract exactly once: a double click or a cancel at the same moment leaves it unsigned.
+  const res = await prisma.applicantContract.updateMany({
+    where: { id: c.id, status: "ISSUED" },
+    data: { status: "SIGNED", signedAt: new Date(), signedName: parsed.data.signedName, signatureKey: key, signatureIp: ev.ipAddress, signatureAgent: ev.userAgent },
+  });
+  if (res.count !== 1) { await deleteStored(key, me.organizationId); return { error: "This contract changed while you were signing. Reload the page." }; }
+  await audit(me.id, "portal.contract_signed", "ApplicantContract", c.id, { engagement: c.engagement }, me.organizationId);
+  const hr = await prisma.user.findMany({ where: { organizationId: me.organizationId, active: true, role: { key: { in: [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN] } } }, select: { id: true } });
+  await notify(me.organizationId, hr.map((u) => u.id), { title: `${me.name} signed the contract. Ready to hire.`, href: `/recruitment/${c.applicant.jobId}` });
+  done();
+  return { ok: "Signed. Thank you! HR will complete your hiring." };
 }

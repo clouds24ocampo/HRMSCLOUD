@@ -97,12 +97,16 @@ const PATH = [
   ["SCREENING", "Screening"],
   ["INTERVIEW", "Interview"],
   ["REQUIREMENTS", "Requirements"],
-  ["OFFER", "Offer"],
+  ["OFFER", "Orientation & contract"],
 ] as const;
+
+import { HiringPanel, type HiringInfo } from "./HiringPanel";
+import { ENGAGEMENT_LABEL, type Engagement } from "@/lib/hiring-pipeline";
 
 type Applicant = {
   id: string; name: string; email: string | null; phone: string | null; source: string | null; stage: string; interviewAt: string | null;
   notes: { id: string; text: string; at: string }[];
+  hiring: HiringInfo;
   // Present when the person applied through the careers page.
   portal?: { applicantNo: string; hasResume: boolean; hasId: boolean; exams: { title: string; kind: string; status: string; passed: boolean | null; traits: string; attemptId: string | null }[]; orientation?: { at: string | null; input: string; signed: number; total: number }; requirements?: { done: number; total: number; items: { title: string; required: boolean; docId: string | null; auto: boolean }[] } };
 };
@@ -119,6 +123,9 @@ export function ApplicantCard(p: {
   const orientation = useKeptForm(setOrientation.bind(null, a.id));
   const hire = useKeptForm(hireApplicant.bind(null, a.id));
   const [login, setLogin] = useState(false);
+  const [anyway, setAnyway] = useState(false);
+  const [eng, setEng] = useState<Engagement>("EMPLOYEE");
+  const chosen: Engagement = a.hiring.contract?.engagement ?? eng; // a contract decides; without one HR chooses
   const move = (stage: (typeof PATH)[number][0] | "REJECTED") => start(async () => setMsg(await moveApplicant(a.id, stage)));
   const closed = a.stage === "HIRED" || a.stage === "REJECTED";
   const at = PATH.findIndex(([s]) => s === a.stage);
@@ -191,6 +198,8 @@ export function ApplicantCard(p: {
           Remove from this position
         </button>
       )}
+
+      {!closed && <HiringPanel applicantId={a.id} hasEmail={!!a.email} stage={a.stage} hiring={a.hiring} today={p.today} />}
 
       {a.portal && ["REQUIREMENTS", "OFFER"].includes(a.stage) && a.portal.orientation && (
         <details className="mt-3" open={!!a.portal.orientation.at}>
@@ -281,12 +290,37 @@ export function ApplicantCard(p: {
                 </div>
               </fieldset>
             </div>
+            {a.hiring.contract ? (
+              <p className="text-sm">Hire as: <span className="font-semibold">{ENGAGEMENT_LABEL[chosen]}</span> <span className="text-muted">(from the signed contract)</span></p>
+            ) : (
+              <fieldset>
+                <legend className="text-sm font-medium">Hire as</legend>
+                <div className="mt-1 flex gap-2">
+                  {(["EMPLOYEE", "SUBCONTRACTOR"] as const).map((e) => (
+                    <label key={e} className="cursor-pointer">
+                      <input type="radio" name="engagement" value={e} checked={eng === e} onChange={() => setEng(e)} className="peer sr-only" />
+                      <span className="inline-block rounded-lg border border-line px-4 py-2 text-sm font-semibold peer-checked:border-brand peer-checked:bg-brand/10 peer-checked:text-brand peer-focus-visible:outline-2">{ENGAGEMENT_LABEL[e]}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
+            {!a.hiring.ready && (
+              <div className="space-y-2 rounded-lg border border-warning/50 bg-warning/5 p-3 text-sm">
+                <p className="font-semibold text-warning">Not ready to hire yet</p>
+                <p>Still missing: {a.hiring.missing.join(", ")}.</p>
+                <label className="flex items-center gap-2 font-medium">
+                  <input type="checkbox" name="override" checked={anyway} onChange={(e) => setAnyway(e.target.checked)} className="h-4 w-4 accent-[var(--brand)]" /> Hire anyway
+                </label>
+                {anyway && <Field label="Why are you hiring before these steps are done?" id="overrideReason" minLength={5} maxLength={300} required />}
+              </div>
+            )}
             <label className="flex items-center gap-2 text-sm font-medium">
               <input type="checkbox" name="createLogin" checked={login} onChange={(e) => setLogin(e.target.checked)} className="h-4 w-4 accent-[var(--brand)]" /> Also create a sign-in (needs the applicant&apos;s email)
             </label>
             {login && <Field label="Temporary password" id="password" type="password" autoComplete="new-password" minLength={10} />}
             <Msg s={hire.state} />
-            <SubmitButton pending={hire.pending}>Hire and create the employee</SubmitButton>
+            <SubmitButton pending={hire.pending}>{`Hire as ${ENGAGEMENT_LABEL[chosen].toLowerCase()}`}</SubmitButton>
           </form>
         </details>
       )}

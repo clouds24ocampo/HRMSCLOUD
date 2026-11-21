@@ -57,3 +57,12 @@ describe("canAccess", () => {
     for (const r of [ROLES.EMPLOYEE, ROLES.SUBCONTRACTOR, ROLES.MANAGER]) expect(canAccess(r, "/id/design")).toBe(false);
   });
 });
+
+describe("applicant with a temporary password", () => {
+  it("can reach the change-password page (otherwise /apply and /change-password redirect to each other forever)", () => {
+    expect(canAccess(ROLES.APPLICANT, "/change-password")).toBe(true);
+    expect(canAccess(ROLES.APPLICANT, "/dashboard")).toBe(false);
+    expect(canAccess(ROLES.APPLICANT, "/recruitment")).toBe(false);
+    expect(canAccess(ROLES.EMPLOYEE, "/change-password")).toBe(true);
+  });
+});

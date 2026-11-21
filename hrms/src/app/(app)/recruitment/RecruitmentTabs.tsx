@@ -7,6 +7,7 @@ import { ApplicantSearch } from "./ApplicantSearch";
 const TABS = [
   ["/recruitment/dashboard", "Dashboard"],
   ["/recruitment", "Positions"],
+  ["/recruitment/pipeline", "Pipeline"],
   ["/recruitment/applicants", "All applicants"],
   ["/recruitment/results", "Exam results"],
   ["/recruitment/commitment", "Corporate commitment"],

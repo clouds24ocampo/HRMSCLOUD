@@ -7,6 +7,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { requireUser, SESSION_COOKIE } from "@/lib/auth";
+import { homeFor } from "@/lib/roles";
 import { deleteOtherSessions } from "@/lib/session";
 import { clearAttempts, tooManyAttempts } from "@/lib/rate-limit";
 import type { FormState } from "@/app/login/actions";
@@ -39,5 +40,5 @@ export async function changePassword(_: FormState, form: FormData): Promise<Form
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (token) await deleteOtherSessions(user.id, token);
   await audit(user.id, "password.changed", "User", user.id, undefined, user.organizationId);
-  redirect("/dashboard");
+  redirect(homeFor(user.role.key)); // staff to the dashboard, an applicant back to their portal
 }

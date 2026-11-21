@@ -26,7 +26,7 @@ const INTERNAL: RoleKey[] = [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER, R
 // Longest matching prefix wins. Unlisted paths are denied.
 export const PAGE_ACCESS: Record<string, RoleKey[]> = {
   "/dashboard": ALL,
-  "/change-password": ALL,
+  "/change-password": [...ALL, ROLES.APPLICANT], // an applicant HR made an account for signs in with a temporary password and must choose their own
   "/employees": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // managers see their own team only
   "/organization": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
   "/schedule": ALL, // employees/subcontractors see their own; managers edit their team

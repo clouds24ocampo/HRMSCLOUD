@@ -21,71 +21,72 @@ model Role {
 // One row per registered company/organization. Every tenant table carries organizationId.
 // categoryKey / industryKey / sizeKey are keys from src/lib/industries.ts.
 model Organization {
-  id             String               @id @default(cuid())
-  name           String
-  categoryKey    String
-  industryKey    String
-  sizeKey        String
-  users          User[]
-  settings       OrgSettings?
-  departments    Department[]
-  positions      Position[]
-  employees      Employee[]
-  history        EmploymentHistory[]
-  shifts         ShiftTemplate[]
-  schedule       ScheduleEntry[]
-  timeEvents     TimeEvent[]
-  leaveTypes     LeaveType[]
-  leaveRequests  LeaveRequest[]
-  stampTypes     TimeStampType[]
-  regulars       RegularSchedule[]
-  notifications  Notification[]
-  overtime       OvertimeRequest[]
-  compensations  Compensation[]
-  payComponents  PayComponent[]
-  empComponents  EmployeeComponent[]
-  contributions  ContributionRule[]
-  taxBrackets    TaxBracket[]
-  periods        PayrollPeriod[]
-  payslips       Payslip[]
-  adjustments    PayrollAdjustment[]
-  checklistTpl   ChecklistTemplate[]
-  checklistItems ChecklistItem[]
-  jobs           JobPosting[]
-  applicants     Applicant[]
-  applicantNotes ApplicantNote[]
-  applicantProfiles ApplicantProfile[]
+  id                 String                   @id @default(cuid())
+  name               String
+  categoryKey        String
+  industryKey        String
+  sizeKey            String
+  users              User[]
+  settings           OrgSettings?
+  departments        Department[]
+  positions          Position[]
+  employees          Employee[]
+  history            EmploymentHistory[]
+  shifts             ShiftTemplate[]
+  schedule           ScheduleEntry[]
+  timeEvents         TimeEvent[]
+  leaveTypes         LeaveType[]
+  leaveRequests      LeaveRequest[]
+  stampTypes         TimeStampType[]
+  regulars           RegularSchedule[]
+  notifications      Notification[]
+  overtime           OvertimeRequest[]
+  compensations      Compensation[]
+  payComponents      PayComponent[]
+  empComponents      EmployeeComponent[]
+  contributions      ContributionRule[]
+  taxBrackets        TaxBracket[]
+  periods            PayrollPeriod[]
+  payslips           Payslip[]
+  adjustments        PayrollAdjustment[]
+  checklistTpl       ChecklistTemplate[]
+  checklistItems     ChecklistItem[]
+  jobs               JobPosting[]
+  applicants         Applicant[]
+  applicantContracts ApplicantContract[]
+  applicantNotes     ApplicantNote[]
+  applicantProfiles  ApplicantProfile[]
   applicantDocuments ApplicantDocument[]
-  exams          Exam[]
-  cycles         ReviewCycle[]
-  reviews        Review[]
-  goals          Goal[]
-  courses        Course[]
-  enrollments    Enrollment[]
-  documents      EmployeeDocument[]
-  hrRequests     HrRequest[]
-  announcements  Announcement[]
-  statutoryRules StatutoryRule[]
-  taxProfiles    EmployeeTaxProfile[]
-  wageOrders     WageOrder[]
-  holidays       Holiday[]
-  prevEmployment PreviousEmployment[]
-  dailyReports   DailyReport[]
-  wsProjects     WsProject[]
-  cashAdvances   CashAdvance[]
-  payouts        Payout[]
-  incentives     Incentive[]
-  contracts      Contract[]
-  handbookSections HandbookSection[]
-  handbookAcks   HandbookAcknowledgment[]
-  reportComments DailyReportComment[]
-  policies       PolicyDocument[]
-  signatures     PolicySignature[]
-  idCard         IdCardSettings?
-  conversations  Conversation[]
-  calls          CallSession[]
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
+  exams              Exam[]
+  cycles             ReviewCycle[]
+  reviews            Review[]
+  goals              Goal[]
+  courses            Course[]
+  enrollments        Enrollment[]
+  documents          EmployeeDocument[]
+  hrRequests         HrRequest[]
+  announcements      Announcement[]
+  statutoryRules     StatutoryRule[]
+  taxProfiles        EmployeeTaxProfile[]
+  wageOrders         WageOrder[]
+  holidays           Holiday[]
+  prevEmployment     PreviousEmployment[]
+  dailyReports       DailyReport[]
+  wsProjects         WsProject[]
+  cashAdvances       CashAdvance[]
+  payouts            Payout[]
+  incentives         Incentive[]
+  contracts          Contract[]
+  handbookSections   HandbookSection[]
+  handbookAcks       HandbookAcknowledgment[]
+  reportComments     DailyReportComment[]
+  policies           PolicyDocument[]
+  signatures         PolicySignature[]
+  idCard             IdCardSettings?
+  conversations      Conversation[]
+  calls              CallSession[]
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
 }
 
 model User {
@@ -241,28 +242,28 @@ enum EmployeeStatus {
 }
 
 model Employee {
-  id             String               @id @default(cuid())
+  id             String                   @id @default(cuid())
   organizationId String
-  organization   Organization         @relation(fields: [organizationId], references: [id])
-  userId         String?              @unique // login account, optional
-  user           User?                @relation(fields: [userId], references: [id])
+  organization   Organization             @relation(fields: [organizationId], references: [id])
+  userId         String?                  @unique // login account, optional
+  user           User?                    @relation(fields: [userId], references: [id])
   employeeNo     String
   firstName      String
   lastName       String
   email          String?
   phone          String?
   departmentId   String?
-  department     Department?          @relation(fields: [departmentId], references: [id])
+  department     Department?              @relation(fields: [departmentId], references: [id])
   positionId     String?
-  position       Position?            @relation(fields: [positionId], references: [id])
+  position       Position?                @relation(fields: [positionId], references: [id])
   managerId      String? // immediate supervisor: defines who sees whom
-  scheduleLinked Boolean              @default(true) // follows the supervisor's regular schedule until someone edits it directly (then Custom)
-  flexible       Boolean              @default(false)
+  scheduleLinked Boolean                  @default(true) // follows the supervisor's regular schedule until someone edits it directly (then Custom)
+  flexible       Boolean                  @default(false)
   photoKey       String? // profile picture, stored like documents (storage/<org>/<uuid>) // no fixed shift: own hours and days off, but at least 8 hours a working day and 1 day off a week
-  manager        Employee?            @relation("Reports", fields: [managerId], references: [id])
-  reports        Employee[]           @relation("Reports")
-  hireDate       DateTime             @db.Date
-  status         EmployeeStatus       @default(ACTIVE)
+  manager        Employee?                @relation("Reports", fields: [managerId], references: [id])
+  reports        Employee[]               @relation("Reports")
+  hireDate       DateTime                 @db.Date
+  status         EmployeeStatus           @default(ACTIVE)
   history        EmploymentHistory[]
   schedule       ScheduleEntry[]
   regulars       RegularSchedule[]
@@ -296,10 +297,10 @@ model Employee {
   philhealthNo   String?
   tinNo          String?
   pagibigNo      String?
-  idIssuedOn     DateTime?            @db.Date // when the ID card was issued; it expires after the design's validity
-  birthDate      DateTime?            @db.Date
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
+  idIssuedOn     DateTime?                @db.Date // when the ID card was issued; it expires after the design's validity
+  birthDate      DateTime?                @db.Date
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
 
   @@unique([organizationId, employeeNo])
   @@index([organizationId])
@@ -895,26 +896,27 @@ enum ApplicantStage {
 }
 
 model Applicant {
-  id             String          @id @default(cuid())
+  id             String              @id @default(cuid())
   organizationId String
-  organization   Organization    @relation(fields: [organizationId], references: [id])
+  organization   Organization        @relation(fields: [organizationId], references: [id])
   jobId          String
-  job            JobPosting      @relation(fields: [jobId], references: [id])
+  job            JobPosting          @relation(fields: [jobId], references: [id])
   name           String
   email          String?
   phone          String?
   source         String?
-  stage          ApplicantStage  @default(APPLIED)
+  stage          ApplicantStage      @default(APPLIED)
   interviewAt    DateTime?
   orientationAt  DateTime? // orientation day: the applicant reads and signs the company policies
-  employeeId     String?         @unique // set when hired: the applicant became this employee
-  employee       Employee?       @relation(fields: [employeeId], references: [id])
+  employeeId     String?             @unique // set when hired: the applicant became this employee
+  employee       Employee?           @relation(fields: [employeeId], references: [id])
   profileId      String? // set when the person applied through the careers page (own account)
-  profile        ApplicantProfile? @relation(fields: [profileId], references: [id])
+  profile        ApplicantProfile?   @relation(fields: [profileId], references: [id])
   notes          ApplicantNote[]
   attempts       ExamAttempt[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  offerContracts ApplicantContract[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
 
   @@unique([jobId, profileId])
   @@index([jobId, stage])
@@ -924,24 +926,24 @@ model Applicant {
 // An applicant's own account details. One per person, shared by every job they apply to.
 // applicantNo is reserved here and becomes the employee number when they are hired.
 model ApplicantProfile {
-  id             String       @id @default(cuid())
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  userId         String       @unique
-  user           User         @relation(fields: [userId], references: [id])
-  applicantNo    String
-  phone          String?
-  resumeKey      String? // stored like documents (storage/<org>/<uuid>)
-  resumeName     String?
-  resumeMime     String?
-  idKey          String?
-  idName         String?
-  idMime         String?
-  applications   Applicant[]
-  documents      ApplicantDocument[]
+  id               String                     @id @default(cuid())
+  organizationId   String
+  organization     Organization               @relation(fields: [organizationId], references: [id])
+  userId           String                     @unique
+  user             User                       @relation(fields: [userId], references: [id])
+  applicantNo      String
+  phone            String?
+  resumeKey        String? // stored like documents (storage/<org>/<uuid>)
+  resumeName       String?
+  resumeMime       String?
+  idKey            String?
+  idName           String?
+  idMime           String?
+  applications     Applicant[]
+  documents        ApplicantDocument[]
   policySignatures ApplicantPolicySignature[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt        DateTime                   @default(now())
+  updatedAt        DateTime                   @updatedAt
 
   @@unique([organizationId, applicantNo])
   @@index([organizationId])
@@ -949,20 +951,49 @@ model ApplicantProfile {
 
 // A policy signed by an applicant on orientation day. On hire it is copied to a PolicySignature for the new employee.
 model ApplicantPolicySignature {
-  id          String           @id @default(cuid())
-  profileId   String
-  profile     ApplicantProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  policyId    String
-  policy      PolicyDocument   @relation(fields: [policyId], references: [id])
-  signedName  String
+  id           String           @id @default(cuid())
+  profileId    String
+  profile      ApplicantProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  policyId     String
+  policy       PolicyDocument   @relation(fields: [policyId], references: [id])
+  signedName   String
   signatureKey String
-  contentHash String
-  ipAddress   String?
-  userAgent   String?
-  createdAt   DateTime         @default(now())
+  contentHash  String
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime         @default(now())
 
   @@unique([policyId, profileId])
   @@index([profileId])
+}
+
+// The contract an applicant reads and signs BEFORE being hired (the last step of Orientation and contract). "engagement" decides the
+// account type created at hire: EMPLOYEE or SUBCONTRACTOR. At hire a signed copy is placed in the new employee's own Contracts.
+model ApplicantContract {
+  id             String         @id @default(cuid())
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  applicantId    String
+  applicant      Applicant      @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  engagement     String         @default("EMPLOYEE") // EMPLOYEE | SUBCONTRACTOR
+  templateKey    String         @default("REGULAR") // REGULAR, PROBATIONARY, PROJECT_BASED, CONSULTANT
+  title          String
+  body           String         @db.Text
+  startDate      DateTime?      @db.Date
+  status         ContractStatus @default(ISSUED)
+  issuedAt       DateTime?
+  issuedById     String?
+  signedAt       DateTime?
+  signedName     String?
+  signatureKey   String? // drawn signature (PNG), stored like documents
+  signatureIp    String?
+  signatureAgent String?
+  voidReason     String?
+  voidedAt       DateTime?
+  createdAt      DateTime       @default(now())
+
+  @@index([applicantId, status])
+  @@index([organizationId])
 }
 
 // 201 file documents an applicant uploads once they are "For requirements". On hire they are copied to the employee's 201 file.
@@ -1471,23 +1502,23 @@ enum PolicyKind {
 
 // A policy to read and sign. Text (body) or an uploaded PDF (storageKey). A new version is a new row; old signatures stay with the old row.
 model PolicyDocument {
-  id                String            @id @default(cuid())
-  organizationId    String
-  organization      Organization      @relation(fields: [organizationId], references: [id])
-  kind              PolicyKind
-  title             String
-  body              String?
-  storageKey        String?           @unique
-  fileName          String?
-  contentHash       String // SHA-256 of the text or file: proves what exactly was signed
-  version           Int               @default(1)
-  requiresSignature Boolean           @default(true)
-  archivedAt        DateTime?
-  createdById       String?
-  signatures        PolicySignature[]
+  id                  String                     @id @default(cuid())
+  organizationId      String
+  organization        Organization               @relation(fields: [organizationId], references: [id])
+  kind                PolicyKind
+  title               String
+  body                String?
+  storageKey          String?                    @unique
+  fileName            String?
+  contentHash         String // SHA-256 of the text or file: proves what exactly was signed
+  version             Int                        @default(1)
+  requiresSignature   Boolean                    @default(true)
+  archivedAt          DateTime?
+  createdById         String?
+  signatures          PolicySignature[]
   applicantSignatures ApplicantPolicySignature[]
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+  createdAt           DateTime                   @default(now())
+  updatedAt           DateTime                   @updatedAt
 
   @@index([organizationId, archivedAt])
 }
@@ -1739,14 +1770,14 @@ model Incentive {
   amountCents    Int
   reason         String
   status         IncentiveStatus @default(PENDING)
-  awardedById    String          // User id
+  awardedById    String // User id
   awardedAt      DateTime        @default(now())
   acceptedAt     DateTime?
   declinedAt     DateTime?
   employeeNote   String?
-  projectId      String?         // Optional link to WorkSync project
-  cardId         String?         // Optional link to WorkSync card
-  payslipId      String?         // Set when credited into a payslip
+  projectId      String? // Optional link to WorkSync project
+  cardId         String? // Optional link to WorkSync card
+  payslipId      String? // Set when credited into a payslip
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
