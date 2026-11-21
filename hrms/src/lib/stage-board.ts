@@ -25,7 +25,7 @@ export async function loadBoard(organizationId: string, stage: BoardStage, opts:
     take: 500,
     include: {
       job: { select: { id: true, title: true } },
-      profile: { select: { id: true, applicantNo: true, resumeKey: true, idKey: true, documents: { where: { archivedAt: null }, select: { id: true, title: true, fileName: true, version: true, createdAt: true } } } },
+      profile: { select: { id: true, applicantNo: true, resumeKey: true, idKey: true, pds: { select: { submittedAt: true } }, documents: { where: { archivedAt: null }, select: { id: true, title: true, fileName: true, version: true, createdAt: true } } } },
       attempts: { where: { submittedAt: { not: null } }, select: { examId: true } },
       offerContracts: { where: { status: { not: "VOID" } }, orderBy: { createdAt: "desc" }, take: 1, select: { status: true } },
       notes: { where: { stage }, orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true } },
@@ -47,7 +47,7 @@ export async function loadBoard(organizationId: string, stage: BoardStage, opts:
   return apps.map((a) => {
     const need = exams.filter((e) => e.jobId === null || e.jobId === a.jobId);
     const handedIn = new Set(a.attempts.map((t) => t.examId));
-    const checklist = a.profile ? buildChecklist(a.profile.documents, !!a.profile.resumeKey) : null;
+    const checklist = a.profile ? buildChecklist(a.profile.documents, !!a.profile.resumeKey, !!a.profile.pds?.submittedAt) : null;
     const contractStatus = a.offerContracts[0]?.status;
     const contract: ContractState = contractStatus === "SIGNED" ? "SIGNED" : contractStatus === "ISSUED" ? "ISSUED" : "NONE";
     const input = {

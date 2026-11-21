@@ -108,7 +108,7 @@ type Applicant = {
   notes: { id: string; text: string; at: string }[];
   hiring: HiringInfo;
   // Present when the person applied through the careers page.
-  portal?: { applicantNo: string; hasResume: boolean; hasId: boolean; exams: { title: string; kind: string; status: string; passed: boolean | null; traits: string; attemptId: string | null }[]; orientation?: { at: string | null; input: string; signed: number; total: number }; requirements?: { done: number; total: number; items: { title: string; required: boolean; docId: string | null; auto: boolean }[] } };
+  portal?: { applicantNo: string; hasResume: boolean; hasId: boolean; exams: { title: string; kind: string; status: string; passed: boolean | null; traits: string; attemptId: string | null }[]; orientation?: { at: string | null; input: string; signed: number; total: number }; requirements?: { done: number; total: number; items: { title: string; required: boolean; docId: string | null; auto: boolean; form: { submitted: boolean; pct: number; started: boolean } | null }[] } };
 };
 
 export function ApplicantCard(p: {
@@ -164,8 +164,8 @@ export function ApplicantCard(p: {
               <ul className="mt-2 space-y-1">
                 {a.portal.requirements.items.map((i) => (
                   <li key={i.title} className="flex flex-wrap items-center justify-between gap-2">
-                    <span className={i.docId || i.auto ? "" : i.required ? "text-warning" : "text-muted"}>{i.title}{!i.required && <span className="text-xs text-muted"> (if it applies)</span>}</span>
-                    {i.docId ? <a href={`/recruitment/applicant/${a.id}/doc/${i.docId}`} target="_blank" className="font-semibold text-brand hover:underline">Open</a> : i.auto ? <a href={`/recruitment/applicant/${a.id}/resume`} target="_blank" className="font-semibold text-brand hover:underline">Open resume</a> : <span className="text-xs text-muted">{i.required ? "Missing" : "–"}</span>}
+                    <span className={i.docId || i.auto || i.form?.submitted ? "" : i.required ? "text-warning" : "text-muted"}>{i.title}{!i.required && <span className="text-xs text-muted"> (if it applies)</span>}</span>
+                    {i.form ? (i.form.started ? <Link href={`/recruitment/applicants/${a.id}/pds`} className="font-semibold text-brand hover:underline">{i.form.submitted ? "Open the form" : `Draft ${i.form.pct}%`}</Link> : <span className="text-xs text-muted">Not started</span>) : i.docId ? <a href={`/recruitment/applicant/${a.id}/doc/${i.docId}`} target="_blank" className="font-semibold text-brand hover:underline">Open</a> : i.auto ? <a href={`/recruitment/applicant/${a.id}/resume`} target="_blank" className="font-semibold text-brand hover:underline">Open resume</a> : <span className="text-xs text-muted">{i.required ? "Missing" : "–"}</span>}
                   </li>
                 ))}
               </ul>

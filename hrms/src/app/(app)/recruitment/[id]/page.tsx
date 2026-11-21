@@ -33,7 +33,7 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
     where: { id, organizationId: me.organizationId },
     include: {
       department: { select: { name: true } },
-      applicants: { orderBy: { createdAt: "asc" }, include: { notes: { orderBy: { createdAt: "desc" }, take: 6 }, profile: { include: { documents: { where: { archivedAt: null }, orderBy: { createdAt: "desc" } }, policySignatures: { select: { policyId: true } } } }, attempts: { include: { exam: { select: { title: true, kind: true, passingPct: true } } }, orderBy: { startedAt: "asc" } } } },
+      applicants: { orderBy: { createdAt: "asc" }, include: { notes: { orderBy: { createdAt: "desc" }, take: 6 }, profile: { include: { pds: { select: { submittedAt: true, completePct: true } }, documents: { where: { archivedAt: null }, orderBy: { createdAt: "desc" } }, policySignatures: { select: { policyId: true } } } }, attempts: { include: { exam: { select: { title: true, kind: true, passingPct: true } } }, orderBy: { startedAt: "asc" } } } },
     },
   });
   if (!job) notFound();
@@ -118,8 +118,8 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
                           }),
                           orientation: { at: a.orientationAt ? when.format(a.orientationAt) : null, input: a.orientationAt ? localInput(a.orientationAt) : "", signed: a.profile.policySignatures.filter((x) => activePolicies.has(x.policyId)).length, total: activePolicies.size },
                           requirements: ["REQUIREMENTS", "OFFER", "HIRED"].includes(a.stage) ? (() => {
-                            const c = buildChecklist(a.profile!.documents, !!a.profile!.resumeKey);
-                            return { done: c.done, total: c.total, items: c.items.map((i) => ({ title: i.title, required: i.required, docId: i.doc?.id ?? null, auto: i.auto })) };
+                            const c = buildChecklist(a.profile!.documents, !!a.profile!.resumeKey, !!a.profile!.pds?.submittedAt);
+                            return { done: c.done, total: c.total, items: c.items.map((i) => ({ title: i.title, required: i.required, docId: i.doc?.id ?? null, auto: i.auto, form: i.form ? { submitted: !!a.profile!.pds?.submittedAt, pct: a.profile!.pds?.completePct ?? 0, started: !!a.profile!.pds } : null })) };
                           })() : undefined,
                         } : undefined,
                       }}

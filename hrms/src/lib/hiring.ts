@@ -11,7 +11,7 @@ export async function hiringState(organizationId: string, applicantId: string) {
     where: { id: applicantId, organizationId },
     include: {
       job: { select: { id: true, title: true, department: { select: { name: true } } } },
-      profile: { include: { documents: { where: { archivedAt: null } } } },
+      profile: { include: { documents: { where: { archivedAt: null } }, pds: { select: { submittedAt: true } } } },
       attempts: { where: { submittedAt: { not: null } }, select: { examId: true } },
       offerContracts: { where: { status: { not: "VOID" } }, orderBy: { createdAt: "desc" }, take: 1 },
     },
@@ -19,7 +19,7 @@ export async function hiringState(organizationId: string, applicantId: string) {
   if (!a) return null;
   const exams = await examsForJob(organizationId, a.jobId);
   const handedIn = new Set(a.attempts.map((t) => t.examId));
-  const checklist = a.profile ? buildChecklist(a.profile.documents, !!a.profile.resumeKey) : null;
+  const checklist = a.profile ? buildChecklist(a.profile.documents, !!a.profile.resumeKey, !!a.profile.pds?.submittedAt) : null;
   const policies = a.profile
     ? await requiredPolicies(organizationId, a.profile.id)
     : Array.from({ length: await prisma.policyDocument.count({ where: { organizationId, archivedAt: null, requiresSignature: true } }) }, () => ({ signed: false }));

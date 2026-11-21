@@ -140,7 +140,7 @@ export default async function ApplyPage() {
             <p className="mt-1 text-sm text-muted">After your interview, HR opens this step and you can upload the documents below. You can start gathering them now. Your uploads and their status will appear here.</p>
           )}
           <ul className="mt-4 space-y-2">
-            {checklist.items.map((i) => <RequirementRow key={i.title} title={i.title} hint={i.hint} required={i.required} fileName={i.doc?.fileName ?? null} version={i.doc?.version ?? null} docId={i.doc?.id ?? null} auto={i.auto} maxMb={config.documentMaxMb} locked={!reqOpen} />)}
+            {checklist.items.map((i) => <RequirementRow key={i.title} title={i.title} hint={i.hint} required={i.required} fileName={i.doc?.fileName ?? null} version={i.doc?.version ?? null} docId={i.doc?.id ?? null} auto={i.auto} maxMb={config.documentMaxMb} locked={!reqOpen} form={i.form ? { pct: checklist.pds.pct, submitted: checklist.pds.submitted, started: checklist.pds.started } : undefined} />)}
           </ul>
         </Card>
       )}

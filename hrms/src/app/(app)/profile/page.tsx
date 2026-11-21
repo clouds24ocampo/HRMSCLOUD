@@ -31,6 +31,7 @@ export default async function ProfilePage() {
   });
   const pledgeLang = asLang(pledge?.lang);
   const pledgeRows = pledge ? commitmentRecord(pledge.exam.questions, (pledge.answers ?? {}) as Answers, pledgeLang) : [];
+  const myPds = await prisma.personalDataSheet.findFirst({ where: { employeeId: e.id, organizationId: me.organizationId }, select: { id: true } });
   const missing = [!e.sssNo && "SSS", !e.philhealthNo && "PhilHealth", !e.tinNo && "TIN", !e.pagibigNo && "Pag-IBIG"].filter(Boolean) as string[];
 
   return (
@@ -58,6 +59,13 @@ export default async function ProfilePage() {
           <div><dt className="text-muted">Organization</dt><dd className="font-medium">{me.organization.name}</dd></div>
         </dl>
       </Card>
+
+      {myPds && (
+        <Card className="flex flex-wrap items-center justify-between gap-3">
+          <div><h2 className="text-lg font-semibold">My personal data sheet</h2><p className="text-sm text-muted">The personal information you gave when you applied.</p></div>
+          <Link href="/profile/pds" className={buttonClass}>Open</Link>
+        </Card>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="h-fit space-y-3">

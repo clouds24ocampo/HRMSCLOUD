@@ -2,31 +2,36 @@
 // (src/lib/file201.ts), so on hire the documents move across without retyping.
 import { prisma } from "@/lib/prisma";
 import { FILE_201, FILE_201_CATEGORY } from "@/lib/file201";
+import { PDS_TITLE } from "@/lib/pds-config";
 
 // "Signed Employment Contract" is added by HR after the offer, not by the applicant.
 export const APPLICANT_REQUIREMENTS = FILE_201.filter((r) => r.title !== "Signed Employment Contract");
 export const isApplicantRequirement = (title: string) => APPLICANT_REQUIREMENTS.some((r) => r.title === title);
 
-export type RequirementItem = { title: string; required: boolean; hint: string; doc: { id: string; fileName: string; version: number; at: Date } | null; auto: boolean };
+// `form`: this requirement is the online Personal Data Sheet form, not a file. It is in once the applicant submits the form.
+export type RequirementItem = { title: string; required: boolean; hint: string; doc: { id: string; fileName: string; version: number; at: Date } | null; auto: boolean; form: boolean; formDone: boolean };
 
-// Pure: the checklist with what is already in. The resume uploaded at sign-up counts as the resume requirement.
-export function buildChecklist(docs: { id: string; title: string; fileName: string; version: number; createdAt: Date }[], hasResume: boolean) {
+// Pure: the checklist with what is already in. The resume uploaded at sign-up counts as the resume requirement, and a submitted
+// Personal Data Sheet form counts as the Personal Data Sheet requirement.
+export function buildChecklist(docs: { id: string; title: string; fileName: string; version: number; createdAt: Date }[], hasResume: boolean, pdsSubmitted = false) {
   const latest = new Map(docs.map((d) => [d.title, d]));
   const items: RequirementItem[] = APPLICANT_REQUIREMENTS.map((r) => {
     const d = latest.get(r.title);
-    return { ...r, doc: d ? { id: d.id, fileName: d.fileName, version: d.version, at: d.createdAt } : null, auto: r.title === "Resume / Curriculum Vitae" && !d && hasResume };
+    const form = r.title === PDS_TITLE;
+    return { ...r, doc: d ? { id: d.id, fileName: d.fileName, version: d.version, at: d.createdAt } : null, auto: r.title === "Resume / Curriculum Vitae" && !d && hasResume, form, formDone: form && pdsSubmitted };
   });
   const required = items.filter((i) => i.required);
-  const done = required.filter((i) => i.doc || i.auto).length;
+  const done = required.filter((i) => i.doc || i.auto || i.formDone).length;
   return { items, done, total: required.length, complete: done === required.length };
 }
 
 export async function requirementChecklist(profileId: string) {
-  const [docs, profile] = await Promise.all([
+  const [docs, profile, pds] = await Promise.all([
     prisma.applicantDocument.findMany({ where: { profileId, archivedAt: null }, orderBy: { createdAt: "desc" }, select: { id: true, title: true, fileName: true, version: true, createdAt: true } }),
     prisma.applicantProfile.findUnique({ where: { id: profileId }, select: { resumeKey: true } }),
+    prisma.personalDataSheet.findUnique({ where: { profileId }, select: { submittedAt: true, completePct: true } }),
   ]);
-  return buildChecklist(docs, !!profile?.resumeKey);
+  return { ...buildChecklist(docs, !!profile?.resumeKey, !!pds?.submittedAt), pds: { submitted: !!pds?.submittedAt, pct: pds?.completePct ?? 0, started: !!pds } };
 }
 
 // On hire: everything the applicant uploaded becomes part of the employee's real 201 file. The resume and valid ID given at

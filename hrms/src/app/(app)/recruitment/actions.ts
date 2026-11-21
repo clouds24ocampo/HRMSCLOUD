@@ -12,13 +12,17 @@ import { requireUser } from "@/lib/auth";
 import { createEmployee, nextEmployeeNo } from "@/lib/employees";
 import { ROLES, ROLE_SEED } from "@/lib/roles";
 import { dbDate } from "@/lib/time";
-import { deleteStored } from "@/lib/documents";
+import { deleteStored, saveFile } from "@/lib/documents";
 import { notify } from "@/lib/notify";
 import { copyToEmployee201, moveSignaturesToEmployee } from "@/lib/requirements";
 import { hiringState } from "@/lib/hiring";
 import { ENGAGEMENT_LABEL, isEngagement, TEMPLATES_FOR, type Engagement } from "@/lib/hiring-pipeline";
 import { issueApplicantContract, voidApplicantContract } from "@/lib/applicant-contract";
 import type { ContractTemplateKey } from "@/lib/contract-templates";
+import { pdsAddress, pdsBirthDate, pdsGovNumbers, pdsMobile, sanitizePds } from "@/lib/pds";
+import { buildPdsPdf } from "@/lib/pds-pdf";
+import { PDS_TITLE } from "@/lib/pds-config";
+import { FILE_201_CATEGORY } from "@/lib/file201";
 import { translateToTagalog } from "@/lib/translate";
 import type { FormState } from "@/app/login/actions";
 
@@ -226,6 +230,22 @@ export async function hireApplicant(id: string, _: FormState, form: FormData): P
     if (a.profile) {
       await copyToEmployee201(tx, a.profile, created.id, me.id); // their requirement files become the employee 201 file
       await moveSignaturesToEmployee(tx, a.profile, created.id); // and their signed policies are theirs as an employee
+      // The Personal Data Sheet follows the person: it is linked to the new employee, and the employee record is filled from it
+      // (address, birth date, mobile number, government numbers) without replacing anything HR already typed.
+      const sheet = await tx.personalDataSheet.findUnique({ where: { profileId: a.profile.id } });
+      if (sheet) {
+        const pd = sanitizePds(sheet.data);
+        const gov = pdsGovNumbers(pd);
+        const born = pdsBirthDate(pd);
+        await tx.personalDataSheet.update({ where: { id: sheet.id }, data: { employeeId: created.id } });
+        await tx.employee.update({
+          where: { id: created.id },
+          data: {
+            address: pdsAddress(pd) || undefined, birthDate: born ? dbDate(born) : undefined, ...(created.phone ? {} : { phone: pdsMobile(pd) ?? undefined }),
+            sssNo: gov.sss, philhealthNo: gov.philhealth, tinNo: gov.tin, pagibigNo: gov.pagibig,
+          },
+        });
+      }
       // The person is an employee now: their other open applications are closed, so they leave the applicant lists.
       const others = await tx.applicant.findMany({ where: { profileId: a.profile.id, id: { not: id }, stage: { notIn: ["HIRED", "REJECTED"] } }, select: { id: true } });
       if (others.length) {
@@ -248,6 +268,21 @@ export async function hireApplicant(id: string, _: FormState, form: FormData): P
     if (hired >= a.job.openings) await tx.jobPosting.update({ where: { id: a.jobId }, data: { status: "CLOSED" } });
     return created;
   });
+  // A printable copy of the submitted Personal Data Sheet goes into the 201 file. If it cannot be made, the hire still stands.
+  if (a.profile) {
+    try {
+      const sheet = await prisma.personalDataSheet.findUnique({ where: { profileId: a.profile.id } });
+      const have = await prisma.employeeDocument.count({ where: { employeeId: emp.id, title: PDS_TITLE, archivedAt: null } });
+      if (sheet?.submittedAt && !have) {
+        const org = await prisma.organization.findUnique({ where: { id: orgId }, select: { name: true } });
+        const pdf = await buildPdsPdf(sanitizePds(sheet.data), { company: org?.name ?? "", applicantNo: a.profile.applicantNo, name: a.name, submittedOn: sheet.submittedAt.toISOString().slice(0, 10) });
+        const key = await saveFile(orgId, new Uint8Array(pdf));
+        await prisma.employeeDocument.create({ data: { organizationId: orgId, employeeId: emp.id, category: FILE_201_CATEGORY, title: PDS_TITLE, fileName: `Personal Data Sheet - ${a.name}.pdf`.replace(/[^\w.\- ()]+/g, "_"), mimeType: "application/pdf", sizeBytes: pdf.length, storageKey: key, uploadedById: me.id } });
+      }
+    } catch (e) {
+      console.error("Could not file the personal data sheet PDF", e instanceof Error ? e.message : e);
+    }
+  }
   await audit(me.id, "applicant.hired", "Applicant", id, { employeeId: emp.id, employeeNo: emp.employeeNo, engagement, contractSigned: !!signedContract, ...(st && !st.pipeline.ready ? { overrode: st.pipeline.missing, reason: d.overrideReason } : {}) }, orgId);
   done(a.jobId);
   revalidatePath("/employees");

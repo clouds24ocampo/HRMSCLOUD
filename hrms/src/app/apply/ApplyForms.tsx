@@ -7,6 +7,7 @@ import { Alert, SubmitButton } from "@/components/Fields";
 import { Badge, buttonClass } from "@/components/ui";
 import type { FormState } from "@/app/login/actions";
 import { applyToJobs, uploadDocuments, uploadRequirement } from "./actions";
+import Link from "next/link";
 import { RoleInfo } from "@/components/RoleInfo";
 import { RoleArt } from "@/components/RoleArt";
 
@@ -93,7 +94,7 @@ export function UploadForm({ hasResume, hasId, maxMb }: { hasResume: boolean; ha
 }
 
 // One line of the 201 file checklist: the file picker and its own Upload button. Big photos are shrunk first.
-export function RequirementRow({ title, hint, required, fileName, version, auto, maxMb, docId, locked = false }: { title: string; hint: string; required: boolean; fileName: string | null; version: number | null; auto: boolean; maxMb: number; docId: string | null; locked?: boolean }) {
+export function RequirementRow({ title, hint, required, fileName, version, auto, maxMb, docId, locked = false, form }: { title: string; hint: string; required: boolean; fileName: string | null; version: number | null; auto: boolean; maxMb: number; docId: string | null; locked?: boolean; form?: { pct: number; submitted: boolean; started: boolean } }) {
   const { state, pending, submit, formProps } = useKeptForm(uploadRequirement.bind(null, title));
   const [localError, setLocalError] = useState<string>();
   const [preparing, setPreparing] = useState(false);
@@ -114,6 +115,23 @@ export function RequirementRow({ title, hint, required, fileName, version, auto,
     }
   };
   const have = !!fileName || auto;
+  // The Personal Data Sheet is an online form, not a file: open it any time, even before the other uploads open.
+  if (form) {
+    return (
+      <li className="rounded-xl border border-line p-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="min-w-0">
+            <p className="font-medium">{title} {required && <span className="text-xs font-normal text-muted">· required</span>}</p>
+            <p className="text-xs text-muted">Fill out the online form: your details, contact and social media, family, education, work, references and emergency contact.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link href="/apply/pds" className="rounded-lg border border-brand px-3 py-1.5 text-sm font-semibold text-brand transition hover:bg-brand/5 active:scale-95">{form.submitted ? "Review or edit" : form.started ? `Continue (${form.pct}%)` : "Fill out the form"}</Link>
+            {form.submitted ? <Badge tone="success">Submitted</Badge> : form.started ? <Badge tone="warning">{form.pct}% filled</Badge> : <Badge tone="warning">Needed</Badge>}
+          </div>
+        </div>
+      </li>
+    );
+  }
   return (
     <li className="rounded-xl border border-line p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">

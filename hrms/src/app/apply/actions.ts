@@ -18,6 +18,8 @@ import { orientationOpen, requiredPolicies } from "@/lib/orientation";
 import { advanceIfComplete, closeRun, examsForJob, finalizeAttempt, shareGlobalAttempts } from "@/lib/applicants";
 import { asLang, secondsLeft, timeIsUp } from "@/lib/exams";
 import { questionsFor, type RunResult } from "@/lib/exam-run";
+import { sanitizePds, validatePds, type Missing } from "@/lib/pds";
+import type { Prisma } from "@/generated/prisma/client";
 import { ensureTagalog } from "@/lib/translate";
 import type { FormState } from "@/app/login/actions";
 
@@ -256,4 +258,34 @@ export async function signApplicantContract(contractId: string, _: FormState, fo
   await notify(me.organizationId, hr.map((u) => u.id), { title: `${me.name} signed the contract. Ready to hire.`, href: `/recruitment/${c.applicant.jobId}` });
   done();
   return { ok: "Signed. Thank you! HR will complete your hiring." };
+}
+
+// Saves the Personal Data Sheet form. Progress can be saved at any time; Submit needs every required answer and no wrong answer.
+// What the browser sends is cleaned first (sizes, dates, links), so only plain, small text is stored.
+export type PdsResult = FormState & { pct?: number; submitted?: boolean; missing?: Missing[]; problems?: string[] };
+export async function savePds(raw: unknown, submit: boolean): Promise<PdsResult> {
+  const { me, profile } = await myProfile();
+  const data = sanitizePds(raw);
+  const v = validatePds(data, submit ? "submit" : "draft");
+  if (submit && !v.ok) {
+    return { error: `Not complete yet: ${v.missing.length ? `${v.missing.length} answer${v.missing.length === 1 ? "" : "s"} still needed` : ""}${v.missing.length && v.problems.length ? " and " : ""}${v.problems.length ? `${v.problems.length} to correct` : ""}.`, pct: v.pct, missing: v.missing, problems: v.problems };
+  }
+  const existing = await prisma.personalDataSheet.findUnique({ where: { profileId: profile.id }, select: { submittedAt: true } });
+  // Editing a submitted sheet keeps it submitted only while it is still complete and correct; otherwise it must be submitted again.
+  const stillGood = validatePds(data, "submit").ok;
+  const submittedAt = submit ? new Date() : existing?.submittedAt && stillGood ? existing.submittedAt : null;
+  const json = data as unknown as Prisma.InputJsonValue;
+  await prisma.personalDataSheet.upsert({
+    where: { profileId: profile.id },
+    create: { organizationId: me.organizationId, profileId: profile.id, data: json, completePct: v.pct, submittedAt },
+    update: { data: json, completePct: v.pct, submittedAt },
+  });
+  await audit(me.id, submit ? "portal.pds_submitted" : "portal.pds_saved", "PersonalDataSheet", profile.id, { pct: v.pct }, me.organizationId);
+  if (submit) {
+    const hr = await prisma.user.findMany({ where: { organizationId: me.organizationId, active: true, role: { key: { in: [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN] } } }, select: { id: true } });
+    await notify(me.organizationId, hr.map((u) => u.id), { title: `${me.name} submitted their personal data sheet`, href: "/recruitment/applicants" });
+  }
+  done();
+  revalidatePath("/apply/pds");
+  return { ok: submit ? "Submitted. Thank you! HR can now read your personal data sheet." : `Saved. ${v.pct}% complete.`, pct: v.pct, submitted: !!submittedAt, problems: v.problems };
 }

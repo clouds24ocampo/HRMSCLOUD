@@ -39,7 +39,7 @@ export default async function ApplicantProfile({ params }: { params: Promise<{ i
       },
     }),
     first.profileId
-      ? prisma.applicantProfile.findUnique({ where: { id: first.profileId }, include: { user: { select: { createdAt: true, active: true } }, documents: { where: { archivedAt: null }, orderBy: { createdAt: "desc" } } } })
+      ? prisma.applicantProfile.findUnique({ where: { id: first.profileId }, include: { user: { select: { createdAt: true, active: true } }, pds: { select: { id: true, submittedAt: true, completePct: true } }, documents: { where: { archivedAt: null }, orderBy: { createdAt: "desc" } } } })
       : null,
   ]);
   await audit(me.id, "applicant.profile_viewed", "Applicant", id, undefined, me.organizationId);
@@ -66,7 +66,7 @@ export default async function ApplicantProfile({ params }: { params: Promise<{ i
     const k = a.attempts.find((t) => t.exam.kind === "KNOWLEDGE"), p = a.attempts.find((t) => t.exam.kind === "PSYCHOLOGICAL");
     return k && p ? Math.round((pctOf(k.score, k.maxScore) + pctOf(p.score, p.maxScore)) / 2) : null;
   }).reduce<number | null>((m, x) => (x !== null && (m === null || x > m) ? x : m), null);
-  const checklist = profile ? buildChecklist(profile.documents, !!profile.resumeKey) : null;
+  const checklist = profile ? buildChecklist(profile.documents, !!profile.resumeKey, !!profile.pds?.submittedAt) : null;
   const showChecklist = !!profile && (profile.documents.length > 0 || apps.some((a) => ["REQUIREMENTS", "OFFER", "HIRED"].includes(a.stage)));
   const notes = apps.flatMap((a) => a.notes.map((n) => ({ ...n, job: a.job.title }))).sort((x, y) => y.createdAt.getTime() - x.createdAt.getTime());
 
@@ -173,6 +173,17 @@ export default async function ApplicantProfile({ params }: { params: Promise<{ i
       </Card>
 
       <Card>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold">Personal Data Sheet</h2>
+            <p className="text-sm text-muted">{!profile ? "No applicant account, so no form." : !profile.pds ? "Not started by the applicant yet." : profile.pds.submittedAt ? "Submitted by the applicant." : `Draft, ${profile.pds.completePct}% complete.`}</p>
+          </div>
+          {profile?.pds && <Link href={`/recruitment/applicants/${lead.id}/pds`} className={`${ghostClass} print:hidden`}>{profile.pds.submittedAt ? "Open the form" : "Open the draft"} →</Link>}
+        </div>
+        {profile?.pds && <div className="mt-3"><Meter value={profile.pds.completePct} tone={profile.pds.completePct >= 100 ? "success" : profile.pds.completePct >= 50 ? "warning" : "danger"} /></div>}
+      </Card>
+
+      <Card>
         <h2 className="mb-3 text-lg font-semibold">Documents</h2>
         {!profile ? <p className="text-sm text-muted">This applicant was added by HR and has no uploaded documents.</p> : (
           <>
@@ -186,8 +197,8 @@ export default async function ApplicantProfile({ params }: { params: Promise<{ i
                 <ul className="divide-y divide-line text-sm">
                   {checklist.items.map((i) => (
                     <li key={i.title} className="flex flex-wrap items-center justify-between gap-2 py-2">
-                      <span className={i.doc || i.auto ? "" : i.required ? "text-warning" : "text-muted"}>{i.title}{!i.required && <span className="text-xs text-muted"> (if it applies)</span>}{i.doc && <span className="ml-2 text-xs text-muted">{i.doc.fileName}{i.doc.version > 1 ? ` · version ${i.doc.version}` : ""} · {day(i.doc.at)}</span>}</span>
-                      {i.doc ? <a href={`/recruitment/applicant/${lead.id}/doc/${i.doc.id}`} target="_blank" className="font-semibold text-brand hover:underline">Open</a> : i.auto ? <a href={`/recruitment/applicant/${lead.id}/resume`} target="_blank" className="font-semibold text-brand hover:underline">Open resume</a> : <span className="text-xs text-muted">{i.required ? "Missing" : "–"}</span>}
+                      <span className={i.doc || i.auto || i.formDone ? "" : i.required ? "text-warning" : "text-muted"}>{i.title}{!i.required && <span className="text-xs text-muted"> (if it applies)</span>}{i.doc && <span className="ml-2 text-xs text-muted">{i.doc.fileName}{i.doc.version > 1 ? ` · version ${i.doc.version}` : ""} · {day(i.doc.at)}</span>}</span>
+                      {i.form ? (profile.pds ? <Link href={`/recruitment/applicants/${lead.id}/pds`} className="font-semibold text-brand hover:underline">{i.formDone ? "Open the form" : `Draft ${profile.pds.completePct}%`}</Link> : <span className="text-xs text-muted">Not started</span>) : i.doc ? <a href={`/recruitment/applicant/${lead.id}/doc/${i.doc.id}`} target="_blank" className="font-semibold text-brand hover:underline">Open</a> : i.auto ? <a href={`/recruitment/applicant/${lead.id}/resume`} target="_blank" className="font-semibold text-brand hover:underline">Open resume</a> : <span className="text-xs text-muted">{i.required ? "Missing" : "–"}</span>}
                     </li>
                   ))}
                 </ul>
