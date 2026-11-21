@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { Icon, StampIcon, ICON_INLINE } from "@/components/Icon";
 import { mapUrl } from "@/lib/locale";
 import Link from "next/link";
@@ -40,7 +41,7 @@ export default async function DtrPage({ searchParams }: { searchParams: Promise<
   const tz = settings.timezone;
   const mine = await getMyEmployee(me, tz);
   const today = dayKey(new Date(), tz);
-  const hr = isHr(me.role.key);
+  const hr = can(me, "dtr.view_all");
 
   const ws = weekStart(today);
   let from = isKey(sp.from) ? sp.from! : ws;
@@ -96,7 +97,7 @@ export default async function DtrPage({ searchParams }: { searchParams: Promise<
         action={
           <span className="flex flex-wrap gap-2">
             <a href={`/dtr/report?${new URLSearchParams({ employee: employeeId, from, to })}`} className={ghostClass}>Download PDF</a>
-            {(hr || me.role.key === ROLES.MANAGER) && <a href={`/dtr/report?${new URLSearchParams({ employee: "all", from, to })}`} className={ghostClass}>PDF, everyone</a>}
+            {(hr || can(me, "team.manage")) && <a href={`/dtr/report?${new URLSearchParams({ employee: "all", from, to })}`} className={ghostClass}>PDF, everyone</a>}
             <a href={`/dtr/export?${new URLSearchParams({ employee: employeeId, from, to })}`} className={ghostClass}>Download CSV</a>
           </span>
         }

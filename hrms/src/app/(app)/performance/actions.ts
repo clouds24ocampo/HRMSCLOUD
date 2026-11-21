@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -31,7 +32,7 @@ export async function addGoal(_: FormState, form: FormData): Promise<FormState> 
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const employeeId = parsed.data.employeeId || mine.id;
   // Own goals for anyone; goals for others only inside your chain (managers) or anywhere (HR).
-  if (employeeId !== mine.id && !(isHr(me.role.key) || (me.role.key === ROLES.MANAGER && (await canViewEmployee(me, mine.id, employeeId))))) return { error: "You can only set goals for your own team." };
+  if (employeeId !== mine.id && !(can(me, "performance.manage") || (can(me, "team.manage") && (await canViewEmployee(me, mine.id, employeeId))))) return { error: "You can only set goals for your own team." };
   if (!(await prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId } }))) return { error: "Employee not found." };
   const g = await prisma.goal.create({
     data: { organizationId: me.organizationId, employeeId, title: parsed.data.title, description: parsed.data.description || null, targetDate: parsed.data.targetDate ? dbDate(parsed.data.targetDate) : null, createdById: me.id },
@@ -52,7 +53,7 @@ export async function updateGoal(id: string, _: FormState, form: FormData): Prom
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const g = await prisma.goal.findFirst({ where: { id, organizationId: me.organizationId } });
   if (!g) return { error: "Goal not found." };
-  if (g.employeeId !== mine.id && !(isHr(me.role.key) || (me.role.key === ROLES.MANAGER && (await canViewEmployee(me, mine.id, g.employeeId))))) return { error: "This goal is not yours to update." };
+  if (g.employeeId !== mine.id && !(can(me, "performance.manage") || (can(me, "team.manage") && (await canViewEmployee(me, mine.id, g.employeeId))))) return { error: "This goal is not yours to update." };
   const { progress, status } = goalOutcome(parsed.data.progress, parsed.data.status);
   await prisma.goal.update({ where: { id }, data: { progress, status } });
   await audit(me.id, "goal.updated", "Goal", id, { progress, status }, me.organizationId);
@@ -63,7 +64,7 @@ export async function updateGoal(id: string, _: FormState, form: FormData): Prom
 // ---------- review cycles ----------
 export async function createCycle(_: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/performance");
-  if (!isHr(me.role.key)) return { error: "Only HR can start a review cycle." };
+  if (!can(me, "performance.manage")) return { error: "Only HR can start a review cycle." };
   const parsed = z
     .object({ name: z.string().trim().min(3, "Name the cycle.").max(80), startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose the dates."), endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose the dates.") })
     .safeParse(Object.fromEntries(form));
@@ -84,7 +85,7 @@ export async function createCycle(_: FormState, form: FormData): Promise<FormSta
 
 export async function closeCycle(id: string) {
   const me = await requireUser("/performance");
-  if (!isHr(me.role.key)) return;
+  if (!can(me, "performance.manage")) return;
   const c = await prisma.reviewCycle.findFirst({ where: { id, organizationId: me.organizationId } });
   if (!c) return;
   await prisma.reviewCycle.update({ where: { id }, data: { status: "CLOSED" } });
@@ -124,7 +125,7 @@ export async function submitManager(id: string, _: FormState, form: FormData): P
   const r = await loadReview(me, id);
   if (!r) return { error: "Review not found." };
   if (r.employeeId === mine.id) return { error: "You cannot evaluate yourself here." };
-  if (!(isHr(me.role.key) || r.reviewerId === mine.id)) return { error: "This review is not yours to evaluate." };
+  if (!(can(me, "performance.manage") || r.reviewerId === mine.id)) return { error: "This review is not yours to evaluate." };
   if (r.cycle.status !== "OPEN") return { error: "This review cycle is closed." };
   if (r.stage !== "MANAGER") return { error: "This review is not waiting for the manager." };
   await prisma.review.update({ where: { id }, data: { managerRating: parsed.data.rating, managerComment: parsed.data.comment, stage: "FINAL" } });
@@ -137,7 +138,7 @@ export async function submitManager(id: string, _: FormState, form: FormData): P
 // Step 3: HR sets the final rating, normally agreeing with the manager.
 export async function finalizeReview(id: string, _: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/performance");
-  if (!isHr(me.role.key)) return { error: "Only HR sets the final rating." };
+  if (!can(me, "performance.manage")) return { error: "Only HR sets the final rating." };
   const parsed = z.object({ rating, comment }).safeParse({ rating: form.get("rating"), comment: form.get("comment") });
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const r = await loadReview(me, id);

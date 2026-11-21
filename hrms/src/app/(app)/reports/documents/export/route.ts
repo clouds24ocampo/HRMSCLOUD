@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { requireUser } from "@/lib/auth";
 import { audit } from "@/lib/audit";
 import { csv, csvResponse } from "@/lib/csv";
@@ -8,7 +9,7 @@ import { dayKey, formatTime } from "@/lib/time";
 
 export async function GET() {
   const me = await requireUser("/reports");
-  if (!isHr(me.role.key)) {
+  if (!can(me, "reports.view")) {
     return new Response("Only HR and administrators can export document compliance reports.", { status: 403 });
   }
 

@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { config } from "@/lib/config";
+import { effectivePerms } from "@/lib/permissions";
 
 const hash = (token: string) => createHash("sha256").update(token).digest("hex");
 const ttlMs = () => config.sessionTtlHours * 3600_000;
@@ -21,7 +22,8 @@ export async function findSession(token: string) {
     include: { user: { include: { role: true, organization: true } } },
   });
   if (!s || s.expiresAt < new Date() || !s.user.active) return null;
-  return s.user;
+  // Itemized access: what the role gives, plus what was added for this account, minus what was taken away.
+  return { ...s.user, perms: effectivePerms(s.user.role, s.user.grants, s.user.revokes) as ReadonlySet<string> };
 }
 
 // The password check before a time stamp. The unlock lives on the session, lasts a short window and is used once.

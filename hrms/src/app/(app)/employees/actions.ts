@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -9,6 +10,7 @@ import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
 import { createEmployee, assignmentSnapshot } from "@/lib/employees";
 import { ROLES } from "@/lib/roles";
+import { checkRoleChoice, levelChangeProblem, levelOfPosition } from "@/lib/access";
 import { descendantIds, isHr } from "@/lib/scope";
 import { getMyEmployee } from "@/lib/employees";
 import { dbDate } from "@/lib/time";
@@ -56,7 +58,7 @@ async function checkRefs(orgId: string, r: { departmentId?: string; positionId?:
 // Also returns the new employee's id, so the form can offer the 201 file uploads next.
 export async function createEmployeeAction(_: FormState, form: FormData): Promise<FormState & { id?: string }> {
   const me = await requireUser("/employees");
-  if (!isHr(me.role.key)) return { error: "Only HR can add employees." };
+  if (!can(me, "employees.add")) return { error: "Only HR can add employees." };
   const parsed = createSchema.safeParse({ ...Object.fromEntries(form), days: undefined });
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const d = parsed.data;
@@ -79,10 +81,11 @@ export async function createEmployeeAction(_: FormState, form: FormData): Promis
     if (!d.username || !/^[a-z0-9._-]{3,30}$/.test(d.username)) return { error: "Choose a username: 3 to 30 letters, numbers, dots, dashes or underscores." };
     if (await prisma.user.findUnique({ where: { username: d.username } })) return { error: "That username is taken. Choose another." };
     if ((d.password ?? "").length < 10) return { error: "Temporary password needs at least 10 characters." };
-    const role = d.roleId ? await prisma.role.findUnique({ where: { id: d.roleId } }) : null;
-    if (!role) return { error: "Choose a role for the login." };
-    // Only a Super Admin may hand out admin roles.
-    if ((role.key === ROLES.SUPER_ADMIN || role.key === ROLES.HR_ADMIN) && me.role.key !== ROLES.SUPER_ADMIN) return { error: "Only a Super Admin can give an admin role." };
+    if (!d.roleId) return { error: "Choose a role for the login." };
+    // Own-company roles only, admin roles only from a Super Admin, nothing the actor does not hold, and nothing elevated for an entry-level position.
+    const choice = await checkRoleChoice(me, d.roleId, { level: await levelOfPosition(d.positionId, me.organizationId) });
+    if ("error" in choice) return { error: choice.error };
+    const role = choice.role;
     const email = d.email.toLowerCase();
     if (await prisma.user.findUnique({ where: { email } })) return { error: "This email already has a login." };
     login = { roleId: role.id, email, username: d.username, passwordHash: await bcrypt.hash(d.password!, 12) };
@@ -127,7 +130,7 @@ export async function createEmployeeAction(_: FormState, form: FormData): Promis
 // Switches between a fixed shift and a flexible schedule (own hours, at least 8 a day and 1 day off a week).
 export async function setFlexible(employeeId: string, flexible: boolean) {
   const me = await requireUser("/employees");
-  if (!isHr(me.role.key)) return;
+  if (!can(me, "employees.edit")) return;
   const n = await prisma.employee.updateMany({ where: { id: employeeId, organizationId: me.organizationId }, data: { flexible } });
   if (n.count === 0) return;
   await audit(me.id, "employee.schedule_kind", "Employee", employeeId, { flexible }, me.organizationId);
@@ -137,7 +140,7 @@ export async function setFlexible(employeeId: string, flexible: boolean) {
 
 export async function updateAssignment(employeeId: string, _: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/employees");
-  if (!isHr(me.role.key)) return { error: "Only HR can change assignments." };
+  if (!can(me, "employees.edit")) return { error: "Only HR can change assignments." };
   const parsed = z
     .object({ departmentId: pick, positionId: pick, managerId: pick, status: z.enum(STATUSES), note: optional })
     .safeParse(Object.fromEntries(form));
@@ -157,6 +160,11 @@ export async function updateAssignment(employeeId: string, _: FormState, form: F
     (d.departmentId ?? null) !== emp.departmentId || (d.positionId ?? null) !== emp.positionId || (d.managerId ?? null) !== emp.managerId;
   const statusChanged = d.status !== emp.status;
   if (!assignmentChanged && !statusChanged) return { ok: "Nothing changed." };
+  // An entry-level position cannot keep manager or higher access: HR changes the access first (Super Admin > Users > Access).
+  if (emp.userId && (d.positionId ?? null) !== emp.positionId) {
+    const problem = await levelChangeProblem(emp.userId, me.organizationId, await levelOfPosition(d.positionId, me.organizationId));
+    if (problem) return { error: problem };
+  }
 
   await prisma.$transaction(async (tx) => {
     await tx.employee.update({
@@ -189,7 +197,7 @@ export async function updateAssignment(employeeId: string, _: FormState, form: F
 // Edit the person's own details and their sign-in. Assignment and status are changed in updateAssignment (they go to history).
 export async function updateDetails(employeeId: string, _: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/employees");
-  if (!isHr(me.role.key)) return { error: "Only HR can edit employees." };
+  if (!can(me, "employees.edit")) return { error: "Only HR can edit employees." };
   const parsed = z
     .object({
       firstName: text("a first name"), lastName: text("a last name"), email: optional, phone: optional, address: optional,
@@ -268,7 +276,7 @@ async function workRecords(employeeId: string, userId: string | null) {
 // Deleting is only for someone added by mistake. Anyone with work records is separated instead (Change assignment or status).
 export async function deleteEmployee(employeeId: string, _: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/employees");
-  if (!isHr(me.role.key)) return { error: "Only HR can delete employees." };
+  if (!can(me, "employees.delete")) return { error: "Only HR can delete employees." };
   const emp = await prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, include: { user: { include: { role: true } } } });
   if (!emp) return { error: "Employee not found." };
   const typed = String(form.get("confirm") ?? "").trim().toUpperCase();
@@ -348,7 +356,7 @@ export async function deleteEmployee(employeeId: string, _: FormState, form: For
 // typed confirmation is needed. The change is written to their employment history.
 export async function setEmployeeActive(employeeId: string, active: boolean): Promise<FormState> {
   const me = await requireUser("/employees");
-  if (!isHr(me.role.key)) return { error: "Only HR can change this." };
+  if (!can(me, "employees.deactivate")) return { error: "Only HR can change this." };
   const emp = await prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, include: { user: { include: { role: true } } } });
   if (!emp) return { error: "Employee not found." };
   const mine = await getMyEmployee(me);

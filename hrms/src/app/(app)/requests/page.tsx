@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
@@ -13,7 +14,7 @@ export default async function RequestsPage() {
   const me = await requireUser("/requests");
   const settings = await getOrgSettings(me.organizationId);
   const mine = await getMyEmployee(me, settings.timezone);
-  const hr = isHr(me.role.key);
+  const hr = can(me, "requests.answer");
   const when = new Intl.DateTimeFormat("en-US", { timeZone: settings.timezone, dateStyle: "medium" });
   const [my, queue] = await Promise.all([
     prisma.hrRequest.findMany({ where: { organizationId: me.organizationId, employeeId: mine.id }, orderBy: { createdAt: "desc" }, take: 30 }),

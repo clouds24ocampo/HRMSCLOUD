@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -17,7 +18,7 @@ const optNum = z.string().optional().transform((v) => (v ? Number(v) : null));
 
 export async function addCourse(_: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/learning");
-  if (!isHr(me.role.key)) return { error: "Only HR manages the course catalog." };
+  if (!can(me, "learning.manage")) return { error: "Only HR manages the course catalog." };
   const parsed = z
     .object({ title: z.string().trim().min(3, "Name the course.").max(100), description: z.string().trim().max(1000).optional(), hours: optNum.pipe(z.number().int().min(1).max(1000).nullable()), validityMonths: optNum.pipe(z.number().int().min(1).max(240).nullable()) })
     .safeParse(Object.fromEntries(form));
@@ -31,7 +32,7 @@ export async function addCourse(_: FormState, form: FormData): Promise<FormState
 
 export async function setCourseArchived(id: string, archived: boolean) {
   const me = await requireUser("/learning");
-  if (!isHr(me.role.key)) return;
+  if (!can(me, "learning.manage")) return;
   const c = await prisma.course.findFirst({ where: { id, organizationId: me.organizationId } });
   if (!c) return;
   await prisma.course.update({ where: { id }, data: { archivedAt: archived ? new Date() : null } });
@@ -42,7 +43,7 @@ export async function setCourseArchived(id: string, archived: boolean) {
 // HR enrolls anyone; a Manager enrolls people in their own team.
 export async function enroll(courseId: string, _: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/learning");
-  if (!isHr(me.role.key) && me.role.key !== ROLES.MANAGER) return { error: "Only HR and managers can enroll people." };
+  if (!can(me, "learning.enroll")) return { error: "Only HR and managers can enroll people." };
   const wanted = form.getAll("people").map(String);
   if (wanted.length === 0) return { error: "Choose at least one person." };
   const course = await prisma.course.findFirst({ where: { id: courseId, organizationId: me.organizationId, archivedAt: null } });
@@ -66,7 +67,7 @@ export async function completeEnrollment(id: string, _: FormState, form: FormDat
   const e = await prisma.enrollment.findFirst({ where: { id, organizationId: me.organizationId }, include: { course: true } });
   if (!e) return { error: "Enrollment not found." };
   const mine = await getMyEmployee(me);
-  const ok = isHr(me.role.key) || (me.role.key === ROLES.MANAGER && e.employeeId !== mine.id && (await canViewEmployee(me, mine.id, e.employeeId)));
+  const ok = can(me, "learning.manage") || (can(me, "team.manage") && e.employeeId !== mine.id && (await canViewEmployee(me, mine.id, e.employeeId)));
   if (!ok) return { error: "Only HR or the person's manager can mark a course complete." };
   const completed = new Date(`${date.data}T00:00:00Z`);
   if (completed.getTime() > Date.now() + 86_400_000) return { error: "The completion date cannot be in the future." };
@@ -88,7 +89,7 @@ export async function cancelEnrollment(id: string) {
   const e = await prisma.enrollment.findFirst({ where: { id, organizationId: me.organizationId, status: "ENROLLED" } });
   if (!e) return;
   const mine = await getMyEmployee(me);
-  const ok = isHr(me.role.key) || (me.role.key === ROLES.MANAGER && (await canViewEmployee(me, mine.id, e.employeeId)));
+  const ok = can(me, "learning.manage") || (can(me, "team.manage") && (await canViewEmployee(me, mine.id, e.employeeId)));
   if (!ok) return;
   await prisma.enrollment.update({ where: { id }, data: { status: "CANCELLED" } });
   await audit(me.id, "enrollment.cancelled", "Enrollment", id, undefined, me.organizationId);

@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -30,7 +31,7 @@ async function checkPeople(me: Me, wanted: string[], tz: string): Promise<{ erro
   return people.length === wanted.length ? { ids: people.map((p) => p.id) } : { error: "One or more people are outside your team." };
 }
 
-const canPlan = (me: Me) => me.role.key === ROLES.MANAGER || isHr(me.role.key);
+const canPlan = (me: Me) => can(me, "team.manage") || can(me, "schedule.plan_all");
 
 // Regular weekly schedule: same shift on chosen weekdays, every week, from an effective date.
 // A change adds a new row; earlier days keep the schedule that applied then.
@@ -45,7 +46,7 @@ export async function setRegularSchedule(_: FormState, form: FormData): Promise<
 
   const settings = await getOrgSettings(me.organizationId);
   const today = dayKey(new Date(), settings.timezone);
-  if (d.effectiveFrom < today && !isHr(me.role.key)) return { error: "Only HR can start a schedule in the past." };
+  if (d.effectiveFrom < today && !can(me, "schedule.edit_past")) return { error: "Only HR can start a schedule in the past." };
   const shift = await prisma.shiftTemplate.findFirst({ where: { id: d.shiftId, organizationId: me.organizationId, archivedAt: null } });
   if (!shift) return { error: "Choose a shift from the list." };
   const checked = await checkPeople(me, d.people, settings.timezone);
@@ -93,7 +94,7 @@ export async function assignSchedule(_: FormState, form: FormData): Promise<Form
 
   const settings = await getOrgSettings(me.organizationId);
   const today = dayKey(new Date(), settings.timezone);
-  if (d.from < today && !isHr(me.role.key)) return { error: "Only HR can change past days." };
+  if (d.from < today && !can(me, "schedule.edit_past")) return { error: "Only HR can change past days." };
   const checked = await checkPeople(me, d.people, settings.timezone);
   if ("error" in checked) return checked;
 
@@ -171,7 +172,7 @@ export async function copyLastWeek(weekStart: string, _: FormState, form: FormDa
   await prisma.$transaction(async (tx) => {
     for (const r of rows) {
       const target = addDaysKey(keyOfDbDate(r.date), 7);
-      if (target < today && !isHr(me.role.key)) continue;
+      if (target < today && !can(me, "schedule.edit_past")) continue;
       await tx.scheduleEntry.upsert({
         where: { employeeId_date: { employeeId: r.employeeId, date: dbDate(target) } },
         update: { shiftId: r.shiftId },

@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -22,7 +23,7 @@ const done = () => {
 // archived together with its signatures (they stay on record), and everyone is asked to sign the new version.
 export async function publishPolicy(_: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/policies");
-  if (!isHr(me.role.key)) return { error: "Only HR can publish policies." };
+  if (!can(me, "policies.manage")) return { error: "Only HR can publish policies." };
   const parsed = z
     .object({ title: z.string().trim().min(3, "Give the policy a title.").max(120), kind: z.enum(KINDS), body: z.string().trim().max(50_000).optional().transform((v) => v || undefined) })
     .safeParse(Object.fromEntries(form));
@@ -57,7 +58,7 @@ export async function publishPolicy(_: FormState, form: FormData): Promise<FormS
 
 export async function archivePolicy(id: string) {
   const me = await requireUser("/policies");
-  if (!isHr(me.role.key)) return;
+  if (!can(me, "policies.manage")) return;
   const n = await prisma.policyDocument.updateMany({ where: { id, organizationId: me.organizationId, archivedAt: null }, data: { archivedAt: new Date() } });
   if (n.count) await audit(me.id, "policy.archived", "PolicyDocument", id, undefined, me.organizationId);
   done();
@@ -66,7 +67,7 @@ export async function archivePolicy(id: string) {
 // Brings an archived policy back, unless a current policy already carries its title (two active versions would split the signatures).
 export async function restorePolicy(id: string): Promise<FormState> {
   const me = await requireUser("/policies");
-  if (!isHr(me.role.key)) return { error: "Only HR can restore policies." };
+  if (!can(me, "policies.manage")) return { error: "Only HR can restore policies." };
   const p = await prisma.policyDocument.findFirst({ where: { id, organizationId: me.organizationId, archivedAt: { not: null } } });
   if (!p) return { error: "Policy not found." };
   if (await prisma.policyDocument.findFirst({ where: { organizationId: me.organizationId, title: p.title, archivedAt: null } })) {

@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { requireUser } from "@/lib/auth";
 import { audit } from "@/lib/audit";
 import { csv, csvResponse } from "@/lib/csv";
@@ -31,7 +32,7 @@ export async function GET(req: Request) {
   }
 
   const type = url.searchParams.get("type") === "people" ? "people" : "cards";
-  const showAll = isHr(me.role.key) || me.role.key === ROLES.MANAGER;
+  const showAll = (can(me, "worksync.manage_all") || can(me, "team.manage"));
   if (type === "people" && !showAll) {
     return new Response("Only leads, managers and HR can download the people report.", { status: 403 });
   }

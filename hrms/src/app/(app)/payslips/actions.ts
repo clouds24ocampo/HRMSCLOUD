@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -18,7 +19,7 @@ import type { FormState } from "@/app/login/actions";
 // as the current answer, but every record stays (see the Payout model).
 export async function recordPayout(payslipId: string, _: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/payslips");
-  if (!isHr(me.role.key)) return { error: "Only HR can record a payment." };
+  if (!can(me, "payslips.record_payment")) return { error: "Only HR can record a payment." };
   const parsed = z
     .object({
       method: z.enum(PAYOUT_METHODS, { error: "Choose how it was paid." }),

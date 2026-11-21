@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -91,7 +92,7 @@ export async function decideLeave(id: string, decision: "APPROVED" | "REJECTED",
   const mine = await getMyEmployee(me);
   const own = r.employeeId === mine.id;
   if (own && me.role.key !== ROLES.SUPER_ADMIN) return { error: "You cannot approve your own request." };
-  const allowed = isHr(me.role.key) || (me.role.key === ROLES.MANAGER && (await canViewEmployee(me, mine.id, r.employeeId)));
+  const allowed = can(me, "leave.approve_all") || (can(me, "team.manage") && (await canViewEmployee(me, mine.id, r.employeeId)));
   if (!allowed) return { error: "This request is not yours to decide." };
 
   await prisma.leaveRequest.update({ where: { id }, data: { status: decision, decidedById: me.id, decidedAt: new Date(), decisionNote: note || null } });

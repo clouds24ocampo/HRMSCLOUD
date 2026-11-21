@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element -- signature images behind a signed-in route */
+import { can } from "@/lib/permissions";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -18,7 +19,7 @@ export default async function PolicyPage({ params, searchParams }: { params: Pro
   const settings = await getOrgSettings(me.organizationId);
   const tz = settings.timezone;
   const mine = await getMyEmployee(me, tz);
-  const hr = isHr(me.role.key);
+  const hr = can(me, "policies.manage");
   const employeeId = hr && sp.employee ? sp.employee : mine.id;
   const p = await prisma.policyDocument.findFirst({ where: { id, organizationId: me.organizationId } });
   if (!p) notFound();

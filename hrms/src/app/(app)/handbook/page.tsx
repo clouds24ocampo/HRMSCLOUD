@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
@@ -15,7 +16,7 @@ export default async function HandbookPage() {
   const me = await requireUser("/handbook");
   const settings = await getOrgSettings(me.organizationId);
   const mine = await getMyEmployee(me, settings.timezone);
-  const hr = isHr(me.role.key);
+  const hr = can(me, "handbook.manage");
 
   // Automatically seed standard handbook chapters if not yet created
   await ensureHandbook(me.organizationId, me.organization.name);

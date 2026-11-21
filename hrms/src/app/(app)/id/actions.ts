@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -16,7 +17,7 @@ import type { FormState } from "@/app/login/actions";
 export async function uploadPhoto(employeeId: string, _: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/id");
   const mine = await getMyEmployee(me);
-  if (employeeId !== mine.id && !isHr(me.role.key)) return { error: "You can only change your own picture." };
+  if (employeeId !== mine.id && !can(me, "id.manage")) return { error: "You can only change your own picture." };
   if (!(await prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, select: { id: true } }))) return { error: "Employee not found." };
   const r = await saveImage(me.organizationId, form.get("photo"));
   if ("error" in r) return r;

@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -31,7 +32,7 @@ export async function createRequest(_: FormState, form: FormData): Promise<FormS
 
 export async function respondRequest(id: string, _: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/requests");
-  if (!isHr(me.role.key)) return { error: "Only HR can answer requests." };
+  if (!can(me, "requests.answer")) return { error: "Only HR can answer requests." };
   const parsed = z.object({ status: z.enum(["IN_PROGRESS", "RESOLVED"]), response: z.string().trim().max(2000).optional() }).safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: "Check the form and try again." };
   if (parsed.data.status === "RESOLVED" && (parsed.data.response ?? "").length < 3) return { error: "Write the answer before resolving." };

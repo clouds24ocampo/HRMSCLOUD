@@ -1,4 +1,4 @@
-// Single source of truth for role keys and who may open which page.
+// Role keys. Who may open which page and do which action is itemized in src/lib/permissions.ts.
 // Roles themselves are rows in the Role table; seed.ts inserts these.
 export const ROLES = {
   SUPER_ADMIN: "SUPER_ADMIN",
@@ -20,56 +20,14 @@ export const ROLE_SEED: { key: RoleKey; name: string }[] = [
   { key: ROLES.APPLICANT, name: "Applicant" },
 ];
 
-const ALL: RoleKey[] = Object.values(ROLES).filter((r) => r !== ROLES.APPLICANT);
-const INTERNAL: RoleKey[] = [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER, ROLES.EMPLOYEE];
-
-// Longest matching prefix wins. Unlisted paths are denied.
-export const PAGE_ACCESS: Record<string, RoleKey[]> = {
-  "/dashboard": ALL,
-  "/change-password": [...ALL, ROLES.APPLICANT], // an applicant HR made an account for signs in with a temporary password and must choose their own
-  "/employees": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // managers see their own team only
-  "/organization": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
-  "/schedule": ALL, // employees/subcontractors see their own; managers edit their team
-  "/schedule/live": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // who is in, late, absent right now: downline only for managers
-  "/schedule/analytics": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // adherence and tardiness across the downline
-  "/dtr": ALL, // everyone sees what their place in the chain allows
-  "/leave": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER],
-  "/overtime": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER],
-  "/worksync": ALL, // project boards: what each person sees is decided by project membership, on the server
-  "/notifications": ALL,
-  "/payroll": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN], // includes /payroll/setup
-  "/payslips": INTERNAL, // own payslips only; HR can open any
-  "/settings": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
-  "/audit": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
-  "/recruitment": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
-  "/performance": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // reviews and goals: managers see their team; HR sees all
-  "/learning": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER],
-  "/documents": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
-  "/requests": INTERNAL, // own requests; HR answers all
-  "/locate": ALL, // phone confirms the location of a desktop time stamp
-  "/id": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN, ROLES.MANAGER], // supervisors and HR can open their people's; HR prints the cards
-  "/profile": ALL, // your own account: picture, contact details and government numbers
-  "/id/design": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
-  "/chat": ALL, // messages and calls inside the organization
-  "/policies": ALL, // read and e-sign; HR uploads
-  "/handbook": ALL, // company handbook: read and acknowledge; HR manages
-  "/contracts": ALL, // employment contracts: read and sign; HR/managers create & issue
-  "/daily-report": ALL, // own report; managers read their downline, HR reads everyone
-  "/cash-advance": ALL, // own requests; HR decides and sees every record
-  "/incentives": ALL, // own incentives to accept; HR/managers award and see records
-  "/announcements": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN], // posting. Everyone reads them on Home
-  "/reports": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN],
-  "/analytics": [ROLES.SUPER_ADMIN, ROLES.HR_ADMIN], // all activity in the system
-  "/admin/users": [ROLES.SUPER_ADMIN],
-  "/apply": [ROLES.APPLICANT], // the applicant portal: own application, exams and documents
-};
+// Who may open which page is in src/lib/permissions.ts (PAGE_PERMS): a page needs one of its permissions, and each built-in role has fixed defaults there.
 
 // Where a person lands after signing in, and where a denied page sends them.
 export const homeFor = (role: string) => (role === ROLES.APPLICANT ? "/apply" : "/dashboard");
 
+// Page access of a built-in role with no personal changes. Signed-in accounts use their own permissions (user.perms) instead.
 export function canAccess(role: string, path: string): boolean {
-  const match = Object.keys(PAGE_ACCESS)
-    .filter((p) => path === p || path.startsWith(p + "/"))
-    .sort((a, b) => b.length - a.length)[0];
-  return match ? (PAGE_ACCESS[match] as string[]).includes(role) : false;
+  return isBuiltInRole(role) && canAccessPath(role, effectivePerms({ key: role }), path);
 }
+
+import { canAccessPath, effectivePerms, isBuiltInRole } from "@/lib/permissions";

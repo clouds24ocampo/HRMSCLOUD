@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { Icon, ICON_INLINE, type IconName } from "@/components/Icon";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -49,8 +50,14 @@ export default async function EmployeePage({ params, searchParams }: { params: P
     },
   });
   if (!e) notFound();
-  const hr = isHr(me.role.key);
-  const canSchedule = hr || me.role.key === ROLES.MANAGER;
+  // What this person may see and do on someone else's file, itemized (see src/lib/permissions.ts).
+  const hr = can(me, "employees.view_all");
+  const canEditEmployee = can(me, "employees.edit");
+  const canPay = can(me, "payroll.view");
+  const canDocs = can(me, "documents.view_all");
+  const canContract = can(me, "contracts.manage");
+  const canRemove = can(me, "employees.deactivate") || can(me, "employees.delete");
+  const canSchedule = can(me, "team.manage") || can(me, "schedule.plan_all");
   const today = dayKey(new Date(), settings.timezone);
   const regulars = await prisma.regularSchedule.findMany({
     where: { employeeId: e.id, organizationId: me.organizationId },
@@ -59,7 +66,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
   });
   const currentReg = regulars.find((r) => keyOfDbDate(r.effectiveFrom) <= today);
   // Pay is visible to HR only (the employee sees it on their payslips).
-  const [comps, assignedComps, allComps] = hr
+  const [comps, assignedComps, allComps] = canPay
     ? await Promise.all([
         prisma.compensation.findMany({ where: { employeeId: e.id, organizationId: me.organizationId }, orderBy: [{ effectiveFrom: "desc" }, { createdAt: "desc" }] }),
         prisma.employeeComponent.findMany({ where: { employeeId: e.id, organizationId: me.organizationId, active: true }, include: { component: true } }),
@@ -68,7 +75,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
     : [[], [], []];
   // Philippine tax profile and this year's totals: HR only.
   const year = Number(today.slice(0, 4));
-  const [profiles, previous, ytd] = hr
+  const [profiles, previous, ytd] = canPay
     ? await Promise.all([
         prisma.employeeTaxProfile.findMany({ where: { employeeId: e.id, organizationId: me.organizationId }, orderBy: [{ effectiveFrom: "desc" }, { createdAt: "desc" }] }),
         prisma.previousEmployment.findMany({ where: { employeeId: e.id, organizationId: me.organizationId }, orderBy: { year: "desc" } }),
@@ -81,7 +88,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
   const taxNow = profiles.find((p) => keyOfDbDate(p.effectiveFrom) <= today) ?? null;
   const basisHint = suggestBasis(currentReg?.workDays.length ?? 5);
   const checklist = await prisma.checklistItem.findMany({ where: { employeeId: e.id, organizationId: me.organizationId }, orderBy: [{ kind: "asc" }, { sortOrder: "asc" }] });
-  const tick = (owner: string) => hr || (owner === "EMPLOYEE" && e.id === mine.id) || (owner === "MANAGER" && me.role.key === ROLES.MANAGER && e.id !== mine.id);
+  const tick = (owner: string) => can(me, "checklists.manage") || (owner === "EMPLOYEE" && e.id === mine.id) || (owner === "MANAGER" && can(me, "team.manage") && e.id !== mine.id);
   const listFor = (kind: "ONBOARDING" | "OFFBOARDING") =>
     checklist.filter((c) => c.kind === kind).map((c) => ({ id: c.id, title: c.title, owner: OWNER_LABEL[c.owner], done: !!c.doneAt, canTick: tick(c.owner) }));
   const onboarding = listFor("ONBOARDING");
@@ -90,20 +97,20 @@ export default async function EmployeePage({ params, searchParams }: { params: P
   const PAY_TYPE = { MONTHLY: "per month", DAILY: "per day", HOURLY: "per hour" } as const;
   const own = e.id === mine.id;
   // Pay is personal: HR and the person themselves only.
-  const breakdown = hr || own ? await payBreakdown(me, mine.id, e.id, today, settings) : null;
-  const f201 = hr ? items201((await load201(me.organizationId, [e.id])).get(e.id)) : null;
+  const breakdown = canPay || own ? await payBreakdown(me, mine.id, e.id, today, settings) : null;
+  const f201 = canDocs ? items201((await load201(me.organizationId, [e.id])).get(e.id)) : null;
   type Tab = { href: string; label: string; icon: IconName };
   const tabs = ([
-    (hr || own) && { href: own ? "/payslips" : `/payslips?employee=${e.id}`, label: "Payslips", icon: "payslip" },
+    (can(me, "payslips.view_all") || own) && { href: own ? "/payslips" : `/payslips?employee=${e.id}`, label: "Payslips", icon: "payslip" },
     { href: `/schedule?employee=${e.id}`, label: "Schedule", icon: "schedule" },
     { href: `/dtr?employee=${e.id}`, label: "DTR", icon: "dtr" },
-    (hr || own) && { href: own ? "/cash-advance" : `/cash-advance?employee=${e.id}`, label: "Cash advance", icon: "cashAdvance" },
+    (can(me, "cashadvance.decide") || own) && { href: own ? "/cash-advance" : `/cash-advance?employee=${e.id}`, label: "Cash advance", icon: "cashAdvance" },
     { href: own ? "/daily-report" : `/daily-report?employee=${e.id}`, label: "Daily report", icon: "dailyReport" },
     (hr || own) && { href: own ? "/policies" : `/policies?employee=${e.id}`, label: "Policies", icon: "policies" },
   ] as (Tab | false)[]).filter((t): t is Tab => !!t);
   const shifts = canSchedule ? await prisma.shiftTemplate.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, orderBy: { startTime: "asc" } }) : [];
 
-  const [departments, positions, managers] = hr
+  const [departments, positions, managers] = canEditEmployee
     ? await Promise.all([
         prisma.department.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
         prisma.position.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, select: { id: true, title: true, level: true }, orderBy: { title: "asc" } }),
@@ -161,7 +168,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
           <div className="mt-5 flex flex-wrap gap-2">
             <Link href={`/dtr?employee=${e.id}`} className={buttonClass}>View DTR</Link>
             <Link href={`/schedule?employee=${e.id}`} className="rounded-lg border border-line px-4 py-2.5 font-semibold transition hover:bg-bg">View schedule</Link>
-            {hr && <Link href={`/contracts?employee=${e.id}`} className="rounded-lg border border-line px-4 py-2.5 font-semibold transition hover:border-brand hover:text-brand"><Icon name="contract" className={ICON_INLINE} /> Contract</Link>}
+            {canContract && <Link href={`/contracts?employee=${e.id}`} className="rounded-lg border border-line px-4 py-2.5 font-semibold transition hover:border-brand hover:text-brand"><Icon name="contract" className={ICON_INLINE} /> Contract</Link>}
           </div>
         </Card>
 
@@ -188,7 +195,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
       <Card>
         <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-semibold">Work schedule {e.flexible && <Badge tone="brand">Flexible</Badge>}</h2>
-          {hr && (
+          {canEditEmployee && (
             <form action={setFlexible.bind(null, e.id, !e.flexible)}>
               <button className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium transition hover:bg-bg active:scale-95">{e.flexible ? "Switch to fixed shift" : "Make flexible"}</button>
             </form>
@@ -232,11 +239,11 @@ export default async function EmployeePage({ params, searchParams }: { params: P
       {f201 && (
         <Card className="space-y-3">
           <h2 className="font-semibold">201 file</h2>
-          <File201 employeeId={e.id} items={f201} mandatory={own && !hr} />
+          <File201 employeeId={e.id} items={f201} mandatory={own && !canDocs} />
         </Card>
       )}
 
-      {!hr && own && breakdown && (
+      {!canPay && own && breakdown && (
         <Card className="space-y-3">
           <h2 className="font-semibold">My pay</h2>
           <PayBreakdown b={breakdown} daysPerYear={settings.daysPerYear} hoursPerDay={settings.hoursPerDay} isAdmin={false} today={today} />
@@ -246,7 +253,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
       {onboarding.length > 0 && <ChecklistCard title="Onboarding checklist" items={onboarding} />}
       {offboarding.length > 0 && <ChecklistCard title="Offboarding checklist" items={offboarding} />}
 
-      {hr && (
+      {canPay && (
         <Card className="space-y-4">
           <div>
             <h2 className="font-semibold">Pay</h2>
@@ -290,7 +297,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
         </Card>
       )}
 
-      {hr && (
+      {canPay && (
         <Card className="space-y-4">
           <div>
             <h2 className="font-semibold">Tax and contributions</h2>
@@ -348,7 +355,19 @@ export default async function EmployeePage({ params, searchParams }: { params: P
         </Card>
       )}
 
-      {hr && (
+      {can(me, "access.manage") && e.userId && e.userId !== me.id && (
+        <Card>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-semibold">Access</h2>
+              <p className="text-sm text-muted">Role, and exactly what this account can open and do. Suggested role follows the position.</p>
+            </div>
+            <Link href={`/admin/users/${e.userId}/access`} className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white transition active:scale-95">Manage access</Link>
+          </div>
+        </Card>
+      )}
+
+      {canEditEmployee && (
         <Card>
           <h2 className="mb-4 font-semibold">Edit details and sign-in</h2>
           <EditDetailsForm
@@ -359,7 +378,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
         </Card>
       )}
 
-      {hr && (
+      {canEditEmployee && (
         <Card>
           <h2 className="mb-4 font-semibold">Change assignment or status</h2>
           <AssignmentForm
@@ -372,7 +391,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
           />
         </Card>
       )}
-      {hr && !own && (
+      {canRemove && !own && (
         <Card className="border-danger/40">
           <h2 className="mb-3 font-semibold">Make inactive or delete</h2>
           <DeleteEmployeeForm employeeId={e.id} employeeNo={e.employeeNo} name={`${e.firstName} ${e.lastName}`} superAdmin={me.role.key === ROLES.SUPER_ADMIN} status={e.status} />

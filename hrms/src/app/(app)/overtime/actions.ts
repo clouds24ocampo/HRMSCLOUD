@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -72,7 +73,7 @@ export async function decideOvertime(id: string, decision: "APPROVED" | "REJECTE
   const mine = await getMyEmployee(me);
   const rows = await prisma.employee.findMany({ where: { organizationId: me.organizationId }, select: { id: true, managerId: true } });
   const step = stepOf(r, !!r.employee.managerId);
-  const blocked = mayDecide({ roleKey: me.role.key, actorUserId: me.id, actorEmployeeId: mine.id, employeeId: r.employeeId, step, ancestors: ancestorIds(rows, r.employeeId), headApprovedById: r.headApprovedById });
+  const blocked = mayDecide({ roleKey: me.role.key, finalApprover: can(me, "overtime.approve_all"), actorUserId: me.id, actorEmployeeId: mine.id, employeeId: r.employeeId, step, ancestors: ancestorIds(rows, r.employeeId), headApprovedById: r.headApprovedById });
   if (blocked) return { error: blocked };
 
   const uid = await userIdOfEmployee(me.organizationId, r.employeeId);

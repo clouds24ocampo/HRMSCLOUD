@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { regularMinutesOf } from "@/lib/payroll";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -106,7 +107,7 @@ export default async function PayslipPage({ params }: { params: Promise<{ id: st
     include: { lines: { orderBy: { sortOrder: "asc" } }, period: true, employee: { select: { userId: true } } },
   });
   if (!s) notFound();
-  const hr = isHr(me.role.key);
+  const hr = can(me, "payslips.view_all");
   const own = s.employee.userId === me.id;
   // HR sees any payslip, even a draft. An employee sees only their own, and only once payroll is final.
   if (!hr && !(own && s.period.status === "FINALIZED")) notFound();

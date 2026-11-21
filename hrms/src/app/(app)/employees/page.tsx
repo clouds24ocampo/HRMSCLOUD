@@ -1,8 +1,10 @@
+import { orgRoles } from "@/lib/access";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
-import { employeeScope, isHr } from "@/lib/scope";
+import { employeeScope } from "@/lib/scope";
+import { can } from "@/lib/permissions";
 import { dayKey, formatDay } from "@/lib/time";
 import { getOrgSettings } from "@/lib/settings";
 import { LEVEL_LABEL } from "@/lib/defaults";
@@ -16,7 +18,8 @@ export default async function EmployeesPage({ searchParams }: { searchParams: Pr
   const sp = await searchParams;
   const settings = await getOrgSettings(me.organizationId);
   const mine = await getMyEmployee(me, settings.timezone);
-  const hr = isHr(me.role.key);
+  const hr = can(me, "employees.view_all");
+  const canAdd = can(me, "employees.add");
   const scope = await employeeScope(me, mine.id);
 
   const q = sp.q?.trim();
@@ -38,10 +41,10 @@ export default async function EmployeesPage({ searchParams }: { searchParams: Pr
       take: 300, // ponytail: no pagination until an organization needs it
     }),
     prisma.department.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
-    hr ? prisma.position.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, select: { id: true, title: true, level: true }, orderBy: { title: "asc" } }) : [],
-    hr ? prisma.employee.findMany({ where: { organizationId: me.organizationId, status: { not: "SEPARATED" } }, select: { id: true, firstName: true, lastName: true, employeeNo: true }, orderBy: { lastName: "asc" } }) : [],
-    hr ? prisma.role.findMany({ select: { id: true, key: true, name: true }, orderBy: { name: "asc" } }) : [],
-    hr ? prisma.shiftTemplate.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, select: { id: true, name: true, startTime: true, endTime: true }, orderBy: { startTime: "asc" } }) : [],
+    canAdd ? prisma.position.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, select: { id: true, title: true, level: true }, orderBy: { title: "asc" } }) : [],
+    canAdd ? prisma.employee.findMany({ where: { organizationId: me.organizationId, status: { not: "SEPARATED" } }, select: { id: true, firstName: true, lastName: true, employeeNo: true }, orderBy: { lastName: "asc" } }) : [],
+    canAdd ? orgRoles(me.organizationId).then((rs) => rs.filter((r) => me.role.key === "SUPER_ADMIN" || (r.key !== "SUPER_ADMIN" && r.key !== "HR_ADMIN"))) : [],
+    canAdd ? prisma.shiftTemplate.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, select: { id: true, name: true, startTime: true, endTime: true }, orderBy: { startTime: "asc" } }) : [],
   ]);
   const today = dayKey(new Date(), settings.timezone);
   const filtered = !!(q || sp.dept || sp.status);
@@ -50,7 +53,7 @@ export default async function EmployeesPage({ searchParams }: { searchParams: Pr
     <div className="mx-auto max-w-5xl space-y-6">
       <PageHeader title={hr ? "Employees" : "My team"} subtitle={hr ? "Everyone in your organization." : "You, and everyone who reports to you."} />
 
-      {hr && (
+      {canAdd && (
         <details className="group rounded-2xl border border-line bg-surface shadow-sm open:pb-1">
           <summary className="cursor-pointer list-none px-5 py-4 font-semibold marker:hidden">
             <span className="mr-2 inline-block transition group-open:rotate-90">▸</span>Add an employee

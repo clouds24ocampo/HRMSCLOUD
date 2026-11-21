@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
@@ -15,8 +16,8 @@ export default async function LearningPage() {
   const me = await requireUser("/learning");
   const settings = await getOrgSettings(me.organizationId);
   const mine = await getMyEmployee(me, settings.timezone);
-  const hr = isHr(me.role.key);
-  const manager = me.role.key === ROLES.MANAGER;
+  const hr = can(me, "learning.manage");
+  const manager = can(me, "team.manage");
   const today = dayKey(new Date(), settings.timezone);
   const soon = addDays(today, SOON_DAYS);
   const fmt = (d: Date) => formatDay(keyOfDbDate(d), { month: "short", day: "numeric", year: "numeric" });

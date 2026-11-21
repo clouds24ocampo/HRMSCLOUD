@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -174,7 +175,7 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
       {view === "timeline" && <TimelineView ctx={ctx} />}
       {view === "calendar" && <CalendarView ctx={ctx} month={month} />}
       {view === "dashboard" && <DashboardView ctx={ctx} />}
-      {view === "reports" && <ReportsView ctx={ctx} days={[7, 30, 90].includes(Number(sp.r)) ? Number(sp.r) : 30} showAll={canManage || isHr(me.role.key) || me.role.key === ROLES.MANAGER} meUserId={me.id} />}
+      {view === "reports" && <ReportsView ctx={ctx} days={[7, 30, 90].includes(Number(sp.r)) ? Number(sp.r) : 30} showAll={canManage || can(me, "worksync.manage_all") || can(me, "team.manage")} meUserId={me.id} />}
 
       {open && (
         <Sheet closeHref={closeHref} label={`Card: ${open.title}`}>

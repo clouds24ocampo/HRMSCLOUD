@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -53,7 +54,7 @@ export async function cancelCashAdvance(id: string) {
 // HR (or a Super Admin) confirms/decides the cash advance request.
 export async function decideCashAdvance(id: string, decision: "APPROVED" | "REJECTED", _: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/cash-advance");
-  if (!isHr(me.role.key)) return { error: "Only HR can decide cash advances." };
+  if (!can(me, "cashadvance.decide")) return { error: "Only HR can decide cash advances." };
   const note = z.string().trim().max(300).optional().parse(form.get("note") ?? undefined);
   if (decision === "REJECTED" && (note ?? "").length < 3) return { error: "Give a short reason for rejecting." };
   const r = await prisma.cashAdvance.findFirst({ where: { id, organizationId: me.organizationId, status: "PENDING" } });
@@ -77,7 +78,7 @@ export async function decideCashAdvance(id: string, decision: "APPROVED" | "REJE
 // It can change until a payroll that took it is finalized; after that the deduction is on record.
 export async function setCashAdvanceDeduction(id: string, _: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/cash-advance");
-  if (!isHr(me.role.key)) return { error: "Only HR can decide deductions." };
+  if (!can(me, "cashadvance.decide")) return { error: "Only HR can decide deductions." };
   const r = await prisma.cashAdvance.findFirst({ where: { id, organizationId: me.organizationId, status: "APPROVED" }, include: { _count: { select: { payments: true } } } });
   if (!r) return { error: "Advance not found." };
   if (r._count.payments > 0) return { error: "Already deducted on a finalized payslip. It can no longer change." };

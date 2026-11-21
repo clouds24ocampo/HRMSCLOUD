@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -17,7 +18,7 @@ export default async function DigitalIdPage({ searchParams }: { searchParams: Pr
   const mine = await getMyEmployee(me);
   const employeeId = sp.employee ?? mine.id;
   if (!(await canViewEmployee(me, mine.id, employeeId))) notFound();
-  const hr = isHr(me.role.key);
+  const hr = can(me, "id.manage");
   const own = employeeId === mine.id;
   // Government numbers are sensitive: in full only for the owner and HR; supervisors who open the card see them hidden.
   const card = await idCardFor(me.organizationId, employeeId, { revealNumbers: own || hr });

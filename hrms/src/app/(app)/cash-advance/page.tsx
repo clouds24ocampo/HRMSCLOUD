@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
@@ -79,7 +80,7 @@ export default async function CashAdvancePage({ searchParams }: { searchParams: 
   const me = await requireUser("/cash-advance");
   const sp = await searchParams;
   const mine = await getMyEmployee(me);
-  const hr = isHr(me.role.key);
+  const hr = can(me, "cashadvance.decide");
   const settings = await getOrgSettings(me.organizationId);
   const tz = settings.timezone;
   // Cut-offs HR can deduct on: the current one and the next five.

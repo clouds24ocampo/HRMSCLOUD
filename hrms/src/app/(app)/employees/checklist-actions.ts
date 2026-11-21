@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
@@ -15,9 +16,9 @@ export async function toggleChecklistItem(id: string) {
   if (!item) return;
   const mine = await getMyEmployee(me);
   const ok =
-    isHr(me.role.key) ||
+    can(me, "checklists.manage") ||
     (item.owner === "EMPLOYEE" && item.employeeId === mine.id) ||
-    (item.owner === "MANAGER" && me.role.key === ROLES.MANAGER && item.employeeId !== mine.id && (await canViewEmployee(me, mine.id, item.employeeId)));
+    (item.owner === "MANAGER" && can(me, "team.manage") && item.employeeId !== mine.id && (await canViewEmployee(me, mine.id, item.employeeId)));
   if (!ok) return;
   const done = !item.doneAt;
   await prisma.checklistItem.update({ where: { id }, data: { doneAt: done ? new Date() : null, doneById: done ? me.id : null } });

@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -12,7 +13,7 @@ import { audit } from "@/lib/audit";
 
 export async function createContractAction(_: FormState, form: FormData): Promise<FormState & { contractId?: string }> {
   const me = await requireUser("/contracts");
-  if (!isHr(me.role.key)) return { error: "Only HR or Administrator can generate employment contracts." };
+  if (!can(me, "contracts.manage")) return { error: "Only HR or Administrator can generate employment contracts." };
 
   const parsed = z
     .object({
@@ -59,7 +60,7 @@ export async function signContractAction(contractId: string, _: FormState, form:
 
 export async function voidContractAction(contractId: string, reason: string): Promise<FormState> {
   const me = await requireUser("/contracts");
-  if (!isHr(me.role.key)) return { error: "Only HR can cancel a contract." };
+  if (!can(me, "contracts.manage")) return { error: "Only HR can cancel a contract." };
 
   const contract = await prisma.contract.findFirst({
     where: { id: contractId, organizationId: me.organizationId },
@@ -79,7 +80,7 @@ export async function voidContractAction(contractId: string, reason: string): Pr
 
 export async function restoreContractAction(contractId: string): Promise<FormState> {
   const me = await requireUser("/contracts");
-  if (!isHr(me.role.key)) return { error: "Only HR can restore a contract." };
+  if (!can(me, "contracts.manage")) return { error: "Only HR can restore a contract." };
 
   const contract = await prisma.contract.findFirst({
     where: { id: contractId, organizationId: me.organizationId, status: "VOID" },
@@ -100,7 +101,7 @@ export async function restoreContractAction(contractId: string): Promise<FormSta
 
 export async function issueContractAction(contractId: string): Promise<FormState> {
   const me = await requireUser("/contracts");
-  if (!isHr(me.role.key)) return { error: "Only HR can issue contracts." };
+  if (!can(me, "contracts.manage")) return { error: "Only HR can issue contracts." };
 
   const contract = await prisma.contract.findFirst({
     where: { id: contractId, organizationId: me.organizationId },
@@ -121,7 +122,7 @@ export async function issueContractAction(contractId: string): Promise<FormState
 
 export async function deleteContractAction(contractId: string) {
   const me = await requireUser("/contracts");
-  if (!isHr(me.role.key)) return;
+  if (!can(me, "contracts.manage")) return;
 
   const contract = await prisma.contract.findFirst({
     where: { id: contractId, organizationId: me.organizationId, status: "DRAFT" },

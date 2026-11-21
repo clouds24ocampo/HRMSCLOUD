@@ -7,6 +7,8 @@ import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
 import { ROLES } from "@/lib/roles";
+import { checkRoleChoice, levelOfUser } from "@/lib/access";
+import { GRANTABLE, effectivePerms, isPerm, rolePerms, type Perm } from "@/lib/permissions";
 import type { FormState } from "@/app/login/actions";
 
 const schema = z.object({
@@ -30,7 +32,8 @@ export async function createUser(_: FormState, form: FormData): Promise<FormStat
   if (await prisma.user.findUnique({ where: { email: data.email } })) {
     return { error: "A user with this email already exists." };
   }
-  if (!(await prisma.role.findUnique({ where: { id: data.roleId } }))) return { error: "Choose a role." };
+  const choice = await checkRoleChoice(actor, data.roleId);
+  if ("error" in choice) return { error: choice.error };
 
   const user = await prisma.user.create({
     data: { ...data, organizationId: actor.organizationId, mustChangePassword: true, passwordHash: await bcrypt.hash(password, 12) },
@@ -84,16 +87,53 @@ export async function changeUserRole(userId: string, _: FormState, form: FormDat
   const me = await requireUser("/admin/users");
   const roleId = z.string().min(1, "Choose a role.").safeParse(form.get("roleId"));
   if (!roleId.success) return { error: roleId.error.issues[0].message };
-  const [t, role] = await Promise.all([target(me.organizationId, userId), prisma.role.findUnique({ where: { id: roleId.data } })]);
-  if (!t || !role) return { error: "User or role not found." };
+  const t = await target(me.organizationId, userId);
+  if (!t) return { error: "User not found." };
   if (t.id === me.id) return { error: "You cannot change your own role." };
+  const choice = await checkRoleChoice(me, roleId.data, { level: await levelOfUser(t.id, me.organizationId) });
+  if ("error" in choice) return { error: choice.error };
+  const role = choice.role;
   if (role.id === t.roleId) return { ok: "Nothing changed." };
   if (t.role.key === ROLES.SUPER_ADMIN && role.key !== ROLES.SUPER_ADMIN && (await otherSuperAdmins(me.organizationId, t.id)) === 0) {
     return { error: "This is the only active Super Admin. Make someone else a Super Admin first." };
   }
-  await prisma.user.update({ where: { id: t.id }, data: { roleId: role.id } });
+  await prisma.user.update({ where: { id: t.id }, data: { roleId: role.id, grants: [], revokes: [] } }); // a new role starts clean: personal changes were made against the old one
   await prisma.session.deleteMany({ where: { userId: t.id } }); // the new role applies at the next sign-in
   await audit(me.id, "user.role_changed", "User", t.id, { from: t.role.key, to: role.key }, me.organizationId);
   revalidatePath("/admin/users");
   return { ok: `${t.name} is now ${role.name}. They must sign in again.` };
+}
+
+// Role and personal access in one save. `perms` is the full list the person should end up with; what differs from the role becomes an
+// extra (added) or a removal for this account only. The Super Admin role is fixed and cannot be edited here.
+export async function saveAccess(userId: string, roleId: string, perms: string[], note: string): Promise<FormState> {
+  const me = await requireUser("/admin/users");
+  const t = await target(me.organizationId, userId);
+  if (!t) return { error: "User not found." };
+  if (t.id === me.id) return { error: "You cannot change your own access. Ask another Super Admin." };
+  const want = new Set(perms.filter((p): p is Perm => isPerm(p) && GRANTABLE.includes(p as Perm)));
+  const level = await levelOfUser(t.id, me.organizationId);
+  const first = await checkRoleChoice(me, roleId, { level });
+  if ("error" in first) return { error: first.error };
+  const role = first.role;
+  const base = new Set(rolePerms(role));
+  const grants = role.key === ROLES.SUPER_ADMIN ? [] : [...want].filter((p) => !base.has(p));
+  const revokes = role.key === ROLES.SUPER_ADMIN ? [] : [...base].filter((p) => !want.has(p));
+  // Nobody can give access they do not hold themselves (a Super Admin holds everything).
+  if (me.role.key !== ROLES.SUPER_ADMIN && grants.some((g) => !me.perms.has(g))) return { error: "You cannot give access you do not have yourself." };
+  const final = effectivePerms(role, grants, revokes);
+  const check = await checkRoleChoice(me, roleId, { level, grants, revokes });
+  if ("error" in check) return { error: check.error };
+  if (t.role.key === ROLES.SUPER_ADMIN && role.key !== ROLES.SUPER_ADMIN && (await otherSuperAdmins(me.organizationId, t.id)) === 0) {
+    return { error: "This is the only active Super Admin. Make someone else a Super Admin first." };
+  }
+  const before = effectivePerms(t.role, t.grants, t.revokes);
+  await prisma.user.update({ where: { id: t.id }, data: { roleId: role.id, grants, revokes } });
+  await prisma.session.deleteMany({ where: { userId: t.id } }); // the new access applies at the next sign-in
+  const added = [...final].filter((p) => !before.has(p));
+  const removed = [...before].filter((p) => !final.has(p));
+  await audit(me.id, "user.access_changed", "User", t.id, { role: { from: t.role.key, to: role.key }, grants, revokes, added, removed, note: note.slice(0, 300) || undefined }, me.organizationId);
+  revalidatePath("/admin/users");
+  revalidatePath(`/admin/users/${t.id}/access`);
+  return { ok: `${t.name}: ${final.size} permission${final.size === 1 ? "" : "s"} (${added.length} added, ${removed.length} removed). They must sign in again.` };
 }

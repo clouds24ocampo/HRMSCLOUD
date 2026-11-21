@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
@@ -20,7 +21,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
   const sp = await searchParams;
   const settings = await getOrgSettings(me.organizationId);
   const mine = await getMyEmployee(me, settings.timezone);
-  const hr = isHr(me.role.key);
+  const hr = can(me, "documents.manage");
   // Only HR can look at someone else's file. Everyone else sees their own, whatever the URL says.
   const employeeId = hr && sp.employee ? sp.employee : mine.id;
   const today = dayKey(new Date(), settings.timezone);

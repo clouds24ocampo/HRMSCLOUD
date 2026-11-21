@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -65,8 +66,8 @@ export default async function ReportsPage({
   if (daysBetween(from, to).length > MAX_RANGE_DAYS) to = addDays(from, MAX_RANGE_DAYS - 1);
   const orgId = me.organizationId;
   const fmt = (k: string) => formatDay(k, { month: "short", day: "numeric", year: "numeric" });
-  const hr = isHr(me.role.key);
-  const isManager = me.role.key === ROLES.MANAGER;
+  const hr = can(me, "reports.view");
+  const isManager = can(me, "team.manage");
   // The route already limits /reports to HR and Super Admin; these tabs hold pay and personal-document data, so they check again here
   // in case the route rule is ever widened (pay data is visible to HR and the person only).
   if ((activeTab === "documents" || activeTab === "payroll") && !hr) notFound();

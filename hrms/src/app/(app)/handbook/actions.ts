@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -26,7 +27,7 @@ export async function acknowledgeHandbookAction(_: FormState, form: FormData): P
 
 export async function updateHandbookSectionAction(sectionId: string, _: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/handbook");
-  if (!isHr(me.role.key)) return { error: "Only HR or Administrator can edit the Company Handbook." };
+  if (!can(me, "handbook.manage")) return { error: "Only HR or Administrator can edit the Company Handbook." };
 
   const parsed = z
     .object({
@@ -67,7 +68,7 @@ export async function updateHandbookSectionAction(sectionId: string, _: FormStat
 
 export async function createHandbookSectionAction(_: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/handbook");
-  if (!isHr(me.role.key)) return { error: "Only HR can add handbook sections." };
+  if (!can(me, "handbook.manage")) return { error: "Only HR can add handbook sections." };
 
   const parsed = z
     .object({
@@ -104,7 +105,7 @@ export async function createHandbookSectionAction(_: FormState, form: FormData):
 // HR loads the ready-made IT company handbook. Chapters that HR already edited by hand are kept as they are.
 export async function installItHandbookAction(): Promise<FormState> {
   const me = await requireUser("/handbook");
-  if (!isHr(me.role.key)) return { error: "Only HR or Administrator can install the handbook." };
+  if (!can(me, "handbook.manage")) return { error: "Only HR or Administrator can install the handbook." };
   const r = await installItHandbook(me.organizationId, me.organization.name, me.id);
   revalidatePath("/handbook");
   const kept = r.keptEdited.length ? ` Kept as you edited them: ${r.keptEdited.join(", ")}.` : "";

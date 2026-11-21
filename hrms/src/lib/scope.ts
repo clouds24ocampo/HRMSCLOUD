@@ -1,11 +1,11 @@
 // Who may see whom. One place, used by every page and action that touches employee data.
 //   Employee            -> self
-//   Manager             -> self + everyone below them in the supervisor chain
-//   HR Admin / Super Admin -> everyone in the organization
+//   Team access (team.manage) -> self + everyone below them in the supervisor chain
+//   employees.view_all  -> everyone in the organization (HR Admin, Super Admin, or any role that was given it)
 import { prisma } from "@/lib/prisma";
 import { ROLES } from "@/lib/roles";
 
-export type Actor = { id: string; organizationId: string; name: string; role: { key: string } };
+export type Actor = { id: string; organizationId: string; name: string; role: { key: string }; perms: ReadonlySet<string> };
 
 export const isHr = (roleKey: string) => roleKey === ROLES.SUPER_ADMIN || roleKey === ROLES.HR_ADMIN;
 
@@ -27,8 +27,8 @@ export function descendantIds(rows: { id: string; managerId: string | null }[], 
 
 // null means "everyone in the organization".
 export async function visibleEmployeeIds(actor: Actor, myEmployeeId: string): Promise<string[] | null> {
-  if (isHr(actor.role.key)) return null;
-  if (actor.role.key === ROLES.MANAGER) {
+  if (actor.perms.has("employees.view_all")) return null;
+  if (actor.perms.has("team.manage")) {
     const rows = await prisma.employee.findMany({ where: { organizationId: actor.organizationId }, select: { id: true, managerId: true } });
     return descendantIds(rows, myEmployeeId);
   }

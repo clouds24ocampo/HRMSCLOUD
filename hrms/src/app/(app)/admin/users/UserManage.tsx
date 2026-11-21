@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { PasswordInput } from "@/components/PasswordInput";
 import { useKeptForm } from "@/components/useKeptForm";
@@ -11,7 +12,7 @@ import { changeUserRole, resetUserPassword, setUserActive } from "./actions";
 type U = { id: string; name: string; active: boolean; roleId: string };
 
 // Reset password, change role, deactivate. Hidden for your own row (those would lock you out).
-export function UserManage({ user, roles }: { user: U; roles: { id: string; name: string }[] }) {
+export function UserManage({ user, roles, extras, removed }: { user: U; roles: { id: string; name: string }[]; extras: number; removed: number }) {
   const [msg, setMsg] = useState<FormState>();
   const [pending, start] = useTransition();
   const reset = useKeptForm(resetUserPassword.bind(null, user.id));
@@ -19,6 +20,13 @@ export function UserManage({ user, roles }: { user: U; roles: { id: string; name
 
   return (
     <div className="space-y-4 border-t border-line bg-bg px-4 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-surface px-4 py-3">
+        <p className="text-sm">
+          <span className="font-semibold">Access.</span>{" "}
+          <span className="text-muted">{extras || removed ? `${extras} added, ${removed} removed on top of the role.` : "Exactly what the role gives."}</span>
+        </p>
+        <Link href={`/admin/users/${user.id}/access`} className="rounded-lg bg-brand px-3 py-1.5 text-sm font-semibold text-white transition active:scale-95">Edit access</Link>
+      </div>
       <form {...reset.formProps} className="flex flex-wrap items-end gap-2">
         <label className="block min-w-0 flex-1 basis-56 text-sm font-medium">
           New temporary password

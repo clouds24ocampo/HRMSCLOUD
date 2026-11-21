@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -27,7 +28,7 @@ export async function uploadDocument(_: FormState, form: FormData): Promise<Form
     })
     .safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
-  const employeeId = isHr(me.role.key) ? parsed.data.employeeId || mine.id : mine.id;
+  const employeeId = can(me, "documents.manage") ? parsed.data.employeeId || mine.id : mine.id;
   if (!(await prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId } }))) return { error: "Employee not found." };
 
   const r = await storeUpload(me, mine.id, employeeId, form.get("file"), { category: parsed.data.category, title: parsed.data.title, expiresOn: parsed.data.expiresOn });
@@ -72,7 +73,7 @@ export async function upload201(employeeId: string, title: string, _: FormState,
   const me = await requireUser("/documents");
   if (!isFile201Title(title)) return { error: "Unknown 201 file requirement." };
   const mine = await getMyEmployee(me);
-  if (!isHr(me.role.key) && employeeId !== mine.id) return { error: "You can only upload to your own 201 file." };
+  if (!can(me, "documents.manage") && employeeId !== mine.id) return { error: "You can only upload to your own 201 file." };
   if (!(await prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId } }))) return { error: "Employee not found." };
   const r = await storeUpload(me, mine.id, employeeId, form.get("file"), { category: FILE_201_CATEGORY, title });
   if ("error" in r) return r;
@@ -84,7 +85,7 @@ export async function upload201(employeeId: string, title: string, _: FormState,
 
 export async function archiveDocument(id: string) {
   const me = await requireUser("/documents");
-  if (!isHr(me.role.key)) return;
+  if (!can(me, "documents.manage")) return;
   const d = await prisma.employeeDocument.findFirst({ where: { id, organizationId: me.organizationId } });
   if (!d) return;
   await prisma.employeeDocument.update({ where: { id }, data: { archivedAt: new Date() } });

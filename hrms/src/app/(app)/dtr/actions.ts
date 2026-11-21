@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -63,7 +64,7 @@ export async function recordTime(raw: StampInput): Promise<ClockResult> {
 // `stamp` is "<typeId>|<phase>" where phase is MAIN (Time In/Out), START or END (pauses).
 export async function addManualPunch(_: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/dtr");
-  if (!isHr(me.role.key)) return { error: "Only HR can add a missed punch." };
+  if (!can(me, "dtr.correct")) return { error: "Only HR can add a missed punch." };
   const parsed = z
     .object({
       employeeId: z.string().min(1, "Choose an employee."),
@@ -105,7 +106,7 @@ export async function addManualPunch(_: FormState, form: FormData): Promise<Form
 
 export async function voidPunch(eventId: string, _: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser("/dtr");
-  if (!isHr(me.role.key)) return { error: "Only HR can void a punch." };
+  if (!can(me, "dtr.correct")) return { error: "Only HR can void a punch." };
   const reason = z.string().trim().min(5, "Give a reason (at least 5 characters).").max(300).safeParse(form.get("reason"));
   if (!reason.success) return { error: reason.error.issues[0].message };
   const ev = await prisma.timeEvent.findFirst({ where: { id: eventId, organizationId: me.organizationId, voidedAt: null } });

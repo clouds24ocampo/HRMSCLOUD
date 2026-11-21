@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
@@ -14,7 +15,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     include: { employee: { select: { userId: true } } },
   });
   const own = doc?.employee.userId === me.id;
-  if (!doc || !(isHr(me.role.key) || own)) return new Response("Not found", { status: 404 });
+  if (!doc || !(can(me, "documents.view_all") || own)) return new Response("Not found", { status: 404 });
   const bytes = await readStored(doc.storageKey, me.organizationId);
   if (!bytes) return new Response("The file is missing from storage.", { status: 404 });
   if (!own) await audit(me.id, "document.viewed", "EmployeeDocument", doc.id, { employeeId: doc.employeeId, title: doc.title }, me.organizationId);

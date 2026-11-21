@@ -9,13 +9,21 @@ datasource db {
 }
 
 // Roles are data. Keys used in code live in src/lib/roles.ts.
+// A built-in role (organizationId empty: Super Admin, HR Admin, Manager, Employee, Sub Contractor, Applicant) has fixed permissions in
+// src/lib/permissions.ts. A company role (organizationId set) is created in the Roles page and carries the permissions chosen for it.
 model Role {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  name      String
-  users     User[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String        @id @default(cuid())
+  key            String        @unique
+  name           String
+  description    String?
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  permissions    String[]      @default([])
+  users          User[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([organizationId])
 }
 
 // One row per registered company/organization. Every tenant table carries organizationId.
@@ -53,6 +61,7 @@ model Organization {
   checklistItems     ChecklistItem[]
   jobs               JobPosting[]
   applicants         Applicant[]
+  roles              Role[]
   personalDataSheets PersonalDataSheet[]
   applicantContracts ApplicantContract[]
   applicantNotes     ApplicantNote[]
@@ -103,6 +112,9 @@ model User {
   mustChangePassword Boolean              @default(false)
   roleId             String
   role               Role                 @relation(fields: [roleId], references: [id])
+  // Itemized access on top of the role: permissions added for this account, and permissions of the role taken away from it.
+  grants             String[]             @default([])
+  revokes            String[]             @default([])
   sessions           Session[]
   employee           Employee?
   notifications      Notification[]

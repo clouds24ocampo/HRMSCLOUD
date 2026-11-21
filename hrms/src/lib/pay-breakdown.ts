@@ -24,6 +24,8 @@ export type PayDayRow = { day: string; recoveredMinutes: number; regularMinutes:
 
 // `cutoff` picks an earlier cut-off (Payslips page); by default the one holding today. Days after today are not counted yet.
 export async function payBreakdown(me: Actor, myEmployeeId: string, employeeId: string, today: string, s: { timezone: string; graceMinutes: number; daysPerYear: number; hoursPerDay: number; otMultiplierBp: number }, cutoff?: Cutoff) {
+  // Someone else's pay needs the payroll or payslip permission, whatever the caller checked.
+  if (employeeId !== myEmployeeId && !me.perms.has("payroll.view") && !me.perms.has("payslips.view_all")) return null;
   const cut = cutoff ?? cutoffFor(today);
   const last = cut.end < today ? cut.end : today;
   // The pay rate in force at the end of that cut-off (a raise later does not rewrite an older cut-off).

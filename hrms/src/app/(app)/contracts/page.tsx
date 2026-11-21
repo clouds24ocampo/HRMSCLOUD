@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import type { ContractStatus } from "@/generated/prisma/client";
@@ -20,7 +21,7 @@ export default async function ContractsPage({
   const me = await requireUser("/contracts");
   const settings = await getOrgSettings(me.organizationId);
   const mine = await getMyEmployee(me, settings.timezone);
-  const hr = isHr(me.role.key);
+  const hr = can(me, "contracts.manage");
   const sp = await searchParams;
 
   const employeeFilter = hr && sp.employee ? sp.employee : undefined;

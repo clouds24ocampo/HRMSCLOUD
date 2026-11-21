@@ -2,7 +2,8 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { findSession } from "@/lib/session";
-import { canAccess, homeFor } from "@/lib/roles";
+import { homeFor } from "@/lib/roles";
+import { canAccessPath } from "@/lib/permissions";
 import { isDbDown } from "@/lib/db-health";
 import { config } from "@/lib/config";
 
@@ -38,6 +39,6 @@ export async function requireUser(path: string) {
   if (!user) redirect(path === "/apply" || path.startsWith("/apply/") ? "/careers/login" : "/login");
   // Temporary password: nothing else is reachable until the user picks their own.
   if (user.mustChangePassword && path !== "/change-password") redirect("/change-password");
-  if (!canAccess(user.role.key, path)) redirect(user.role.key === "APPLICANT" ? "/apply" : "/dashboard?denied=1"); // /apply must not bounce back to itself
+  if (!canAccessPath(user.role.key, user.perms, path)) redirect(user.role.key === "APPLICANT" ? "/apply" : "/dashboard?denied=1"); // /apply must not bounce back to itself
   return user;
 }

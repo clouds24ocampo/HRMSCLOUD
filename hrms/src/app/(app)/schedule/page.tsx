@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
@@ -25,7 +26,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
   const today = dayKey(new Date(), tz);
   const ws = weekStart(sp.week && /^\d{4}-\d{2}-\d{2}$/.test(sp.week) ? sp.week : today);
   const days = daysBetween(ws, addDays(ws, 6));
-  const canEdit = me.role.key === ROLES.MANAGER || isHr(me.role.key);
+  const canEdit = can(me, "team.manage") || can(me, "schedule.plan_all");
 
   const scope = await employeeScope(me, mine.id);
   const [people, shifts] = await Promise.all([
@@ -196,7 +197,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
                             day={d}
                             weekday={new Date(`${d}T00:00:00Z`).getUTCDay()}
                             shifts={shiftOpts}
-                            locked={!canEdit || (d < today && !isHr(me.role.key))}
+                            locked={!canEdit || (d < today && !can(me, "schedule.edit_past"))}
                             activity={activity}
                           >
                             {/* 1. FLEXIBLE SCHEDULE */}
@@ -318,7 +319,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
           </Card>
           <Card>
             <h2 className="mb-1 text-lg font-semibold">Change specific days</h2>
-            <p className="mb-4 text-sm text-muted">A swap, an extra shift or a day off. This sits on top of the regular schedule.{isHr(me.role.key) ? "" : " You can change today and later."}</p>
+            <p className="mb-4 text-sm text-muted">A swap, an extra shift or a day off. This sits on top of the regular schedule.{can(me, "schedule.edit_past") ? "" : " You can change today and later."}</p>
             <ScheduleForm people={personOpts} teams={teams} shifts={shiftOpts} from={ws > today ? ws : today} to={days[6] > today ? days[6] : addDays(today, 6)} preselect={sp.employee} />
           </Card>
         </div>

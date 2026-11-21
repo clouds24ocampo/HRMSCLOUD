@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
@@ -22,7 +23,7 @@ export default async function PayslipsPage({ searchParams }: { searchParams: Pro
   const settings = await getOrgSettings(me.organizationId);
   const tz = settings.timezone;
   const mine = await getMyEmployee(me, tz);
-  const hr = isHr(me.role.key);
+  const hr = can(me, "payslips.view_all");
   // Pay is HR-only: anyone else always sees their own, whatever the URL says.
   const other = hr && sp.employee && sp.employee !== mine.id
     ? await prisma.employee.findFirst({ where: { id: sp.employee, organizationId: me.organizationId }, select: { id: true, firstName: true, lastName: true } })

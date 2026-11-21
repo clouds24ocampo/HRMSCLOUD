@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { requireUser } from "@/lib/auth";
 import { audit } from "@/lib/audit";
 import { csv, csvResponse } from "@/lib/csv";
@@ -23,7 +24,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const loaded = await loadProject(me, mine.id, id);
   if (!loaded) return new Response("Not found", { status: 404 });
   const type = url.searchParams.get("type") === "people" ? "people" : "cards";
-  const showAll = isHr(me.role.key) || me.role.key === ROLES.MANAGER || loaded.level === "MANAGE";
+  const showAll = (can(me, "worksync.manage_all") || can(me, "team.manage")) || loaded.level === "MANAGE";
   if (type === "people" && !showAll) return new Response("Only project leads, managers and HR can download the people report.", { status: 403 });
   const asked = Number(url.searchParams.get("r"));
   const days = RANGES.includes(asked) ? asked : 30;

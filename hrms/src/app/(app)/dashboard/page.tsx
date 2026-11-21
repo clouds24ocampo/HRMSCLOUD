@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
@@ -52,8 +53,8 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const today = dayKey(new Date(), tz);
   const dayStart = zonedTimeToUtc(today, 0, tz);
   const dayEnd = zonedTimeToUtc(addDays(today, 1), 0, tz);
-  const hr = isHr(me.role.key);
-  const approver = hr || me.role.key === ROLES.MANAGER;
+  const hr = can(me, "employees.view_all");
+  const approver = can(me, "team.manage");
   const cut = cutoffFor(today);
 
   if (hr) {

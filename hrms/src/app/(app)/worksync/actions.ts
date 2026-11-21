@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -54,7 +55,7 @@ const leadUserIds = (members: { role: string; employee: { userId: string | null 
 
 export async function createProject(_: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser(PATH);
-  if (!isHr(me.role.key) && me.role.key !== ROLES.MANAGER) return { error: "Only HR and managers can start a project." };
+  if (!can(me, "worksync.start_project")) return { error: "Only HR and managers can start a project." };
   const parsed = z
     .object({
       name: z.string().trim().min(2, "Give the project a name.").max(120),
@@ -128,7 +129,7 @@ export async function removeMember(projectId: string, employeeId: string) {
   const target = c.project.members.find((m) => m.employeeId === employeeId);
   if (!target) return;
   const leads = c.project.members.filter((m) => m.role === "LEAD");
-  if (target.role === "LEAD" && leads.length === 1 && !isHr(c.me.role.key)) return; // a project never loses its last lead, except by HR
+  if (target.role === "LEAD" && leads.length === 1 && !can(c.me, "worksync.manage_all")) return; // a project never loses its last lead, except by HR
   await prisma.$transaction([
     prisma.wsAssignee.deleteMany({ where: { employeeId, card: { projectId } } }),
     prisma.wsMember.delete({ where: { id: target.id } }),

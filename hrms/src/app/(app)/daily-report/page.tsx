@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -33,7 +34,7 @@ export default async function DailyReportPage({ searchParams }: { searchParams: 
   const settings = await getOrgSettings(me.organizationId);
   const mine = await getMyEmployee(me, settings.timezone);
   const today = dayKey(new Date(), settings.timezone);
-  const lead = isHr(me.role.key) || me.role.key === ROLES.MANAGER;
+  const lead = can(me, "team.manage");
   const fmt = (d: Date) => formatDay(keyOfDbDate(d), { weekday: "short", month: "short", day: "numeric", year: "numeric" });
 
   // One person's history: yourself, or someone you may see.
@@ -90,7 +91,7 @@ export default async function DailyReportPage({ searchParams }: { searchParams: 
       {lead && !person && (
         <Card className="space-y-3">
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <h2 className="text-lg font-semibold">{isHr(me.role.key) ? "Everyone" : "My team"} · {formatDay(day, { month: "short", day: "numeric" })} <Badge tone={submitted === team.length ? "success" : "warning"}>{submitted} of {team.length} submitted</Badge></h2>
+            <h2 className="text-lg font-semibold">{can(me, "employees.view_all") ? "Everyone" : "My team"} · {formatDay(day, { month: "short", day: "numeric" })} <Badge tone={submitted === team.length ? "success" : "warning"}>{submitted} of {team.length} submitted</Badge></h2>
             <form className="flex items-end gap-2">
               <label className="text-sm font-medium">Day<input type="date" name="date" max={today} defaultValue={day} className={inputClass} /></label>
               <button className={buttonClass}>Show</button>

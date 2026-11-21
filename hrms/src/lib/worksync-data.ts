@@ -11,8 +11,8 @@ type Db = Prisma.TransactionClient | typeof prisma;
 // Everyone else: projects they are a member of. Every lookup by id goes through this, so an id from a URL proves nothing.
 export async function projectScope(me: Actor, mineId: string): Promise<Prisma.WsProjectWhereInput> {
   const base = { organizationId: me.organizationId };
-  if (isHr(me.role.key)) return base;
-  if (me.role.key === ROLES.MANAGER) {
+  if (me.perms.has("worksync.manage_all")) return base;
+  if (me.perms.has("team.manage")) {
     const rows = await prisma.employee.findMany({ where: base, select: { id: true, managerId: true } });
     return { ...base, members: { some: { employeeId: { in: descendantIds(rows, mineId) } } } };
   }
@@ -30,7 +30,7 @@ export async function loadProject(me: Actor, mineId: string, id: string) {
   });
   if (!project) return null;
   const mem = project.members.find((m) => m.employeeId === mineId);
-  let level: Level | null = accessLevel(isHr(me.role.key), (mem?.role ?? null) as MemberRole | null, !mem);
+  let level: Level | null = accessLevel(me.perms.has("worksync.manage_all"), (mem?.role ?? null) as MemberRole | null, !mem);
   if (level && project.archivedAt) level = "VIEW"; // an archived project is read only
   return level ? { project, level, myRole: (mem?.role ?? null) as MemberRole | null } : null;
 }

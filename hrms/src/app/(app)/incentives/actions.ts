@@ -1,5 +1,6 @@
 "use server";
 
+import { can } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
@@ -14,7 +15,7 @@ const PATH = "/incentives";
 
 export async function awardIncentiveAction(_: FormState, form: FormData): Promise<FormState> {
   const me = await requireUser(PATH);
-  const canAward = isHr(me.role.key) || me.role.key === ROLES.MANAGER;
+  const canAward = can(me, "incentives.award");
   if (!canAward) return { error: "Only HR administrators and managers can award incentives." };
 
   const parsed = z

@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { Icon, ICON_INLINE } from "@/components/Icon";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
@@ -29,7 +30,7 @@ export default async function WorkSyncPage({ searchParams }: { searchParams: Pro
   const tz = settings.timezone;
   const mine = await getMyEmployee(me, tz);
   const today = dayKey(new Date(), tz);
-  const lead = isHr(me.role.key) || me.role.key === ROLES.MANAGER;
+  const lead = (can(me, "worksync.manage_all") || can(me, "team.manage"));
   const view = VIEWS.some(([k]) => k === sp.view) ? sp.view! : "projects";
   const scope = await projectScope(me, mine.id);
 

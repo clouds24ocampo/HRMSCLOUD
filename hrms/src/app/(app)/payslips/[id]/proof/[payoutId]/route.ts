@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { readStored, safeName, sniffType } from "@/lib/documents";
@@ -8,7 +9,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   const { id, payoutId } = await params;
   const me = await requireUser("/payslips");
   const p = await prisma.payout.findFirst({ where: { id: payoutId, payslipId: id, organizationId: me.organizationId }, include: { payslip: { select: { employee: { select: { userId: true } } } } } });
-  if (!p?.proofKey || !(isHr(me.role.key) || p.payslip.employee.userId === me.id)) return new Response("Not found", { status: 404 });
+  if (!p?.proofKey || !(can(me, "payslips.view_all") || p.payslip.employee.userId === me.id)) return new Response("Not found", { status: 404 });
   const bytes = await readStored(p.proofKey, me.organizationId);
   if (!bytes) return new Response("The file is missing from storage.", { status: 404 });
   // The type comes from the stored bytes, never from what was saved with the record; only PDF/PNG/JPEG open inline.

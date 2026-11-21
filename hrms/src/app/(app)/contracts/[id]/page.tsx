@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { Icon, ICON_INLINE } from "@/components/Icon";
 import { DEFAULT_TIMEZONE } from "@/lib/locale";
 import Link from "next/link";
@@ -19,7 +20,7 @@ export default async function ContractDetailPage({
   const me = await requireUser("/contracts");
   const { id } = await params;
   const mine = await getMyEmployee(me);
-  const hr = isHr(me.role.key);
+  const hr = can(me, "contracts.manage");
 
   const contract = await prisma.contract.findFirst({
     where: {

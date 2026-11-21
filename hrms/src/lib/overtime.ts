@@ -21,11 +21,11 @@ export function ancestorIds(rows: Row[], id: string): string[] {
 export const stepOf = (r: { headApprovedAt: Date | null }, hasSupervisor: boolean): OtStep => (hasSupervisor && !r.headApprovedAt ? "HEAD" : "FINAL");
 
 // Pure: may this actor decide this request at its current step?
-export function mayDecide(o: { roleKey: string; actorUserId: string; actorEmployeeId: string; employeeId: string; step: OtStep; ancestors: string[]; headApprovedById: string | null }): string | null {
+export function mayDecide(o: { roleKey: string; finalApprover: boolean; actorUserId: string; actorEmployeeId: string; employeeId: string; step: OtStep; ancestors: string[]; headApprovedById: string | null }): string | null {
   const superAdmin = o.roleKey === ROLES.SUPER_ADMIN;
   if (o.employeeId === o.actorEmployeeId && !superAdmin) return "You cannot approve your own overtime.";
   if (o.step === "HEAD") return o.ancestors.includes(o.actorEmployeeId) || superAdmin ? null : "Waiting for the department head to approve first.";
-  if (!isHr(o.roleKey)) return "Your part is done. HR gives the final approval.";
+  if (!o.finalApprover) return "Your part is done. HR gives the final approval.";
   if (o.headApprovedById === o.actorUserId && !superAdmin) return "You approved as department head. Another HR admin gives the final approval.";
   return null;
 }
@@ -44,7 +44,7 @@ export async function overtimeQueue(me: Actor, myEmployeeId: string) {
   return pending
     .map((r) => {
       const step = stepOf(r, !!r.employee.managerId);
-      const blocked = mayDecide({ roleKey: me.role.key, actorUserId: me.id, actorEmployeeId: myEmployeeId, employeeId: r.employeeId, step, ancestors: ancestorIds(rows, r.employeeId), headApprovedById: r.headApprovedById });
+      const blocked = mayDecide({ roleKey: me.role.key, finalApprover: me.perms.has("overtime.approve_all"), actorUserId: me.id, actorEmployeeId: myEmployeeId, employeeId: r.employeeId, step, ancestors: ancestorIds(rows, r.employeeId), headApprovedById: r.headApprovedById });
       return { ...r, step, blocked };
     })
     .filter((r) => !r.blocked);

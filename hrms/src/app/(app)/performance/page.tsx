@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
@@ -39,8 +40,8 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
   const mine = await getMyEmployee(me, tz);
   // Opened from someone's profile: show that person's reviews, goals, and schedule adherence (read-only), never your own.
   if (sp.employee && sp.employee !== mine.id) return <PersonPerformance meId={mine.id} employeeId={sp.employee} me={me} daysParam={sp.days} />;
-  const hr = isHr(me.role.key);
-  const manager = me.role.key === ROLES.MANAGER;
+  const hr = can(me, "performance.manage");
+  const manager = can(me, "team.manage");
   const orgId = me.organizationId;
   const fmt = (d: Date) => formatDay(keyOfDbDate(d), { month: "short", day: "numeric", year: "numeric" });
 

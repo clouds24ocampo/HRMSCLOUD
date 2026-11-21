@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
@@ -29,7 +30,7 @@ export async function GET(req: Request) {
   const people = await prisma.employee.findMany({ where: { AND: [scope, wanted === "all" ? { status: { not: "SEPARATED" } } : { id: wanted }] }, select: { id: true }, take: 300 });
   if (people.length === 0) return new Response("Not found", { status: 404 });
 
-  const wages = isHr(me.role.key) || (people.length === 1 && people[0].id === mine.id);
+  const wages = can(me, "payroll.view") || (people.length === 1 && people[0].id === mine.id);
   const report = await loadDtrReport(me.organizationId, me.organization.name, people.map((p) => p.id), from, to, dayKey(new Date(), settings.timezone), settings, wages);
   const pdf = await buildDtrPdf(report);
   await audit(me.id, "dtr_report.downloaded", "DtrReport", undefined, { from, to, people: people.length, wages }, me.organizationId);

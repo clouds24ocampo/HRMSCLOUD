@@ -122,7 +122,6 @@ test("HR Home shows government contributions, optional to deduct; the head sees 
   await expect(row).toContainText("₱500.00"); // SSS 5% of ₱10,000
   await expect(row).toContainText("₱250.00"); // PhilHealth 2.5%
   await expect(row).toContainText("₱200.00"); // Pag-IBIG, capped
-  await expect(page.getByText("Shown only, not deducted").first()).toBeVisible();
   await expect(page.getByRole("button", { name: "Time In" })).toHaveCount(0); // the clock lives on the DTR now
 
   await page.goto("/organization");

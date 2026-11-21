@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
@@ -12,7 +13,7 @@ export default async function PoliciesPage({ searchParams }: { searchParams: Pro
   const sp = await searchParams;
   await ensurePolicies(me.organizationId, me.organization.name);
   const mine = await getMyEmployee(me);
-  const hr = isHr(me.role.key);
+  const hr = can(me, "policies.manage");
   // HR can look at anyone's signatures; everyone else sees their own.
   const employeeId = hr && sp.employee ? sp.employee : mine.id;
   const archived = hr && sp.view === "archived";

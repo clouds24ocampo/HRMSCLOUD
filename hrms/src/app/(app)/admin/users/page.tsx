@@ -1,4 +1,5 @@
-import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+import { orgRoles } from "@/lib/access";
 import { requireUser } from "@/lib/auth";
 import { listOrgUsers } from "@/lib/users";
 import { Badge } from "@/components/ui";
@@ -9,13 +10,16 @@ export default async function UsersPage() {
   const me = await requireUser("/admin/users");
   const [users, roles] = await Promise.all([
     listOrgUsers(me.organizationId),
-    prisma.role.findMany({ where: { key: { not: "APPLICANT" } }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
+    orgRoles(me.organizationId),
   ]);
 
   return (
     <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1fr_20rem]">
       <section className="min-w-0 lg:order-1">
-        <h1 className="text-2xl font-bold tracking-tight">Users</h1>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h1 className="text-2xl font-bold tracking-tight">Users</h1>
+          <Link href="/admin/roles" className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium transition hover:bg-bg">Manage roles</Link>
+        </div>
         <p className="mb-4 mt-1 text-sm text-muted">Sign-ins and roles. To add a person with a full employee record, use Employees and tick “create a sign-in”.</p>
         {users.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-line bg-surface p-8 text-center text-muted">No users yet. Add the first one.</p>
@@ -32,11 +36,11 @@ export default async function UsersPage() {
                     <span className="flex shrink-0 items-center gap-2">
                       {!u.active && <Badge tone="danger">Deactivated</Badge>}
                       {u.mustChangePassword && u.active && <Badge tone="warning">Temporary password</Badge>}
-                      <Badge tone="brand">{u.role.name}</Badge>
+                      <Badge tone="brand">{u.role.name}</Badge>{(u.grants.length > 0 || u.revokes.length > 0) && <Badge tone="warning">Custom access</Badge>}
                       {u.id !== me.id && <span className="text-muted transition group-open:rotate-90" aria-hidden>▸</span>}
                     </span>
                   </summary>
-                  {u.id !== me.id && <UserManage user={u} roles={roles} />}
+                  {u.id !== me.id && <UserManage user={u} roles={roles} extras={u.grants.length} removed={u.revokes.length} />}
                 </details>
               </li>
             ))}
@@ -44,7 +48,7 @@ export default async function UsersPage() {
         )}
       </section>
       <aside className="lg:order-2">
-        <CreateUserForm roles={roles} />
+        <CreateUserForm roles={roles.map((r) => ({ id: r.id, name: r.name }))} />
       </aside>
     </div>
   );

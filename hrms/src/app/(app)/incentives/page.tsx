@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { Icon, ICON_INLINE } from "@/components/Icon";
 import { DEFAULT_LOCALE } from "@/lib/locale";
 import { prisma } from "@/lib/prisma";
@@ -22,7 +23,7 @@ export default async function IncentivesPage() {
   const settings = await getOrgSettings(me.organizationId);
   const tz = settings.timezone;
   const mine = await getMyEmployee(me, tz);
-  const lead = isHr(me.role.key) || me.role.key === ROLES.MANAGER;
+  const lead = can(me, "incentives.award");
 
   // Load employee's own incentives
   const myIncentives = await prisma.incentive.findMany({

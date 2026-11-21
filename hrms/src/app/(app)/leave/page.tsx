@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getMyEmployee } from "@/lib/employees";
@@ -25,7 +26,7 @@ export default async function LeavePage({ searchParams }: { searchParams: Promis
   const year = today.slice(0, 4);
   // Opened from someone's profile: that person's balances and requests, never your own.
   if (sp.employee && sp.employee !== emp.id) return <PersonLeave me={me} meId={emp.id} employeeId={sp.employee} year={year} />;
-  const approver = isHr(me.role.key) || me.role.key === ROLES.MANAGER;
+  const approver = (can(me, "team.manage") || can(me, "leave.approve_all"));
 
   const [types, mine, yearRequests] = await Promise.all([
     prisma.leaveType.findMany({ where: { organizationId: me.organizationId, archivedAt: null }, orderBy: { name: "asc" } }),

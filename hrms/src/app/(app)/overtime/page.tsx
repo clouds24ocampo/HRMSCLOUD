@@ -1,3 +1,4 @@
+import { can } from "@/lib/permissions";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
@@ -19,7 +20,7 @@ export default async function OvertimePage({ searchParams }: { searchParams: Pro
   const emp = await getMyEmployee(me, settings.timezone);
   // Opened from someone's profile: that person's overtime, never your own.
   if (sp.employee && sp.employee !== emp.id) return <PersonOvertime me={me} meId={emp.id} employeeId={sp.employee} />;
-  const approver = isHr(me.role.key) || me.role.key === ROLES.MANAGER;
+  const approver = (can(me, "team.manage") || can(me, "overtime.approve_all"));
 
   const mine = await prisma.overtimeRequest.findMany({ where: { employeeId: emp.id, organizationId: me.organizationId }, orderBy: { date: "desc" }, take: 30 });
 
