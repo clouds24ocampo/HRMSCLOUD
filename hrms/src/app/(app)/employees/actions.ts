@@ -13,6 +13,7 @@ import { descendantIds, isHr } from "@/lib/scope";
 import { getMyEmployee } from "@/lib/employees";
 import { dbDate } from "@/lib/time";
 import { createChecklist } from "@/lib/checklists";
+import { deleteStored } from "@/lib/documents";
 import { parsePesos } from "@/lib/money";
 import type { FormState } from "@/app/login/actions";
 
@@ -168,6 +169,9 @@ export async function updateAssignment(employeeId: string, _: FormState, form: F
       await tx.employmentHistory.create({ data: { ...base, change: "ASSIGNMENT", ...(await assignmentSnapshot(tx, me.organizationId, d)) } });
     }
     if (statusChanged) await tx.employmentHistory.create({ data: { ...base, change: "STATUS", status: d.status } });
+    if (statusChanged && emp.status === "SEPARATED" && d.status !== "SEPARATED" && emp.userId) {
+      await tx.user.update({ where: { id: emp.userId }, data: { active: true } }); // coming back: the sign-in works again
+    }
     if (statusChanged && d.status === "SEPARATED") {
       await createChecklist(tx, me.organizationId, emp.id, "OFFBOARDING");
       if (emp.userId) {
@@ -246,7 +250,7 @@ async function workRecords(employeeId: string, userId: string | null) {
       _count: {
         select: {
           timeEvents: true, leaveRequests: true, overtime: true, payslips: true, adjustments: true, reviews: true, goals: true, enrollments: true,
-          documents: true, hrRequests: true, prevEmployment: true, dailyReports: true, signatures: true, reports: true,
+          documents: true, hrRequests: true, prevEmployment: true, dailyReports: true, signatures: true, reports: true, cashAdvances: true, incentives: true, contracts: true,
         },
       },
     },
@@ -254,7 +258,7 @@ async function workRecords(employeeId: string, userId: string | null) {
   const LABEL: Record<string, string> = {
     timeEvents: "time stamps", leaveRequests: "leave requests", overtime: "overtime requests", payslips: "payslips", adjustments: "payroll adjustments", reviews: "reviews",
     goals: "goals", enrollments: "trainings", documents: "documents", hrRequests: "HR requests", prevEmployment: "previous employment", dailyReports: "daily reports",
-    signatures: "signed policies", reports: "people reporting to them",
+    signatures: "signed policies", reports: "people reporting to them", cashAdvances: "cash advances", incentives: "incentives", contracts: "contracts",
   };
   const found = Object.entries(c._count).filter(([, n]) => n > 0).map(([k, n]) => `${n} ${LABEL[k]}`);
   if (userId && (await prisma.message.count({ where: { senderId: userId } }))) found.push("chat messages");
@@ -285,15 +289,30 @@ export async function deleteEmployee(employeeId: string, _: FormState, form: For
     return { error: `${emp.firstName} has finalized payslips, which must be kept for payroll and government records. Set their status to Separated instead.` };
   }
 
+  // Files that belong only to this person are removed from disk after the records are gone.
+  const profile = emp.userId ? await prisma.applicantProfile.findUnique({ where: { userId: emp.userId }, select: { id: true, resumeKey: true, idKey: true } }) : null;
+  const files: (string | null)[] = [];
+  if (profile) {
+    files.push(profile.resumeKey, profile.idKey);
+    files.push(...(await prisma.applicantDocument.findMany({ where: { profileId: profile.id }, select: { storageKey: true } })).map((d) => d.storageKey));
+    files.push(...(await prisma.applicantPolicySignature.findMany({ where: { profileId: profile.id }, select: { signatureKey: true } })).map((d) => d.signatureKey));
+  }
+  if (everything) {
+    files.push(...(await prisma.employeeDocument.findMany({ where: { employeeId: emp.id }, select: { storageKey: true } })).map((d) => d.storageKey));
+    files.push(...(await prisma.policySignature.findMany({ where: { employeeId: emp.id }, select: { signatureKey: true } })).map((d) => d.signatureKey));
+  }
+  try {
   await prisma.$transaction(async (tx) => {
     const id = emp.id;
     if (everything) {
       // Super Admin, records included. Counts are written to the audit log below; the files of their documents stay on disk.
       await tx.employee.updateMany({ where: { managerId: id }, data: { managerId: null } }); // their people lose this supervisor
+      await tx.incentive.deleteMany({ where: { employeeId: id } });
+      await tx.contract.deleteMany({ where: { employeeId: id } });
       const slips = await tx.payslip.findMany({ where: { employeeId: id }, select: { id: true } });
       await tx.payslipLine.deleteMany({ where: { payslipId: { in: slips.map((x) => x.id) } } });
       await tx.dailyReportComment.deleteMany({ where: { report: { employeeId: id } } }); // the thread under their daily reports
-      for (const m of ["payslip", "payrollAdjustment", "timeEvent", "leaveRequest", "overtimeRequest", "review", "goal", "enrollment", "employeeDocument", "hrRequest", "previousEmployment", "dailyReport", "policySignature"] as const) {
+      for (const m of ["payslip", "payrollAdjustment", "timeEvent", "leaveRequest", "overtimeRequest", "review", "goal", "enrollment", "employeeDocument", "hrRequest", "previousEmployment", "dailyReport", "policySignature", "cashAdvance"] as const) {
         await (tx[m] as unknown as { deleteMany: (a: { where: { employeeId: string } }) => Promise<unknown> }).deleteMany({ where: { employeeId: id } });
       }
     }
@@ -306,9 +325,51 @@ export async function deleteEmployee(employeeId: string, _: FormState, form: For
     await tx.checklistItem.deleteMany({ where: { employeeId: id } });
     await tx.employeeTaxProfile.deleteMany({ where: { employeeId: id } });
     await tx.employee.delete({ where: { id } });
-    if (emp.userId) await tx.user.delete({ where: { id: emp.userId } }); // sessions, notifications and chat memberships go with it
+    if (emp.userId) {
+      // Someone hired from the applicant portal still has their applicant account: it goes with them (its documents, signed policies and
+      // personal data sheet are removed; the recruitment record stays in Recruitment, unlinked).
+      await tx.applicantProfile.deleteMany({ where: { userId: emp.userId } });
+      await tx.user.delete({ where: { id: emp.userId } }); // sessions, notifications and chat memberships go with it
+    }
   });
+  } catch (e) {
+    // A record we did not expect still points at this person. Say so, and keep the person: never throw to a blank error page.
+    console.error("deleteEmployee failed", e instanceof Error ? e.message : e);
+    const code = (e as { code?: string } | null)?.code;
+    return { error: code === "P2003" || code === "P2014" ? `${emp.firstName} is still linked to records the system could not remove. Nothing was deleted. Make them inactive instead (it keeps their history and turns off their sign-in), or ask support.` : "Could not delete this person. Nothing was deleted. Try again, or make them inactive instead." };
+  }
+  for (const k of files) await deleteStored(k, me.organizationId);
   await audit(me.id, everything ? "employee.deleted_with_records" : "employee.deleted", "Employee", emp.id, { employeeNo: emp.employeeNo, name: `${emp.firstName} ${emp.lastName}`, login: emp.user?.email ?? null, recordsDeleted: everything ? found : [] }, me.organizationId);
   revalidatePath("/employees");
   redirect("/employees");
+}
+
+// Makes someone inactive (status Separated: their sign-in is turned off, their history stays) or brings them back. Reversible, so no
+// typed confirmation is needed. The change is written to their employment history.
+export async function setEmployeeActive(employeeId: string, active: boolean): Promise<FormState> {
+  const me = await requireUser("/employees");
+  if (!isHr(me.role.key)) return { error: "Only HR can change this." };
+  const emp = await prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, include: { user: { include: { role: true } } } });
+  if (!emp) return { error: "Employee not found." };
+  const mine = await getMyEmployee(me);
+  if (emp.id === mine.id) return { error: "You cannot make yourself inactive." };
+  if (emp.user && (emp.user.role.key === ROLES.SUPER_ADMIN || emp.user.role.key === ROLES.HR_ADMIN) && me.role.key !== ROLES.SUPER_ADMIN) return { error: "Only a Super Admin can change an admin." };
+  const status = active ? "ACTIVE" : "SEPARATED";
+  if (emp.status === status && (!emp.user || emp.user.active === active)) return { ok: active ? "Already active." : "Already inactive." };
+  await prisma.$transaction(async (tx) => {
+    await tx.employee.update({ where: { id: emp.id }, data: { status } });
+    if (emp.status !== status) {
+      const today = dbDate(new Date().toISOString().slice(0, 10));
+      await tx.employmentHistory.create({ data: { organizationId: me.organizationId, employeeId: emp.id, effectiveFrom: today, note: active ? "Reactivated" : "Made inactive", createdById: me.id, change: "STATUS", status } });
+      if (!active) await createChecklist(tx, me.organizationId, emp.id, "OFFBOARDING");
+    }
+    if (emp.userId) {
+      await tx.user.update({ where: { id: emp.userId }, data: { active } });
+      if (!active) await tx.session.deleteMany({ where: { userId: emp.userId } }); // signed out everywhere, right now
+    }
+  });
+  await audit(me.id, active ? "employee.reactivated" : "employee.made_inactive", "Employee", emp.id, { from: emp.status, to: status }, me.organizationId);
+  revalidatePath(`/employees/${emp.id}`);
+  revalidatePath("/employees");
+  return { ok: active ? `${emp.firstName} is active again and can sign in.` : `${emp.firstName} is inactive. Their sign-in is off and their history is kept.` };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { MoneyInput } from "@/components/MoneyInput";
 import { useKeptForm } from "@/components/useKeptForm";
 import { Alert, Field, SubmitButton } from "@/components/Fields";
@@ -10,7 +10,7 @@ import { File201 } from "@/app/(app)/documents/File201";
 import { FILE_201 } from "@/lib/file201";
 import { formatMoney, formatRate, parsePesos } from "@/lib/money";
 import { rates } from "@/lib/ph/calc";
-import { createEmployeeAction, deleteEmployee, updateAssignment, updateDetails } from "./actions";
+import { createEmployeeAction, deleteEmployee, setEmployeeActive, updateAssignment, updateDetails } from "./actions";
 
 type Opt = { id: string; label: string };
 
@@ -232,24 +232,47 @@ export function EditDetailsForm(p: {
   );
 }
 
-export function DeleteEmployeeForm({ employeeId, employeeNo, name, superAdmin }: { employeeId: string; employeeNo: string; name: string; superAdmin: boolean }) {
+export function DeleteEmployeeForm({ employeeId, employeeNo, name, superAdmin, status }: { employeeId: string; employeeNo: string; name: string; superAdmin: boolean; status: string }) {
   const { state, pending, formProps } = useKeptForm(deleteEmployee.bind(null, employeeId));
+  const [toggling, startToggle] = useTransition();
+  const [toggleMsg, setToggleMsg] = useState<FormState>();
+  const inactive = status === "SEPARATED";
   return (
-    <form {...formProps} className="space-y-3">
-      <p className="text-sm text-muted">
-        Only for someone added by mistake. If {name} has any work records (time stamps, payslips, leave, documents…), deleting is refused: set their status to <span className="font-semibold">Separated</span> instead, which turns off their sign-in and keeps their history.
-      </p>
-      <Field label={`Type ${employeeNo} to confirm`} id="confirm" required autoComplete="off" />
-      {superAdmin && (
-        <label className="flex items-start gap-2 text-sm">
-          <input type="checkbox" name="withRecords" className="mt-0.5 h-4 w-4 accent-danger" />
-          <span>Also delete all their records (time stamps, leave, overtime, unfinalized payslips, documents, reports, signatures). This cannot be undone. Finalized payslips are always kept.</span>
-        </label>
-      )}
-      {state?.error && <Alert kind="error">{state.error}</Alert>}
-      <button type="submit" disabled={pending} className="w-full rounded-lg bg-danger px-4 py-2.5 font-semibold text-white transition active:scale-[0.98] disabled:opacity-60">
-        {pending ? "Deleting…" : `Delete ${name} permanently`}
-      </button>
-    </form>
+    <div className="space-y-5">
+      <div className="space-y-2 rounded-xl border border-line p-4">
+        <p className="font-semibold">{inactive ? `${name} is inactive` : "Make inactive (keeps everything)"}</p>
+        <p className="text-sm text-muted">
+          {inactive
+            ? "Their sign-in is off and their history is kept. Reactivate to let them sign in again."
+            : "Turns off their sign-in and sets their status to Separated. Their time stamps, payslips, leave and documents stay. You can bring them back any time."}
+        </p>
+        <button
+          type="button" disabled={toggling}
+          onClick={() => { if (confirm(inactive ? `Reactivate ${name}? They will be able to sign in again.` : `Make ${name} inactive? They will be signed out and cannot sign in until you reactivate them.`)) startToggle(async () => setToggleMsg(await setEmployeeActive(employeeId, inactive))); }}
+          className={`rounded-lg px-4 py-2.5 font-semibold transition active:scale-[0.98] disabled:opacity-60 ${inactive ? "bg-success text-white" : "border border-warning text-warning hover:bg-warning/10"}`}
+        >
+          {toggling ? "Please wait…" : inactive ? "Reactivate" : "Make inactive"}
+        </button>
+        {toggleMsg?.error && <Alert kind="error">{toggleMsg.error}</Alert>}
+        {toggleMsg?.ok && <Alert kind="success">{toggleMsg.ok}</Alert>}
+      </div>
+      <form {...formProps} className="space-y-3 rounded-xl border border-danger/40 p-4">
+        <p className="font-semibold text-danger">Delete permanently</p>
+        <p className="text-sm text-muted">
+          Removes {name} from the system for good. {superAdmin ? "If they have work records (time stamps, payslips, leave, documents…), tick the box below to delete those too." : "If they have work records, only a Super Admin can delete them; make them inactive instead."}
+        </p>
+        <Field label={`Type ${employeeNo} to confirm`} id="confirm" required autoComplete="off" />
+        {superAdmin && (
+          <label className="flex items-start gap-2 text-sm">
+            <input type="checkbox" name="withRecords" className="mt-0.5 h-4 w-4 accent-danger" />
+            <span>Also delete all their records (time stamps, leave, overtime, unfinalized payslips, cash advances, contracts, documents, reports, signatures and their applicant account). This cannot be undone. Finalized payslips are always kept, and then the person cannot be deleted: make them inactive.</span>
+          </label>
+        )}
+        {state?.error && <Alert kind="error">{state.error}</Alert>}
+        <button type="submit" disabled={pending} className="w-full rounded-lg bg-danger px-4 py-2.5 font-semibold text-white transition active:scale-[0.98] disabled:opacity-60">
+          {pending ? "Deleting…" : `Delete ${name} permanently`}
+        </button>
+      </form>
+    </div>
   );
 }

@@ -374,8 +374,8 @@ export default async function EmployeePage({ params, searchParams }: { params: P
       )}
       {hr && !own && (
         <Card className="border-danger/40">
-          <h2 className="mb-3 font-semibold text-danger">Delete employee</h2>
-          <DeleteEmployeeForm employeeId={e.id} employeeNo={e.employeeNo} name={`${e.firstName} ${e.lastName}`} superAdmin={me.role.key === ROLES.SUPER_ADMIN} />
+          <h2 className="mb-3 font-semibold">Make inactive or delete</h2>
+          <DeleteEmployeeForm employeeId={e.id} employeeNo={e.employeeNo} name={`${e.firstName} ${e.lastName}`} superAdmin={me.role.key === ROLES.SUPER_ADMIN} status={e.status} />
         </Card>
       )}
     </div>
