@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 
+// Organizations registered as "BPO, IT & Services" (src/lib/industries.ts).
+const IT_CATEGORY = "bpo-it";
+
 export const DEFAULT_HANDBOOK_SECTIONS = [
   {
     sortOrder: 1,
@@ -128,9 +131,15 @@ Returning company-issued assets, equipment, keys, and settling outstanding cash 
 /**
  * Ensures standard handbook sections exist for the organization
  */
-export async function ensureHandbook(organizationId: string, companyName: string) {
-  const count = await prisma.handbookSection.count({ where: { organizationId } });
-  if (count > 0) return;
+export async function ensureHandbook(organizationId: string, companyName: string, categoryKey?: string) {
+  const existing = await prisma.handbookSection.findMany({ where: { organizationId }, select: { slug: true } });
+  // An IT company gets the full IT handbook by itself: when it has nothing yet, or only the generic starter chapters.
+  // Chapters HR edited are kept, and an organization that already has its own chapters is left alone.
+  if (categoryKey === IT_CATEGORY && existing.every((e) => DEFAULT_HANDBOOK_SECTIONS.some((d) => d.slug === e.slug))) {
+    await installItHandbook(organizationId, companyName, null);
+    return;
+  }
+  if (existing.length > 0) return;
 
   await prisma.handbookSection.createMany({
     data: DEFAULT_HANDBOOK_SECTIONS.map((sec) => ({

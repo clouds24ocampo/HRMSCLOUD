@@ -19,7 +19,7 @@ export default async function HandbookPage() {
   const hr = can(me, "handbook.manage");
 
   // Automatically seed standard handbook chapters if not yet created
-  await ensureHandbook(me.organizationId, me.organization.name);
+  await ensureHandbook(me.organizationId, me.organization.name, me.organization.categoryKey);
 
   // Fetch sections and acknowledgment status
   const [sections, myAck, allAcks, totalEmployees] = await Promise.all([
