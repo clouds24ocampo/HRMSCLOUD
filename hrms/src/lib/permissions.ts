@@ -56,6 +56,7 @@ export const PERMISSIONS = [
   { key: "settings.manage", group: "Company", label: "Company settings", help: "Time stamps, GPS rules, schedules and other settings.", elevated: true },
   { key: "announcements.post", group: "Company", label: "Post announcements", help: "Write announcements everyone reads on Home.", elevated: true },
   { key: "policies.manage", group: "Company", label: "Publish company policies", help: "Upload, replace and restore policies that need signatures.", elevated: true },
+  { key: "handbook.read", group: "Company", label: "Read the company handbook", help: "Open the handbook, read every chapter and acknowledge it. Employees have this by default.", elevated: false },
   { key: "handbook.manage", group: "Company", label: "Edit the company handbook", help: "Edit and install handbook sections.", elevated: true },
   { key: "requests.answer", group: "Company", label: "Answer HR requests", help: "Reply to and close employees' requests.", elevated: true },
   { key: "reports.view", group: "Company", label: "Reports and exports", help: "Open reports and export data.", elevated: true },
@@ -78,14 +79,14 @@ export const isLockedPerm = (k: string) => !!(permInfo(k) as P | undefined)?.loc
 export const GRANTABLE: Perm[] = PERMISSIONS.filter((p) => !(p as P).locked).map((p) => p.key);
 
 // ---- built-in role defaults
-const TEAM_LEAD_DEFAULTS: Perm[] = ["team.manage", "schedule.insights", "incentives.award", "learning.enroll", "worksync.start_project", "payslips.own", "requests.own"];
+const TEAM_LEAD_DEFAULTS: Perm[] = ["handbook.read", "team.manage", "schedule.insights", "incentives.award", "learning.enroll", "worksync.start_project", "payslips.own", "requests.own"];
 
 export const ROLE_DEFAULTS: Record<RoleKey, Perm[]> = {
   SUPER_ADMIN: PERMISSION_KEYS, // everything, always
   HR_ADMIN: PERMISSION_KEYS.filter((k) => k !== "access.manage"),
   MANAGER: TEAM_LEAD_DEFAULTS,
-  EMPLOYEE: ["payslips.own", "requests.own"],
-  SUBCONTRACTOR: [],
+  EMPLOYEE: ["handbook.read", "payslips.own", "requests.own"],
+  SUBCONTRACTOR: ["handbook.read"],
   APPLICANT: [],
 };
 export const isBuiltInRole = (key: string): key is RoleKey => key in ROLE_DEFAULTS;
@@ -144,7 +145,7 @@ export const PAGE_PERMS: Record<string, "BASE" | "APPLICANT" | Perm[]> = {
   "/id/design": ["id.manage"],
   "/chat": "BASE",
   "/policies": "BASE",
-  "/handbook": "BASE",
+  "/handbook": ["handbook.read", "handbook.manage"],
   "/contracts": "BASE",
   "/daily-report": "BASE",
   "/cash-advance": "BASE",
@@ -196,8 +197,8 @@ export const ROLE_TEMPLATES: { name: string; description: string; perms: Perm[] 
   { name: "Assistant Department Head", description: "Supports a department head. Like a manager, plus the department's reports.", perms: [...TEAM_LEAD_DEFAULTS, "reports.view", "performance.manage"] },
   { name: "Department Head", description: "Runs a department: team approvals, schedules, performance, learning, reports and the department's people.", perms: [...TEAM_LEAD_DEFAULTS, "employees.view_all", "schedule.plan_all", "reports.view", "performance.manage", "learning.manage", "dtr.view_all"] },
   { name: "Executive", description: "Senior leadership: sees the whole company and its reports; does not run HR operations.", perms: [...TEAM_LEAD_DEFAULTS, "employees.view_all", "dtr.view_all", "reports.view", "analytics.view", "performance.manage", "payroll.view", "recruitment.access"] },
-  { name: "Payroll Officer", description: "Runs payroll and payslips; sees cash advances and the time records payroll needs.", perms: ["payroll.view", "payroll.manage", "payslips.own", "payslips.view_all", "payslips.record_payment", "cashadvance.decide", "dtr.view_all", "employees.view_all", "reports.view", "requests.own"] },
-  { name: "Recruiter", description: "Runs hiring: jobs, applicants, exams and the pipeline; can hire.", perms: ["recruitment.access", "recruitment.hire", "employees.view_all", "documents.view_all", "payslips.own", "requests.own"] },
-  { name: "Timekeeper", description: "Keeps time records right: sees everyone's DTR and schedule, corrects punches.", perms: ["dtr.view_all", "dtr.correct", "schedule.insights", "schedule.plan_all", "employees.view_all", "payslips.own", "requests.own"] },
-  { name: "HR Assistant", description: "Helps HR with people records without payroll, hiring or deleting.", perms: ["employees.view_all", "employees.add", "employees.edit", "checklists.manage", "documents.view_all", "documents.manage", "requests.answer", "policies.manage", "payslips.own", "requests.own"] },
+  { name: "Payroll Officer", description: "Runs payroll and payslips; sees cash advances and the time records payroll needs.", perms: ["handbook.read", "payroll.view", "payroll.manage", "payslips.own", "payslips.view_all", "payslips.record_payment", "cashadvance.decide", "dtr.view_all", "employees.view_all", "reports.view", "requests.own"] },
+  { name: "Recruiter", description: "Runs hiring: jobs, applicants, exams and the pipeline; can hire.", perms: ["handbook.read", "recruitment.access", "recruitment.hire", "employees.view_all", "documents.view_all", "payslips.own", "requests.own"] },
+  { name: "Timekeeper", description: "Keeps time records right: sees everyone's DTR and schedule, corrects punches.", perms: ["handbook.read", "dtr.view_all", "dtr.correct", "schedule.insights", "schedule.plan_all", "employees.view_all", "payslips.own", "requests.own"] },
+  { name: "HR Assistant", description: "Helps HR with people records without payroll, hiring or deleting.", perms: ["handbook.read", "employees.view_all", "employees.add", "employees.edit", "checklists.manage", "documents.view_all", "documents.manage", "requests.answer", "policies.manage", "payslips.own", "requests.own"] },
 ];

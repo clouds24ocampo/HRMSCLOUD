@@ -68,7 +68,7 @@ test("itemized access: company role, suggestion, extras, removals, entry-level r
   await row(page, "Open everyone's 201 file").getByRole("checkbox").uncheck();
   await page.getByLabel("Reason").fill("e2e");
   await page.getByRole("button", { name: "Save access" }).click();
-  await expect(page.getByText("7 permissions (5 added, 0 removed)", { exact: false })).toBeVisible();
+  await expect(page.getByText("8 permissions (5 added, 0 removed)", { exact: false })).toBeVisible();
 
   // That account now opens Reports (extra) and the DTR list (role), not Payroll.
   const ctx = await browser.newContext();
@@ -78,6 +78,8 @@ test("itemized access: company role, suggestion, extras, removals, entry-level r
   await expect(head).toHaveURL(/\/reports/);
   await head.goto("/payroll");
   await expect(head).toHaveURL(/denied=1/);
+  await head.goto("/handbook"); // everyone can read the handbook until HR takes it away
+  await expect(head).toHaveURL(/\/handbook/);
 
   // Taking the extra away closes Reports again.
   await page.goto(`/admin/users/${ids.head}/access`);
@@ -85,14 +87,22 @@ test("itemized access: company role, suggestion, extras, removals, entry-level r
   await expect(row(page, "Reports and exports")).not.toContainText("Added for this account");
   await row(page, "See everyone's time records").getByRole("checkbox").uncheck(); // a role permission taken away for this account only
   await expect(row(page, "See everyone's time records")).toContainText("Removed for this account");
+  await row(page, "Read the company handbook").getByRole("checkbox").uncheck();
   await page.getByRole("button", { name: "Save access" }).click();
-  await expect(page.getByText("5 permissions (0 added, 2 removed)", { exact: false })).toBeVisible();
+  await expect(page.getByText("5 permissions (0 added, 3 removed)", { exact: false })).toBeVisible();
   const again = await (await browser.newContext()).newPage();
   await signIn(again, "head");
   await again.goto("/reports");
   await expect(again).toHaveURL(/denied=1/);
+  await again.goto("/handbook"); // taken away for this account only
+  await expect(again).toHaveURL(/denied=1/);
 
   // Entry-level: manager-level access cannot be ticked and a manager role is refused.
+  const plain = await (await browser.newContext()).newPage(); // a plain employee reads the handbook with no extra setup
+  await signIn(plain, "entry");
+  await plain.goto("/handbook");
+  await expect(plain).toHaveURL(/\/handbook/);
+  await expect(plain.getByRole("link", { name: "Company Handbook" }).first()).toBeVisible();
   await page.goto(`/admin/users/${ids.entry}/access`);
   await expect(page.getByText("entry-level position").first()).toBeVisible();
   await expect(row(page, "Reports and exports").getByRole("checkbox")).toBeDisabled();
