@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
-import { requireUser } from "@/lib/auth";
+import { requirePerm } from "@/lib/auth";
 import { parsePesos } from "@/lib/money";
 import { leavePresetsFor } from "@/lib/ph/leaves";
 import { PACK_VERSION, packFor } from "@/lib/ph/pack";
@@ -26,7 +26,7 @@ const toRow = (r: { id: string; code: string; kind: RuleKind; sector: "ALL" | "P
 
 // Copies the starter set into this organization. Rows that already exist (same code, sector and dates) are left alone.
 export async function installPack(which: "PRIVATE" | "GOVERNMENT" | "BOTH"): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const s = scope.safeParse(which);
   if (!s.success) return { error: "Choose private, government or both." };
   const existing = (await prisma.statutoryRule.findMany({ where: { organizationId: me.organizationId } })).map(toRow);
@@ -55,7 +55,7 @@ export async function installPack(which: "PRIVATE" | "GOVERNMENT" | "BOTH"): Pro
 }
 
 export async function addRuleVersion(_: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const p = z
     .object({
       code: z.string().trim().regex(/^[A-Z0-9_]{2,40}$/, "The code uses capital letters, digits and underscores, for example DM_RICE."),
@@ -109,7 +109,7 @@ export async function addRuleVersion(_: FormState, form: FormData): Promise<Form
 }
 
 export async function endRule(id: string, _: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const to = day.safeParse(form.get("effectiveTo"));
   if (!to.success) return { error: "Choose the last day this version applies." };
   const r = await prisma.statutoryRule.findFirst({ where: { id, organizationId: me.organizationId } });
@@ -122,7 +122,7 @@ export async function endRule(id: string, _: FormState, form: FormData): Promise
 }
 
 export async function removeRule(id: string) {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const r = await prisma.statutoryRule.findFirst({ where: { id, organizationId: me.organizationId } });
   if (!r) return;
   await prisma.statutoryRule.delete({ where: { id } });
@@ -131,7 +131,7 @@ export async function removeRule(id: string) {
 }
 
 export async function addWageOrder(_: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const p = z
     .object({ region: z.string().trim().min(2, "Enter the region, for example NCR.").max(60), orderNo: z.string().trim().min(1, "Enter the wage order number.").max(40), sector: z.string().trim().max(60).optional(), effectiveFrom: day, effectiveTo: z.string().optional() })
     .safeParse(Object.fromEntries(form));
@@ -148,7 +148,7 @@ export async function addWageOrder(_: FormState, form: FormData): Promise<FormSt
 }
 
 export async function removeWageOrder(id: string) {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const w = await prisma.wageOrder.findFirst({ where: { id, organizationId: me.organizationId } });
   if (!w) return;
   await prisma.wageOrder.delete({ where: { id } });
@@ -157,7 +157,7 @@ export async function removeWageOrder(id: string) {
 }
 
 export async function installLeaves(which: "PRIVATE" | "GOVERNMENT" | "BOTH"): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const s = scope.safeParse(which);
   if (!s.success) return { error: "Choose private, government or both." };
   const have = new Set((await prisma.leaveType.findMany({ where: { organizationId: me.organizationId }, select: { name: true } })).map((l) => l.name));

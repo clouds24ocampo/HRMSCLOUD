@@ -4,7 +4,7 @@ import { effectivePerms, entryLevelProblem, isBuiltInRole, rolePerms, type Level
 
 // Server helpers for itemized access. The rules live in permissions.ts; these load the data and apply them.
 
-export type Chooser = { role: { key: string }; organizationId: string; perms: ReadonlySet<string> };
+export type Chooser = { id?: string; role: { key: string }; organizationId: string; perms: ReadonlySet<string> };
 
 const roleSelect = { id: true, key: true, name: true, description: true, permissions: true, organizationId: true } as const;
 
@@ -61,3 +61,16 @@ export async function levelChangeProblem(userId: string, organizationId: string,
 }
 
 export const isCustomRole = (key: string) => !isBuiltInRole(key);
+
+// May `actor` change the sign-in, status or existence of this account? A Super Admin may. Anyone else may not touch an admin, nor an
+// account that holds access they do not hold themselves (otherwise a small permission could take over a bigger account).
+export function accountProblem(
+  actor: Chooser,
+  target: { id: string; role: { key: string; permissions?: readonly string[] | null }; grants: readonly string[]; revokes: readonly string[] } | null | undefined,
+  what: string,
+): string | null {
+  if (!target || actor.role.key === ROLES.SUPER_ADMIN || target.id === actor.id) return null;
+  if (target.role.key === ROLES.SUPER_ADMIN || target.role.key === ROLES.HR_ADMIN) return `Only a Super Admin can ${what} an admin.`;
+  if ([...effectivePerms(target.role, target.grants, target.revokes)].some((p) => !actor.perms.has(p))) return `This account holds access you do not have yourself, so only a Super Admin can ${what} it.`;
+  return null;
+}

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
-import { requireUser } from "@/lib/auth";
+import { requirePerm } from "@/lib/auth";
 import { standardHolidays } from "@/lib/ph/holidays";
 import { dbDate } from "@/lib/time";
 import type { FormState } from "@/app/login/actions";
@@ -12,7 +12,7 @@ import type { FormState } from "@/app/login/actions";
 const done = () => revalidatePath("/payroll/holidays");
 
 export async function addHoliday(_: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const p = z
     .object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose a date."), name: z.string().trim().min(2, "Name the holiday.").max(80), type: z.enum(["REGULAR", "SPECIAL_NON_WORKING", "SPECIAL_WORKING"], "Choose the kind of holiday.") })
     .safeParse(Object.fromEntries(form));
@@ -26,7 +26,7 @@ export async function addHoliday(_: FormState, form: FormData): Promise<FormStat
 
 // The holidays fixed by law, plus Holy Week. Proclaimed ones (Eid'l Fitr, Eid'l Adha, extra special days) are added by hand.
 export async function addStandardHolidays(_: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const y = z.coerce.number().int().min(2020).max(2100).safeParse(form.get("year"));
   if (!y.success) return { error: "Enter a year, for example 2026." };
   const res = await prisma.holiday.createMany({
@@ -39,7 +39,7 @@ export async function addStandardHolidays(_: FormState, form: FormData): Promise
 }
 
 export async function removeHoliday(id: string) {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const h = await prisma.holiday.findFirst({ where: { id, organizationId: me.organizationId } });
   if (!h) return;
   await prisma.holiday.delete({ where: { id } });

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
-import { requireUser } from "@/lib/auth";
+import { requirePerm } from "@/lib/auth";
 import { parsePercent, parsePesos } from "@/lib/money";
 import { getOrgSettings } from "@/lib/settings";
 import { installPack } from "@/app/(app)/payroll/rules/actions";
@@ -14,7 +14,7 @@ const done = () => revalidatePath("/payroll/setup");
 const name = z.string().trim().min(2, "Enter a name.").max(60);
 
 export async function saveFactors(_: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const parsed = z
     .object({
       workDaysPerMonth: z.coerce.number().int().min(1).max(31, "Work days per month is between 1 and 31."),
@@ -35,7 +35,7 @@ export async function saveFactors(_: FormState, form: FormData): Promise<FormSta
 }
 
 export async function addComponent(_: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const parsed = z.object({ name, kind: z.enum(["EARNING", "DEDUCTION"]), calc: z.enum(["FIXED", "PERCENT_OF_BASIC"]) }).safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const raw = String(form.get("value") ?? "");
@@ -61,7 +61,7 @@ export async function addComponent(_: FormState, form: FormData): Promise<FormSt
 }
 
 export async function setComponentArchived(id: string, archived: boolean) {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const c = await prisma.payComponent.findFirst({ where: { id, organizationId: me.organizationId } });
   if (!c) return;
   await prisma.payComponent.update({ where: { id }, data: { archivedAt: archived ? new Date() : null } });
@@ -70,7 +70,7 @@ export async function setComponentArchived(id: string, archived: boolean) {
 }
 
 export async function addContribution(_: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const n = name.safeParse(form.get("name"));
   if (!n.success) return { error: n.error.issues[0].message };
   const employeeBp = parsePercent(String(form.get("employeePct") ?? ""));
@@ -89,7 +89,7 @@ export async function addContribution(_: FormState, form: FormData): Promise<For
 }
 
 export async function setContributionArchived(id: string, archived: boolean) {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const c = await prisma.contributionRule.findFirst({ where: { id, organizationId: me.organizationId } });
   if (!c) return;
   await prisma.contributionRule.update({ where: { id }, data: { archivedAt: archived ? new Date() : null } });
@@ -98,7 +98,7 @@ export async function setContributionArchived(id: string, archived: boolean) {
 }
 
 export async function addBracket(_: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const from = parsePesos(String(form.get("from") ?? ""));
   const rate = parsePercent(String(form.get("ratePct") ?? ""));
   const fixed = form.get("fixed") ? parsePesos(form.get("fixed")) : 0;
@@ -112,7 +112,7 @@ export async function addBracket(_: FormState, form: FormData): Promise<FormStat
 }
 
 export async function removeBracket(id: string) {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const b = await prisma.taxBracket.findFirst({ where: { id, organizationId: me.organizationId } });
   if (!b) return;
   await prisma.taxBracket.delete({ where: { id } });
@@ -121,7 +121,7 @@ export async function removeBracket(id: string) {
 }
 
 export async function savePhSettings(_: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const parsed = z.object({ statutoryProfile: z.enum(["MANUAL", "PHILIPPINES"]), contributionSchedule: z.enum(["EVERY_PERIOD", "LAST_PERIOD"]) }).safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: "Choose how payroll gets its rates." };
   if (parsed.data.statutoryProfile === "PHILIPPINES" && (await prisma.statutoryRule.count({ where: { organizationId: me.organizationId } })) === 0) {
@@ -137,7 +137,7 @@ export async function savePhSettings(_: FormState, form: FormData): Promise<Form
 // Government contributions (SSS/GSIS, PhilHealth, Pag-IBIG) and withholding tax: take them off pay, or only show them.
 // Turning it on uses the Philippine rules; the starter set is installed first if the organization has none.
 export async function setStatutoryDeduction(on: boolean): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   if (on && (await prisma.statutoryRule.count({ where: { organizationId: me.organizationId } })) === 0) {
     const r = await installPack("PRIVATE");
     if (r?.error) return r;

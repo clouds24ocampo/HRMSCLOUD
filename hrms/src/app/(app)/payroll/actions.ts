@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
-import { requireUser } from "@/lib/auth";
+import { requirePerm } from "@/lib/auth";
 import { notify } from "@/lib/notify";
 import { parsePesos } from "@/lib/money";
 import { calculatePeriod } from "@/lib/payroll-data";
@@ -21,7 +21,7 @@ const done = (id?: string) => {
 };
 
 export async function createPeriod(_: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const parsed = z
     .object({
       name: z.string().trim().min(2, "Give the period a name.").max(60),
@@ -57,7 +57,7 @@ export async function createPeriod(_: FormState, form: FormData): Promise<FormSt
 }
 
 export async function calculate(periodId: string): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const r = await calculatePeriod(me, periodId);
   if ("error" in r) return { error: r.error };
   await audit(me.id, "payroll.calculated", "PayrollPeriod", periodId, { payslips: r.count, skipped: r.skipped.length }, me.organizationId);
@@ -68,7 +68,7 @@ export async function calculate(periodId: string): Promise<FormState> {
 
 // Maker-checker: the person who calculated should not also approve. A Super Admin may, and it is recorded.
 export async function approve(periodId: string): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const p = await prisma.payrollPeriod.findFirst({ where: { id: periodId, organizationId: me.organizationId } });
   if (!p) return { error: "Pay period not found." };
   if (p.status !== "CALCULATED") return { error: "Only a calculated payroll can be approved." };
@@ -81,7 +81,7 @@ export async function approve(periodId: string): Promise<FormState> {
 }
 
 export async function finalize(periodId: string): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const p = await prisma.payrollPeriod.findFirst({ where: { id: periodId, organizationId: me.organizationId } });
   if (!p) return { error: "Pay period not found." };
   if (p.status !== "APPROVED") return { error: "Approve the payroll before finalizing it." };
@@ -109,7 +109,7 @@ export async function finalize(periodId: string): Promise<FormState> {
 }
 
 export async function deletePeriod(periodId: string) {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const p = await prisma.payrollPeriod.findFirst({ where: { id: periodId, organizationId: me.organizationId } });
   if (!p || p.status === "FINALIZED") return;
   await prisma.$transaction([
@@ -124,7 +124,7 @@ export async function deletePeriod(periodId: string) {
 
 // One-off correction. Fixes to a finalized payroll go into the next period, never into the locked one.
 export async function addAdjustment(periodId: string, _: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const parsed = z
     .object({ employeeId: z.string().min(1, "Choose an employee."), kind: z.enum(["EARNING", "DEDUCTION"]), label: z.string().trim().min(2, "Name the adjustment.").max(60), reason: z.string().trim().min(5, "Give a reason (at least 5 characters).").max(300) })
     .safeParse(Object.fromEntries(form));
@@ -148,7 +148,7 @@ export async function addAdjustment(periodId: string, _: FormState, form: FormDa
 }
 
 export async function removeAdjustment(id: string) {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const a = await prisma.payrollAdjustment.findFirst({ where: { id, organizationId: me.organizationId }, include: { period: true } });
   if (!a || a.period.status === "FINALIZED") return;
   await prisma.payrollAdjustment.delete({ where: { id } });
@@ -159,7 +159,7 @@ export async function removeAdjustment(id: string) {
 
 // People left out of one payroll (for example someone not eligible for a bonus). The payroll must be calculated again.
 export async function setSkipped(periodId: string, _: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const p = await prisma.payrollPeriod.findFirst({ where: { id: periodId, organizationId: me.organizationId } });
   if (!p) return { error: "Pay period not found." };
   if (p.status === "FINALIZED") return { error: "This payroll is finalized." };

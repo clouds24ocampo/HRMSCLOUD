@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { findSession } from "@/lib/session";
 import { homeFor } from "@/lib/roles";
-import { canAccessPath } from "@/lib/permissions";
+import { canAccessPath, type Perm } from "@/lib/permissions";
 import { isDbDown } from "@/lib/db-health";
 import { config } from "@/lib/config";
 
@@ -40,5 +40,12 @@ export async function requireUser(path: string) {
   // Temporary password: nothing else is reachable until the user picks their own.
   if (user.mustChangePassword && path !== "/change-password") redirect("/change-password");
   if (!canAccessPath(user.role.key, user.perms, path)) redirect(user.role.key === "APPLICANT" ? "/apply" : "/dashboard?denied=1"); // /apply must not bounce back to itself
+  return user;
+}
+
+// For actions that change data: the page rule, plus the one specific permission the change needs (opening a page is not enough).
+export async function requirePerm(path: string, perm: Perm) {
+  const user = await requireUser(path);
+  if (!user.perms.has(perm)) redirect("/dashboard?denied=1");
   return user;
 }

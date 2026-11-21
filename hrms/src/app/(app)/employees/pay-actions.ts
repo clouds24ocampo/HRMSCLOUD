@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
-import { requireUser } from "@/lib/auth";
+import { requirePerm, requireUser } from "@/lib/auth";
 import { parsePesos } from "@/lib/money";
 import { dbDate } from "@/lib/time";
 import type { FormState } from "@/app/login/actions";
@@ -12,7 +12,7 @@ import type { FormState } from "@/app/login/actions";
 // Pay data is HR-only. requireUser("/payroll") applies the same access rule as the Payroll pages.
 
 export async function setCompensation(employeeId: string, _: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const parsed = z
     .object({ payType: z.enum(["MONTHLY", "DAILY", "HOURLY"]), effectiveFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose the date it starts."), note: z.string().trim().max(200).optional() })
     .safeParse(Object.fromEntries(form));
@@ -31,7 +31,7 @@ export async function setCompensation(employeeId: string, _: FormState, form: Fo
 }
 
 export async function assignComponent(employeeId: string, _: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   const componentId = z.string().min(1, "Choose a pay item.").safeParse(form.get("componentId"));
   if (!componentId.success) return { error: componentId.error.issues[0].message };
   const [emp, comp] = await Promise.all([
@@ -56,7 +56,7 @@ export async function assignComponent(employeeId: string, _: FormState, form: Fo
 }
 
 export async function removeComponent(employeeId: string, componentId: string) {
-  const me = await requireUser("/payroll");
+  const me = await requirePerm("/payroll", "payroll.manage");
   await prisma.employeeComponent.deleteMany({ where: { employeeId, componentId, organizationId: me.organizationId } });
   await audit(me.id, "compensation.component_removed", "EmployeeComponent", undefined, { employeeId, componentId }, me.organizationId);
   revalidatePath(`/employees/${employeeId}`);

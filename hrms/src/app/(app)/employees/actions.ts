@@ -10,7 +10,7 @@ import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
 import { createEmployee, assignmentSnapshot } from "@/lib/employees";
 import { ROLES } from "@/lib/roles";
-import { checkRoleChoice, levelChangeProblem, levelOfPosition } from "@/lib/access";
+import { accountProblem, checkRoleChoice, levelChangeProblem, levelOfPosition } from "@/lib/access";
 import { descendantIds, isHr } from "@/lib/scope";
 import { getMyEmployee } from "@/lib/employees";
 import { dbDate } from "@/lib/time";
@@ -147,8 +147,15 @@ export async function updateAssignment(employeeId: string, _: FormState, form: F
   if (!parsed.success) return { error: "Check the form and try again." };
   const d = parsed.data;
 
-  const emp = await prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId } });
+  const emp = await prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, include: { user: { include: { role: true } } } });
   if (!emp) return { error: "Employee not found." };
+  // Moving someone to or from Separated turns their sign-in off or on: that needs the same permission, and the same target rules, as Make inactive.
+  if (d.status !== emp.status && (d.status === "SEPARATED" || emp.status === "SEPARATED")) {
+    if (!can(me, "employees.deactivate")) return { error: "You do not have permission to make employees inactive or active." };
+    if (emp.id === (await getMyEmployee(me)).id) return { error: "You cannot make yourself inactive." };
+    const blocked = accountProblem(me, emp.user, "change");
+    if (blocked) return { error: blocked };
+  }
   const bad = await checkRefs(me.organizationId, d, emp.id);
   if (bad) return { error: bad };
   if (d.managerId) {
@@ -216,7 +223,8 @@ export async function updateDetails(employeeId: string, _: FormState, form: Form
   const userData: { name: string; email?: string; username?: string | null; passwordHash?: string; mustChangePassword?: boolean } = { name: `${d.firstName} ${d.lastName}` };
   if (user) {
     // Only a Super Admin may change the sign-in of an admin.
-    if ((user.role.key === ROLES.SUPER_ADMIN || user.role.key === ROLES.HR_ADMIN) && me.role.key !== ROLES.SUPER_ADMIN && user.id !== me.id) return { error: "Only a Super Admin can change an admin's sign-in." };
+    const blocked = accountProblem(me, user, "change the sign-in of");
+    if (blocked) return { error: blocked };
     if (!d.email) return { error: "This person signs in with their email: it cannot be empty." };
     const email = d.email.toLowerCase();
     if (email !== user.email) {
@@ -284,7 +292,7 @@ export async function deleteEmployee(employeeId: string, _: FormState, form: For
   if (typed !== emp.employeeNo.toUpperCase()) return { error: `Type ${emp.employeeNo} to confirm.` };
   const mine = await getMyEmployee(me);
   if (emp.id === mine.id) return { error: "You cannot delete yourself." };
-  if (emp.user && (emp.user.role.key === ROLES.SUPER_ADMIN || emp.user.role.key === ROLES.HR_ADMIN) && me.role.key !== ROLES.SUPER_ADMIN) return { error: "Only a Super Admin can delete an admin." };
+  { const blocked = accountProblem(me, emp.user, "delete"); if (blocked) return { error: blocked }; }
   const found = await workRecords(emp.id, emp.userId);
   if (found.length && !everything) {
     return {
@@ -361,7 +369,7 @@ export async function setEmployeeActive(employeeId: string, active: boolean): Pr
   if (!emp) return { error: "Employee not found." };
   const mine = await getMyEmployee(me);
   if (emp.id === mine.id) return { error: "You cannot make yourself inactive." };
-  if (emp.user && (emp.user.role.key === ROLES.SUPER_ADMIN || emp.user.role.key === ROLES.HR_ADMIN) && me.role.key !== ROLES.SUPER_ADMIN) return { error: "Only a Super Admin can change an admin." };
+  { const blocked = accountProblem(me, emp.user, "change"); if (blocked) return { error: blocked }; }
   const status = active ? "ACTIVE" : "SEPARATED";
   if (emp.status === status && (!emp.user || emp.user.active === active)) return { ok: active ? "Already active." : "Already inactive." };
   await prisma.$transaction(async (tx) => {

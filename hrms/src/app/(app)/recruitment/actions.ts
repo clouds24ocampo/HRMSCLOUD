@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
-import { requireUser } from "@/lib/auth";
+import { requirePerm, requireUser } from "@/lib/auth";
 import { createEmployee, nextEmployeeNo } from "@/lib/employees";
 import { ROLES, ROLE_SEED } from "@/lib/roles";
 import { dbDate } from "@/lib/time";
@@ -164,7 +164,7 @@ function offsetOf(tz: string, local: string): string {
 
 // The applicant becomes an employee. No retyping: name, email and phone come over, and the job's department and position are the defaults.
 export async function hireApplicant(id: string, _: FormState, form: FormData): Promise<FormState> {
-  const me = await requireUser("/recruitment");
+  const me = await requirePerm("/recruitment", "recruitment.hire");
   const parsed = z
     .object({
       hireDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose the hire date."),
@@ -291,7 +291,7 @@ export async function hireApplicant(id: string, _: FormState, form: FormData): P
 
 // Takes one application away (the person stays, with their other applications). A hired applicant is kept: the employee record points back to it.
 export async function deleteApplication(id: string): Promise<FormState> {
-  const me = await requireUser("/recruitment");
+  const me = await requirePerm("/recruitment", "recruitment.hire");
   const a = await prisma.applicant.findFirst({ where: { id, organizationId: me.organizationId }, include: { job: { select: { title: true } } } });
   if (!a) return { error: "Applicant not found." };
   if (a.stage === "HIRED") return { error: "This applicant was hired and is now an employee. Their record cannot be deleted here." };
@@ -307,7 +307,7 @@ export async function deleteApplication(id: string): Promise<FormState> {
 // Deletes the whole person: every application, exam result, uploaded file and their applicant sign-in.
 // Someone who was hired is never deleted from here.
 export async function deleteApplicantPerson(id: string): Promise<FormState> {
-  const me = await requireUser("/recruitment");
+  const me = await requirePerm("/recruitment", "recruitment.hire");
   const a = await prisma.applicant.findFirst({ where: { id, organizationId: me.organizationId }, include: { profile: true } });
   if (!a) return { error: "Applicant not found." };
   const scope = a.profileId ? { profileId: a.profileId } : { id: a.id };

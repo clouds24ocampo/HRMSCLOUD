@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
-import { requireUser } from "@/lib/auth";
+import { requirePerm } from "@/lib/auth";
 import { parsePesos } from "@/lib/money";
 import { dbDate } from "@/lib/time";
 import type { FormState } from "@/app/login/actions";
@@ -13,7 +13,7 @@ const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose a date.");
 const id = z.string().trim().max(30).optional();
 
 async function hrEmployee(employeeId: string) {
-  const me = await requireUser("/payroll"); // HR and Super Admin
+  const me = await requirePerm("/payroll", "payroll.manage"); // HR and Super Admin
   const e = await prisma.employee.findFirst({ where: { id: employeeId, organizationId: me.organizationId }, select: { id: true, firstName: true, lastName: true } });
   return { me, e };
 }
