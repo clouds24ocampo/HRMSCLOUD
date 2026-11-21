@@ -13,8 +13,8 @@ export default async function ApplicantLoginPage() {
   return (
     <div className="min-h-dvh bg-slate-50 px-4 py-6 text-slate-900 sm:px-8">
       <header className="mx-auto mb-10 flex max-w-5xl items-center justify-between rounded-full border border-line bg-white py-2 pr-2 pl-5 shadow-sm">
-        <Link href="/careers" className="flex items-center gap-2 font-headline text-lg font-medium text-brand"><Logo className="h-6 w-6" /> {org?.name ?? "HRMS"} <span className="font-normal text-slate-400">Careers</span></Link>
-        <Link href="/careers" className="rounded-full border border-line px-5 py-2.5 text-sm font-medium transition hover:border-brand hover:text-brand">Open positions</Link>
+        <Link href="/careers" className="flex min-w-0 items-center gap-2 font-headline text-base font-medium text-brand sm:text-lg"><Logo className="h-6 w-6 shrink-0" /> <span className="truncate">{org?.name ?? "HRMS"}</span> <span className="hidden font-normal text-slate-400 sm:inline">Careers</span></Link>
+        <Link href="/careers" className="shrink-0 whitespace-nowrap rounded-full border border-line px-4 py-2.5 text-sm font-medium transition hover:border-brand hover:text-brand sm:px-5">Open positions</Link>
       </header>
       <main className="mx-auto max-w-md rounded-3xl border border-line bg-white p-7 shadow-xl sm:p-8">
         <h1 className="text-2xl font-bold tracking-tight">Applicant sign in</h1>

@@ -120,8 +120,8 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
         <EmptyState title="No one to schedule yet" hint={canEdit ? "Add employees first." : undefined} />
       ) : (
         <Card className="overflow-x-auto p-0">
-          <table className="w-full min-w-176 text-sm">
-            <thead>
+          <table className="block w-full text-sm md:table md:min-w-176">
+            <thead className="hidden md:table-header-group">
               <tr className="border-b border-line text-left text-muted">
                 <th className="px-4 py-3 font-medium">Person</th>
                 {days.map((d) => (
@@ -129,15 +129,15 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-line">
+            <tbody className="block divide-y divide-line md:table-row-group">
               {people.map((p) => {
                 const regs = sched.get(p.id)?.regulars ?? [];
                 const cur = [...regs].reverse().find((r) => r.effectiveFrom <= today);
                 const dtrDays = teamDtr.get(p.id) ?? [];
 
                 return (
-                  <tr key={p.id}>
-                    <td className="px-4 py-2.5">
+                  <tr key={p.id} className="block px-3 py-3 md:table-row md:p-0">
+                    <td className="block pb-2 md:table-cell md:px-4 md:py-2.5">
                       <p className="font-medium">{p.lastName}, {p.firstName}</p>
                       {p.flexible ? (
                         <p className="mt-0.5 flex flex-wrap items-center gap-1.5">
@@ -188,7 +188,9 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
                         : null;
 
                       return (
-                        <td key={d} className="px-1.5 py-2 text-center">
+                        <td key={d} className="flex items-center gap-3 border-t border-line/60 py-1.5 md:table-cell md:border-0 md:px-1.5 md:py-2 md:text-center">
+                          <span className={`w-14 shrink-0 text-xs font-medium md:hidden ${d === today ? "text-brand" : "text-muted"}`}>{formatDay(d, { weekday: "short", day: "numeric" })}</span>
+                          <div className="min-w-0 flex-1">
                           <CellEditor
                             employeeId={p.id}
                             day={d}
@@ -284,6 +286,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
                               )
                             )}
                           </CellEditor>
+                          </div>
                         </td>
                       );
                     })}

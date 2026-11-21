@@ -83,6 +83,11 @@ body {
   body { background: #fff; }
 }
 
+/* A phone page never scrolls sideways. Wide tables and carousels keep their own scroll box; this only stops stray overflow. */
+@media (max-width: 767px) {
+  html, body { overflow-x: clip; }
+}
+
 /* iOS Safari gives date/time inputs a wide built-in minimum width, so in a narrow row they overflow their box. */
 input[type="date"], input[type="time"], input[type="month"], input[type="datetime-local"] { min-width: 0; max-width: 100%; }
 

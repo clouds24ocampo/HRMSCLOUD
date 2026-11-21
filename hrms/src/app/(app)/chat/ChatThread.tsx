@@ -70,7 +70,7 @@ export function ChatThread({ conversationId, initial }: { conversationId: string
   };
 
   return (
-    <div className="flex h-[65vh] flex-col">
+    <div className="flex h-[calc(100dvh-19rem)] min-h-[20rem] flex-col md:h-[65vh]">
       <div className="flex-1 space-y-2 overflow-y-auto p-4" aria-live="polite" aria-label="Messages">
         {messages.length === 0 && <p className="text-center text-sm text-muted">No messages yet. Say hello.</p>}
         {messages.map((m) => (
@@ -94,7 +94,7 @@ export function ChatThread({ conversationId, initial }: { conversationId: string
           <button type="button" onClick={() => setFile(null)} aria-label="Remove attachment" className="px-1 text-muted hover:text-danger">×</button>
         </div>
       )}
-      <form onSubmit={send} className="flex flex-wrap gap-2 border-t border-line p-3">
+      <form onSubmit={send} className="sticky bottom-20 z-10 flex flex-wrap items-center gap-2 rounded-b-2xl border-t border-line bg-surface p-3 md:static">
         <label className={pick} title="Take a photo"><Icon name="camera" className="h-5 w-5" /><span className="sr-only">Use camera</span><input type="file" accept="image/*" capture="environment" onChange={choose} className="sr-only" /></label>
         <label className={pick} title="Attach a photo"><Icon name="image" className="h-5 w-5" /><span className="sr-only">Attach photo</span><input type="file" accept="image/png,image/jpeg" onChange={choose} className="sr-only" /></label>
         <label className={pick} title="Attach a file"><Icon name="attach" className="h-5 w-5" /><span className="sr-only">Attach file</span><input type="file" accept={FILE_ACCEPT} onChange={choose} className="sr-only" /></label>
@@ -102,9 +102,9 @@ export function ChatThread({ conversationId, initial }: { conversationId: string
         <textarea
           id="chat-text" value={text} onChange={(e) => setText(e.target.value)} rows={1} maxLength={4000} placeholder={file ? "Add a caption (optional)…" : "Write a message…"}
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) send(e); }}
-          className="min-w-0 flex-1 resize-none rounded-lg border border-line bg-surface px-3 py-2.5 text-base"
+          className="order-first min-h-11 w-full resize-none rounded-lg border border-line bg-surface px-3 py-2.5 text-base md:order-none md:w-auto md:min-w-0 md:flex-1"
         />
-        <button disabled={pending || (!text.trim() && !file)} className="rounded-lg bg-brand px-4 py-2.5 font-semibold text-brand-ink transition active:scale-95 disabled:opacity-60">Send</button>
+        <button disabled={pending || (!text.trim() && !file)} className="ml-auto min-h-11 rounded-lg bg-brand px-5 py-2.5 font-semibold text-brand-ink transition active:scale-95 disabled:opacity-60 md:ml-0">Send</button>
       </form>
       {error && <p role="alert" className="px-3 pb-2 text-sm text-danger">{error}</p>}
     </div>

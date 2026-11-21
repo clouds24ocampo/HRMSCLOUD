@@ -104,10 +104,10 @@ export default async function StagePage({ params, searchParams }: { params: Prom
     <div className="mx-auto max-w-6xl space-y-5">
       {head}
       <p className="text-sm text-muted">{blurb}</p>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Card className="text-center"><p className="text-3xl font-bold">{all.length}</p><p className="text-sm text-muted">In {label}</p></Card>
-        <Card className="text-center"><p className="text-3xl font-bold text-success">{ready}</p><p className="text-sm text-muted">{next === "HIRE" ? "Ready to hire" : "Ready to move on"}</p></Card>
-        <Card className="text-center"><p className="text-3xl font-bold">{average === null ? "–" : `${average}%`}</p><p className="text-sm text-muted">Average complete</p></Card>
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <Card className="p-3 text-center sm:p-5"><p className="text-2xl font-bold sm:text-3xl">{all.length}</p><p className="text-xs text-muted sm:text-sm">In {label}</p></Card>
+        <Card className="p-3 text-center sm:p-5"><p className="text-2xl font-bold text-success sm:text-3xl">{ready}</p><p className="text-xs text-muted sm:text-sm">{next === "HIRE" ? "Ready to hire" : "Ready to move on"}</p></Card>
+        <Card className="p-3 text-center sm:p-5"><p className="text-2xl font-bold sm:text-3xl">{average === null ? "–" : `${average}%`}</p><p className="text-xs text-muted sm:text-sm">Average complete</p></Card>
       </div>
       {filters}
       {rows.length === 0 ? (

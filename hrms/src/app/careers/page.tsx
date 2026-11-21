@@ -23,10 +23,10 @@ export default async function CareersPage() {
     <div className="min-h-dvh bg-white text-slate-900">
       <header className="sticky top-0 z-20 border-b border-line bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <Link href="/careers" className="flex items-center gap-2 font-headline text-lg font-medium text-brand"><Logo className="h-7 w-7" /> {org?.name ?? "HRMS"} <span className="font-normal text-slate-400">Careers</span></Link>
-          <nav className="flex items-center gap-2 text-sm font-medium">
+          <Link href="/careers" className="flex min-w-0 items-center gap-2 font-headline text-base font-medium text-brand sm:text-lg"><Logo className="h-7 w-7 shrink-0" /> <span className="truncate">{org?.name ?? "HRMS"}</span> <span className="hidden font-normal text-slate-400 sm:inline">Careers</span></Link>
+          <nav className="flex shrink-0 items-center gap-2 text-sm font-medium">
             <a href="#positions" className="hidden rounded-full px-4 py-2 text-slate-600 hover:text-brand sm:block">Open positions</a>
-            <Link href={me ? homeFor(me.role.key) : "/careers/login"} className="rounded-full border border-line px-4 py-2 transition hover:border-brand hover:text-brand">{!me ? "Applicant sign in" : applicant ? "My application" : "Back to workspace"}</Link>
+            <Link href={me ? homeFor(me.role.key) : "/careers/login"} className="whitespace-nowrap rounded-full border border-line px-4 py-2 transition hover:border-brand hover:text-brand">{!me ? "Applicant sign in" : applicant ? "My application" : "Back to workspace"}</Link>
           </nav>
         </div>
       </header>

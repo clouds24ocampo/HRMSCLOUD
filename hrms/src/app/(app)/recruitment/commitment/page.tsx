@@ -65,7 +65,7 @@ export default async function CommitmentResultsPage({ searchParams }: { searchPa
       />
       <RecruitmentTabs />
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <Card className="text-center"><p className="text-3xl font-bold">{average === null ? "–" : `${average}%`}</p><p className="text-sm text-muted">Average score</p></Card>
         {COMMITMENT_BANDS.map((b) => (
           <Link key={b.key} href={link({ band: band === b.key ? "" : b.key })} aria-current={band === b.key ? "true" : undefined} title={b.hint}

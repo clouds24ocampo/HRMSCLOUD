@@ -39,7 +39,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <Link href="/profile" className="block truncate font-semibold hover:text-brand hover:underline" title="My profile">{user.name}</Link>
             <p className="truncate text-xs text-muted">{user.organization.name} · {user.role.name}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <Link href="/chat" aria-label={unreadChat ? `Chat, ${unreadChat} unread` : "Chat"} className="relative rounded-lg px-2.5 py-2 text-muted transition hover:bg-bg hover:text-ink">
               <Icon name="chat" className="h-5 w-5" />
               {unreadChat > 0 && <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1 text-[11px] font-bold text-white">{unreadChat > 9 ? "9+" : unreadChat}</span>}
@@ -52,7 +52,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               Change password
             </Link>
             <form action={logout}>
-              <button className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium transition hover:bg-bg active:scale-95">
+              <button className="whitespace-nowrap rounded-lg border border-line px-3 py-1.5 text-sm font-medium transition hover:bg-bg active:scale-95">
                 Sign out
               </button>
             </form>
